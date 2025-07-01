@@ -13,30 +13,36 @@ const loginSchema = Joi.object({
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    
     const { error } = loginSchema.validate(req.body);
-    if (error) return res.status(400).json({ message: error.details[0].message });
+    if (error) {
+      
+      return res.status(400).json({ message: error.details[0].message });
+    }
 
     const { email, password } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
-
-    if (!user) return res.status(401).json({ message: "Email invalid" });
-
+   
+    if (!user) {
+      return res.status(401).json({ message: "Email invalid" });
+    }
     const passwordValid = await bcrypt.compare(password, user.password);
-    if (!passwordValid) return res.status(401).json({ message: "Parolă incorectă" });
-
+   
+    if (!passwordValid) {
+      return res.status(401).json({ message: "Parolă incorectă" });
+    }
     const token = jwt.sign(
       {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
       },
       process.env.JWT_SECRET as string,
       { expiresIn: "1d" }
     );
-
     return res.json({ token });
-  } catch (error) {
-    next(error);
+   } catch (error) {
+    return res.status(500).json({ message: "Eroare internă la login" });
   }
 };

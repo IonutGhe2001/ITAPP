@@ -23,7 +23,7 @@ app.use(rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100
 }));
-app.use(logRequest); // opțional: log requesturi
+ app.use(logRequest);
 
 // Routes
 app.use("/api/auth", authRoutes);
