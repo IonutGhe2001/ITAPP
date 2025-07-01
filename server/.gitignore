@@ -1,0 +1,21 @@
+# Node
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Prisma
+prisma/dev.db
+prisma/dev.db-journal
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+
+# IDE/OS
+.DS_Store
+*.swp

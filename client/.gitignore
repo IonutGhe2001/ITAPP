@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+.vite/
+
+# Build output
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Mac/Linux/Windows junk
+.DS_Store
+Thumbs.db

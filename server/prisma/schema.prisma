@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  password  String
+  name      String
+  role      String
+  createdAt DateTime @default(now())
+}
+
+model Angajat {
+  id            String       @id @default(uuid())
+  nume          String
+  prenume       String
+  email         String?
+  telefon       String?
+  echipamente   Echipament[] // Un angajat poate avea mai multe echipamente
+  createdAt     DateTime     @default(now())
+}
+
+model Echipament {
+  id           String    @id @default(uuid())
+  nume         String
+  tip          String    // "laptop", "telefon", etc.
+  stare        String    // "disponibil", "predat"
+  angajatId    String?   // poate fi null dacă nu e asignat
+  angajat      Angajat?  @relation(fields: [angajatId], references: [id])
+  createdAt    DateTime  @default(now())
+}

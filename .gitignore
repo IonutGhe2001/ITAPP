@@ -1,0 +1,42 @@
+# ----------------------------
+# GLOBAL IGNORE
+# ----------------------------
+node_modules/
+.env
+*.log
+.DS_Store
+Thumbs.db
+
+# ----------------------------
+# CLIENT-SPECIFIC (vite / react)
+# ----------------------------
+client/dist/
+client/.env
+client/.env.local
+client/.vite/
+client/.next/
+client/.cache/
+client/.turbo/
+
+# Editor / tooling
+client/.eslintcache
+client/.parcel-cache/
+client/.coverage/
+
+# ----------------------------
+# SERVER-SPECIFIC (express / prisma)
+# ----------------------------
+server/dist/
+server/build/
+server/.env
+server/.env.local
+
+# Prisma DB files
+server/prisma/dev.db*
+server/prisma/migrations/*/migration.sql
+server/prisma/*.sqlite*
+server/prisma/*.db
+
+# Editor files
+server/.coverage/
+server/.nyc_output/
