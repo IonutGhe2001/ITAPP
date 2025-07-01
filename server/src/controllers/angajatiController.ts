@@ -1,59 +1,72 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { prisma } from "../config/db";
+import Joi from "joi";
 
-// Get all angajati
-export const getAngajati = async (_: Request, res: Response) => {
+// Joi schema pentru validare input
+const angajatSchema = Joi.object({
+  nume: Joi.string().min(2).required(),
+  prenume: Joi.string().min(2).required(),
+  email: Joi.string().email().allow(null, ""),
+  telefon: Joi.string().min(10).allow(null, "")
+});
+
+// GET /api/angajati
+export const getAngajati = async (_: Request, res: Response, next: NextFunction) => {
   try {
     const angajati = await prisma.angajat.findMany({
-      include: { echipamente: true },
+      include: { echipamente: true }
     });
     res.json(angajati);
   } catch (err) {
-    res.status(500).json({ error: "Eroare la preluarea angajaților" });
+    next(err);
   }
 };
 
-// Create new angajat
-export const createAngajat = async (req: Request, res: Response) => {
+// POST /api/angajati
+export const createAngajat = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { nume, prenume, email, telefon } = req.body;
+    const { error } = angajatSchema.validate(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
 
+    const { nume, prenume, email, telefon } = req.body;
     const angajat = await prisma.angajat.create({
-      data: { nume, prenume, email, telefon },
+      data: { nume, prenume, email, telefon }
     });
 
     res.status(201).json(angajat);
   } catch (err) {
-    res.status(400).json({ error: "Eroare la creare angajat" });
+    next(err);
   }
 };
 
-// Update angajat
-export const updateAngajat = async (req: Request, res: Response) => {
+// PUT /api/angajati/:id
+export const updateAngajat = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const { email, telefon } = req.body;
 
     const updated = await prisma.angajat.update({
-      where: { id },
-      data: { email, telefon },
+      where: { id }, // ID este string (UUID), deci nu îl convertim
+      data: { email, telefon }
     });
 
     res.json(updated);
   } catch (err) {
-    res.status(400).json({ error: "Eroare la actualizare angajat" });
+    next(err);
   }
 };
 
-// Delete angajat
-export const deleteAngajat = async (req: Request, res: Response) => {
+// DELETE /api/angajati/:id
+export const deleteAngajat = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
 
-    await prisma.angajat.delete({ where: { id } });
+    await prisma.angajat.delete({
+      where: { id }
+    });
 
-    res.status(204).send();
+    res.json({ message: "Angajat șters cu succes." });
   } catch (err) {
-    res.status(400).json({ error: "Eroare la ștergere angajat" });
+    next(err);
   }
 };

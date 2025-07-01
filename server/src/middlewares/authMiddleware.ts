@@ -25,3 +25,15 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     return res.status(401).json({ message: "Token invalid" });
   }
 };
+
+export const authorizeRoles = (...roles: string[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const user = (req as any).user;
+
+    if (!user || !roles.includes(user.role)) {
+      return res.status(403).json({ message: "Acces interzis: rol insuficient" });
+    }
+
+    next();
+  };
+};
