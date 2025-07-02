@@ -4,8 +4,8 @@ import Joi from "joi";
 
 // Joi schema pentru validare input
 const angajatSchema = Joi.object({
-  nume: Joi.string().min(2).required(),
-  prenume: Joi.string().min(2).required(),
+  numeComplet: Joi.string().min(2).required(),
+  functie: Joi.string().min(2).required(),
   email: Joi.string().email().allow(null, ""),
   telefon: Joi.string().min(10).allow(null, "")
 });
@@ -28,9 +28,15 @@ export const createAngajat = async (req: Request, res: Response, next: NextFunct
     const { error } = angajatSchema.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
 
-    const { nume, prenume, email, telefon } = req.body;
+    const { numeComplet, functie, email, telefon } = req.body;
+
     const angajat = await prisma.angajat.create({
-      data: { nume, prenume, email, telefon }
+      data: {
+        numeComplet,
+        functie,
+        email,
+        telefon,
+      },
     });
 
     res.status(201).json(angajat);

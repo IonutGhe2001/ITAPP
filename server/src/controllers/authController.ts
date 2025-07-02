@@ -52,8 +52,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 export const getMe = (req: Request, res: Response) => {
   const user = (req as any).user;
 
-    console.log("USER IN /me:", user);
-
   if (!user) {
     return res.status(401).json({ message: "Neautentificat" });
   }

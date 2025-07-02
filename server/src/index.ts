@@ -19,10 +19,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(helmet());
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100
-}));
+
+const loginLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minut
+  max: 20, // max 20 cereri
+  message: "Prea multe încercări. Încearcă din nou mai târziu.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use("/api/auth/login", loginLimiter);
  app.use(logRequest);
 
 // Routes
