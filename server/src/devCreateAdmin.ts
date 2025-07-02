@@ -7,8 +7,10 @@ async function createAdmin() {
   const admin = await prisma.user.create({
     data: {
       email: "admin@itapp.com",
-      name: "Admin",
       password: hashedPassword,
+      nume: "Ionut",
+      prenume: "Gheba",
+      functie: "IT Manager",
       role: "admin"
     }
   });
