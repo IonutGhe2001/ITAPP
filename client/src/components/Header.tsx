@@ -21,7 +21,7 @@ export default function Header() {
 
  useEffect(() => {
   const token = localStorage.getItem("token");
-  console.log("TOKEN IN HEADER:", token); 
+ 
 
   if (!token) return;
 
@@ -30,7 +30,6 @@ export default function Header() {
       Authorization: `Bearer ${token}`,
     },
   }).then((res) => {
-    console.log("USER FROM /me:", res.data); 
     setUser(res.data);
   }).catch((err) => {
     console.error("Eroare la /me:", err);
