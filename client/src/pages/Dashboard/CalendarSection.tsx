@@ -1,13 +1,20 @@
-import { CalendarDaysIcon } from "lucide-react";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
 
 export default function CalendarSection() {
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow h-full">
-      <h2 className="text-sm font-semibold text-gray-600 mb-4">Calendar</h2>
-      <div className="flex flex-col items-center justify-center text-gray-400 h-full py-10">
-        <CalendarDaysIcon className="w-12 h-12 mb-2" />
-        <p className="text-sm">Integrare calendar in curs...</p>
+    <section aria-labelledby="calendar-heading">
+      <h2 id="calendar-heading" className="text-sm font-semibold text-primary mb-4">
+        Calendar
+      </h2>
+      <div className="rounded-xl border border-primary/20 bg-white overflow-hidden">
+        <DayPicker
+          mode="single"
+          selected={undefined}
+          onSelect={() => {}}
+          className="p-4 [&_.rdp-day_selected]:bg-primary [&_.rdp-day_selected]:text-white [&_.rdp-day]:rounded-md [&_.rdp-day]:transition [&_.rdp-day:hover]:bg-primary/10"
+        />
       </div>
-    </div>
+    </section>
   );
 }

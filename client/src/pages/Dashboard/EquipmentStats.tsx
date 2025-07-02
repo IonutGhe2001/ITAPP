@@ -13,21 +13,15 @@ export default function EquipmentStats() {
   const active = echipamente.filter((e) => e.stare === "predat").length;
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow">
-      <h2 className="text-sm font-semibold text-gray-600 mb-4">Statistici Echipamente</h2>
-      <div className="flex items-center gap-4">
-        <div className="p-4 bg-red-100 text-red-600 rounded-full">
-          <LaptopIcon className="w-6 h-6" />
-        </div>
-        <div className="text-sm">
-          <p>
-            <span className="font-bold text-xl">{total}</span> Total echipamente
-          </p>
-          <p className="text-green-600">
-            <span className="font-bold">{active}</span> Echipamente active
-          </p>
-        </div>
+    <section className="flex items-center gap-6">
+      <div className="p-4 bg-primary/10 text-primary rounded-xl">
+        <LaptopIcon className="w-8 h-8" />
       </div>
-    </div>
+      <div className="flex flex-col">
+        <h2 className="text-sm font-semibold text-primary">Echipamente</h2>
+        <p className="text-xl font-bold text-gray-900">{total} totale</p>
+        <p className="text-sm text-primary-dark">{active} active</p>
+      </div>
+    </section>
   );
 }

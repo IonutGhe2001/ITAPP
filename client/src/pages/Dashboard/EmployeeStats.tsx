@@ -10,18 +10,14 @@ export default function EmployeeStats() {
   }, []);
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow">
-      <h2 className="text-sm font-semibold text-gray-600 mb-4">Statistici Colegi</h2>
-      <div className="flex items-center gap-4">
-        <div className="p-4 bg-blue-100 text-blue-600 rounded-full">
-          <UsersIcon className="w-6 h-6" />
-        </div>
-        <div className="text-sm">
-          <p>
-            <span className="font-bold text-xl">{angajati.length}</span> Total colegi
-          </p>
-        </div>
+    <section className="flex items-center gap-6">
+      <div className="p-4 bg-primary/10 text-primary rounded-xl">
+        <UsersIcon className="w-8 h-8" />
       </div>
-    </div>
+      <div className="flex flex-col">
+        <h2 className="text-sm font-semibold text-primary">Colegi</h2>
+        <p className="text-xl font-bold text-gray-900">{angajati.length} în total</p>
+      </div>
+    </section>
   );
 }

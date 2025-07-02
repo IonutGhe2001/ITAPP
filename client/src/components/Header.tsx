@@ -12,15 +12,20 @@ export default function Header() {
   const title = pageTitles[location.pathname] || "Pagina";
 
   return (
-    <header className="flex justify-between items-center px-6 py-4 border-b shadow-sm">
-      <h1 className="text-lg font-semibold text-gray-800">{title}</h1>
-      
+    <header className="flex justify-between items-center px-6 py-4 bg-white border-b-2 border-primary shadow-sm sticky top-0 z-40 text-gray-900">
+      <h1 className="text-xl font-bold tracking-tight">{title}</h1>
+
       <div className="flex items-center gap-4">
-        <FaBell className="text-red-600 text-xl cursor-pointer" />
-        <FaUserCircle className="text-gray-600 text-3xl cursor-pointer" />
-        <div className="text-right">
-          <p className="font-semibold text-sm">Ionut G.</p>
-          <p className="text-xs text-gray-500">IT Manager</p>
+        <button className="relative p-2 rounded-full hover:bg-gray-100">
+          <FaBell className="text-primary text-lg" />
+        </button>
+
+        <div className="flex items-center gap-3 bg-primary/10 px-3 py-2 rounded-lg">
+          <FaUserCircle className="text-primary text-2xl" />
+          <div className="text-sm leading-tight">
+            <p className="font-semibold">Ionut G.</p>
+            <p className="text-xs text-primary">IT Manager</p>
+          </div>
         </div>
       </div>
     </header>

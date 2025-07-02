@@ -1,29 +1,32 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon, MonitorIcon, UsersIcon } from "lucide-react";
 
 export default function QuickAccess() {
   const navigate = useNavigate();
 
   const items = [
-    { label: "Echipamente", route: "/echipamente" },
-    { label: "Colegi", route: "/colegi" },
+    { label: "Echipamente", route: "/echipamente", icon: <MonitorIcon className="w-5 h-5" /> },
+    { label: "Colegi", route: "/colegi", icon: <UsersIcon className="w-5 h-5" /> },
   ];
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow">
-      <h2 className="text-sm font-semibold text-gray-600 mb-4">Accese rapide</h2>
+    <section>
+      <h2 className="text-sm font-semibold text-white mb-4">Accese rapide</h2>
       <ul className="flex flex-col gap-2">
         {items.map((item) => (
           <li
             key={item.route}
             onClick={() => navigate(item.route)}
-            className="flex items-center justify-between px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer"
+            className="flex items-center justify-between px-4 py-3 bg-white/20 hover:bg-white/30 rounded-xl cursor-pointer transition text-white"
           >
-            <span>{item.label}</span>
-            <ArrowRightIcon className="w-4 h-4 text-gray-500" />
+            <div className="flex items-center gap-3">
+              <div className="text-white">{item.icon}</div>
+              <span className="font-medium text-white">{item.label}</span>
+            </div>
+            <ArrowRightIcon className="w-4 h-4 text-white/70" />
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   );
 }
