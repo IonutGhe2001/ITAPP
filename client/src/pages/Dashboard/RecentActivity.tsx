@@ -1,10 +1,13 @@
 import { ClockIcon } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { ro } from "date-fns/locale";
 
 export default function RecentActivity() {
+  const now = new Date();
   const entries = [
-    "Echipament adăugat: Laptop ASUS - acum 2 ore",
-    "Angajat adăugat: Maria T. - acum 3 ore",
-    "SIM asociat unui telefon - acum 5 ore",
+    { message: "Echipament adăugat: Laptop ASUS", timestamp: new Date(now.getTime() - 2 * 60 * 60 * 1000) },
+    { message: "Angajat adăugat: Ionut G.", timestamp: new Date(now.getTime() - 3 * 60 * 60 * 1000) },
+    { message: "SIM asociat unui telefon", timestamp: new Date(now.getTime() - 5 * 60 * 60 * 1000) },
   ];
 
   return (
@@ -16,7 +19,12 @@ export default function RecentActivity() {
         {entries.map((entry, index) => (
           <li key={index} className="flex items-start gap-3">
             <ClockIcon className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-            <span className="truncate">{entry}</span>
+            <div className="flex flex-col">
+              <span className="truncate font-medium">{entry.message}</span>
+              <span className="text-xs text-gray-500">
+                {formatDistanceToNow(entry.timestamp, { addSuffix: true, locale: ro })}
+              </span>
+            </div>
           </li>
         ))}
       </ul>
