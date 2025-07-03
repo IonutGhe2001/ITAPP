@@ -10,6 +10,8 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
+      "@": resolve(__dirname, "src"),
+      "@hooks": resolve(__dirname, "src/hooks"),
       "@assets": resolve(__dirname, "src/assets"),
       "@pages": resolve(__dirname, "src/pages"),
       "@components": resolve(__dirname, "src/components"),

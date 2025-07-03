@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { createEchipament } from "../../services/echipamenteService";
 import { getAngajati } from "../../services/angajatiService";
-import { useToast } from "../../components/ToastProvider";
+import { useToast } from "@hooks/use-toast";
 
 export default function ModalAddEchipament({ onClose }: { onClose: () => void }) {
   const [formData, setFormData] = useState({
@@ -14,7 +14,7 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [angajati, setAngajati] = useState([]);
-  const toast = useToast();
+  const { toast } = useToast();
 
   useEffect(() => {
     getAngajati().then((res) => setAngajati(res.data));
@@ -39,12 +39,19 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
     };
 
     try {
-      await createEchipament(payload);
-      toast("Echipament adăugat", "success");
-      onClose();
-    } catch (err) {
-      toast("Eroare la adăugare echipament", "error");
-    }
+  await createEchipament(payload);
+  toast({
+    title: "Echipament adăugat",
+    description: "Echipamentul a fost salvat cu succes.",
+  });
+  onClose();
+} catch (err) {
+  toast({
+    title: "Eroare",
+    description: "Eroare la adăugare echipament.",
+    variant: "destructive",
+  });
+}
   };
 
   return (

@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { createAngajat } from "../../services/angajatiService";
-import { useToast } from "../../components/ToastProvider";
+import { useToast } from "@hooks/use-toast";
 
 export default function ModalAddColeg({ onClose }: { onClose: () => void }) {
   const [formData, setFormData] = useState({
@@ -12,7 +12,7 @@ export default function ModalAddColeg({ onClose }: { onClose: () => void }) {
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const toast = useToast();
+const { toast } = useToast();
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
@@ -31,12 +31,20 @@ export default function ModalAddColeg({ onClose }: { onClose: () => void }) {
   const handleSubmit = async () => {
     if (!validate()) return;
     try {
-      await createAngajat(formData);
-      toast("Coleg adăugat cu succes", "success");
-      onClose();
-    } catch (err) {
-      toast("Eroare la adăugare coleg", "error");
-    }
+  await createAngajat(formData);
+  toast({
+    title: "Coleg adăugat",
+    description: "Coleg adăugat cu succes.",
+  });
+  onClose();
+} catch (err) {
+  toast({
+    title: "Eroare",
+    description: "Eroare la adăugare coleg.",
+    variant: "destructive",
+  });
+}
+
   };
 
   return (

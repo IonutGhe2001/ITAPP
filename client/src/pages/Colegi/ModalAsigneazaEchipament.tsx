@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { getEchipamente, updateEchipament } from "../../services/echipamenteService";
 
@@ -25,6 +26,7 @@ export default function ModalAsigneazaEchipament({
 
     await updateEchipament(selectedId, {
       angajatId,
+      stare: "predat"  // asigurăm explicit statusul
     });
 
     onClose();

@@ -1,7 +1,13 @@
-import { FaBell, FaUserCircle } from "react-icons/fa";
+import { FaBell } from "react-icons/fa";
+import { UserCircle } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+import { Button } from "@components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@components/ui/dropdown-menu";
+
 
 const pageTitles: Record<string, string> = {
   "/": "Dashboard",
@@ -12,6 +18,11 @@ const pageTitles: Record<string, string> = {
 export default function Header() {
   const location = useLocation();
   const title = pageTitles[location.pathname] || "Pagina";
+  const navigate = useNavigate();
+  const handleLogout = () => {
+  localStorage.removeItem("token");
+  navigate("/login");
+};
 
   const [user, setUser] = useState<{
     nume: string;
@@ -19,42 +30,53 @@ export default function Header() {
     functie: string;
   } | null>(null);
 
- useEffect(() => {
-  const token = localStorage.getItem("token");
- 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-  if (!token) return;
-
-  axios.get("/api/auth/me", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }).then((res) => {
-    setUser(res.data);
-  }).catch((err) => {
-    console.error("Eroare la /me:", err);
-  });
-}, []);
+    axios.get("/api/auth/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => setUser(res.data))
+      .catch((err) => console.error("Eroare la /me:", err));
+  }, []);
 
   return (
-    <header className="flex justify-between items-center px-6 py-4 bg-white border-b-2 border-primary shadow-sm sticky top-0 z-40 text-gray-900">
-      <h1 className="text-xl font-bold tracking-tight">{title}</h1>
+    <header className="flex justify-between items-center px-6 py-4 bg-white dark:bg-gray-900 border-b shadow-sm sticky top-0 z-40">
+      <h1 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+        {title}
+      </h1>
 
       <div className="flex items-center gap-4">
-        <button className="relative p-2 rounded-full hover:bg-gray-100">
+        {/* Notificări */}
+        <Button variant="ghost" size="icon">
           <FaBell className="text-primary text-lg" />
-        </button>
+        </Button>
 
+
+        {/* User Dropdown */}
         {user && (
-          <div className="flex items-center gap-3 bg-primary/10 px-3 py-2 rounded-lg">
-            <FaUserCircle className="text-primary text-2xl" />
-            <div className="text-sm leading-tight">
-              <p className="font-semibold">
-                {user.nume} {user.prenume?.charAt(0)}.
-              </p>
-              <p className="text-xs text-primary">{user.functie}</p>
-            </div>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center gap-2">
+                <UserCircle className="text-primary text-2xl" />
+                <div className="hidden md:flex flex-col text-left">
+  <span className="text-sm font-semibold">
+    {user.nume} {user.prenume?.charAt(0)}.
+  </span>
+  <span className="text-xs text-gray-500 dark:text-gray-400">
+    {user.functie}
+  </span>
+</div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>Profil</DropdownMenuItem>
+             <DropdownMenuItem onClick={handleLogout}>
+  Logout
+</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
       </div>
     </header>
