@@ -1,7 +1,12 @@
 "use client";
 
-import { Toaster } from "@components/ui/toaster";
+import type { ReactNode } from "react";
+import { ToastProvider as InternalToastProvider } from "@/hooks/use-toast/useToast";
 
-export function ToastProvider() {
-  return <Toaster />;
+interface ToastProviderProps {
+  children: ReactNode;
+}
+
+export function ToastProvider({ children }: ToastProviderProps) {
+  return <InternalToastProvider>{children}</InternalToastProvider>;
 }

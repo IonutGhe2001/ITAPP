@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createEchipament } from "@/services/echipamenteService";
 import { getAngajati } from "@/services/angajatiService";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast/useToast";
 
 export default function ModalAddEchipament({ onClose }: { onClose: () => void }) {
   const [formData, setFormData] = useState({
