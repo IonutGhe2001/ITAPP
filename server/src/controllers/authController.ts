@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
 import Joi from "joi";
 
 const prisma = new PrismaClient();
@@ -30,6 +30,8 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return res.status(401).json({ message: "Parolă incorectă" });
     }
 
+    const expiresIn: string = process.env.JWT_EXPIRES_IN || "1d";
+
     const token = jwt.sign(
       {
         id: user.id,
@@ -40,7 +42,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         functie: user.functie,
       },
       process.env.JWT_SECRET as string,
-      { expiresIn: "1d" }
+      { expiresIn } as SignOptions  
     );
 
     return res.json({ token });

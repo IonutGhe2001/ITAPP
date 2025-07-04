@@ -9,6 +9,7 @@ import { logRequest } from "./utils/logger";
 import authRoutes from "./routes/auth";
 import echipamenteRoutes from "./routes/echipamente";
 import angajatiRoutes from "./routes/angajati";
+import evenimenteRoutes from "./routes/evenimente";
 import { authenticate } from "./middlewares/authMiddleware";
 
 dotenv.config();
@@ -35,6 +36,7 @@ app.use("/api/auth/login", loginLimiter);
 app.use("/api/auth", authRoutes);
 app.use("/api/echipamente", authenticate, echipamenteRoutes);
 app.use("/api/angajati", authenticate, angajatiRoutes);
+app.use("/api/evenimente", evenimenteRoutes);
 
 // Error handler middleware (final)
 app.use(errorHandler);

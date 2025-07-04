@@ -38,3 +38,11 @@ model Echipament {
   angajat    Angajat?  @relation(fields: [angajatId], references: [id])
   createdAt  DateTime  @default(now())
 }
+
+model Eveniment {
+  id        Int      @id @default(autoincrement())
+  titlu     String
+  data      DateTime
+  ora       String
+  userId    Int      
+}
