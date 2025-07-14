@@ -1,61 +1,64 @@
 export default {
-    darkMode: ["class"],
-    content: [
+  darkMode: ["class"],
+  content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-  	extend: {
-  		colors: {
-  			primary: {
-  				DEFAULT: 'hsl(var(--primary))',
-  				light: '#ef5350',
-  				dark: '#c62828',
-  				foreground: 'hsl(var(--primary-foreground))'
-  			},
-  			background: 'hsl(var(--background))',
-  			foreground: 'hsl(var(--foreground))',
-  			card: {
-  				DEFAULT: 'hsl(var(--card))',
-  				foreground: 'hsl(var(--card-foreground))'
-  			},
-  			popover: {
-  				DEFAULT: 'hsl(var(--popover))',
-  				foreground: 'hsl(var(--popover-foreground))'
-  			},
-  			secondary: {
-  				DEFAULT: 'hsl(var(--secondary))',
-  				foreground: 'hsl(var(--secondary-foreground))'
-  			},
-  			muted: {
-  				DEFAULT: 'hsl(var(--muted))',
-  				foreground: 'hsl(var(--muted-foreground))'
-  			},
-  			accent: {
-  				DEFAULT: 'hsl(var(--accent))',
-  				foreground: 'hsl(var(--accent-foreground))'
-  			},
-  			destructive: {
-  				DEFAULT: 'hsl(var(--destructive))',
-  				foreground: 'hsl(var(--destructive-foreground))'
-  			},
-  			border: 'hsl(var(--border))',
-  			input: 'hsl(var(--input))',
-  			ring: 'hsl(var(--ring))',
-  			chart: {
-  				'1': 'hsl(var(--chart-1))',
-  				'2': 'hsl(var(--chart-2))',
-  				'3': 'hsl(var(--chart-3))',
-  				'4': 'hsl(var(--chart-4))',
-  				'5': 'hsl(var(--chart-5))'
-  			}
-  		},
-  		borderRadius: {
-  			lg: 'var(--radius)',
-  			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
-  		}
-  	}
+    extend: {
+      colors: {
+        // Culoarea principală: roșu vibrant
+        primary: {
+          DEFAULT: '#E53935',
+          light: '#FFCDD2',
+          dark: '#B71C1C',
+          foreground: '#FFFFFF',
+        },
+        // Fundal principal
+        background: '#FFFFFF',
+        // Text de bază
+        foreground: '#212121',
+        // Zone neutre (ex: sidebar, carduri)
+        muted: {
+          DEFAULT: '#F5F5F5',
+          foreground: '#757575',
+        },
+        // Borduri și elemente UI
+        border: '#E0E0E0',
+        input: '#E0E0E0',
+        ring: '#E53935',
+        // Culori pentru stări de eroare sau acțiuni distructive
+        destructive: {
+          DEFAULT: '#D32F2F',
+          foreground: '#FFFFFF',
+        },
+        // Opționale – pentru viitoare completări:
+        accent: {
+          DEFAULT: '#FF8A80',
+          foreground: '#B71C1C',
+        },
+        card: {
+          DEFAULT: '#FFFFFF',
+          foreground: '#212121',
+        },
+        popover: {
+          DEFAULT: '#FFFFFF',
+          foreground: '#212121',
+        },
+        chart: {
+          '1': '#E53935',
+          '2': '#FF7043',
+          '3': '#FDD835',
+          '4': '#66BB6A',
+          '5': '#29B6F6',
+        },
+      },
+      borderRadius: {
+        lg: '1rem',
+        md: '0.75rem',
+        sm: '0.5rem',
+      },
+    },
   },
   plugins: [require("tailwindcss-animate")],
 };

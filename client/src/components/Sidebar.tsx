@@ -3,12 +3,11 @@ import { sidebarRoutes } from "../routes/sidebarRoutes";
 import { LogOut } from "lucide-react";
 
 export default function Sidebar() {
-  const navItemClass = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-3 px-4 py-2 rounded-md transition font-medium ${
-      isActive ? "bg-white text-primary" : "text-white/90 hover:bg-white/10"
-    }`;
-
   const navigate = useNavigate();
+
+  const navItemClass = ({ isActive }: { isActive: boolean }) =>
+    `group flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium
+     ${isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`;
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -16,26 +15,32 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="hidden md:flex md:flex-col fixed top-0 left-0 h-screen w-60 bg-gradient-to-b from-primary to-primary-dark text-sm py-8 px-4 z-40">
-      <div className="text-2xl font-bold text-white mb-8 pl-1">IT APP</div>
-      <nav className="flex flex-col gap-2">
+    <aside className="hidden md:flex md:flex-col fixed top-0 left-0 h-screen w-60 bg-background border-r border-border py-6 px-4 z-40 shadow-sm">
+      {/* Brand */}
+      <div className="text-2xl font-extrabold text-primary mb-10 tracking-tight pl-1 select-none">
+        IT <span className="text-foreground">APP</span>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex flex-col gap-1">
         {sidebarRoutes.map((route) => {
           const Icon = route.icon;
           return (
             <NavLink key={route.path} to={route.path} className={navItemClass}>
-              <Icon className="text-base" />
-              {route.label}
+              <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              <span>{route.label}</span>
             </NavLink>
           );
         })}
       </nav>
 
-      <div className="mt-auto pt-4 border-t border-white/20">
+      {/* Footer logout */}
+      <div className="mt-auto pt-6 border-t border-border">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-2 rounded-md text-white/90 hover:bg-white/10 transition text-sm w-full"
+          className="flex items-center gap-3 px-4 py-2 rounded-lg text-muted-foreground hover:bg-muted transition text-sm w-full"
         >
-          <LogOut className="text-base" />
+          <LogOut className="w-5 h-5" />
           Logout
         </button>
       </div>

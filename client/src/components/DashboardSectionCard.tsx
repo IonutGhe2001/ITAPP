@@ -1,7 +1,32 @@
-export default function DashboardSectionCard({ children }: { children: React.ReactNode }) {
+import { cn } from "@/lib/utils";
+
+type DashboardSectionCardProps = {
+  children: React.ReactNode;
+  className?: string;
+  title?: string;
+  icon?: React.ReactNode; 
+};
+
+export default function DashboardSectionCard({
+  children,
+  className,
+  title,
+  icon,
+}: DashboardSectionCardProps) {
   return (
-    <div className="rounded-3xl shadow-2xl shadow-pink-100/50 backdrop-blur-xl bg-white/80 border-0 p-8 transition-transform hover:scale-105 duration-300 ease-out">
-      {children}
-    </div>
+    <section
+      className={cn(
+        "rounded-2xl bg-white p-6 shadow-md border border-border transition-transform hover:shadow-lg hover:-translate-y-1",
+        className
+      )}
+    >
+      {(title || icon) && (
+        <div className="mb-4 flex items-center gap-2 text-xl font-semibold text-foreground">
+          {icon && <span className="text-2xl">{icon}</span>}
+          {title}
+        </div>
+      )}
+      <div>{children}</div>
+    </section>
   );
 }

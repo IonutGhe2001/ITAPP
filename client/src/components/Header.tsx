@@ -1,13 +1,17 @@
 import { FaBell } from "react-icons/fa";
-import { UserCircle } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { UserCircle, Search } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { Button } from "@components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@components/ui/dropdown-menu";
-import { getCurrentUser } from "@/services/authService";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@components/ui/dropdown-menu";
 
+import { getCurrentUser } from "@/services/authService";
 
 const pageTitles: Record<string, string> = {
   "/": "Dashboard",
@@ -20,7 +24,12 @@ export default function Header() {
   const navigate = useNavigate();
   const title = pageTitles[location.pathname] || "Pagina";
 
-  const [user, setUser] = useState<{ nume: string; prenume: string; functie: string } | null>(null);
+  const [user, setUser] = useState<{
+    nume: string;
+    prenume: string;
+    functie: string;
+  } | null>(null);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -36,32 +45,47 @@ export default function Header() {
   };
 
   const handleProfile = () => {
-    navigate("/profil"); 
+    navigate("/profil");
   };
 
   return (
-    <header className="flex justify-between items-center px-6 py-4 bg-white dark:bg-gray-900 border-b shadow-sm sticky top-0 z-40">
-      <h1 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-        {title}
-      </h1>
+    <header className="sticky top-0 z-40 flex items-center justify-between px-6 py-4 bg-background shadow-sm border-b border-border">
+      {/* Left: Titlu + Salut */}
+      <div className="flex flex-col">
+        <h1 className="text-sm text-muted-foreground tracking-wide uppercase">
+          {title}
+        </h1>
+        <p className="text-xl font-bold text-foreground flex items-center gap-1">
+          Salut{user ? `, ${user.nume}` : ""}{" "}
+          <span className="animate-wave origin-bottom">👋</span>
+        </p>
+      </div>
 
+      {/* Right: Search + Bell + User */}
       <div className="flex items-center gap-4">
-        {/* Notificări */}
-        <Button variant="ghost" size="icon">
-          <FaBell className="text-primary text-lg" />
+        <div className="relative hidden md:block">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Caută..."
+            className="pl-9 pr-4 py-2 text-sm bg-muted text-foreground rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        </div>
+
+        <Button variant="ghost" size="icon" className="hover:bg-muted">
+          <FaBell className="text-muted-foreground" />
         </Button>
 
-        {/* User Dropdown */}
         {user && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2">
+              <Button variant="ghost" className="flex items-center gap-2 px-2 hover:bg-muted">
                 <UserCircle className="text-primary text-2xl" />
                 <div className="hidden md:flex flex-col text-left">
                   <span className="text-sm font-semibold">
                     {user.nume} {user.prenume?.charAt(0)}.
                   </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                  <span className="text-xs text-muted-foreground">
                     {user.functie}
                   </span>
                 </div>
@@ -70,7 +94,7 @@ export default function Header() {
             <DropdownMenuContent align="end">
               {loading ? (
                 <DropdownMenuItem disabled>Se încarcă...</DropdownMenuItem>
-              ) : user ? (
+              ) : (
                 <>
                   <DropdownMenuItem onClick={handleProfile}>
                     Profil
@@ -79,10 +103,6 @@ export default function Header() {
                     Logout
                   </DropdownMenuItem>
                 </>
-              ) : (
-                <DropdownMenuItem onClick={handleLogout}>
-                  Logout
-                </DropdownMenuItem>
               )}
             </DropdownMenuContent>
           </DropdownMenu>

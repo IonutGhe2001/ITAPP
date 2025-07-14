@@ -1,54 +1,48 @@
-const API_URL = "/api/evenimente";
+import api from "./api";
 
-export async function fetchEvenimente(token: string) {
-  const res = await fetch(API_URL, {
+// Tipuri de bază
+export type EvenimentData = {
+  titlu: string;
+  ora: string;
+  data: Date;
+};
+
+export type Eveniment = EvenimentData & {
+  id: number;
+};
+
+// 🔍 Obține toate evenimentele
+export const fetchEvenimente = (token: string): Promise<Eveniment[]> => {
+  return api.get("/evenimente", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
-  });
-  if (!res.ok) {
-    throw new Error("Nu s-au putut încărca evenimentele.");
-  }
-  return res.json();
-}
+  }).then(res => res.data);
+};
 
-export async function createEveniment(token: string, eveniment: { titlu: string; data: string; ora: string }) {
-  const res = await fetch(API_URL, {
-    method: "POST",
+// ➕ Creează un nou eveniment
+export const createEveniment = (data: EvenimentData, token: string): Promise<Eveniment> => {
+  return api.post("/evenimente", data, {
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(eveniment),
-  });
+  }).then(res => res.data);
+};
 
-  if (!res.ok) {
-    throw new Error("Nu s-a putut crea evenimentul.");
-  }
-  return res.json();
-}
-
-export async function deleteEveniment(token: string, id: number) {
-  const res = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error("Nu s-a putut șterge evenimentul.");
-}
-
-export async function updateEveniment(
-  token: string,
-  id: number,
-  data: { titlu: string; ora: string; data?: string }
-) {
-  const res = await fetch(`${API_URL}/${id}`, {
-    method: "PATCH",
+// 📝 Actualizează un eveniment existent
+export const updateEveniment = (id: number, data: EvenimentData, token: string): Promise<Eveniment> => {
+  return api.patch(`/evenimente/${id}`, data, {
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw new Error("Nu s-a putut actualiza evenimentul.");
-  return res.json();
-}
+  }).then(res => res.data);
+};
+
+// ❌ Șterge un eveniment
+export const deleteEveniment = (id: number, token: string): Promise<void> => {
+  return api.delete(`/evenimente/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }).then(res => res.data);
+};
