@@ -14,7 +14,7 @@ const angajatSchema = Joi.object({
 export const getAngajati = async (_: Request, res: Response, next: NextFunction) => {
   try {
     const angajati = await prisma.angajat.findMany({
-      include: { echipamente: true }
+      select: { id: true, numeComplet: true }
     });
     res.json(angajati);
   } catch (err) {

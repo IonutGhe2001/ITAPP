@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
+import path from "path";
 import { errorHandler } from "./middlewares/errorHandler";
 import { logRequest } from "./utils/logger"; 
 
@@ -10,6 +11,7 @@ import authRoutes from "./routes/auth";
 import echipamenteRoutes from "./routes/echipamente";
 import angajatiRoutes from "./routes/angajati";
 import evenimenteRoutes from "./routes/evenimente";
+import proceseVerbaleRoutes from "./routes/proceseVerbale";
 import { authenticate } from "./middlewares/authMiddleware";
 
 dotenv.config();
@@ -29,6 +31,7 @@ const loginLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+app.use("/assets", express.static(path.join(__dirname, "../public/assets")));
 app.use("/api/auth/login", loginLimiter);
  app.use(logRequest);
 
@@ -37,6 +40,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/echipamente", authenticate, echipamenteRoutes);
 app.use("/api/angajati", authenticate, angajatiRoutes);
 app.use("/api/evenimente", evenimenteRoutes);
+app.use("/api/procese-verbale", proceseVerbaleRoutes);
 
 // Error handler middleware (final)
 app.use(errorHandler);

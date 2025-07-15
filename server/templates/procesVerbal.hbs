@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      height: 100%;
+    }
+
+    .page {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      padding: 50px 60px;
+      box-sizing: border-box;
+    }
+
+    .header,
+    .footer {
+      text-align: center;
+    }
+
+    .header img {
+      width: 100%;
+      max-height: 100px;
+    }
+
+    .footer img {
+      width: 100%;
+      max-height: 90px;
+    }
+
+    .main {
+      margin-top: 20px; /* distanță între header și conținut */
+    }
+
+    h2 {
+      text-align: center;
+      text-transform: uppercase;
+      margin-top: 0;
+    }
+
+    .content {
+      margin-top: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table, th, td {
+      border: 1px solid #000;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+
+    .signatures {
+      margin-top: 40px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .signatures div {
+      width: 40%;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <img src="{{headerImg}}" alt="Header" />
+    </div>
+
+    <div class="main">
+      <h2>PROCES VERBAL DE PREDARE – PRIMIRE ECHIPAMENTE</h2>
+
+      <div class="content">
+        Realizat astăzi în data de {{data}} în două exemplare, între
+        <strong>{{firma}}</strong>, cu sediul în Jud. Ilfov, Oraş Pantelimon, Strada RĂSCOALEI, Nr. 46
+        și <strong>{{angajat.numeComplet}}</strong>.
+      </div>
+
+      <div class="content">
+        Primul a predat iar ultimul a primit următoarele echipamente de lucru:
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Denumire echipament</th>
+            <th>SN</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each echipamente}}
+            <tr>
+              <td>{{tip}} {{nume}}</td>
+              <td>{{serie}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+
+      <div class="signatures">
+        <div>Am predat,<br /><br />______________</div>
+        <div>Am primit,<br /><br />______________</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <img src="{{footerImg}}" alt="Footer" />
+    </div>
+  </div>
+</body>
+</html>

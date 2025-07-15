@@ -26,6 +26,7 @@ model Angajat {
   telefon     String?
   echipamente Echipament[]
   createdAt   DateTime     @default(now())
+   proceseVerbale ProcesVerbal[] 
 }
 
 model Echipament {
@@ -37,6 +38,7 @@ model Echipament {
   angajatId  String?
   angajat    Angajat?  @relation(fields: [angajatId], references: [id])
   createdAt  DateTime  @default(now())
+  proceseVerbale ProcesVerbal[] @relation("EchipamenteProcesVerbal")
 }
 
 model Eveniment {
@@ -45,4 +47,13 @@ model Eveniment {
   data      DateTime
   ora       String
   userId    Int      
+}
+
+model ProcesVerbal {
+  id           String        @id @default(uuid())
+  angajatId    String
+  angajat      Angajat       @relation(fields: [angajatId], references: [id])
+  echipamente  Echipament[]  @relation("EchipamenteProcesVerbal")
+  dataGenerare DateTime      @default(now())
+  observatii   String?
 }
