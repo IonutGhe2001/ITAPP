@@ -1,15 +1,18 @@
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
+import { ro } from "date-fns/locale";
 
 type EventCalendarProps = {
   selected: Date | undefined;
   onSelect: (date: Date | undefined) => void;
+  onDoubleClick?: (date: Date) => void;
   highlightDates?: Date[];
 };
 
 export default function EventCalendar({
   selected,
   onSelect,
+  onDoubleClick,
   highlightDates = [],
 }: EventCalendarProps) {
   const normalizeDate = (date: Date) =>
@@ -20,18 +23,33 @@ export default function EventCalendar({
   };
 
   const modifiersClassNames = {
-    hasEvent: "has-event",
+    hasEvent:
+      "rounded-full bg-chart-1 text-white font-semibold hover:bg-chart-1/90",
+  };
+
+  const handleDayClick = (
+    date?: Date,
+    _modifiers?: unknown,
+    e?: React.MouseEvent
+  ) => {
+    if (!date) return;
+    if (e?.detail === 2) {
+      onDoubleClick?.(date);
+    } else {
+      onSelect?.(date);
+    }
   };
 
   return (
-    <div className="rounded-xl border border-border bg-background shadow-sm p-4 sm:p-6 w-full">
+    <div className="min-w-[350px] rounded-xl border border-border bg-card shadow-sm p-4 sm:p-6">
       <DayPicker
         mode="single"
         selected={selected}
-        onSelect={onSelect}
+        onDayClick={handleDayClick}
         modifiers={modifiers}
         modifiersClassNames={modifiersClassNames}
         showOutsideDays
+        locale={{ ...ro, options: { weekStartsOn: 1 } }}
       />
     </div>
   );

@@ -3,7 +3,14 @@
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { ro } from "date-fns/locale";
-import { Badge } from "@components/ui/badge";
+import { Badge } from "@/components/ui/badge";
+import { UserIcon, MonitorIcon, PhoneIcon } from "lucide-react";
+
+const updateIcons = {
+  Echipament: <MonitorIcon className="w-4 h-4" />,
+  Coleg: <UserIcon className="w-4 h-4" />,
+  SIM: <PhoneIcon className="w-4 h-4" />,
+};
 
 type Update = {
   id: number;
@@ -40,39 +47,29 @@ export default function RecentUpdates() {
     filter ? u.type.toLowerCase().includes(filter.toLowerCase()) : true
   );
 
-  const badgeVariant = {
-    Echipament: "secondary",
-    Coleg: "default",
-    SIM: "outline",
-  } as const;
-
   return (
-    <ul className="space-y-2">
-      {filteredUpdates.length > 0 ? (
-        filteredUpdates.map((update) => (
-          <li
-            key={update.id}
-            className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-muted p-4 rounded-lg border border-border shadow-sm hover:shadow transition group"
-          >
-            <div>
-              <p className="text-sm text-foreground group-hover:underline">
-                {update.message}
-              </p>
+    <ul className="space-y-4">
+      {filteredUpdates.map((update) => (
+        <li
+          key={update.id}
+          className="flex items-start gap-4 rounded-xl border border-border bg-card p-4 shadow-sm hover:shadow-md transition"
+        >
+          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-muted">
+            {updateIcons[update.type]}
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <Badge variant="outline">{update.type}</Badge>
               <span className="text-xs text-muted-foreground">
-                {formatDistanceToNow(update.timestamp, {
-                  addSuffix: true,
-                  locale: ro,
-                })}
+                {formatDistanceToNow(update.timestamp, { addSuffix: true, locale: ro })}
               </span>
             </div>
-            <Badge variant={badgeVariant[update.type]}>{update.type}</Badge>
-          </li>
-        ))
-      ) : (
-        <div className="text-center text-muted-foreground text-sm py-4">
-          Nu există update-uri recente. 🎉
-        </div>
-      )}
+            <p className="text-sm text-foreground leading-tight">
+              {update.message}
+            </p>
+          </div>
+        </li>
+      ))}
     </ul>
   );
 }

@@ -25,39 +25,32 @@ export default function EventList({ events, onEdit, onDelete }: EventListProps) 
   }
 
   return (
-    <ul className="space-y-3">
+    <ul className="space-y-4">
       {events.map((event) => {
         const isToday = new Date(event.data).toDateString() === new Date().toDateString();
 
         return (
           <li
             key={event.id}
-            className="flex justify-between items-start gap-4 p-4 bg-muted rounded-xl border border-border shadow-sm hover:shadow-md transition"
+            className="flex justify-between items-start gap-4 p-4 bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition"
           >
-            {/* Info eveniment */}
-            <div className="flex flex-col gap-1">
-              <span className="text-xs text-muted-foreground">
-  {event.ora || format(new Date(event.data), "HH:mm")}
-  {isToday && (
-    <Badge className="ml-1 bg-primary/10 text-primary">Astăzi</Badge>
-  )}
-</span>
-              <p className="text-sm font-medium text-foreground">{event.titlu}</p>
+            <div className="flex-1 space-y-1">
+              <div className="flex items-center gap-2">
+                <h4 className="font-semibold text-foreground">{event.titlu}</h4>
+                {isToday && <Badge variant="outline">Astăzi</Badge>}
+              </div>
+              <p className="text-sm text-muted-foreground">Ora {format(new Date(event.data), "HH:mm")}</p>
             </div>
-
-            {/* Acțiuni */}
-            <div className="flex gap-2 items-center mt-1">
+            <div className="flex gap-2 pt-1">
               <button
                 onClick={() => onEdit(event)}
-                aria-label="Editează"
-                className="rounded-md p-1 hover:bg-muted/70 transition text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-primary transition"
               >
                 <Pencil className="w-4 h-4" />
               </button>
               <button
                 onClick={() => onDelete(event.id)}
-                aria-label="Șterge"
-                className="rounded-md p-1 hover:bg-red-100 transition text-red-500 hover:text-red-600"
+                className="text-muted-foreground hover:text-destructive transition"
               >
                 <Trash2 className="w-4 h-4" />
               </button>

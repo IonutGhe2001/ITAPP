@@ -1,3 +1,5 @@
+"use client";
+
 import DashboardSectionCard from "@/components/DashboardSectionCard";
 import NavigationShortcuts from "./sections/NavigationShortcuts";
 import OverviewCards from "./sections/OverviewCards";
@@ -16,11 +18,21 @@ import {
   type EvenimentData,
 } from "@/services/evenimenteService";
 import { useAuth } from "@/store/authStore";
+import {
+  BarChartIcon,
+  FlashlightIcon,
+  CompassIcon,
+  Clock4Icon,
+  CalendarCheckIcon,
+} from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export default function Dashboard() {
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(new Date());
   const [evenimente, setEvenimente] = useState<Eveniment[]>([]);
   const [editing, setEditing] = useState<Eveniment | null>(null);
+  const [formDate, setFormDate] = useState<Date | null>(null);
+  const [showFormModal, setShowFormModal] = useState(false);
   const token = useAuth((state) => state.token);
 
   useEffect(() => {
@@ -34,6 +46,7 @@ export default function Dashboard() {
     if (!token) return;
     const nou = await createEveniment(data, token);
     setEvenimente((prev) => [...prev, nou]);
+    setShowFormModal(false);
   };
 
   const handleUpdate = async (id: number | null, data: EvenimentData) => {
@@ -43,6 +56,7 @@ export default function Dashboard() {
       prev.map((e) => (e.id === id ? updated : e))
     );
     setEditing(null);
+    setShowFormModal(false);
   };
 
   const handleDelete = async (id: number) => {
@@ -51,61 +65,80 @@ export default function Dashboard() {
     setEvenimente((prev) => prev.filter((e) => e.id !== id));
   };
 
+  const handleDayDoubleClick = (date: Date) => {
+    setFormDate(date);
+    setEditing(null);
+    setShowFormModal(true);
+  };
+
+  const handleEditEvent = (event: Eveniment) => {
+    setFormDate(new Date(event.data));
+    setEditing(event);
+    setShowFormModal(true);
+  };
+
   const eventsInDay = evenimente.filter(
     (e) => new Date(e.data).toDateString() === selectedDay?.toDateString()
   );
 
   return (
-    <div className="flex flex-col gap-10 px-4 lg:px-0">
-      {/* Secțiune 1: Sumar + Navigare + Acțiuni */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <DashboardSectionCard title="Statistici" icon="📊" className="md:col-span-3">
+    <div className="flex flex-col gap-8 p-6">
+      <DashboardSectionCard title="Prezentare generală" icon={<BarChartIcon />}>
+        <div className="flex flex-wrap gap-4 justify-start sm:justify-center">
           <OverviewCards />
-        </DashboardSectionCard>
-        <DashboardSectionCard title="Navigare rapidă" icon="🚀">
-          <NavigationShortcuts />
-        </DashboardSectionCard>
-        <DashboardSectionCard title="Acțiuni rapide" icon="⚡">
-          <QuickActions />
-        </DashboardSectionCard>
-      </section>
+        </div>
+      </DashboardSectionCard>
 
-      {/* Secțiune 2: Calendar + Evenimente */}
-      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        <DashboardSectionCard title="Calendar" icon="📅">
-          <EventCalendar
-            selected={selectedDay}
-            onSelect={(date) => date && setSelectedDay(date)}
-            highlightDates={evenimente.map((e) => new Date(e.data))}
-          />
-        </DashboardSectionCard>
-        <div className="lg:col-span-2 space-y-6">
-          <DashboardSectionCard title="Evenimente" icon="🗓️">
+      <DashboardSectionCard title="Evenimente" icon={<CalendarCheckIcon />} className="p-4">
+        <div className="flex flex-col lg:flex-row gap-6 overflow-hidden">
+          <div className="lg:w-[360px]">
+            <EventCalendar
+              selected={selectedDay}
+              onSelect={setSelectedDay}
+              onDoubleClick={handleDayDoubleClick}
+              highlightDates={evenimente.map((e) => new Date(e.data))}
+            />
+          </div>
+          <div className="flex-1 space-y-4">
             <EventList
               events={eventsInDay}
-              onEdit={(e) => setEditing(e)}
+              onEdit={handleEditEvent}
               onDelete={handleDelete}
             />
+          </div>
+        </div>
+      </DashboardSectionCard>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-6">
+          <DashboardSectionCard title="Acțiuni rapide" icon={<FlashlightIcon />}>
+            <QuickActions />
           </DashboardSectionCard>
-          <DashboardSectionCard title="Adaugă eveniment" icon="➕">
-            <EventForm
-              selectedDay={selectedDay ?? new Date()}
-              onSave={(id, data) =>
-                id ? handleUpdate(id, data) : handleCreate(data)
-              }
-              initial={editing}
-              onCancel={() => setEditing(null)}
-            />
+
+          <DashboardSectionCard title="Navigare" icon={<CompassIcon />}>
+            <NavigationShortcuts />
           </DashboardSectionCard>
         </div>
-      </section>
 
-      {/* Secțiune 3: Activitate Recentă */}
-      <section>
-        <DashboardSectionCard title="Update-uri recente" icon="📌">
-          <RecentUpdates />
+        <DashboardSectionCard title="Activitate recentă" icon={<Clock4Icon />} className="p-4">
+          <div className="max-h-[200px] overflow-y-auto text-sm">
+            <RecentUpdates />
+          </div>
         </DashboardSectionCard>
-      </section>
+      </div>
+
+      <Dialog open={showFormModal} onOpenChange={setShowFormModal}>
+        <DialogContent>
+          {formDate && (
+            <EventForm
+              selectedDay={formDate}
+              initial={editing}
+              onSave={editing ? handleUpdate : (_id, data) => handleCreate(data)}
+              onCancel={() => setShowFormModal(false)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

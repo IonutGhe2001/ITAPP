@@ -22,52 +22,47 @@ export default function EventForm({
   const [ora, setOra] = useState("");
   const { toast } = useToast();
 
- useEffect(() => {
-  console.log("Loaded initial event:", initial);
-  if (initial) {
-    setTitlu(initial.titlu);
-    setOra(initial.ora);
-  } else {
-    setTitlu("");
-    setOra("");
-  }
-}, [initial]);
+  useEffect(() => {
+    if (initial) {
+      setTitlu(initial.titlu);
+      setOra(initial.ora);
+    } else {
+      setTitlu("");
+      setOra("");
+    }
+  }, [initial]);
 
-const handleSubmit = (e: React.FormEvent) => {
-  e.preventDefault();
-  console.log("Submitting form", {
-    id: initial?.id,
-    titlu,
-    ora,
-    data: selectedDay,
-  });
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!titlu || !ora) {
+      toast({
+        title: "Completare necesară",
+        description: "Te rugăm să completezi toate câmpurile.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  if (!titlu.trim() || !ora) {
-    toast({
-      title: "Câmpuri incomplete",
-      description: "Completează titlul și ora pentru a salva evenimentul.",
-    });
-    return;
-  }
-
-  const data = { titlu, ora, data: selectedDay };
-  onSave(initial?.id ?? null, data);
-};
+    const data: EvenimentData = {
+      titlu,
+      ora,
+      data: selectedDay,
+    };
+    onSave(initial?.id ?? null, data);
+  };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-5 p-6 border border-border bg-muted rounded-xl shadow-sm"
+      
     >
       <div className="space-y-2">
         <Label htmlFor="titlu">Titlu eveniment</Label>
         <Input
           id="titlu"
-          type="text"
-          placeholder="Ex: Ședință echipă"
           value={titlu}
           onChange={(e) => setTitlu(e.target.value)}
-          required
+          placeholder="Ex: Ședință echipă"
         />
       </div>
 
@@ -75,23 +70,22 @@ const handleSubmit = (e: React.FormEvent) => {
         <Label htmlFor="ora">Ora</Label>
         <Input
           id="ora"
-          type="time"
           value={ora}
           onChange={(e) => setOra(e.target.value)}
-          required
+          placeholder="Ex: 14:00"
         />
       </div>
 
-      <div className="flex justify-end gap-2 pt-2">
-        {initial && (
-          <Button type="button" variant="ghost" onClick={onCancel}>
-            Anulează
-          </Button>
-        )}
-        <Button type="submit">
-          {initial ? "Salvează modificările" : "Adaugă eveniment"}
-        </Button>
-      </div>
+    <div className="flex justify-end gap-3 pt-2">
+  {initial && (
+    <Button type="button" variant="ghost" onClick={onCancel}>
+      Renunță
+    </Button>
+  )}
+  <Button type="submit">
+    Salvează
+  </Button>
+</div>
     </form>
   );
 }

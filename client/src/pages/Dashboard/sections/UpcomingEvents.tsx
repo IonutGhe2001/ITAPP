@@ -14,6 +14,8 @@ import { useAuth } from "@/store/authStore";
 import EventCalendar from "./upcoming-events/EventCalendar";
 import EventList from "./upcoming-events/EventList";
 import EventForm from "./upcoming-events/EventForm";
+import DashboardSectionCard from "@/components/DashboardSectionCard";
+import { CalendarCheckIcon } from "lucide-react";
 
 export default function UpcomingEvents() {
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(new Date());
@@ -34,23 +36,14 @@ export default function UpcomingEvents() {
     setEvenimente((prev) => [...prev, nou]);
   };
 
- const handleUpdate = async (id: number | null, data: EvenimentData) => {
-  console.log("handleUpdate CALLED", { id, data });
-  if (!token || id === null) {
-    console.warn("Token sau ID invalid pentru update.");
-    return;
-  }
-  try {
+  const handleUpdate = async (id: number | null, data: EvenimentData) => {
+    if (!token || id === null) return;
     const updated = await updateEveniment(id, data, token);
     setEvenimente((prev) =>
       prev.map((e) => (e.id === id ? updated : e))
     );
-    console.log("Eveniment actualizat cu succes:", updated);
     setEditing(null);
-  } catch (err) {
-    console.error("Eroare la actualizare:", err);
-  }
-};
+  };
 
   const handleDelete = async (id: number) => {
     if (!token) return;
@@ -58,39 +51,34 @@ export default function UpcomingEvents() {
     setEvenimente((prev) => prev.filter((e) => e.id !== id));
   };
 
-  const handleEdit = (event: Eveniment) => {
-    setEditing(event);
-    setSelectedDay(new Date(event.data));
-  };
-
   const eventsInDay = evenimente.filter(
-    (e) =>
-      new Date(e.data).toDateString() ===
-      selectedDay?.toDateString()
+    (e) => new Date(e.data).toDateString() === selectedDay?.toDateString()
   );
 
   return (
-    <div className="space-y-6">
-      <EventCalendar
-        selected={selectedDay}
-        onSelect={(date) => date && setSelectedDay(date)}
-        highlightDates={evenimente.map(
-          (e) => new Date(e.data)
-        )}
-      />
-      <EventList
-        events={eventsInDay}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
-      <EventForm
-        selectedDay={selectedDay ?? new Date()}
-        onSave={(id, data) =>
-          id ? handleUpdate(id, data) : handleCreate(data)
-        }
-        initial={editing}
-        onCancel={() => setEditing(null)}
-      />
-    </div>
+    <DashboardSectionCard title="Evenimente" icon={<CalendarCheckIcon />} className="p-0">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
+        <div className="lg:col-span-1">
+          <EventCalendar
+            selected={selectedDay}
+            onSelect={setSelectedDay}
+            highlightDates={evenimente.map((e) => new Date(e.data))}
+          />
+        </div>
+        <div className="lg:col-span-2 space-y-6">
+          <EventList
+            events={eventsInDay}
+            onEdit={setEditing}
+            onDelete={handleDelete}
+          />
+          <EventForm
+            selectedDay={selectedDay || new Date()}
+            initial={editing}
+            onSave={editing ? handleUpdate : (_id, data) => handleCreate(data)}
+            onCancel={() => setEditing(null)}
+          />
+        </div>
+      </div>
+    </DashboardSectionCard>
   );
 }
