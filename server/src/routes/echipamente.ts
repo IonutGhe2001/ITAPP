@@ -1,19 +1,16 @@
 import express from "express";
-import {
-  getEchipamente,
-  createEchipament,
-  updateEchipament,
-  deleteEchipament
-} from "../controllers/echipamenteController";
-
-import { authenticate, authorizeRoles } from "../middlewares/authMiddleware";
+import * as controller from "../controllers/echipamenteController";
+import { validateRequest } from "../middlewares/validateRequest";
+import { createEchipamentSchema, updateEchipamentSchema } from "../validators/echipament.validator";
+import { authenticate } from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
-// Protejăm toate rutele
-router.get("/", authenticate, getEchipamente);
-router.post("/", authenticate, authorizeRoles("admin"), createEchipament);
-router.put("/:id", authenticate, updateEchipament);
-router.delete("/:id", authenticate, authorizeRoles("admin"), deleteEchipament);
+router.use(authenticate);
+
+router.get("/", controller.getEchipamente);
+router.post("/", validateRequest(createEchipamentSchema), controller.createEchipament);
+router.put("/:id", validateRequest(updateEchipamentSchema), controller.updateEchipament);
+router.delete("/:id", controller.deleteEchipament);
 
 export default router;

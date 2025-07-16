@@ -1,12 +1,16 @@
-import { Router } from "express";
-import { getEvenimente, createEveniment, deleteEveniment, updateEveniment } from "../controllers/evenimenteController";
+import express from "express";
+import * as controller from "../controllers/evenimenteController";
+import { validateRequest } from "../middlewares/validateRequest";
+import { createEvenimentSchema, updateEvenimentSchema } from "../validators/eveniment.validator";
 import { authenticate } from "../middlewares/authMiddleware";
 
-const router = Router();
+const router = express.Router();
 
-router.get("/", authenticate, getEvenimente);
-router.post("/", authenticate, createEveniment);
-router.delete("/:id", authenticate, deleteEveniment);
-router.patch("/:id", authenticate, updateEveniment);
+router.use(authenticate);
+
+router.get("/", controller.getEvenimente);
+router.post("/", validateRequest(createEvenimentSchema), controller.createEveniment);
+router.patch("/:id", validateRequest(updateEvenimentSchema), controller.updateEveniment);
+router.delete("/:id", controller.deleteEveniment);
 
 export default router;

@@ -1,20 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import { prisma } from "../config/db";
-import { AuthPayload } from "../middlewares/authMiddleware";
-import Joi from "joi";
-
-const evenimentSchema = Joi.object({
-  titlu: Joi.string().min(2).required(),
-  data: Joi.date().required(),
-  ora: Joi.string().required(),
-});
+import * as evenimentService from "../services/eveniment.service";
 
 export const getEvenimente = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = req.user as AuthPayload;
-    const evenimente = await prisma.eveniment.findMany({
-      where: { userId: user.id },
-    });
+    const userId = Number((req.user as any).id);
+    const evenimente = await evenimentService.getEvenimenteByUser(userId);
     res.json(evenimente);
   } catch (err) {
     next(err);
@@ -23,75 +13,32 @@ export const getEvenimente = async (req: Request, res: Response, next: NextFunct
 
 export const createEveniment = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { error } = evenimentSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
-
-    const user = req.user as AuthPayload;
+    const userId = Number((req.user as any).id);
     const { titlu, data, ora } = req.body;
-
-    const eveniment = await prisma.eveniment.create({
-      data: {
-        titlu,
-        data: new Date(data),
-        ora,
-        userId: user.id,
-      },
+    const eveniment = await evenimentService.createEveniment({
+      titlu,
+      ora,
+      data: new Date(data),
+      userId,
     });
-
     res.status(201).json(eveniment);
   } catch (err) {
     next(err);
   }
 };
 
-export const deleteEveniment = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const user = req.user as AuthPayload;
-
-    const eveniment = await prisma.eveniment.findUnique({
-      where: { id: Number(id) },
-    });
-
-    if (!eveniment || eveniment.userId !== user.id) {
-      return res.status(404).json({ message: "Evenimentul nu a fost găsit." });
-    }
-
-    await prisma.eveniment.delete({ where: { id: Number(id) } });
-
-    res.status(204).send();
-  } catch (error) {
-    res.status(500).json({ message: "Eroare la ștergerea evenimentului." });
-  }
+export const updateEveniment = async (req: Request, res: Response) => {
+  const userId = Number((req.user as any).id);
+  const { id } = req.params;
+  const result = await evenimentService.updateEveniment(Number(id), userId, req.body);
+  if (!result) return res.status(404).json({ message: "Evenimentul nu a fost găsit." });
+  res.json(result);
 };
 
-export const updateEveniment = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const user = req.user as AuthPayload;
-    const { titlu, ora, data } = req.body;
-
-    const eveniment = await prisma.eveniment.findUnique({
-      where: { id: Number(id) },
-    });
-
-    if (!eveniment || eveniment.userId !== user.id) {
-      return res.status(404).json({ message: "Evenimentul nu a fost găsit." });
-    }
-
-    const updatedEveniment = await prisma.eveniment.update({
-      where: { id: Number(id) },
-      data: {
-        titlu,
-        ora,
-        data: data ? new Date(data) : eveniment.data,
-      },
-    });
-
-    res.json(updatedEveniment);
-  } catch (error) {
-    res.status(500).json({ message: "Eroare la actualizarea evenimentului." });
-  }
+export const deleteEveniment = async (req: Request, res: Response) => {
+  const userId = Number((req.user as any).id);
+  const { id } = req.params;
+  const success = await evenimentService.deleteEveniment(Number(id), userId);
+  if (!success) return res.status(404).json({ message: "Evenimentul nu a fost găsit." });
+  res.status(204).send();
 };

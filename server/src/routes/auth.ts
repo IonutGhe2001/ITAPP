@@ -1,11 +1,12 @@
-import { Router } from "express";
-import { getMe, login } from "../controllers/authController";
+import express from "express";
+import { login, getMe } from "../controllers/authController";
+import { validateRequest } from "../middlewares/validateRequest";
+import { loginSchema } from "../validators/auth.validator";
 import { authenticate } from "../middlewares/authMiddleware";
 
-const router = Router();
+const router = express.Router();
 
-// Rute publice
-router.post("/login", login);
+router.post("/login", validateRequest(loginSchema), login);
 router.get("/me", authenticate, getMe);
 
 export default router;
