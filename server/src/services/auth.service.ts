@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
 
@@ -33,4 +33,35 @@ export const authenticateUser = async (email: string, password: string): Promise
 
   const token = jwt.sign(payload, secret, options);
   return token;
+};
+
+export const registerUser = async (input: {
+  email: string;
+  password: string;
+  nume: string;
+  prenume: string;
+  functie: string;
+  role: string;
+}): Promise<User> => {
+  const { email, password, nume, prenume, functie, role } = input;
+
+  const existingUser = await prisma.user.findUnique({ where: { email } });
+  if (existingUser) {
+    throw new Error("Email deja înregistrat");
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const newUser = await prisma.user.create({
+    data: {
+      email,
+      password: hashedPassword,
+      nume,
+      prenume,
+      functie,
+      role,
+    },
+  });
+
+  return newUser;
 };
