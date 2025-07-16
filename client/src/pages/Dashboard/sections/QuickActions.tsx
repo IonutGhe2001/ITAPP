@@ -1,59 +1,47 @@
 "use client";
 
 import { useState } from "react";
-import { UserPlusIcon, LaptopIcon, FileTextIcon } from "lucide-react";
+import { UserPlusIcon, LaptopIcon, FileTextIcon, UserCogIcon } from "lucide-react";
 import ModalAddColeg from "../modals/ModalAddColeg";
 import ModalAddEchipament from "../modals/ModalAddEchipament";
 import ModalProcesVerbal from "../modals/ModalProcesVerbal";
+import ModalCreateUser from "../modals/ModalCreateUser"; // nou
 import { Button } from "@/components/ui/button";
 
 export default function QuickActions() {
   const [showColegModal, setShowColegModal] = useState(false);
   const [showEchipamentModal, setShowEchipamentModal] = useState(false);
   const [showProcesModal, setShowProcesModal] = useState(false);
+  const [showCreateUserModal, setShowCreateUserModal] = useState(false); // nou
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Button
-          onClick={() => setShowColegModal(true)}
-          variant="outline"
-          className="flex items-center justify-center gap-3 rounded-xl border border-border bg-chart-1/10 px-6 py-4 text-sm font-medium text-foreground shadow-sm hover:scale-105 hover:shadow-md transition-all duration-300"
-        >
-          <UserPlusIcon className="w-5 h-5 stroke-[1.5] text-chart-1 animate-in fade-in" />
-          Adaugă coleg
-        </Button>
+    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4">
+  <Button onClick={() => setShowColegModal(true)} variant="outline" className="min-w-[180px] flex items-center justify-center gap-3 rounded-2xl border bg-chart-1/10 px-6 py-4 text-sm font-medium text-foreground hover:scale-105 transition-all">
+    <UserPlusIcon className="w-5 h-5" />
+    Adaugă coleg
+  </Button>
 
-        <Button
-          onClick={() => setShowEchipamentModal(true)}
-          variant="outline"
-          className="flex items-center justify-center gap-3 rounded-xl border border-border bg-chart-2/10 px-6 py-4 text-sm font-medium text-foreground shadow-sm hover:scale-105 hover:shadow-md transition-all duration-300"
-        >
-          <LaptopIcon className="w-5 h-5 stroke-[1.5] text-chart-2 animate-in fade-in" />
-          Adaugă echipament
-        </Button>
+  <Button onClick={() => setShowEchipamentModal(true)} variant="outline" className="min-w-[180px] flex items-center justify-center gap-3 rounded-2xl border bg-chart-2/10 px-6 py-4 text-sm font-medium text-foreground hover:scale-105 transition-all">
+    <LaptopIcon className="w-5 h-5" />
+    Adaugă echipament
+  </Button>
 
-        <Button
-          onClick={() => setShowProcesModal(true)}
-          variant="outline"
-          className="flex items-center justify-center gap-3 rounded-xl border border-border bg-chart-3/10 px-6 py-4 text-sm font-medium text-foreground shadow-sm hover:scale-105 hover:shadow-md transition-all duration-300"
-        >
-          <FileTextIcon className="w-5 h-5 stroke-[1.5] text-chart-3 animate-in fade-in" />
-          Generează proces verbal
-        </Button>
-      </div>
+  <Button onClick={() => setShowProcesModal(true)} variant="outline" className="min-w-[180px] flex items-center justify-center gap-3 rounded-2xl border bg-chart-3/10 px-6 py-4 text-sm font-medium text-foreground hover:scale-105 transition-all">
+    <FileTextIcon className="w-5 h-5" />
+    Generează proces verbal
+  </Button>
 
-      {showColegModal && (
-        <ModalAddColeg onClose={() => setShowColegModal(false)} />
-      )}
+  <Button onClick={() => setShowCreateUserModal(true)} variant="outline" className="min-w-[180px] flex items-center justify-center gap-3 rounded-2xl border bg-chart-4/10 px-6 py-4 text-sm font-medium text-foreground hover:scale-105 transition-all">
+    <UserCogIcon className="w-5 h-5" />
+    Creează cont
+  </Button>
+</div>
 
-      {showEchipamentModal && (
-        <ModalAddEchipament onClose={() => setShowEchipamentModal(false)} />
-      )}
-
-      {showProcesModal && (
-        <ModalProcesVerbal onClose={() => setShowProcesModal(false)} />
-      )}
+      {showColegModal && <ModalAddColeg onClose={() => setShowColegModal(false)} />}
+      {showEchipamentModal && <ModalAddEchipament onClose={() => setShowEchipamentModal(false)} />}
+      {showProcesModal && <ModalProcesVerbal onClose={() => setShowProcesModal(false)} />}
+      {showCreateUserModal && <ModalCreateUser onClose={() => setShowCreateUserModal(false)} />}
     </>
   );
 }

@@ -37,26 +37,32 @@ export default function ModalProcesVerbal({ onClose }: ModalProcesVerbalProps) {
       .catch((err) => console.error("Eroare la încărcare angajați", err));
   }, []);
 
-  const genereazaProces = async () => {
-    if (!selectedId) return;
-    setLoading(true);
-    try {
-      const res = await axios.post(
-        "/api/procese-verbale",
-        { angajatId: selectedId },
-        { responseType: "blob" }
-      );
-      const file = new Blob([res.data], { type: "application/pdf" });
-      const url = URL.createObjectURL(file);
-      setPdfUrl(url);
-      toast({ title: "Proces verbal generat", description: "PDF-ul a fost creat cu succes." });
-    } catch (err) {
-      console.error("Eroare la generare proces verbal", err);
-      toast({ title: "Eroare", description: "Eroare la generarea PDF-ului.", variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
-  };
+ const genereazaProces = async () => {
+  if (!selectedId) return;
+  setLoading(true);
+  try {
+    const token = localStorage.getItem("token"); 
+    const res = await axios.post(
+      "/api/procese-verbale",
+      { angajatId: selectedId },
+      {
+        responseType: "blob",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const file = new Blob([res.data], { type: "application/pdf" });
+    const url = URL.createObjectURL(file);
+    setPdfUrl(url);
+    toast({ title: "Proces verbal generat", description: "PDF-ul a fost creat cu succes." });
+  } catch (err) {
+    console.error("Eroare la generare proces verbal", err);
+    toast({ title: "Eroare", description: "Eroare la generarea PDF-ului.", variant: "destructive" });
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <Dialog open onOpenChange={onClose}>
