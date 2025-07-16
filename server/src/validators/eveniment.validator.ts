@@ -3,7 +3,7 @@ import Joi from "joi";
 export const createEvenimentSchema = Joi.object({
   titlu: Joi.string().min(2).required(),
   data: Joi.date().required(),
-  ora: Joi.string().required(),
+  ora: Joi.string().allow("").optional()
 });
 
 export const updateEvenimentSchema = Joi.object({
