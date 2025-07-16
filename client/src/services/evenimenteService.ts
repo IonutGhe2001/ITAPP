@@ -3,7 +3,7 @@ import api from "./api";
 // Tipuri de bază
 export type EvenimentData = {
   titlu: string;
-  ora: string;
+  ora: string | null;
   data: Date;
 };
 

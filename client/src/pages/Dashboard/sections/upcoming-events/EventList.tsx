@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 type Eveniment = {
   id: number;
   titlu: string;
-  ora: string;
+  ora: string | null;
   data: Date;
 };
 
@@ -28,6 +28,7 @@ export default function EventList({ events, onEdit, onDelete }: EventListProps) 
     <ul className="space-y-4">
       {events.map((event) => {
         const isToday = new Date(event.data).toDateString() === new Date().toDateString();
+        const ziua = format(new Date(event.data), "EEEE", { locale: undefined });
 
         return (
           <li
@@ -39,7 +40,9 @@ export default function EventList({ events, onEdit, onDelete }: EventListProps) 
                 <h4 className="font-semibold text-foreground">{event.titlu}</h4>
                 {isToday && <Badge variant="outline">Astăzi</Badge>}
               </div>
-              <p className="text-sm text-muted-foreground">Ora {format(new Date(event.data), "HH:mm")}</p>
+              <p className="text-sm text-muted-foreground italic">
+                {event.ora ? `Ora ${event.ora}` : `Eveniment toată ziua (${ziua})`}
+              </p>
             </div>
             <div className="flex gap-2 pt-1">
               <button
