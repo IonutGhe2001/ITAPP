@@ -26,7 +26,6 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
     nume: "",
     serie: "",
     tip: "laptop",
-    stare: "disponibil", // automat, nu apare în UI
     angajatId: "none",
   });
 
@@ -49,24 +48,25 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async () => {
-    if (!validate()) return;
-    const payload = {
-      ...formData,
-      angajatId: formData.angajatId === "none" ? null : formData.angajatId,
-    };
-    try {
-      await createEchipament(payload);
-      toast({ title: "Echipament adăugat", description: "Echipamentul a fost salvat cu succes." });
-      onClose();
-    } catch (err) {
-      toast({
-        title: "Eroare",
-        description: "Eroare la adăugare echipament.",
-        variant: "destructive",
-      });
-    }
+const handleSubmit = async () => {
+  if (!validate()) return;
+  const payload = {
+    ...formData,
+    angajatId: formData.angajatId === "none" ? null : formData.angajatId,
   };
+
+  try {
+    await createEchipament(payload);
+    toast({ title: "Echipament adăugat", description: "Echipamentul a fost salvat cu succes." });
+    onClose();
+  } catch (err) {
+    toast({
+      title: "Eroare",
+      description: "Eroare la adăugare echipament.",
+      variant: "destructive",
+    });
+  }
+};
 
   return (
     <Dialog open onOpenChange={onClose}>
