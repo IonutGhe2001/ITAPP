@@ -3,7 +3,9 @@ const prisma = new PrismaClient();
 
 export const getAngajati = () => {
   return prisma.angajat.findMany({
-    select: { id: true, numeComplet: true },
+    include: {
+      echipamente: true, 
+    },
   });
 };
 
