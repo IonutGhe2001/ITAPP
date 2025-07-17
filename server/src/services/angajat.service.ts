@@ -3,8 +3,26 @@ const prisma = new PrismaClient();
 
 export const getAngajati = () => {
   return prisma.angajat.findMany({
-    include: {
-      echipamente: true, 
+    select: {
+      id: true,
+      numeComplet: true,
+      functie: true,
+      email: true,
+      telefon: true,
+      echipamente: {
+        where: {
+          angajatId: {
+            not: null,
+          },
+        },
+        select: { 
+          id: true,
+          nume: true,
+          tip: true,
+          serie: true,
+          stare: true,
+        },
+      },
     },
   });
 };

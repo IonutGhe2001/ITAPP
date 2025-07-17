@@ -28,18 +28,23 @@ export const updateEchipament = (
     nume?: string;
     tip?: string;
     serie?: string;
+    stare?: string;
     angajatId?: string | null;
   }
 ) => {
-  return prisma.echipament.update({
-    where: { id },
-    data: {
-      nume: data.nume ?? undefined,
-      tip: data.tip ?? undefined,
-      serie: data.serie ?? undefined,
-      angajatId: data.angajatId ?? undefined,
-    },
-  });
+return prisma.echipament.update({
+  where: { id },
+  data: {
+    ...(data.nume !== undefined && { nume: data.nume }),
+    ...(data.tip !== undefined && { tip: data.tip }),
+    ...(data.serie !== undefined && { serie: data.serie }),
+    ...(data.stare !== undefined && { stare: data.stare }),
+    ...(data.angajatId !== undefined && { angajatId: data.angajatId }),
+  },
+  include: {
+    angajat: true, 
+  },
+});
 };
 
 export const deleteEchipament = (id: string) => {
