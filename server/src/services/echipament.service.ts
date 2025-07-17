@@ -15,8 +15,24 @@ export const createEchipament = (data: {
   return prisma.echipament.create({ data });
 };
 
-export const updateEchipament = (id: string, data: { serie?: string }) => {
-  return prisma.echipament.update({ where: { id }, data });
+export const updateEchipament = (
+  id: string,
+  data: {
+    nume?: string;
+    tip?: string;
+    serie?: string;
+    angajatId?: string | null;
+  }
+) => {
+  return prisma.echipament.update({
+    where: { id },
+    data: {
+      nume: data.nume ?? undefined,
+      tip: data.tip ?? undefined,
+      serie: data.serie ?? undefined,
+      angajatId: data.angajatId ?? undefined,
+    },
+  });
 };
 
 export const deleteEchipament = (id: string) => {
