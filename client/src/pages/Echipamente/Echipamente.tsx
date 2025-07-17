@@ -54,17 +54,16 @@ export default function Echipamente() {
     setEchipamente((prev) => prev.filter((e) => e.id !== id));
   };
 
-  const handleEdit = async (data: any) => {
-
-  // Dacă obiectul are DOAR angajatId schimbat, și e apelat din buton context → update rapid
-  const isQuickUpdate = "angajatId" in data && !("stare" in data); // detectăm că e doar o acțiune rapidă
+ const handleEdit = async (data: any) => {
+  const isQuickUpdate = "angajatId" in data && data.__editMode !== true;
 
   if (isQuickUpdate) {
     const payload = {
       nume: data.nume?.trim() || "",
       tip: data.tip?.trim() || "",
       serie: data.serie?.trim() || "",
-      angajatId: data.angajatId ?? null,
+      angajatId: data.angajatId === null ? null : data.angajatId ?? null,
+      stare: data.stare ?? undefined,
     };
 
     Object.keys(payload).forEach((key) => {
@@ -74,10 +73,11 @@ export default function Echipamente() {
     });
 
     try {
-      const res = await updateEchipament(data.id, payload);
-      setEchipamente((prev) =>
-        prev.map((e) => (e.id === data.id ? res.data : e))
-      );
+     const res = await updateEchipament(data.id, payload);
+if (!res || !res.id) throw new Error("Obiectul returnat nu este valid");
+setEchipamente((prev) =>
+  prev.map((e) => (e?.id === data.id ? res : e))
+);
     } catch (error: any) {
       console.error("❌ Eroare la update rapid:", error.response?.data || error.message);
       alert("A apărut o eroare la actualizarea echipamentului.");
@@ -111,12 +111,17 @@ export default function Echipamente() {
         <ModalEditEchipament
           echipament={selected}
           onClose={() => setSelected(null)}
-          onUpdated={(updated: any) => {
-            setEchipamente((prev) =>
-              prev.map((e) => (e.id === updated.id ? updated : e))
-            );
-            setSelected(null);
-          }}
+        onUpdated={(updated: any) => {
+  if (!updated || !updated.id) {
+    console.error("⚠️ Obiectul actualizat e invalid:", updated);
+    return;
+  }
+
+  setEchipamente((prev) =>
+    prev.map((e) => (e?.id === updated.id ? updated : e))
+  );
+  setSelected(null);
+}}
         />
       )}
     </div>

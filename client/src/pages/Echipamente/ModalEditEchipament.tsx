@@ -78,28 +78,33 @@ export default function ModalEditEchipament({
   };
 
   const handleSubmit = async () => {
-    if (!validate()) return;
+  if (!validate()) return;
 
-    const payload = {
-      nume: formData.nume.trim(),
-      tip: formData.tip.trim(),
-      serie: formData.serie.trim(),
-      angajatId: formData.angajatId === "none" ? null : formData.angajatId,
-    };
-
-    try {
-      const updated = await updateEchipament(echipament.id, payload);
-      toast({ title: "Echipament salvat", description: "Modificările au fost salvate cu succes." });
-      onUpdated(updated.data);
-      onClose();
-    } catch (error) {
-      toast({
-        title: "Eroare la salvare",
-        description: "Actualizarea echipamentului a eșuat.",
-        variant: "destructive",
-      });
-    }
+  const payload = {
+    nume: formData.nume.trim(),
+    tip: formData.tip.trim(),
+    serie: formData.serie.trim(),
+    angajatId: formData.angajatId === "none" ? null : formData.angajatId,
   };
+
+  try {
+    const updated = await updateEchipament(echipament.id, payload);
+
+    toast({
+      title: "Echipament salvat",
+      description: "Modificările au fost salvate cu succes.",
+    });
+
+    onUpdated(updated); 
+    onClose();
+  } catch (error) {
+    toast({
+      title: "Eroare la salvare",
+      description: "Actualizarea echipamentului a eșuat.",
+      variant: "destructive",
+    });
+  }
+};
 
   return (
     <Dialog open onOpenChange={onClose}>

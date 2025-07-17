@@ -1,4 +1,3 @@
-
 import { useEffect, useState, type JSX } from "react";
 import profileIcon from "@assets/profile.png";
 import { getAngajati } from "../../services/angajatiService";
@@ -13,13 +12,18 @@ export default function Colegi() {
   const [colegi, setColegi] = useState<any[]>([]);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [selectedAngajatId, setSelectedAngajatId] = useState<string | null>(null);
+  const [refetchKey, setRefetchKey] = useState(0);
 
   const fetchAngajati = () =>
     getAngajati().then((res) => setColegi(res.data));
 
   useEffect(() => {
     fetchAngajati();
-  }, []);
+  }, [refetchKey]);
+
+  useEffect(() => {
+    console.log("COLEGI din backend:", colegi);
+  }, [colegi]);
 
   const toggleExpand = (id: string) => {
     setExpanded((prev) => (prev === id ? null : id));
@@ -33,7 +37,6 @@ export default function Colegi() {
 
   return (
     <div className="p-6 space-y-6">
-      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {colegi.map((coleg) => (
           <div
@@ -53,21 +56,21 @@ export default function Colegi() {
                 <p className="text-sm text-gray-600">{coleg.telefon}</p>
               </div>
             </div>
-      <div className="flex justify-between items-center gap-4 text-sm">
-            <button
-              onClick={() => toggleExpand(coleg.id)}
-              className="text-sm text-primary hover:underline self-start"
-            >
-              {expanded === coleg.id ? "Ascunde echipamente" : "Vezi echipamente"}
-            </button>
+            <div className="flex justify-between items-center gap-4 text-sm">
+              <button
+                onClick={() => toggleExpand(coleg.id)}
+                className="text-sm text-primary hover:underline self-start"
+              >
+                {expanded === coleg.id ? "Ascunde echipamente" : "Vezi echipamente"}
+              </button>
 
-            <button
-              onClick={() => setSelectedAngajatId(coleg.id)}
-              className="text-sm text-primary hover:underline self-start"
-            >
-              Asignează echipament
-            </button>
-      </div>
+              <button
+                onClick={() => setSelectedAngajatId(coleg.id)}
+                className="text-sm text-primary hover:underline self-start"
+              >
+                Asignează echipament
+              </button>
+            </div>
             {expanded === coleg.id && (
               <ul className="space-y-2 mt-2">
                 {coleg.echipamente.length === 0 ? (
@@ -102,7 +105,8 @@ export default function Colegi() {
           angajatId={selectedAngajatId}
           onClose={() => setSelectedAngajatId(null)}
           onSuccess={() => {
-            fetchAngajati();
+            setRefetchKey((k) => k + 1);
+            setExpanded(null); 
             setSelectedAngajatId(null);
           }}
         />

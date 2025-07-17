@@ -1,5 +1,14 @@
+import { useState } from "react";
 import { FaLaptop, FaMobileAlt, FaSimCard } from "react-icons/fa";
 import { PencilIcon, TrashIcon } from "lucide-react";
+import ModalPredaEchipament from "./ModalPredaEchipament";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 function getIcon(tip: string) {
   const baseStyle = "text-2xl text-primary";
@@ -18,11 +27,22 @@ export default function EquipmentCard({
   echipament,
   onEdit,
   onDelete,
+  onRefresh,
 }: {
   echipament: any;
   onEdit?: (echipament?: any) => void;
   onDelete?: () => void;
+  onRefresh?: () => void;
 }) {
+  const [showModal, setShowModal] = useState(false);
+  const [confirmRecupereaza, setConfirmRecupereaza] = useState(false);
+
+  const handleConfirmRecupereaza = () => {
+    onEdit?.({ ...echipament, angajatId: null, stare: "disponibil" });
+    setConfirmRecupereaza(false);
+    onRefresh?.();
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-md p-5 flex items-center justify-between transition hover:shadow-lg">
       <div className="flex items-center gap-4">
@@ -40,7 +60,6 @@ export default function EquipmentCard({
       </div>
 
       <div className="flex flex-col items-end gap-2">
-        {/* Badge de stare */}
         <span
           className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${
             echipament.stare === "disponibil"
@@ -51,10 +70,9 @@ export default function EquipmentCard({
           {echipament.stare}
         </span>
 
-        {/* Acțiune contextuală */}
         {echipament.stare === "disponibil" ? (
           <button
-            onClick={onEdit}
+            onClick={() => setShowModal(true)}
             className="text-xs text-blue-600 hover:underline"
             title="Predă echipamentul"
           >
@@ -62,11 +80,7 @@ export default function EquipmentCard({
           </button>
         ) : (
           <button
-            onClick={() => {
-              if (confirm("Recuperezi echipamentul de la angajat?")) {
-                onEdit?.({ ...echipament, angajatId: null });
-              }
-            }}
+            onClick={() => setConfirmRecupereaza(true)}
             className="text-xs text-red-600 hover:underline"
             title="Recuperează echipamentul"
           >
@@ -74,16 +88,48 @@ export default function EquipmentCard({
           </button>
         )}
 
-        {/* Acțiuni clasice */}
         <div className="flex gap-2">
-  <button onClick={() => onEdit?.(echipament)} title="Editează">
-    <PencilIcon className="w-4 h-4 text-primary hover:text-primary-dark" />
-  </button>
-  <button onClick={onDelete} title="Șterge">
-    <TrashIcon className="w-4 h-4 text-primary hover:text-primary-dark" />
-  </button>
-</div>
+          <button onClick={() => onEdit?.({ ...echipament, __editMode: true })} title="Editează">
+  <PencilIcon className="w-4 h-4 text-primary hover:text-primary-dark" />
+</button>
+          <button onClick={onDelete} title="Șterge">
+            <TrashIcon className="w-4 h-4 text-primary hover:text-primary-dark" />
+          </button>
+        </div>
       </div>
+
+      {showModal && (
+        <ModalPredaEchipament
+          echipament={echipament}
+          onClose={() => setShowModal(false)}
+          onSubmit={(data) => {
+            onEdit?.(data);
+            setShowModal(false);
+            onRefresh?.();
+          }}
+        />
+      )}
+
+      {confirmRecupereaza && (
+        <Dialog open onOpenChange={setConfirmRecupereaza}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirmare recuperare</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-gray-700">
+              Sigur dorești să recuperezi acest echipament? Acesta va deveni disponibil și va fi disasociat de angajat.
+            </p>
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="outline" onClick={() => setConfirmRecupereaza(false)}>
+                Anulează
+              </Button>
+              <Button variant="default" onClick={handleConfirmRecupereaza}>
+                Confirmă
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
