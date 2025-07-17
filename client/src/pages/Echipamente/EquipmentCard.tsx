@@ -20,7 +20,7 @@ export default function EquipmentCard({
   onDelete,
 }: {
   echipament: any;
-  onEdit?: () => void;
+  onEdit?: (echipament?: any) => void;
   onDelete?: () => void;
 }) {
   return (
@@ -38,24 +38,51 @@ export default function EquipmentCard({
           )}
         </div>
       </div>
+
       <div className="flex flex-col items-end gap-2">
+        {/* Badge de stare */}
         <span
           className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${
             echipament.stare === "disponibil"
-              ? "bg-primary/10 text-primary"
-              : "bg-primary text-white"
+              ? "bg-green-100 text-green-800"
+              : "bg-blue-100 text-blue-800"
           }`}
         >
           {echipament.stare}
         </span>
+
+        {/* Acțiune contextuală */}
+        {echipament.stare === "disponibil" ? (
+          <button
+            onClick={onEdit}
+            className="text-xs text-blue-600 hover:underline"
+            title="Predă echipamentul"
+          >
+            Predă
+          </button>
+        ) : (
+          <button
+            onClick={() => {
+              if (confirm("Recuperezi echipamentul de la angajat?")) {
+                onEdit?.({ ...echipament, angajatId: null });
+              }
+            }}
+            className="text-xs text-red-600 hover:underline"
+            title="Recuperează echipamentul"
+          >
+            Recuperează
+          </button>
+        )}
+
+        {/* Acțiuni clasice */}
         <div className="flex gap-2">
-          <button onClick={onEdit} title="Editează">
-            <PencilIcon className="w-4 h-4 text-primary hover:text-primary-dark" />
-          </button>
-          <button onClick={onDelete} title="Șterge">
-            <TrashIcon className="w-4 h-4 text-primary hover:text-primary-dark" />
-          </button>
-        </div>
+  <button onClick={() => onEdit?.(echipament)} title="Editează">
+    <PencilIcon className="w-4 h-4 text-primary hover:text-primary-dark" />
+  </button>
+  <button onClick={onDelete} title="Șterge">
+    <TrashIcon className="w-4 h-4 text-primary hover:text-primary-dark" />
+  </button>
+</div>
       </div>
     </div>
   );

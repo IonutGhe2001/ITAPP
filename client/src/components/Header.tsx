@@ -50,15 +50,11 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between px-6 py-4 bg-background shadow-sm border-b border-border">
-      {/* Left: Titlu + Salut */}
+      {/* Left: Titlu  */}
       <div className="flex flex-col">
         <h1 className="text-sm text-muted-foreground tracking-wide uppercase">
           {title}
         </h1>
-        <p className="text-xl font-bold text-foreground flex items-center gap-1">
-          Salut{user ? `, ${user.nume}` : ""}{" "}
-          <span className="animate-wave origin-bottom">👋</span>
-        </p>
       </div>
 
       {/* Right: Search + Bell + User */}

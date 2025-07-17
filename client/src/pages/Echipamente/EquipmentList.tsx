@@ -6,7 +6,7 @@ export default function EquipmentList({
   onDelete,
 }: {
   echipamente: any[];
-  onEdit?: (id: string) => void;
+  onEdit?: (echipament: any) => void;
   onDelete?: (id: string) => void;
 }) {
   if (echipamente.length === 0) {
@@ -23,7 +23,13 @@ export default function EquipmentList({
         <EquipmentCard
           key={eq.id}
           echipament={eq}
-          onEdit={() => onEdit?.(eq.id)}
+          onEdit={(val) => {
+            if (typeof val === "object") {
+              onEdit?.(val); // predare/recuperare directă
+            } else {
+              onEdit?.(eq); // editare clasică
+            }
+          }}
           onDelete={() => onDelete?.(eq.id)}
         />
       ))}
