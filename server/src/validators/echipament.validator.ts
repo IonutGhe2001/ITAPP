@@ -3,7 +3,7 @@ import Joi from "joi";
 export const createEchipamentSchema = Joi.object({
   nume: Joi.string().required(),
   tip: Joi.string().required(),
-  stare: Joi.string().required(),
+  stare: Joi.string().optional(),
   serie: Joi.string().required(),
   angajatId: Joi.string().uuid().allow(null, ""),
 });

@@ -8,11 +8,18 @@ export const getEchipamente = () => {
 export const createEchipament = (data: {
   nume: string;
   tip: string;
-  stare: string;
+  stare?: string; 
   serie: string;
   angajatId?: string | null;
 }) => {
-  return prisma.echipament.create({ data });
+  const finalStare = data.angajatId ? "asignat" : "disponibil";
+
+  return prisma.echipament.create({
+    data: {
+      ...data,
+      stare: finalStare,
+    },
+  });
 };
 
 export const updateEchipament = (
