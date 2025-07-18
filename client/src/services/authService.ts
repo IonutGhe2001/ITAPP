@@ -20,3 +20,21 @@ export const getCurrentUser = async () => {
   }
 };
 
+export const updateCurrentUser = async (data: Partial<{
+  nume: string;
+  prenume: string;
+  functie: string;
+  telefon?: string;
+  profilePicture?: string;
+}>) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Neautentificat");
+
+  const res = await axios.patch("/api/auth/me", data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};

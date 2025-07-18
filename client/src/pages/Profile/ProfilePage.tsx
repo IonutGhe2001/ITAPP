@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Pencil } from "lucide-react";
-import { getCurrentUser } from "@/services/authService";
+import { getCurrentUser, updateCurrentUser } from "@/services/authService";
 
 const fallbackImage = "/src/assets/profile.png";
 
@@ -15,9 +15,15 @@ type UserProfile = {
 
 export default function ProfilePage() {
   const [user, setUser] = useState<UserProfile | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [original, setOriginal] = useState<UserProfile | null>(null);
 
   useEffect(() => {
-    getCurrentUser().then(setUser);
+    getCurrentUser().then((data) => {
+      setUser(data);
+      setOriginal(data);
+    });
   }, []);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,6 +37,31 @@ export default function ProfilePage() {
     }
   };
 
+  const handleChange = (field: keyof UserProfile) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUser((prev) => prev ? { ...prev, [field]: e.target.value } : prev);
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    try {
+      const updated = await updateCurrentUser(user);
+      setUser(updated);
+      setOriginal(updated);
+      setIsEditing(false);
+    } catch (err) {
+      console.error("Eroare la salvare:", err);
+      alert("A apărut o eroare la salvarea profilului.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setUser(original);
+    setIsEditing(false);
+  };
+
   return (
     <div className="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold text-foreground mb-8">Profilul meu</h1>
@@ -42,26 +73,66 @@ export default function ProfilePage() {
             alt="Profil"
             className="w-32 h-32 rounded-full object-cover border-4 border-primary shadow"
           />
-          <label
-            htmlFor="profile-picture"
-            className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full cursor-pointer shadow"
-          >
-            <Pencil size={16} />
-            <input
-              id="profile-picture"
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
-          </label>
+          {isEditing && (
+            <label
+              htmlFor="profile-picture"
+              className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full cursor-pointer shadow"
+            >
+              <Pencil size={16} />
+              <input
+                id="profile-picture"
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </label>
+          )}
         </div>
 
         <div className="w-full space-y-4">
-          <ProfileField label="Nume complet" value={`${user?.nume ?? ""} ${user?.prenume ?? ""}`} />
-          <ProfileField label="Email" value={user?.email} />
-          <ProfileField label="Funcție" value={user?.functie} />
-          <ProfileField label="Telefon" value={user?.telefon || "-"} />
+          {isEditing ? (
+            <>
+              <ProfileInput label="Nume" value={user?.nume} onChange={handleChange("nume")} />
+              <ProfileInput label="Prenume" value={user?.prenume} onChange={handleChange("prenume")} />
+              <ProfileInput label="Funcție" value={user?.functie} onChange={handleChange("functie")} />
+              <ProfileInput label="Telefon" value={user?.telefon || ""} onChange={handleChange("telefon")} />
+            </>
+          ) : (
+            <>
+              <ProfileField label="Nume complet" value={`${user?.nume ?? ""} ${user?.prenume ?? ""}`} />
+              <ProfileField label="Email" value={user?.email} />
+              <ProfileField label="Funcție" value={user?.functie} />
+              <ProfileField label="Telefon" value={user?.telefon || "-"} />
+            </>
+          )}
+        </div>
+
+        <div className="flex gap-4 mt-6">
+          {isEditing ? (
+            <>
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary/80 transition"
+              >
+                {isSaving ? "Se salvează..." : "Salvează"}
+              </button>
+              <button
+                onClick={handleCancel}
+                className="px-6 py-2 bg-muted text-foreground rounded-xl hover:bg-muted/70 transition"
+              >
+                Anulează
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary/80 transition"
+            >
+              Editează
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -73,6 +144,20 @@ function ProfileField({ label, value }: { label: string; value?: string }) {
     <div>
       <p className="text-sm text-muted-foreground">{label}</p>
       <p className="text-base font-medium text-foreground">{value}</p>
+    </div>
+  );
+}
+
+function ProfileInput({ label, value, onChange }: { label: string; value?: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void }) {
+  return (
+    <div>
+      <p className="text-sm text-muted-foreground">{label}</p>
+      <input
+        type="text"
+        value={value || ""}
+        onChange={onChange}
+        className="text-base font-medium text-foreground w-full bg-transparent border-b border-border focus:outline-none focus:border-primary"
+      />
     </div>
   );
 }
