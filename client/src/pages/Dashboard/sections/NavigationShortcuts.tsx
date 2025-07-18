@@ -1,7 +1,7 @@
 "use client";
 
 import { useNavigate } from "react-router-dom";
-import { MonitorIcon, UsersIcon } from "lucide-react";
+import { MonitorIcon, UsersIcon, UserCircle } from "lucide-react";
 
 const shortcuts = [
   {
@@ -18,6 +18,13 @@ const shortcuts = [
     icon: <UsersIcon className="w-5 h-5 stroke-[1.5]" />,
     color: "bg-chart-1/10 text-chart-1",
   },
+  {
+  id: 3,
+  label: "Profil",
+  route: "/profil",
+  icon: <UserCircle className="w-5 h-5 stroke-[1.5]" />,
+  color: "bg-primary/10 text-primary",
+}
 ];
 
 export default function NavigationShortcuts() {

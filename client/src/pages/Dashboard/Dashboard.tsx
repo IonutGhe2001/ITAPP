@@ -120,11 +120,13 @@ export default function Dashboard() {
           </DashboardSectionCard>
         </div>
 
-        <DashboardSectionCard title="Activitate recentă" icon={<Clock4Icon />} className="p-4">
-          <div className="max-h-[200px] overflow-y-auto text-sm">
-            <RecentUpdates />
-          </div>
-        </DashboardSectionCard>
+  <DashboardSectionCard
+  title="Activitate recentă"
+  icon={<Clock4Icon />}
+  className="p-4 h-64 flex flex-col"
+>
+  <RecentUpdates />
+</DashboardSectionCard>
       </div>
 
       <Dialog open={showFormModal} onOpenChange={setShowFormModal}>

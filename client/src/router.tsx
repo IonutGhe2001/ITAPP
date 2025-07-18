@@ -7,6 +7,7 @@ const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard"));
 const Echipamente = lazy(() => import("./pages/Echipamente/Echipamente"));
 const Colegi = lazy(() => import("./pages/Colegi/Colegi"));
 const AppLayout = lazy(() => import("./layouts/AppLayout"));
+const ProfilePage = lazy(() => import("./pages/Profile/ProfilePage"));
 
 // Componentă pentru rute protejate
 function ProtectedRoute({ children }: { children: JSX.Element }) {
@@ -37,6 +38,7 @@ export default function AppRouter() {
             <Route index element={<Dashboard />} />
             <Route path="echipamente" element={<Echipamente />} />
             <Route path="colegi" element={<Colegi />} />
+            <Route path="profil" element={<ProfilePage />} />
           </Route>
         </Routes>
       </Suspense>

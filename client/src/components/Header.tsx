@@ -1,5 +1,5 @@
 import { FaBell } from "react-icons/fa";
-import { UserCircle, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
@@ -17,6 +17,7 @@ const pageTitles: Record<string, string> = {
   "/": "Dashboard",
   "/echipamente": "Echipamente",
   "/colegi": "Colegi",
+  "/profil": "Profil",
 };
 
 export default function Header() {
@@ -24,11 +25,12 @@ export default function Header() {
   const navigate = useNavigate();
   const title = pageTitles[location.pathname] || "Pagina";
 
-  const [user, setUser] = useState<{
-    nume: string;
-    prenume: string;
-    functie: string;
-  } | null>(null);
+const [user, setUser] = useState<{
+  nume: string;
+  prenume: string;
+  functie: string;
+  profilePicture?: string;
+} | null>(null);
 
   const [loading, setLoading] = useState(true);
 
@@ -76,7 +78,11 @@ export default function Header() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 px-2 hover:bg-muted">
-                <UserCircle className="text-primary text-2xl" />
+                <img
+  src={user.profilePicture || "/src/assets/profile.png"}
+  alt="User"
+  className="w-8 h-8 rounded-full object-cover border border-border"
+/>
                 <div className="hidden md:flex flex-col text-left">
                   <span className="text-sm font-semibold">
                     {user.nume} {user.prenume?.charAt(0)}.

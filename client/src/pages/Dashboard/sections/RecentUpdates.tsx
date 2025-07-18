@@ -47,29 +47,31 @@ export default function RecentUpdates() {
     filter ? u.type.toLowerCase().includes(filter.toLowerCase()) : true
   );
 
-  return (
-    <ul className="space-y-4">
-      {filteredUpdates.map((update) => (
-        <li
-          key={update.id}
-          className="flex items-start gap-4 rounded-xl border border-border bg-card p-4 shadow-sm hover:shadow-md transition"
-        >
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-muted">
-            {updateIcons[update.type]}
-          </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <Badge variant="outline">{update.type}</Badge>
-              <span className="text-xs text-muted-foreground">
-                {formatDistanceToNow(update.timestamp, { addSuffix: true, locale: ro })}
-              </span>
+ return (
+    <div className="flex-1 overflow-y-auto min-h-0 w-full pr-1 space-y-4">
+      <ul>
+        {filteredUpdates.map((update) => (
+          <li
+            key={update.id}
+            className="flex items-start gap-4 rounded-xl border border-border bg-card p-4 shadow-sm hover:shadow-md transition"
+          >
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-muted">
+              {updateIcons[update.type]}
             </div>
-            <p className="text-sm text-foreground leading-tight">
-              {update.message}
-            </p>
-          </div>
-        </li>
-      ))}
-    </ul>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <Badge variant="outline">{update.type}</Badge>
+                <span className="text-xs text-muted-foreground">
+                  {formatDistanceToNow(update.timestamp, { addSuffix: true, locale: ro })}
+                </span>
+              </div>
+              <p className="text-sm text-foreground leading-tight">
+                {update.message}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
