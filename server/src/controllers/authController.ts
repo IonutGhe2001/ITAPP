@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { authenticateUser, registerUser } from "../services/auth.service";
+import { updateUser, authenticateUser, registerUser, getUserById } from "../services/auth.service";
 
 export const login = async (req: Request, res: Response) => {
   try {
@@ -16,11 +16,34 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-export const getMe = (req: Request, res: Response) => {
-  const user = (req as any).user;
-  if (!user) return res.status(401).json({ message: "Neautentificat" });
-  const { id, email, role, nume, prenume, functie, profilePicture } = user;
-return res.json({ id, email, role, nume, prenume, functie, profilePicture });
+export const getMe = async (req: Request, res: Response) => {
+  const userId = (req as any).user.id;
+  try {
+    const user = await getUserById(Number(userId));
+    if (!user) return res.status(404).json({ message: "Utilizatorul nu a fost găsit" });
+    return res.json(user);
+  } catch (err) {
+    return res.status(500).json({ message: "Eroare la preluarea utilizatorului" });
+  }
+};
+
+export const updateMe = async (req: Request, res: Response) => {
+  const userId = (req as any).user.id;
+  const { nume, prenume, functie, telefon, profilePicture } = req.body;
+
+  const updateData: any = { nume, prenume, functie, telefon, profilePicture };
+  Object.keys(updateData).forEach((key) => {
+    if (updateData[key] === undefined || updateData[key] === "") {
+      delete updateData[key];
+    }
+  });
+
+  try {
+    const updatedUser = await updateUser(userId, updateData);
+    return res.json(updatedUser);
+  } catch (err: any) {
+    return res.status(400).json({ message: err.message || "Eroare la actualizarea profilului" });
+  }
 };
 
 export const register = async (req: Request, res: Response) => {
@@ -32,5 +55,3 @@ export const register = async (req: Request, res: Response) => {
     return res.status(400).json({ error: err.message || "Eroare la creare cont" });
   }
 };
-
-

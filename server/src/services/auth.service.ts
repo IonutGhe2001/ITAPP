@@ -65,3 +65,26 @@ export const registerUser = async (input: {
 
   return newUser;
 };
+
+export const updateUser = (id: string, data: Partial<{ nume: string; prenume: string; functie: string; telefon: string; profilePicture: string; }>) => {
+  return prisma.user.update({
+    where: { id: Number(id) },
+    data,
+  });
+};
+
+export const getUserById = (id: number) => {
+  return prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      nume: true,
+      prenume: true,
+      functie: true,
+      telefon: true,
+      profilePicture: true,
+    },
+  });
+};
