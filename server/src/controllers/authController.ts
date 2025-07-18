@@ -19,8 +19,8 @@ export const login = async (req: Request, res: Response) => {
 export const getMe = (req: Request, res: Response) => {
   const user = (req as any).user;
   if (!user) return res.status(401).json({ message: "Neautentificat" });
-  const { id, email, role, nume, prenume, functie } = user;
-  return res.json({ id, email, role, nume, prenume, functie });
+  const { id, email, role, nume, prenume, functie, profilePicture } = user;
+return res.json({ id, email, role, nume, prenume, functie, profilePicture });
 };
 
 export const register = async (req: Request, res: Response) => {
@@ -32,3 +32,5 @@ export const register = async (req: Request, res: Response) => {
     return res.status(400).json({ error: err.message || "Eroare la creare cont" });
   }
 };
+
+
