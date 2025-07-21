@@ -10,17 +10,11 @@ export const processImportRows = async (rows: any[]) => {
       "Nume Echipament": nume,
       Tip: tip,
       Serie: serie,
-      Stare: stare,
       "Email Angajat": email,
     } = row as Record<string, string>;
 
-    if (!nume || !tip || !serie || !stare) {
+    if (!nume || !tip || !serie) {
       errors.push({ index, error: "Campuri obligatorii lipsa" });
-      continue;
-    }
-
-    if (!["asignat", "disponibil"].includes(stare)) {
-      errors.push({ index, error: `Stare invalida: ${stare}` });
       continue;
     }
 
@@ -53,7 +47,13 @@ export const processImportRows = async (rows: any[]) => {
     }
 
     const echipament = await prisma.echipament.create({
-      data: { nume, tip, serie, stare, angajatId },
+      data: {
+        nume,
+        tip,
+        serie,
+        stare: angajatId ? "asignat" : "disponibil",
+        angajatId,
+      },
     });
 
     results.push(echipament);
