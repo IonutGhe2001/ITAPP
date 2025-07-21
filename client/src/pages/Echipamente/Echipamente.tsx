@@ -8,6 +8,7 @@ import EquipmentTabs from "./EquipmentTabs";
 import EquipmentFilter from "./EquipmentFilter";
 import EquipmentList from "./EquipmentList";
 import ModalEditEchipament from "./ModalEditEchipament";
+import ImportEchipamente from "./ImportEchipamente";
 
 export default function Echipamente() {
   const [echipamente, setEchipamente] = useState<any[]>([]);
@@ -19,11 +20,14 @@ export default function Echipamente() {
 
   const [selected, setSelected] = useState<any | null>(null);
 
+  const fetchEchipamente = async () => {
+    const res = await getEchipamente();
+    setEchipamente(res.data);
+    setFiltered(res.data);
+  };
+
   useEffect(() => {
-    getEchipamente().then((res) => {
-      setEchipamente(res.data);
-      setFiltered(res.data);
-    });
+    fetchEchipamente();
   }, []);
 
   useEffect(() => {
@@ -54,74 +58,75 @@ export default function Echipamente() {
     setEchipamente((prev) => prev.filter((e) => e.id !== id));
   };
 
- const handleEdit = async (data: any) => {
-  const isQuickUpdate = "angajatId" in data && data.__editMode !== true;
+  const handleEdit = async (data: any) => {
+    const isQuickUpdate = "angajatId" in data && data.__editMode !== true;
 
-  if (isQuickUpdate) {
-    const payload = {
-      nume: data.nume?.trim() || "",
-      tip: data.tip?.trim() || "",
-      serie: data.serie?.trim() || "",
-      angajatId: data.angajatId === null ? null : data.angajatId ?? null,
-      stare: data.stare ?? undefined,
-    };
+    if (isQuickUpdate) {
+      const payload = {
+        nume: data.nume?.trim() || "",
+        tip: data.tip?.trim() || "",
+        serie: data.serie?.trim() || "",
+        angajatId: data.angajatId === null ? null : data.angajatId ?? null,
+        stare: data.stare ?? undefined,
+      };
 
-    Object.keys(payload).forEach((key) => {
-      if (payload[key as keyof typeof payload] === "") {
-        delete payload[key as keyof typeof payload];
+      Object.keys(payload).forEach((key) => {
+        if (payload[key as keyof typeof payload] === "") {
+          delete payload[key as keyof typeof payload];
+        }
+      });
+
+      try {
+        const res = await updateEchipament(data.id, payload);
+        if (!res || !res.id) throw new Error("Obiectul returnat nu este valid");
+        setEchipamente((prev) =>
+          prev.map((e) => (e?.id === data.id ? res : e))
+        );
+      } catch (error: any) {
+        console.error("❌ Eroare la update rapid:", error.response?.data || error.message);
+        alert("A apărut o eroare la actualizarea echipamentului.");
       }
-    });
-
-    try {
-     const res = await updateEchipament(data.id, payload);
-if (!res || !res.id) throw new Error("Obiectul returnat nu este valid");
-setEchipamente((prev) =>
-  prev.map((e) => (e?.id === data.id ? res : e))
-);
-    } catch (error: any) {
-      console.error("❌ Eroare la update rapid:", error.response?.data || error.message);
-      alert("A apărut o eroare la actualizarea echipamentului.");
+    } else {
+      setSelected(data);
     }
-  } else {
-    setSelected(data); 
-  }
-};
+  };
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        {/* Poți adăuga aici butonul pentru "Adaugă echipament" */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-4">
+          <EquipmentTabs active={tip} onChange={setTip} />
+          <EquipmentFilter
+            search={search}
+            status={status}
+            onSearchChange={setSearch}
+            onStatusChange={setStatus}
+          />
+          <EquipmentList
+            echipamente={filtered}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </div>
+        <div>
+          <ImportEchipamente onImportSuccess={fetchEchipamente} />
+        </div>
       </div>
-
-      <EquipmentTabs active={tip} onChange={setTip} />
-      <EquipmentFilter
-        search={search}
-        status={status}
-        onSearchChange={setSearch}
-        onStatusChange={setStatus}
-      />
-
-      <EquipmentList
-        echipamente={filtered}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
 
       {selected && (
         <ModalEditEchipament
           echipament={selected}
           onClose={() => setSelected(null)}
-        onUpdated={(updated: any) => {
-  if (!updated || !updated.id) {
-    console.error("⚠️ Obiectul actualizat e invalid:", updated);
-    return;
-  }
-
-  setEchipamente((prev) =>
-    prev.map((e) => (e?.id === updated.id ? updated : e))
-  );
-  setSelected(null);
-}}
+          onUpdated={(updated: any) => {
+            if (!updated || !updated.id) {
+              console.error("⚠️ Obiectul actualizat e invalid:", updated);
+              return;
+            }
+            setEchipamente((prev) =>
+              prev.map((e) => (e?.id === updated.id ? updated : e))
+            );
+            setSelected(null);
+          }}
         />
       )}
     </div>

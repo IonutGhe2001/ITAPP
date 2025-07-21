@@ -1,45 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Pencil } from "lucide-react";
-import { getCurrentUser, updateCurrentUser } from "@/services/authService";
+import { updateCurrentUser } from "@/services/authService";
+import { useUser } from "@/store/UserContext";
+import type { User } from "@/store/UserContext";
 
 const fallbackImage = "/src/assets/profile.png";
 
-type UserProfile = {
-  nume: string;
-  prenume: string;
-  email: string;
-  functie: string;
-  telefon?: string;
-  profilePicture?: string;
-};
-
 export default function ProfilePage() {
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const { user, setUser } = useUser();
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [original, setOriginal] = useState<UserProfile | null>(null);
-
-  useEffect(() => {
-    getCurrentUser().then((data) => {
-      setUser(data);
-      setOriginal(data);
-    });
-  }, []);
+  const [original, setOriginal] = useState<User | null>(user ?? null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setUser((prev) => prev ? { ...prev, profilePicture: reader.result as string } : prev);
-      };
+  if (user) {
+    setUser({ ...user, profilePicture: reader.result as string });
+  }
+};
       reader.readAsDataURL(file);
     }
   };
 
-  const handleChange = (field: keyof UserProfile) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUser((prev) => prev ? { ...prev, [field]: e.target.value } : prev);
-  };
+ const handleChange = (field: keyof User) => (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (user) {
+    setUser({ ...user, [field]: e.target.value });
+  }
+};
 
   const handleSave = async () => {
     if (!user) return;

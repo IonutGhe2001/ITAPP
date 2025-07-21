@@ -1,8 +1,6 @@
 import { FaBell } from "react-icons/fa";
 import { Search } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-
 import { Button } from "@components/ui/button";
 import {
   DropdownMenu,
@@ -10,8 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
-
-import { getCurrentUser } from "@/services/authService";
+import { useUser } from "@/store/UserContext";
 
 const pageTitles: Record<string, string> = {
   "/": "Dashboard",
@@ -25,21 +22,7 @@ export default function Header() {
   const navigate = useNavigate();
   const title = pageTitles[location.pathname] || "Pagina";
 
-const [user, setUser] = useState<{
-  nume: string;
-  prenume: string;
-  functie: string;
-  profilePicture?: string;
-} | null>(null);
-
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getCurrentUser().then((data) => {
-      setUser(data);
-      setLoading(false);
-    });
-  }, []);
+ const { user, loading } = useUser();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
