@@ -3,6 +3,7 @@ import { Pencil } from "lucide-react";
 import { updateCurrentUser } from "@/services/authService";
 import { useUser } from "@/store/UserContext";
 import type { User } from "@/store/UserContext";
+import { useToast } from "@/hooks/use-toast/useToast";
 
 const fallbackImage = "/src/assets/profile.png";
 
@@ -11,6 +12,7 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [original, setOriginal] = useState<User | null>(user ?? null);
+  const { toast } = useToast();
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -39,6 +41,10 @@ export default function ProfilePage() {
       setUser(updated);
       setOriginal(updated);
       setIsEditing(false);
+      toast({
+  title: "Profil actualizat",
+  description: "Modificările au fost salvate cu succes.",
+});
     } catch (err) {
       console.error("Eroare la salvare:", err);
       alert("A apărut o eroare la salvarea profilului.");
