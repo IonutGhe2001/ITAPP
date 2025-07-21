@@ -35,7 +35,7 @@ model Echipament {
   id         String    @id @default(uuid())
   nume       String
   tip        String    
-  serie      String   
+  serie      String    @unique
   stare      String    
   angajatId  String?
   angajat    Angajat?  @relation(fields: [angajatId], references: [id])

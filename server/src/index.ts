@@ -12,6 +12,7 @@ import echipamenteRoutes from "./routes/echipamente";
 import angajatiRoutes from "./routes/angajati";
 import evenimenteRoutes from "./routes/evenimente";
 import proceseVerbaleRoutes from "./routes/proceseVerbale";
+import importRoutes from "./routes/import";
 import { authenticate } from "./middlewares/authMiddleware";
 
 dotenv.config();
@@ -42,6 +43,7 @@ app.use("/api/echipamente", authenticate, echipamenteRoutes);
 app.use("/api/angajati", authenticate, angajatiRoutes);
 app.use("/api/evenimente", evenimenteRoutes);
 app.use("/api/procese-verbale", proceseVerbaleRoutes);
+app.use("/api/import", importRoutes);
 
 // Error handler middleware (final)
 app.use(errorHandler);
