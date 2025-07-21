@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
-import { UploadCloud } from "lucide-react";
+import { UploadCloud, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast/useToast";
 
 export default function ImportEchipamente({ onImportSuccess }: { onImportSuccess?: () => void }) {
@@ -63,7 +63,7 @@ export default function ImportEchipamente({ onImportSuccess }: { onImportSuccess
         download
         className="text-sm text-primary hover:underline flex items-center gap-1"
       >
-        <UploadCloud className="w-4 h-4" />
+        <Download className="w-4 h-4" />
         Descarcă șablon Excel
       </a>
 
