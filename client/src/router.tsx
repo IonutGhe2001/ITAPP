@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import type { JSX } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 const LoginPage = lazy(() => import("./pages/Login/Login"));
 const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard"));
@@ -11,8 +12,8 @@ const ProfilePage = lazy(() => import("./pages/Profile/ProfilePage"));
 
 // Componentă pentru rute protejate
 function ProtectedRoute({ children }: { children: JSX.Element }) {
-  const token = localStorage.getItem("token");
-  return token ? children : <Navigate to="/login" />;
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/login" />;
 }
 
 export default function AppRouter() {
