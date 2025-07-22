@@ -7,7 +7,14 @@
     "resolveJsonModule": true,
     "strict": true,
     "skipLibCheck": true,
-    "typeRoots": ["./src/types", "./node_modules/@types"]
+    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "baseUrl": "./src",
+    "paths": {
+      "@lib/*": ["lib/*"],
+      "@services/*": ["services/*"],
+      "@middlewares/*": ["middlewares/*"],
+      "@validators/*": ["validators/*"]
+    }
   },
   "include": ["src", "prisma"]
 }

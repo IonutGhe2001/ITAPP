@@ -1,62 +1,69 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "../lib/prisma";
 
-export const processImportRows = async (rows: any[]) => {
+type ImportRow = {
+  "Nume Echipament": string;
+  Tip: string;
+  Serie: string;
+  "Email Angajat"?: string;
+};
+
+export const processImportRows = async (rows: ImportRow[]) => {
   const results: any[] = [];
   const errors: { index: number; error: string }[] = [];
 
-  for (const [index, row] of rows.entries()) {
-    const {
-      "Nume Echipament": nume,
-      Tip: tip,
-      Serie: serie,
-      "Email Angajat": email,
-    } = row as Record<string, string>;
+  const limit = 10; // procesează 10 rânduri simultan
+  for (let i = 0; i < rows.length; i += limit) {
+    const chunk = rows.slice(i, i + limit);
 
-    if (!nume || !tip || !serie) {
-      errors.push({ index, error: "Campuri obligatorii lipsa" });
-      continue;
-    }
+    const chunkResults = await Promise.allSettled(
+      chunk.map(async (row, idx) => {
+        const index = i + idx;
+        try {
+          const { "Nume Echipament": nume, Tip: tip, Serie: serie, "Email Angajat": email } = row;
 
-    const existing = await prisma.echipament.findUnique({ where: { serie } });
-    if (existing) {
-      errors.push({ index, error: `Serie duplicata: ${serie}` });
-      continue;
-    }
+          if (!nume || !tip || !serie) {
+            throw new Error("Campuri obligatorii lipsa");
+          }
 
-    let angajatId: string | null = null;
-    if (email) {
-      let angajat = await prisma.angajat.findFirst({ where: { email } });
+          const existing = await prisma.echipament.findUnique({ where: { serie } });
+          if (existing) throw new Error(`Serie duplicata: ${serie}`);
 
-      if (!angajat) {
-        const username = email.split("@")[0];
-        const numeComplet = username
-          .replace(".", " ")
-          .replace(/(^\w{1})|(\s+\w{1})/g, (l) => l.toUpperCase());
+          let angajatId: string | null = null;
+          if (email) {
+            let angajat = await prisma.angajat.findFirst({ where: { email } });
+            if (!angajat) {
+              const username = email.split("@")[0];
+              const numeComplet = username.replace(".", " ").replace(/\b\w/g, c => c.toUpperCase());
 
-        angajat = await prisma.angajat.create({
-          data: {
-            email,
-            numeComplet,
-            functie: "Necunoscuta",
-          },
-        });
-      }
+              angajat = await prisma.angajat.create({
+                data: {
+                  email,
+                  numeComplet,
+                  functie: "Import automat",
+                },
+              });
+            }
+            angajatId = angajat.id;
+          }
 
-      angajatId = angajat.id;
-    }
+          const echipament = await prisma.echipament.create({
+            data: {
+              nume,
+              tip,
+              serie,
+              angajatId,
+              stare: angajatId ? "asignat" : "disponibil",
+            },
+          });
 
-    const echipament = await prisma.echipament.create({
-      data: {
-        nume,
-        tip,
-        serie,
-        stare: angajatId ? "asignat" : "disponibil",
-        angajatId,
-      },
-    });
+          results.push(echipament);
+        } catch (error: any) {
+          errors.push({ index, error: error.message || "Eroare necunoscută" });
+        }
+      })
+    );
 
-    results.push(echipament);
+    // optional: log sau alertă dacă chunk-ul are prea multe erori
   }
 
   return { results, errors };

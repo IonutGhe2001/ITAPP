@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "../lib/prisma";
+
 
 export const getEvenimenteByUser = (userId: number) => {
   return prisma.eveniment.findMany({ where: { userId } });

@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "../lib/prisma";
+
 
 export const creeazaProcesVerbalCuEchipamente = async (angajatId: string, observatii?: string | null) => {
   const angajat = await prisma.angajat.findUnique({

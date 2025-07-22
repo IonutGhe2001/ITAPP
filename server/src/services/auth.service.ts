@@ -1,8 +1,9 @@
 import { PrismaClient, User } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
+import { prisma } from "../lib/prisma";
 
-const prisma = new PrismaClient();
+
 
 export const authenticateUser = async (email: string, password: string): Promise<string | null> => {
   const user = await prisma.user.findUnique({ where: { email } });
