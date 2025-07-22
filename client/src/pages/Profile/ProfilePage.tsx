@@ -5,7 +5,7 @@ import { useUser } from "@/store/UserContext";
 import type { User } from "@/store/UserContext";
 import { useToast } from "@/hooks/use-toast/useToast";
 
-const fallbackImage = "/src/assets/profile.png";
+const fallbackImage = "/profile.png";
 
 export default function ProfilePage() {
   const { user, setUser } = useUser();

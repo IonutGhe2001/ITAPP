@@ -1,14 +1,11 @@
 import EquipmentCard from "./EquipmentCard";
+import type { EquipmentListProps } from "@/features/echipamente/types";
 
 export default function EquipmentList({
   echipamente,
   onEdit,
   onDelete,
-}: {
-  echipamente: any[];
-  onEdit?: (echipament: any) => void;
-  onDelete?: (id: string) => void;
-}) {
+}: EquipmentListProps) {
   if (echipamente.length === 0) {
     return (
       <div className="text-center text-sm text-gray-500 mt-10">
@@ -25,9 +22,9 @@ export default function EquipmentList({
           echipament={eq}
           onEdit={(val) => {
             if (typeof val === "object") {
-              onEdit?.(val); // predare/recuperare directă
+              onEdit?.(val);
             } else {
-              onEdit?.(eq); // editare clasică
+              onEdit?.(eq);
             }
           }}
           onDelete={() => onDelete?.(eq.id)}

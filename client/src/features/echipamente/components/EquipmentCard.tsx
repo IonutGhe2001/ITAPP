@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FaLaptop, FaMobileAlt, FaSimCard } from "react-icons/fa";
 import { PencilIcon, TrashIcon } from "lucide-react";
-import ModalPredaEchipament from "./ModalPredaEchipament";
+import ModalPredaEchipament from "@/features/echipamente/components/ModalPredaEchipament";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import type { EquipmentCardProps } from "@/features/echipamente/types";
 
 function getIcon(tip: string) {
   const baseStyle = "text-2xl text-primary";
@@ -28,12 +29,7 @@ export default function EquipmentCard({
   onEdit,
   onDelete,
   onRefresh,
-}: {
-  echipament: any;
-  onEdit?: (echipament?: any) => void;
-  onDelete?: () => void;
-  onRefresh?: () => void;
-}) {
+}: EquipmentCardProps) {
   const [showModal, setShowModal] = useState(false);
   const [confirmRecupereaza, setConfirmRecupereaza] = useState(false);
 
@@ -92,7 +88,7 @@ export default function EquipmentCard({
           <button onClick={() => onEdit?.({ ...echipament, __editMode: true })} title="Editează">
   <PencilIcon className="w-4 h-4 text-primary hover:text-primary-dark" />
 </button>
-          <button onClick={onDelete} title="Șterge">
+           <button onClick={() => onDelete?.(echipament.id)}>
             <TrashIcon className="w-4 h-4 text-primary hover:text-primary-dark" />
           </button>
         </div>

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
-import logo from "@assets/logo.png";
-import loginImage from "@assets/login.webp"; // imagine optimizata
+
+const logo = "/logo.png";
+const loginImage = "/login.webp";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (

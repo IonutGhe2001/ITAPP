@@ -1,5 +1,4 @@
 import { useEffect, useState, type JSX } from "react";
-import profileIcon from "@assets/profile.png";
 import { getAngajati } from "../../services/angajatiService";
 import {
   LaptopIcon,
@@ -44,11 +43,11 @@ export default function Colegi() {
             className="bg-white rounded-xl shadow-md p-4 flex flex-col gap-4"
           >
             <div className="flex items-center gap-4">
-              <img
-                src={profileIcon}
-                alt="avatar"
-                className="w-16 h-16 rounded-full"
-              />
+             <img
+  src="/profile.png"
+  alt="avatar"
+  className="w-16 h-16 rounded-full"
+/>
               <div className="flex-1">
                 <p className="font-semibold text-gray-800">{coleg.numeComplet}</p>
                 <p className="text-sm text-gray-600">{coleg.functie}</p>

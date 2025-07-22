@@ -14,18 +14,13 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { getAngajati } from "@/services/angajatiService";
+import { useRefresh } from "@/context/useRefreshContext"; 
+import type { ModalPredaEchipamentProps } from "@/features/echipamente/types";
 
-export default function ModalPredaEchipament({
-  echipament,
-  onClose,
-  onSubmit,
-}: {
-  echipament: any;
-  onClose: () => void;
-  onSubmit: (data: any) => void;
-}) {
+export default function ModalPredaEchipament({ echipament, onClose, onSubmit }: ModalPredaEchipamentProps) {
   const [angajati, setAngajati] = useState<any[]>([]);
   const [angajatId, setAngajatId] = useState<string>("");
+  const { triggerRefresh } = useRefresh(); 
 
   useEffect(() => {
     getAngajati()
@@ -35,7 +30,9 @@ export default function ModalPredaEchipament({
 
   const handleSubmit = () => {
     if (!angajatId) return alert("Selectează un angajat!");
+
     onSubmit({ ...echipament, angajatId, stare: "asignat" });
+    triggerRefresh(); 
     onClose();
   };
 

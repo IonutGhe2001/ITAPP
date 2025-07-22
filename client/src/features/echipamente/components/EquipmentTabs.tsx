@@ -1,10 +1,6 @@
-export default function EquipmentTabs({
-  active,
-  onChange,
-}: {
-  active: string;
-  onChange: (tip: string) => void;
-}) {
+import type { EquipmentTabsProps } from "@/features/echipamente/types";
+
+export default function EquipmentTabs({ active, onChange }: EquipmentTabsProps) {
   const tabs = ["toate", "laptop", "telefon", "sim"];
 
   return (

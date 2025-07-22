@@ -4,11 +4,11 @@ import {
   deleteEchipament,
   updateEchipament,
 } from "../../services/echipamenteService";
-import EquipmentTabs from "./EquipmentTabs";
-import EquipmentFilter from "./EquipmentFilter";
-import EquipmentList from "./EquipmentList";
-import ModalEditEchipament from "./ModalEditEchipament";
-import ImportEchipamente from "./ImportEchipamente";
+import EquipmentTabs from "../../features/echipamente/components/EquipmentTabs";
+import EquipmentFilter from "../../features/echipamente/components/EquipmentFilter";
+import EquipmentList from "../../features/echipamente/components/EquipmentList";
+import ModalEditEchipament from "../../features/echipamente/components/ModalEditEchipament";
+import ImportEchipamente from "../../features/echipamente/ImportEchipamente";
 
 export default function Echipamente() {
   const [echipamente, setEchipamente] = useState<any[]>([]);

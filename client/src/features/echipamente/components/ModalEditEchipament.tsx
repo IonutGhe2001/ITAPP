@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import {
   Dialog,
@@ -20,16 +18,14 @@ import {
 import { updateEchipament } from "@/services/echipamenteService";
 import { getAngajati } from "@/services/angajatiService";
 import { useToast } from "@/hooks/use-toast/useToast";
+import { useRefresh } from "@/context/useRefreshContext"; 
+import type { ModalEditEchipamentProps } from "@/features/echipamente/types";
 
 export default function ModalEditEchipament({
   echipament,
   onClose,
   onUpdated,
-}: {
-  echipament: any;
-  onClose: () => void;
-  onUpdated: (updated: any) => void;
-}) {
+}: ModalEditEchipamentProps) {
   const [formData, setFormData] = useState({
     nume: "",
     serie: "",
@@ -40,6 +36,7 @@ export default function ModalEditEchipament({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [angajati, setAngajati] = useState<any[]>([]);
   const { toast } = useToast();
+  const { triggerRefresh } = useRefresh(); 
 
   useEffect(() => {
     if (echipament) {
@@ -53,20 +50,20 @@ export default function ModalEditEchipament({
   }, [echipament]);
 
   useEffect(() => {
-  getAngajati()
-    .then((res) => {
-      if (Array.isArray(res.data)) {
-        setAngajati(res.data);
-      } else {
-        console.error("❌ Răspuns invalid la getAngajati:", res);
+    getAngajati()
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setAngajati(res.data);
+        } else {
+          console.error("❌ Răspuns invalid la getAngajati:", res);
+          setAngajati([]);
+        }
+      })
+      .catch((err) => {
+        console.error("❌ Eroare la getAngajati:", err);
         setAngajati([]);
-      }
-    })
-    .catch((err) => {
-      console.error("❌ Eroare la getAngajati:", err);
-      setAngajati([]);
-    });
-}, []);
+      });
+  }, []);
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
@@ -78,33 +75,32 @@ export default function ModalEditEchipament({
   };
 
   const handleSubmit = async () => {
-  if (!validate()) return;
+    if (!validate()) return;
 
-  const payload = {
-    nume: formData.nume.trim(),
-    tip: formData.tip.trim(),
-    serie: formData.serie.trim(),
-    angajatId: formData.angajatId === "none" ? null : formData.angajatId,
+    const payload = {
+      nume: formData.nume.trim(),
+      tip: formData.tip.trim(),
+      serie: formData.serie.trim(),
+      angajatId: formData.angajatId === "none" ? null : formData.angajatId,
+    };
+
+    try {
+      const updated = await updateEchipament(echipament.id, payload);
+      toast({
+        title: "Echipament salvat",
+        description: "Modificările au fost salvate cu succes.",
+      });
+      triggerRefresh(); 
+      onUpdated(updated);
+      onClose();
+    } catch (error) {
+      toast({
+        title: "Eroare la salvare",
+        description: "Actualizarea echipamentului a eșuat.",
+        variant: "destructive",
+      });
+    }
   };
-
-  try {
-    const updated = await updateEchipament(echipament.id, payload);
-
-    toast({
-      title: "Echipament salvat",
-      description: "Modificările au fost salvate cu succes.",
-    });
-
-    onUpdated(updated); 
-    onClose();
-  } catch (error) {
-    toast({
-      title: "Eroare la salvare",
-      description: "Actualizarea echipamentului a eșuat.",
-      variant: "destructive",
-    });
-  }
-};
 
   return (
     <Dialog open onOpenChange={onClose}>
@@ -121,7 +117,6 @@ export default function ModalEditEchipament({
             />
             {errors.nume && <p className="text-sm text-red-500">{errors.nume}</p>}
           </div>
-
           <div>
             <Label>Seria</Label>
             <Input
@@ -130,7 +125,6 @@ export default function ModalEditEchipament({
             />
             {errors.serie && <p className="text-sm text-red-500">{errors.serie}</p>}
           </div>
-
           <div>
             <Label>Tip</Label>
             <Select
@@ -148,7 +142,6 @@ export default function ModalEditEchipament({
             </Select>
             {errors.tip && <p className="text-sm text-red-500">{errors.tip}</p>}
           </div>
-
           <div>
             <Label>Angajat</Label>
             <Select
@@ -168,7 +161,6 @@ export default function ModalEditEchipament({
               </SelectContent>
             </Select>
           </div>
-
           <Button onClick={handleSubmit}>Salvează</Button>
         </div>
       </DialogContent>

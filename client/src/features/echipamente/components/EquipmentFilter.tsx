@@ -1,14 +1,11 @@
+import type { EquipmentFilterProps } from "@/features/echipamente/types";
+
 export default function EquipmentFilter({
   search,
   status,
   onSearchChange,
   onStatusChange,
-}: {
-  search: string;
-  status: string;
-  onSearchChange: (val: string) => void;
-  onStatusChange: (val: string) => void;
-}) {
+}: EquipmentFilterProps) {
   return (
     <div className="flex flex-col sm:flex-row gap-4 mb-6">
       <input

@@ -20,6 +20,7 @@ import {
 import { createEchipament } from "@/services/echipamenteService";
 import { getAngajati } from "@/services/angajatiService";
 import { useToast } from "@/hooks/use-toast/useToast";
+import { useRefresh } from "@/context/useRefreshContext"; // ✅ nou
 
 export default function ModalAddEchipament({ onClose }: { onClose: () => void }) {
   const [formData, setFormData] = useState({
@@ -32,6 +33,7 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [angajati, setAngajati] = useState<any[]>([]);
   const { toast } = useToast();
+  const { triggerRefresh } = useRefresh(); 
 
   useEffect(() => {
     getAngajati()
@@ -48,25 +50,27 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
     return Object.keys(newErrors).length === 0;
   };
 
-const handleSubmit = async () => {
-  if (!validate()) return;
-  const payload = {
-    ...formData,
-    angajatId: formData.angajatId === "none" ? null : formData.angajatId,
-  };
+  const handleSubmit = async () => {
+    if (!validate()) return;
 
-  try {
-    await createEchipament(payload);
-    toast({ title: "Echipament adăugat", description: "Echipamentul a fost salvat cu succes." });
-    onClose();
-  } catch (err) {
-    toast({
-      title: "Eroare",
-      description: "Eroare la adăugare echipament.",
-      variant: "destructive",
-    });
-  }
-};
+    const payload = {
+      ...formData,
+      angajatId: formData.angajatId === "none" ? null : formData.angajatId,
+    };
+
+    try {
+      await createEchipament(payload);
+      toast({ title: "Echipament adăugat", description: "Echipamentul a fost salvat cu succes." });
+      triggerRefresh(); // ✅ actualizează OverviewCards și altele
+      onClose();
+    } catch (err) {
+      toast({
+        title: "Eroare",
+        description: "Eroare la adăugare echipament.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <Dialog open onOpenChange={onClose}>

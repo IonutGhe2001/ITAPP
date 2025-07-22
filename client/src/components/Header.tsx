@@ -9,23 +9,18 @@ import {
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
 import { useUser } from "@/store/UserContext";
-
-const pageTitles: Record<string, string> = {
-  "/": "Dashboard",
-  "/echipamente": "Echipamente",
-  "/colegi": "Colegi",
-  "/profil": "Profil",
-};
+import { removeToken } from "@/utils/storage"; 
+import pageTitles from "@/constants/pageTitles"; 
 
 export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const title = pageTitles[location.pathname] || "Pagina";
 
- const { user, loading } = useUser();
+  const { user, loading } = useUser();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    removeToken();
     navigate("/login");
   };
 
@@ -35,14 +30,12 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between px-6 py-4 bg-background shadow-sm border-b border-border">
-      {/* Left: Titlu  */}
       <div className="flex flex-col">
         <h1 className="text-sm text-muted-foreground tracking-wide uppercase">
           {title}
         </h1>
       </div>
 
-      {/* Right: Search + Bell + User */}
       <div className="flex items-center gap-4">
         <div className="relative hidden md:block">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -62,10 +55,10 @@ export default function Header() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 px-2 hover:bg-muted">
                 <img
-  src={user.profilePicture || "/src/assets/profile.png"}
-  alt="User"
-  className="w-8 h-8 rounded-full object-cover border border-border"
-/>
+                  src={user.profilePicture || "/profile.png"}
+                  alt="User"
+                  className="w-8 h-8 rounded-full object-cover border border-border"
+                />
                 <div className="hidden md:flex flex-col text-left">
                   <span className="text-sm font-semibold">
                     {user.nume} {user.prenume?.charAt(0)}.

@@ -67,18 +67,6 @@
   }
 }
 
-
-@keyframes wave {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(10deg); }
-  50% { transform: rotate(-6deg); }
-  75% { transform: rotate(8deg); }
-}
-.animate-wave {
-  animation: wave 2s ease-in-out infinite;
-  display: inline-block;
-}
-
 input::-ms-reveal,
 input::-webkit-credentials-auto-fill-button {
   display: none !important;
