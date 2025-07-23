@@ -1,6 +1,6 @@
 import { prisma } from "../lib/prisma";
 
-type ImportRow = {
+export type ImportRow = {
   "Nume Echipament": string;
   Tip: string;
   Serie: string;
