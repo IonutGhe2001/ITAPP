@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { createAngajat } from "@/services/angajatiService";
+import { useCreateAngajat } from "@/services/angajatiService";
 import { useToast } from "@/hooks/use-toast/useToast";
 
 export default function ModalAddColeg({ onClose }: { onClose: () => void }) {
@@ -17,6 +17,7 @@ export default function ModalAddColeg({ onClose }: { onClose: () => void }) {
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { toast } = useToast();
+  const createMutation = useCreateAngajat();
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
@@ -31,7 +32,7 @@ export default function ModalAddColeg({ onClose }: { onClose: () => void }) {
   const handleSubmit = async () => {
     if (!validate()) return;
     try {
-      await createAngajat(formData);
+      await createMutation.mutateAsync(formData);
       toast({ title: "Coleg adăugat", description: "Coleg adăugat cu succes." });
       onClose();
     } catch (err) {

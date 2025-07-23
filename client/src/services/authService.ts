@@ -1,4 +1,3 @@
-import axios from "axios";
 import api from "./api";
 
 export const login = async (email: string, password: string) => {
@@ -10,9 +9,7 @@ export const getCurrentUser = async () => {
   const token = localStorage.getItem("token");
   if (!token) return null;
   try {
-    const res = await axios.get("/api/auth/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+   const res = await api.get("/auth/me");
     return res.data;
   } catch (error) {
     console.error("Eroare la /me:", error);
@@ -30,11 +27,7 @@ export const updateCurrentUser = async (data: Partial<{
   const token = localStorage.getItem("token");
   if (!token) throw new Error("Neautentificat");
 
-  const res = await axios.patch("/api/auth/me", data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+   const res = await api.patch("/auth/me", data);
 
   return res.data;
 };

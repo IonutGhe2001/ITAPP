@@ -1,12 +1,26 @@
+export interface Angajat {
+  id: string;
+  numeComplet: string;
+  functie: string;
+  email?: string;
+  telefon?: string;
+}
+
 export interface Echipament {
   id: string;
+  nume: string;
   tip: string;
-  marca: string;
-  model: string;
-  status: string;
   serie: string;
-  user?: string;
-  [key: string]: any; 
+  stare: string;
+  angajatId?: string | null;
+  /**
+   * Included when the backend query joins the related angajat.
+   */
+  angajat?: {
+    numeComplet: string;
+    id: string;
+  };
+  [key: string]: any;
 }
 
 export interface EquipmentCardProps {

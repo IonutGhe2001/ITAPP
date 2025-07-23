@@ -1,5 +1,5 @@
 import { useState, memo } from "react";
-import axios from "axios";
+import api from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { UploadCloud, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast/useToast";
@@ -28,10 +28,9 @@ function ImportEchipamente({ onImportSuccess }: { onImportSuccess?: () => void }
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await axios.post("/api/import/echipamente", formData, {
+       const res = await api.post("/import/echipamente", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 

@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getAngajati } from "@/services/angajatiService";
-import axios from "axios";
+import api from "@/services/api";
 import { useToast } from "@/hooks/use-toast/useToast";
 
 interface ModalProcesVerbalProps {
@@ -41,15 +41,12 @@ export default function ModalProcesVerbal({ onClose }: ModalProcesVerbalProps) {
   if (!selectedId) return;
   setLoading(true);
   try {
-    const token = localStorage.getItem("token"); 
-    const res = await axios.post(
-      "/api/procese-verbale",
+     const res = await api.post(
+      "/procese-verbale",
       { angajatId: selectedId },
       {
         responseType: "blob",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        
       }
     );
     const file = new Blob([res.data], { type: "application/pdf" });
