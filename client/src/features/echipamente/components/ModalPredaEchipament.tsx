@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, memo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,26 +13,17 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { getAngajati } from "@/services/angajatiService";
-import { useRefresh } from "@/context/useRefreshContext"; 
+import { useAngajati } from "@/services/angajatiService";
 import type { ModalPredaEchipamentProps } from "@/features/echipamente/types";
 
-export default function ModalPredaEchipament({ echipament, onClose, onSubmit }: ModalPredaEchipamentProps) {
-  const [angajati, setAngajati] = useState<any[]>([]);
+function ModalPredaEchipament({ echipament, onClose, onSubmit }: ModalPredaEchipamentProps) {
+  const { data: angajati = [] } = useAngajati();
   const [angajatId, setAngajatId] = useState<string>("");
-  const { triggerRefresh } = useRefresh(); 
-
-  useEffect(() => {
-    getAngajati()
-      .then((res) => setAngajati(res.data))
-      .catch((err) => console.error("Eroare la încărcare angajați:", err));
-  }, []);
-
+  
   const handleSubmit = () => {
     if (!angajatId) return alert("Selectează un angajat!");
 
-    onSubmit({ ...echipament, angajatId, stare: "asignat" });
-    triggerRefresh(); 
+    onSubmit({ ...echipament, angajatId, stare: "asignat" }); 
     onClose();
   };
 
@@ -64,3 +55,5 @@ export default function ModalPredaEchipament({ echipament, onClose, onSubmit }: 
     </Dialog>
   );
 }
+
+export default memo(ModalPredaEchipament);

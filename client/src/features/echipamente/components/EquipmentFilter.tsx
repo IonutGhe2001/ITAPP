@@ -1,6 +1,7 @@
+import { memo } from "react";
 import type { EquipmentFilterProps } from "@/features/echipamente/types";
 
-export default function EquipmentFilter({
+function EquipmentFilter({
   search,
   status,
   onSearchChange,
@@ -27,3 +28,5 @@ export default function EquipmentFilter({
     </div>
   );
 }
+
+export default memo(EquipmentFilter);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo, useMemo } from "react";
 import { FaLaptop, FaMobileAlt, FaSimCard } from "react-icons/fa";
 import { PencilIcon, TrashIcon } from "lucide-react";
 import ModalPredaEchipament from "@/features/echipamente/components/ModalPredaEchipament";
@@ -24,7 +24,7 @@ function getIcon(tip: string) {
   }
 }
 
-export default function EquipmentCard({
+function EquipmentCard({
   echipament,
   onEdit,
   onDelete,
@@ -39,10 +39,12 @@ export default function EquipmentCard({
     onRefresh?.();
   };
 
+  const icon = useMemo(() => getIcon(echipament.tip), [echipament.tip]);
+
   return (
     <div className="bg-white rounded-2xl shadow-md p-5 flex items-center justify-between transition hover:shadow-lg">
       <div className="flex items-center gap-4">
-        <div>{getIcon(echipament.tip)}</div>
+        <div>{icon}</div>
         <div className="text-sm space-y-1">
           <p className="font-semibold text-gray-900">{echipament.nume}</p>
           <p className="text-xs text-gray-600">Serie: {echipament.serie}</p>
@@ -129,3 +131,5 @@ export default function EquipmentCard({
     </div>
   );
 }
+
+export default memo(EquipmentCard);

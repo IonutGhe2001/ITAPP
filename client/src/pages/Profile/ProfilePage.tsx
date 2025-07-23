@@ -64,11 +64,12 @@ export default function ProfilePage() {
 
       <div className="bg-white shadow-md rounded-2xl p-6 flex flex-col items-center gap-6">
         <div className="relative">
-          <img
-            src={user?.profilePicture || fallbackImage}
-            alt="Profil"
-            className="w-32 h-32 rounded-full object-cover border-4 border-primary shadow"
-          />
+           <img
+              src={user?.profilePicture || fallbackImage}
+              alt="Profil"
+              loading="lazy"
+              className="w-32 h-32 rounded-full object-cover border-4 border-primary shadow"
+            />
           {isEditing && (
             <label
               htmlFor="profile-picture"

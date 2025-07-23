@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,10 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createEchipament } from "@/services/echipamenteService";
-import { getAngajati } from "@/services/angajatiService";
+import { useCreateEchipament } from "@/services/echipamenteService";
+import { useAngajati } from "@/services/angajatiService";
 import { useToast } from "@/hooks/use-toast/useToast";
-import { useRefresh } from "@/context/useRefreshContext"; // ✅ nou
+
 
 export default function ModalAddEchipament({ onClose }: { onClose: () => void }) {
   const [formData, setFormData] = useState({
@@ -31,15 +31,9 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [angajati, setAngajati] = useState<any[]>([]);
+   const { data: angajati = [] } = useAngajati();
+  const createMutation = useCreateEchipament();
   const { toast } = useToast();
-  const { triggerRefresh } = useRefresh(); 
-
-  useEffect(() => {
-    getAngajati()
-      .then((res) => setAngajati(res.data))
-      .catch((err) => console.error("Eroare la getAngajati:", err));
-  }, []);
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
@@ -59,9 +53,11 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
     };
 
     try {
-      await createEchipament(payload);
-      toast({ title: "Echipament adăugat", description: "Echipamentul a fost salvat cu succes." });
-      triggerRefresh(); // ✅ actualizează OverviewCards și altele
+      await createMutation.mutateAsync(payload);
+      toast({
+        title: "Echipament adăugat",
+        description: "Echipamentul a fost salvat cu succes.",
+      });
       onClose();
     } catch (err) {
       toast({

@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
-  getEchipamente,
-  deleteEchipament,
-  updateEchipament,
+    useEchipamente,
+  useDeleteEchipament,
+  useUpdateEchipament,
 } from "../../services/echipamenteService";
 import EquipmentTabs from "../../features/echipamente/components/EquipmentTabs";
 import EquipmentFilter from "../../features/echipamente/components/EquipmentFilter";
@@ -11,8 +11,7 @@ import ModalEditEchipament from "../../features/echipamente/components/ModalEdit
 import ImportEchipamente from "../../features/echipamente/ImportEchipamente";
 
 export default function Echipamente() {
-  const [echipamente, setEchipamente] = useState<any[]>([]);
-  const [filtered, setFiltered] = useState<any[]>([]);
+ const { data: echipamente = [], refetch } = useEchipamente();
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -20,42 +19,23 @@ export default function Echipamente() {
 
   const [selected, setSelected] = useState<any | null>(null);
 
-  const fetchEchipamente = async () => {
-    const res = await getEchipamente();
-    setEchipamente(res.data);
-    setFiltered(res.data);
-  };
+  const deleteMutation = useDeleteEchipament();
+  const updateMutation = useUpdateEchipament();
 
-  useEffect(() => {
-    fetchEchipamente();
-  }, []);
-
-  useEffect(() => {
-    let data = [...echipamente];
-
-    if (tip !== "toate") {
-      data = data.filter((e) => e.tip === tip);
-    }
-
-    if (status) {
-      data = data.filter((e) => e.stare === status);
-    }
+  const filtered = echipamente.filter((e) => {
+    if (tip !== "toate" && e.tip !== tip) return false;
+    if (status && e.stare !== status) return false;
 
     if (search.trim()) {
       const q = search.toLowerCase();
-      data = data.filter(
-        (e) =>
-          e.nume.toLowerCase().includes(q) ||
-          e.serie?.toLowerCase().includes(q)
-      );
+      if (!e.nume.toLowerCase().includes(q) && !e.serie?.toLowerCase().includes(q)) return false;
     }
 
-    setFiltered(data);
-  }, [search, status, tip, echipamente]);
+  return true;
+  });
 
   const handleDelete = async (id: string) => {
-    await deleteEchipament(id);
-    setEchipamente((prev) => prev.filter((e) => e.id !== id));
+    await deleteMutation.mutateAsync(id);
   };
 
   const handleEdit = async (data: any) => {
@@ -77,11 +57,8 @@ export default function Echipamente() {
       });
 
       try {
-        const res = await updateEchipament(data.id, payload);
-        if (!res || !res.id) throw new Error("Obiectul returnat nu este valid");
-        setEchipamente((prev) =>
-          prev.map((e) => (e?.id === data.id ? res : e))
-        );
+         const res = await updateMutation.mutateAsync({ id: data.id, data: payload });
+        if (!res || !(res as any).id) throw new Error("Obiectul returnat nu este valid");
       } catch (error: any) {
         console.error("❌ Eroare la update rapid:", error.response?.data || error.message);
         alert("A apărut o eroare la actualizarea echipamentului.");
@@ -109,25 +86,16 @@ export default function Echipamente() {
           />
         </div>
         <div>
-          <ImportEchipamente onImportSuccess={fetchEchipamente} />
+          <ImportEchipamente onImportSuccess={() => refetch()} />
         </div>
       </div>
 
       {selected && (
         <ModalEditEchipament
-          echipament={selected}
-          onClose={() => setSelected(null)}
-          onUpdated={(updated: any) => {
-            if (!updated || !updated.id) {
-              console.error("⚠️ Obiectul actualizat e invalid:", updated);
-              return;
-            }
-            setEchipamente((prev) =>
-              prev.map((e) => (e?.id === updated.id ? updated : e))
-            );
-            setSelected(null);
-          }}
-        />
+            echipament={selected}
+            onClose={() => setSelected(null)}
+            onUpdated={() => setSelected(null)}
+          />
       )}
     </div>
   );

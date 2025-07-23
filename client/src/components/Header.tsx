@@ -54,11 +54,12 @@ export default function Header() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 px-2 hover:bg-muted">
-                <img
-                  src={user.profilePicture || "/profile.png"}
-                  alt="User"
-                  className="w-8 h-8 rounded-full object-cover border border-border"
-                />
+                 <img
+                    src={user.profilePicture || "/profile.png"}
+                    alt="User"
+                    loading="lazy"
+                    className="w-8 h-8 rounded-full object-cover border border-border"
+                  />
                 <div className="hidden md:flex flex-col text-left">
                   <span className="text-sm font-semibold">
                     {user.nume} {user.prenume?.charAt(0)}.

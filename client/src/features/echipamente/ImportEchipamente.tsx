@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { UploadCloud, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast/useToast";
 
-export default function ImportEchipamente({ onImportSuccess }: { onImportSuccess?: () => void }) {
+function ImportEchipamente({ onImportSuccess }: { onImportSuccess?: () => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ importate: number; erori: any[] } | null>(null);
@@ -102,3 +102,5 @@ export default function ImportEchipamente({ onImportSuccess }: { onImportSuccess
     </div>
   );
 }
+
+export default memo(ImportEchipamente);

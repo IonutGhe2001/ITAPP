@@ -8,7 +8,12 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
     <div className="flex flex-col md:flex-row min-h-screen overflow-hidden">
       {/* Formular login */}
       <div className="flex-1 flex flex-col justify-center items-center px-6 md:px-10 py-12 bg-background text-foreground">
-        <img src={logo} alt="CreativeMed Logo" className="h-16 mb-6" />
+          <img
+            src={logo}
+            alt="CreativeMed Logo"
+            loading="lazy"
+            className="h-16 mb-6"
+          />
         {children}
       </div>
 

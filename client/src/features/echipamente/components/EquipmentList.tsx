@@ -1,11 +1,28 @@
+import { memo } from "react";
+import { useEffect, useRef, useState } from "react";
+import { FixedSizeList as List } from "react-window";
 import EquipmentCard from "./EquipmentCard";
 import type { EquipmentListProps } from "@/features/echipamente/types";
 
-export default function EquipmentList({
+function EquipmentList({
   echipamente,
   onEdit,
   onDelete,
 }: EquipmentListProps) {
+    const containerRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setWidth(containerRef.current.offsetWidth);
+      }
+    };
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
+
   if (echipamente.length === 0) {
     return (
       <div className="text-center text-sm text-gray-500 mt-10">
@@ -14,9 +31,10 @@ export default function EquipmentList({
     );
   }
 
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {echipamente.map((eq) => (
+ const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
+    const eq = echipamente[index];
+    return (
+      <div style={style} className="p-2">
         <EquipmentCard
           key={eq.id}
           echipament={eq}
@@ -29,7 +47,27 @@ export default function EquipmentList({
           }}
           onDelete={() => onDelete?.(eq.id)}
         />
-      ))}
+     </div>
+    );
+  };
+
+  const ITEM_HEIGHT = 190;
+
+  return (
+    <div ref={containerRef} className="h-[600px]">
+      {width > 0 && (
+        <List
+          height={600}
+          width={width}
+          itemCount={echipamente.length}
+          itemSize={ITEM_HEIGHT}
+          overscanCount={5}
+        >
+          {Row}
+        </List>
+      )}
     </div>
   );
 }
+
+export default memo(EquipmentList);

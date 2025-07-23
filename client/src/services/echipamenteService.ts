@@ -1,9 +1,39 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "./api";
 
-export const getEchipamente = () => api.get("/echipamente");
-export const createEchipament = (data: any) => api.post("/echipamente", data);
-export const updateEchipament = async (id: string, data: any) => {
-  const res = await api.put(`/echipamente/${id}`, data);
-  return res.data; 
+export const useEchipamente = () =>
+  useQuery({
+    queryKey: ["echipamente"],
+    queryFn: async () => (await api.get("/echipamente")).data,
+  });
+
+export const useCreateEchipament = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: any) => api.post("/echipamente", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["echipamente"] });
+    },
+  });
 };
-export const deleteEchipament = (id: string) => api.delete(`/echipamente/${id}`);
+
+export const useUpdateEchipament = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      api.put(`/echipamente/${id}`, data).then((r) => r.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["echipamente"] });
+    },
+  });
+};
+
+export const useDeleteEchipament = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/echipamente/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["echipamente"] });
+    },
+  });
+};

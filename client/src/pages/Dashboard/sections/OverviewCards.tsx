@@ -1,15 +1,14 @@
 "use client";
 
-import { useEffect, useState, type JSX } from "react";
+import { type JSX } from "react";
 import {
   UsersIcon,
   LaptopIcon,
   CheckCircle2Icon,
   MinusCircleIcon,
 } from "lucide-react";
-import { getAngajati } from "@/services/angajatiService";
-import { getEchipamente } from "@/services/echipamenteService";
-import { useRefresh } from "@/context/useRefreshContext";
+import { useAngajati } from "@/services/angajatiService";
+import { useEchipamente } from "@/services/echipamenteService";
 
 type Echipament = {
   id: string;
@@ -18,18 +17,13 @@ type Echipament = {
 };
 
 export default function OverviewCards() {
-  const [angajatiCount, setAngajatiCount] = useState(0);
-  const [echipamente, setEchipamente] = useState<Echipament[]>([]);
-  const { refreshKey } = useRefresh();
+ const { data: angajati } = useAngajati();
+  const { data: echipamente } = useEchipamente();
 
-  useEffect(() => {
-    getAngajati().then((res) => setAngajatiCount(res.data.length));
-    getEchipamente().then((res) => setEchipamente(res.data));
-  }, [refreshKey]);
-
-  const total = echipamente.length;
-  const disponibile = echipamente.filter((e) => !e.angajatId).length;
-  const predate = echipamente.filter((e) => !!e.angajatId).length;
+ const angajatiCount = angajati?.length ?? 0;
+  const total = echipamente?.length ?? 0;
+  const disponibile = echipamente?.filter((e) => !e.angajatId).length ?? 0;
+  const predate = echipamente?.filter((e) => !!e.angajatId).length ?? 0;
 
   const Card = ({
     label,

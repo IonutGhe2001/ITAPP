@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { UserPlusIcon, LaptopIcon, FileTextIcon, UserCogIcon, DownloadIcon } from "lucide-react";
-import ModalAddColeg from "../modals/ModalAddColeg";
-import ModalAddEchipament from "../modals/ModalAddEchipament";
-import ModalProcesVerbal from "../modals/ModalProcesVerbal";
-import ModalCreateUser from "../modals/ModalCreateUser";
+const ModalAddColeg = React.lazy(() => import("../modals/ModalAddColeg"));
+const ModalAddEchipament = React.lazy(() => import("../modals/ModalAddEchipament"));
+const ModalProcesVerbal = React.lazy(() => import("../modals/ModalProcesVerbal"));
+const ModalCreateUser = React.lazy(() => import("../modals/ModalCreateUser"));
 import { Button } from "@/components/ui/button";
 
 export default function QuickActions() {
@@ -68,10 +68,20 @@ export default function QuickActions() {
       </div>
 
       {/* Modaluri */}
-      {showColegModal && <ModalAddColeg onClose={() => setShowColegModal(false)} />}
-      {showEchipamentModal && <ModalAddEchipament onClose={() => setShowEchipamentModal(false)} />}
-      {showProcesModal && <ModalProcesVerbal onClose={() => setShowProcesModal(false)} />}
-      {showCreateUserModal && <ModalCreateUser onClose={() => setShowCreateUserModal(false)} />}
+     <Suspense fallback={null}>
+        {showColegModal && (
+          <ModalAddColeg onClose={() => setShowColegModal(false)} />
+        )}
+        {showEchipamentModal && (
+          <ModalAddEchipament onClose={() => setShowEchipamentModal(false)} />
+        )}
+        {showProcesModal && (
+          <ModalProcesVerbal onClose={() => setShowProcesModal(false)} />
+        )}
+        {showCreateUserModal && (
+          <ModalCreateUser onClose={() => setShowCreateUserModal(false)} />
+        )}
+      </Suspense>
     </>
   );
 }

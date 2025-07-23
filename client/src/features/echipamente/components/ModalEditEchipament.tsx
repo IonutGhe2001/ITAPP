@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -15,13 +15,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { updateEchipament } from "@/services/echipamenteService";
-import { getAngajati } from "@/services/angajatiService";
+import { useUpdateEchipament } from "@/services/echipamenteService";
+import { useAngajati } from "@/services/angajatiService";
 import { useToast } from "@/hooks/use-toast/useToast";
-import { useRefresh } from "@/context/useRefreshContext"; 
 import type { ModalEditEchipamentProps } from "@/features/echipamente/types";
 
-export default function ModalEditEchipament({
+function ModalEditEchipament({
   echipament,
   onClose,
   onUpdated,
@@ -34,9 +33,10 @@ export default function ModalEditEchipament({
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [angajati, setAngajati] = useState<any[]>([]);
+   const { data: angajati = [] } = useAngajati();
+  const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
-  const { triggerRefresh } = useRefresh(); 
+  
 
   useEffect(() => {
     if (echipament) {
@@ -49,21 +49,7 @@ export default function ModalEditEchipament({
     }
   }, [echipament]);
 
-  useEffect(() => {
-    getAngajati()
-      .then((res) => {
-        if (Array.isArray(res.data)) {
-          setAngajati(res.data);
-        } else {
-          console.error("❌ Răspuns invalid la getAngajati:", res);
-          setAngajati([]);
-        }
-      })
-      .catch((err) => {
-        console.error("❌ Eroare la getAngajati:", err);
-        setAngajati([]);
-      });
-  }, []);
+
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
@@ -85,13 +71,12 @@ export default function ModalEditEchipament({
     };
 
     try {
-      const updated = await updateEchipament(echipament.id, payload);
+      const updated = await updateMutation.mutateAsync({ id: echipament.id, data: payload });
       toast({
         title: "Echipament salvat",
         description: "Modificările au fost salvate cu succes.",
       });
-      triggerRefresh(); 
-      onUpdated(updated);
+      onUpdated(updated as any);
       onClose();
     } catch (error) {
       toast({
@@ -167,3 +152,5 @@ export default function ModalEditEchipament({
     </Dialog>
   );
 }
+
+export default memo(ModalEditEchipament);

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { cn } from "@/lib/utils";
 
 type DashboardSectionCardProps = {
@@ -7,7 +8,7 @@ type DashboardSectionCardProps = {
   icon?: React.ReactNode; 
 };
 
-export default function DashboardSectionCard({
+function DashboardSectionCard({
   children,
   className,
   title,
@@ -30,3 +31,5 @@ export default function DashboardSectionCard({
 </section>
   );
 }
+
+export default memo(DashboardSectionCard);

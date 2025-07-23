@@ -1,7 +1,8 @@
+import { memo, useMemo } from "react";
 import type { EquipmentTabsProps } from "@/features/echipamente/types";
 
-export default function EquipmentTabs({ active, onChange }: EquipmentTabsProps) {
-  const tabs = ["toate", "laptop", "telefon", "sim"];
+function EquipmentTabs({ active, onChange }: EquipmentTabsProps) {
+  const tabs = useMemo(() => ["toate", "laptop", "telefon", "sim"], []);
 
   return (
     <div className="flex gap-2 mb-6">
@@ -21,3 +22,5 @@ export default function EquipmentTabs({ active, onChange }: EquipmentTabsProps) 
     </div>
   );
 }
+
+export default memo(EquipmentTabs);

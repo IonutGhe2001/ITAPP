@@ -1,5 +1,5 @@
-import { useEffect, useState, type JSX } from "react";
-import { getAngajati } from "../../services/angajatiService";
+import { useState, type JSX } from "react";
+import { useAngajati } from "../../services/angajatiService";
 import {
   LaptopIcon,
   SmartphoneIcon,
@@ -8,21 +8,9 @@ import {
 import ModalAsigneazaEchipament from "./ModalAsigneazaEchipament";
 
 export default function Colegi() {
-  const [colegi, setColegi] = useState<any[]>([]);
+  const { data: colegi = [], refetch } = useAngajati();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [selectedAngajatId, setSelectedAngajatId] = useState<string | null>(null);
-  const [refetchKey, setRefetchKey] = useState(0);
-
-  const fetchAngajati = () =>
-    getAngajati().then((res) => setColegi(res.data));
-
-  useEffect(() => {
-    fetchAngajati();
-  }, [refetchKey]);
-
-  useEffect(() => {
-    console.log("COLEGI din backend:", colegi);
-  }, [colegi]);
 
   const toggleExpand = (id: string) => {
     setExpanded((prev) => (prev === id ? null : id));
@@ -44,10 +32,11 @@ export default function Colegi() {
           >
             <div className="flex items-center gap-4">
              <img
-  src="/profile.png"
-  alt="avatar"
-  className="w-16 h-16 rounded-full"
-/>
+   src="/profile.png"
+    alt="avatar"
+    loading="lazy"
+    className="w-16 h-16 rounded-full"
+  />
               <div className="flex-1">
                 <p className="font-semibold text-gray-800">{coleg.numeComplet}</p>
                 <p className="text-sm text-gray-600">{coleg.functie}</p>
@@ -100,15 +89,15 @@ export default function Colegi() {
       </div>
 
       {selectedAngajatId && (
-        <ModalAsigneazaEchipament
-          angajatId={selectedAngajatId}
-          onClose={() => setSelectedAngajatId(null)}
-          onSuccess={() => {
-            setRefetchKey((k) => k + 1);
-            setExpanded(null); 
-            setSelectedAngajatId(null);
-          }}
-        />
+      <ModalAsigneazaEchipament
+            angajatId={selectedAngajatId}
+            onClose={() => setSelectedAngajatId(null)}
+            onSuccess={() => {
+              refetch();
+              setExpanded(null);
+              setSelectedAngajatId(null);
+            }}
+          />
       )}
     </div>
   );
