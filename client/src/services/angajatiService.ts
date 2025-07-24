@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "./api";
 
+export const getAngajati = () => api.get("/angajati");
+
 export const useAngajati = () =>
   useQuery({
     queryKey: ["angajati"],
