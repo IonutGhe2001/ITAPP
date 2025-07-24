@@ -14,7 +14,7 @@ export const creeazaProcesVerbalCuEchipamente = async (angajatId: string, observ
       angajatId: angajat.id,
       observatii: observatii || null,
       echipamente: {
-        connect: angajat.echipamente.map(eq => ({ id: eq.id })),
+       connect: angajat.echipamente.map((eq: { id: string }) => ({ id: eq.id })),
       },
     },
     include: {

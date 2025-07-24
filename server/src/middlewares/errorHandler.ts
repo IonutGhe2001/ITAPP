@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ValidationError as JoiValidationError } from "joi";
 import { Prisma } from "@prisma/client";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export function errorHandler(err: any, req: Request, res: Response, next: NextFunction) {
   console.error(err);
@@ -11,7 +12,7 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
   }
 
   // Prisma unique constraint
-  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+  if (err instanceof PrismaClientKnownRequestError) {
     if (err.code === "P2002") {
       return res.status(409).json({ error: `Valoarea introdusă există deja.` });
     }
