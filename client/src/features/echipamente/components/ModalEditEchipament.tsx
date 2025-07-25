@@ -94,12 +94,13 @@ function ModalEditEchipament({
   };
 
   return (
-    <Dialog open onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Editează echipamentul</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
+     <>
+      <Dialog open onOpenChange={onClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editează echipamentul</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
           <div>
             <Label>Nume echipament</Label>
             <Input
@@ -166,15 +167,16 @@ function ModalEditEchipament({
               Adaugă coleg nou
             </button>
           </div>
-          <Button onClick={handleSubmit}>Salvează</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-    <Suspense fallback={null}>
-      {showColegModal && (
-        <ModalAddColeg onClose={() => setShowColegModal(false)} />
-      )}
-    </Suspense>
+              <Button onClick={handleSubmit}>Salvează</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Suspense fallback={null}>
+        {showColegModal && (
+          <ModalAddColeg onClose={() => setShowColegModal(false)} />
+        )}
+      </Suspense>
+    </>
   );
 }
 

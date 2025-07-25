@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import React from "react";
+import type { Angajat } from "@/features/echipamente/types";
 const ModalAddColeg = React.lazy(() => import("./ModalAddColeg"));
 import { useCreateEchipament } from "@/services/echipamenteService";
 import { useAngajati } from "@/services/angajatiService";
@@ -75,12 +75,13 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
   };
 
   return (
-    <Dialog open onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Adaugă echipament</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
+   <>
+      <Dialog open onOpenChange={onClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Adaugă echipament</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
           <div>
             <Label>Nume echipament</Label>
             <Input
@@ -137,8 +138,10 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
               <SelectContent>
                 <SelectItem value="none">Neatribuit</SelectItem>
                {angajati
-                  .filter((a) => a.numeComplet.toLowerCase().includes(search.toLowerCase()))
-                  .map((a) => (
+                  filter((a: Angajat) =>
+                    a.numeComplet.toLowerCase().includes(search.toLowerCase())
+                  )
+                  .map((a: Angajat) => (
                     <SelectItem key={a.id} value={a.id}>
                       {a.numeComplet}
                     </SelectItem>
@@ -163,5 +166,6 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
         <ModalAddColeg onClose={() => setShowColegModal(false)} />
       )}
     </Suspense>
+    </>
   );
 }

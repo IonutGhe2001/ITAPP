@@ -12,7 +12,10 @@ import ModalEditEchipament from "../../features/echipamente/components/ModalEdit
 import ImportEchipamente from "../../features/echipamente/ImportEchipamente";
 
 export default function Echipamente() {
- const { data: echipamente = [], refetch } = useEchipamente();
+ const {
+    data: echipamente = [],
+    refetch,
+  } = useEchipamente() as { data: Echipament[] | undefined; refetch: () => void };
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -74,12 +77,16 @@ export default function Echipamente() {
     <div className="p-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
-          <EquipmentTabs active={tip} onChange={setTip} tabs={["toate", ...types]} />
+          <EquipmentTabs
+            active={tip}
+            onChange={(value: string) => setTip(value)}
+            tabs={["toate", ...types]}
+          />
           <EquipmentFilter
             search={search}
             status={status}
-            onSearchChange={setSearch}
-            onStatusChange={setStatus}
+             onSearchChange={(value: string) => setSearch(value)}
+            onStatusChange={(value: string) => setStatus(value)}
           />
           <EquipmentList
             echipamente={filtered}
