@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { logout as logoutRequest } from "@/services/authService";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -18,7 +19,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setToken(newToken);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await logoutRequest();
+    } catch (e) {
+      // ignore errors
+    }
     setToken(null);
   };
 

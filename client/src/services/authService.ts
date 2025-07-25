@@ -26,3 +26,7 @@ export const updateCurrentUser = async (data: Partial<{
 
   return res.data;
 };
+
+export const logout = async () => {
+  await api.post("/auth/logout");
+};
