@@ -39,7 +39,8 @@ export default function Echipamente() {
 
   const filtered = echipamente.filter((e: Echipament) => {
     if (tip !== "toate" && e.tip !== tip) return false;
-    if (status && e.stare !== status) return false;
+   if (status === "disponibil" && e.angajatId) return false;
+    if (status === "predat" && !e.angajatId) return false;
 
     if (search.trim()) {
       const q = search.toLowerCase();
