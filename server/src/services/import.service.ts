@@ -52,7 +52,7 @@ export const processImportRows = async (rows: ImportRow[]) => {
               tip,
               serie,
               angajatId,
-              stare: angajatId ? "asignat" : "disponibil",
+              stare: angajatId ? "predat" : "disponibil",
             },
           });
 

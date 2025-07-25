@@ -36,7 +36,8 @@ model Echipament {
   nume       String
   tip        String    
   serie      String    @unique
-  stare      String    
+  stare      String
+  metadata   Json?    
   angajatId  String?
   angajat    Angajat?  @relation(fields: [angajatId], references: [id])
   createdAt  DateTime  @default(now())

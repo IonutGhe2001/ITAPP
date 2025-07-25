@@ -2,7 +2,7 @@ import { prisma } from "../lib/prisma";
 
 
 export const getEchipamente = () => {
-  return prisma.echipament.findMany();
+  return prisma.echipament.findMany({ include: { angajat: true } });
 };
 
 export const createEchipament = (data: {
@@ -11,8 +11,9 @@ export const createEchipament = (data: {
   stare?: string; 
   serie: string;
   angajatId?: string | null;
+  metadata?: any;
 }) => {
-  const finalStare = data.angajatId ? "asignat" : "disponibil";
+  const finalStare = data.angajatId ? "predat" : "disponibil";
 
   return prisma.echipament.create({
     data: {
@@ -30,6 +31,7 @@ export const updateEchipament = (
     serie?: string;
     stare?: string;
     angajatId?: string | null;
+    metadata?: any;
   }
 ) => {
 return prisma.echipament.update({
@@ -40,6 +42,7 @@ return prisma.echipament.update({
     ...(data.serie !== undefined && { serie: data.serie }),
     ...(data.stare !== undefined && { stare: data.stare }),
     ...(data.angajatId !== undefined && { angajatId: data.angajatId }),
+    ...(data.metadata !== undefined && { metadata: data.metadata }),
   },
   include: {
     angajat: true, 
