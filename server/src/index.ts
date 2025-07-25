@@ -4,6 +4,7 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 import path from "path";
+import compression from "compression";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/errorHandler";
 import { logRequest } from "./utils/logger"; 
@@ -36,6 +37,7 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(helmet());
 app.use(cookieParser());
+app.use(compression());
 
 const loginLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minut
@@ -45,7 +47,13 @@ const loginLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-app.use("/assets", express.static(path.join(__dirname, "../public/assets")));
+app.use(
+  "/assets",
+  express.static(path.join(__dirname, "../public/assets"), {
+    maxAge: "1y",
+    etag: false,
+  })
+);
 app.use("/api/auth/login", loginLimiter);
  app.use(logRequest);
 
