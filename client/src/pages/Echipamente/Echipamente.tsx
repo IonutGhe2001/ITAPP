@@ -21,7 +21,16 @@ export default function Echipamente() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [tip, setTip] = useState("toate");
-  const types = Array.from(new Set(echipamente.map((e: Echipament) => e.tip)));
+  const types = (() => {
+    const map = new Map<string, string>();
+    echipamente.forEach((e: Echipament) => {
+      const key = e.tip.trim().toLowerCase();
+      if (!map.has(key)) {
+        map.set(key, e.tip.trim());
+      }
+    });
+    return Array.from(map.values());
+  })();
 
   const [selected, setSelected] = useState<any | null>(null);
 

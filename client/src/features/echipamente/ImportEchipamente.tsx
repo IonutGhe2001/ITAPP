@@ -5,6 +5,7 @@ import {
   Card,
   CardContent,
   CardHeader,
+  CardFooter,
   CardTitle,
 } from "@/components/ui/card";
 import { UploadCloud, Download } from "lucide-react";
@@ -80,17 +81,6 @@ function ImportEchipamente({ onImportSuccess }: { onImportSuccess?: () => void }
      <p className="text-sm text-muted-foreground">
           Încarcă un fișier Excel (.xlsx) cu echipamente. Poți specifica și angajatul asignat.
         </p>
-      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-          <input
-            type="file"
-            accept=".xlsx"
-            onChange={handleFileChange}
-            className="flex-1 text-sm border rounded-lg px-4 py-2 file:border-0 file:bg-primary file:text-white"
-          />
-          <Button onClick={handleImport} disabled={!file || loading}>
-            {loading ? "Se importă..." : "Importă"}
-          </Button>
-        </div>
 
      {result && (
           <div className="text-sm mt-2">
@@ -109,6 +99,17 @@ function ImportEchipamente({ onImportSuccess }: { onImportSuccess?: () => void }
 
         {error && <p className="text-red-500 text-sm">{error}</p>}
       </CardContent>
+      <CardFooter className="flex flex-col sm:flex-row sm:items-center gap-2">
+        <input
+          type="file"
+          accept=".xlsx"
+          onChange={handleFileChange}
+          className="flex-1 text-sm border rounded-lg px-4 py-2 file:border-0 file:bg-primary file:text-white"
+        />
+        <Button onClick={handleImport} disabled={!file || loading} className="sm:w-auto w-full">
+          {loading ? "Se importă..." : "Importă"}
+        </Button>
+      </CardFooter>
     </Card>
   );
 }
