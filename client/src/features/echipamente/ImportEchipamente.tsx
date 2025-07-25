@@ -68,7 +68,7 @@ function ImportEchipamente({ onImportSuccess }: { onImportSuccess?: () => void }
           Import echipamente
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 flex-1">
         <a
           href="/template_import_echipamente.xlsx"
           download
@@ -99,17 +99,17 @@ function ImportEchipamente({ onImportSuccess }: { onImportSuccess?: () => void }
 
         {error && <p className="text-red-500 text-sm">{error}</p>}
       </CardContent>
-      <CardFooter className="flex flex-col sm:flex-row sm:items-center gap-2">
-        <input
-          type="file"
-          accept=".xlsx"
-          onChange={handleFileChange}
-          className="flex-1 text-sm border rounded-lg px-4 py-2 file:border-0 file:bg-primary file:text-white"
-        />
-        <Button onClick={handleImport} disabled={!file || loading} className="sm:w-auto w-full">
-          {loading ? "Se importă..." : "Importă"}
-        </Button>
-      </CardFooter>
+      <CardFooter className="flex flex-col sm:flex-row sm:items-center gap-3  flex-wrap">
+  <input
+    type="file"
+    accept=".xlsx"
+    onChange={handleFileChange}
+    className="flex-1 min-w-[150px] text-sm border rounded-lg px-4 py-2 file:border-0 file:bg-primary file:text-white"
+  />
+  <Button onClick={handleImport} disabled={!file || loading} className="w-full sm:w-auto">
+    {loading ? "Se importă..." : "Importă"}
+  </Button>
+</CardFooter>
     </Card>
   );
 }
