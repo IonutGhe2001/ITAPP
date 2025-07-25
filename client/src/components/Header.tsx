@@ -1,5 +1,6 @@
 import { FaBell } from "react-icons/fa";
-import { Search } from "lucide-react";
+import { Search, Menu } from "lucide-react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@components/ui/button";
 import {
@@ -10,12 +11,14 @@ import {
 } from "@components/ui/dropdown-menu";
 import { useUser } from "@/store/UserContext";
 import { removeToken } from "@/utils/storage"; 
-import pageTitles from "@/constants/pageTitles"; 
+import pageTitles from "@/constants/pageTitles";
+import MobileSidebar from "@/components/MobileSidebar"; 
 
 export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const title = pageTitles[location.pathname] || "Pagina";
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { user, loading } = useUser();
 
@@ -29,11 +32,21 @@ export default function Header() {
   };
 
   return (
+    <>
     <header className="sticky top-0 z-40 flex items-center justify-between px-6 py-4 bg-background shadow-sm border-b border-border">
-      <div className="flex flex-col">
-        <h1 className="text-sm text-muted-foreground tracking-wide uppercase">
-          {title}
-        </h1>
+      <div className="flex items-center gap-2">
+        <button
+          className="md:hidden text-muted-foreground"
+          onClick={() => setMobileMenuOpen(true)}
+        >
+          <Menu className="w-6 h-6" />
+          <span className="sr-only">Deschide meniul</span>
+        </button>
+        <div className="flex flex-col">
+          <h1 className="text-sm text-muted-foreground tracking-wide uppercase">
+            {title}
+          </h1>
+        </div>
       </div>
 
       <div className="flex items-center gap-4">
@@ -88,5 +101,7 @@ export default function Header() {
         )}
       </div>
     </header>
+    <MobileSidebar open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} />
+    </>
   );
 }

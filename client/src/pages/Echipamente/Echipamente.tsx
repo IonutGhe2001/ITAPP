@@ -10,6 +10,7 @@ import EquipmentFilter from "../../features/echipamente/components/EquipmentFilt
 import EquipmentList from "../../features/echipamente/components/EquipmentList";
 import ModalEditEchipament from "../../features/echipamente/components/ModalEditEchipament";
 import ImportEchipamente from "../../features/echipamente/ImportEchipamente";
+import Container from "@/components/Container";
 
 export default function Echipamente() {
  const {
@@ -74,7 +75,7 @@ export default function Echipamente() {
   };
 
   return (
-    <div className="p-6">
+    <Container className="py-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
           <EquipmentTabs
@@ -106,6 +107,6 @@ export default function Echipamente() {
             onUpdated={() => setSelected(null)}
           />
       )}
-    </div>
+    </Container>
   );
 }

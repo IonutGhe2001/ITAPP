@@ -4,6 +4,7 @@ import { updateCurrentUser } from "@/services/authService";
 import { useUser } from "@/store/UserContext";
 import type { User } from "@/store/UserContext";
 import { useToast } from "@/hooks/use-toast/useToast";
+import Container from "@/components/Container";
 
 const fallbackImage = "/profile.png";
 
@@ -59,7 +60,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <Container className="py-10">
       <h1 className="text-3xl font-bold text-foreground mb-8">Profilul meu</h1>
 
       <div className="bg-white shadow-md rounded-2xl p-6 flex flex-col items-center gap-6">
@@ -132,7 +133,7 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
-    </div>
+    </Container>
   );
 }
 

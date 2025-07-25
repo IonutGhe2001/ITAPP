@@ -25,6 +25,7 @@ import {
   CalendarCheckIcon,
 } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import Container from "@/components/Container";
 
 export default function Dashboard() {
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(new Date());
@@ -78,7 +79,8 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="flex flex-col gap-8 p-6">
+    <Container className="py-6">
+      <div className="flex flex-col gap-8">
       <DashboardSectionCard title="Prezentare generală" icon={<BarChartIcon />}>
         <div className="flex flex-wrap gap-4 justify-start sm:justify-center">
           <OverviewCards />
@@ -138,5 +140,6 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
     </div>
+    </Container>
   );
 }

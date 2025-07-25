@@ -7,6 +7,7 @@ import {
   NetworkIcon,
 } from "lucide-react";
 import ModalAsigneazaEchipament from "./ModalAsigneazaEchipament";
+import Container from "@/components/Container";
 
 export default function Colegi() {
   const { data: colegi = [], refetch } = useAngajati();
@@ -24,7 +25,7 @@ export default function Colegi() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <Container className="py-6 space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
          {colegi.map((coleg: Angajat & { echipamente: Echipament[] }) => (
           <div
@@ -100,6 +101,6 @@ export default function Colegi() {
             }}
           />
       )}
-    </div>
+    </Container>
   );
 }
