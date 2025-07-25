@@ -12,7 +12,7 @@ import {
 import { useUser } from "@/store/UserContext";
 import { removeToken } from "@/utils/storage"; 
 import pageTitles from "@/constants/pageTitles";
-import MobileSidebar from "@/components/MobileSidebar"; 
+import MobileSidebar from "@/components/MobileSideBar"; 
 
 export default function Header() {
   const location = useLocation();
