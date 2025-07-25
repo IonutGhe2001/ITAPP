@@ -7,7 +7,13 @@ export const loginSchema = Joi.object({
 
 export const registerSchema = Joi.object({
   email: Joi.string().email().required(),
-  password: Joi.string().min(6).required(),
+  password: Joi.string()
+    .pattern(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/)
+    .required()
+    .messages({
+      "string.pattern.base":
+        "Parola trebuie să aibă cel puțin 8 caractere, o literă mare și o cifră",
+    }),
   nume: Joi.string().required(),
   prenume: Joi.string().required(),
   functie: Joi.string().required(),

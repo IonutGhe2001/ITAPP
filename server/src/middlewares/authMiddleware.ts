@@ -11,13 +11,18 @@ export interface AuthPayload {
 }
 
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
+   let token: string | undefined;
   const authHeader = req.headers.authorization;
 
-  if (!authHeader?.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Token lipsă" });
+  if (authHeader?.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else if (req.cookies?.token) {
+    token = req.cookies.token;
   }
 
-  const token = authHeader.split(" ")[1];
+ if (!token) {
+    return res.status(401).json({ message: "Token lipsă" });
+  }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as AuthPayload;

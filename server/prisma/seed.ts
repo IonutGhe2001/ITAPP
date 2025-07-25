@@ -1,5 +1,13 @@
 import { prisma } from "@lib/prisma";
 import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+if (process.env.NODE_ENV === 'production') {
+  console.log('Seeding skipped in production environment');
+  process.exit(0);
+}
 
 
 

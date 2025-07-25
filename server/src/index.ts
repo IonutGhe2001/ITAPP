@@ -4,6 +4,7 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 import path from "path";
+import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/errorHandler";
 import { logRequest } from "./utils/logger"; 
 
@@ -20,10 +21,17 @@ dotenv.config();
 const app = express();
 
 // Global Middlewares
-app.use(cors());
+const allowedOrigins = (process.env.CORS_ORIGIN || "").split(",").filter(Boolean);
+app.use(
+  cors({
+    origin: allowedOrigins.length ? allowedOrigins : undefined,
+    credentials: true,
+  })
+);
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(helmet());
+app.use(cookieParser());
 
 const loginLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minut
