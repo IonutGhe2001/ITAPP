@@ -21,10 +21,12 @@ dotenv.config();
 const app = express();
 
 // Global Middlewares
-const allowedOrigins = (process.env.CORS_ORIGIN || "").split(",").filter(Boolean);
+const allowedOrigins = (process.env.CORS_ORIGIN || "")
+  .split(",")
+  .filter(Boolean);
 app.use(
   cors({
-    origin: allowedOrigins.length ? allowedOrigins : undefined,
+    origin: allowedOrigins.length ? allowedOrigins : "*",
     credentials: true,
   })
 );
