@@ -18,7 +18,7 @@ import {
 import { useUpdateEchipament } from "@/services/echipamenteService";
 import { useAngajati } from "@/services/angajatiService";
 import { useToast } from "@/hooks/use-toast/useToast";
-import type { ModalEditEchipamentProps } from "@/features/echipamente/types";
+import type { ModalEditEchipamentProps, Angajat } from "@/features/echipamente/types";
 
 function ModalEditEchipament({
   echipament,
@@ -138,7 +138,7 @@ function ModalEditEchipament({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">Neatribuit</SelectItem>
-                {angajati.map((a) => (
+                {angajati.map((a: Angajat) => (
                   <SelectItem key={a.id} value={a.id}>
                     {a.numeComplet}
                   </SelectItem>

@@ -2,7 +2,8 @@ import { memo } from "react";
 import { useEffect, useRef, useState } from "react";
 import { FixedSizeList as List } from "react-window";
 import EquipmentCard from "./EquipmentCard";
-import type { EquipmentListProps } from "@/features/echipamente/types";
+import type { EquipmentListProps, Echipament } from "@/features/echipamente/types";
+
 
 function EquipmentList({
   echipamente,
@@ -32,13 +33,13 @@ function EquipmentList({
   }
 
  const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
-    const eq = echipamente[index];
+    const eq: Echipament = echipamente[index];
     return (
       <div style={style} className="p-2">
         <EquipmentCard
           key={eq.id}
           echipament={eq}
-          onEdit={(val) => {
+          onEdit={(val: Echipament | string) => {
             if (typeof val === "object") {
               onEdit?.(val);
             } else {

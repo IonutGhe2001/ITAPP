@@ -1,5 +1,6 @@
 import { useState, type JSX } from "react";
 import { useAngajati } from "../../services/angajatiService";
+import type { Angajat, Echipament } from "@/features/echipamente/types";
 import {
   LaptopIcon,
   SmartphoneIcon,
@@ -13,7 +14,7 @@ export default function Colegi() {
   const [selectedAngajatId, setSelectedAngajatId] = useState<string | null>(null);
 
   const toggleExpand = (id: string) => {
-    setExpanded((prev) => (prev === id ? null : id));
+    setExpanded((prev: string | null) => (prev === id ? null : id));
   };
 
   const iconMap: Record<string, JSX.Element> = {
@@ -25,7 +26,7 @@ export default function Colegi() {
   return (
     <div className="p-6 space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {colegi.map((coleg) => (
+         {colegi.map((coleg: Angajat & { echipamente: Echipament[] }) => (
           <div
             key={coleg.id}
             className="bg-white rounded-xl shadow-md p-4 flex flex-col gap-4"
@@ -66,7 +67,7 @@ export default function Colegi() {
                     Nu are echipamente alocate.
                   </li>
                 ) : (
-                  coleg.echipamente.map((e: any) => (
+                  coleg.echipamente.map((e: Echipament) => (
                     <li
                       key={e.id}
                       className="flex items-start gap-3 text-sm border border-gray-100 rounded-lg p-2 shadow-sm bg-gray-50"

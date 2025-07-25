@@ -20,10 +20,10 @@ export default function OverviewCards() {
  const { data: angajati } = useAngajati();
   const { data: echipamente } = useEchipamente();
 
- const angajatiCount = angajati?.length ?? 0;
+  const angajatiCount = angajati?.length ?? 0;
   const total = echipamente?.length ?? 0;
-  const disponibile = echipamente?.filter((e) => !e.angajatId).length ?? 0;
-  const predate = echipamente?.filter((e) => !!e.angajatId).length ?? 0;
+  const disponibile = echipamente?.filter((e: Echipament) => !e.angajatId).length ?? 0;
+  const predate = echipamente?.filter((e: Echipament) => !!e.angajatId).length ?? 0;
 
   const Card = ({
     label,

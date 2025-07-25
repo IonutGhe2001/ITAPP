@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useEchipamente, useUpdateEchipament } from "../../services/echipamenteService";
+import type { Echipament } from "@/features/echipamente/types";
 
 export default function ModalAsigneazaEchipament({
   angajatId,
@@ -39,8 +40,8 @@ export default function ModalAsigneazaEchipament({
         >
           <option value="">Selectează echipament disponibil</option>
            {echipamente
-            .filter((e) => e.stare === "disponibil")
-            .map((e) => (
+            .filter((e: Echipament) => e.stare === "disponibil")
+            .map((e: Echipament) => (
             <option key={e.id} value={e.id}>
               {e.nume} – Serie: {e.serie}
             </option>

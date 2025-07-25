@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { Echipament } from "@/features/echipamente/types";
 import {
     useEchipamente,
   useDeleteEchipament,
@@ -22,7 +23,7 @@ export default function Echipamente() {
   const deleteMutation = useDeleteEchipament();
   const updateMutation = useUpdateEchipament();
 
-  const filtered = echipamente.filter((e) => {
+  const filtered = echipamente.filter((e: Echipament) => {
     if (tip !== "toate" && e.tip !== tip) return false;
     if (status && e.stare !== status) return false;
 
@@ -38,7 +39,7 @@ export default function Echipamente() {
     await deleteMutation.mutateAsync(id);
   };
 
-  const handleEdit = async (data: any) => {
+  const handleEdit = async (data: Echipament & { __editMode?: boolean }) => {
     const isQuickUpdate = "angajatId" in data && data.__editMode !== true;
 
     if (isQuickUpdate) {

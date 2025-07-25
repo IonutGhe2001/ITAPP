@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useAngajati } from "@/services/angajatiService";
-import type { ModalPredaEchipamentProps } from "@/features/echipamente/types";
+import type { ModalPredaEchipamentProps, Angajat } from "@/features/echipamente/types";
 
 function ModalPredaEchipament({ echipament, onClose, onSubmit }: ModalPredaEchipamentProps) {
   const { data: angajati = [] } = useAngajati();
@@ -39,7 +39,7 @@ function ModalPredaEchipament({ echipament, onClose, onSubmit }: ModalPredaEchip
               <SelectValue placeholder="Selectează angajatul" />
             </SelectTrigger>
             <SelectContent>
-              {angajati.map((a) => (
+              {angajati.map((a: Angajat) => (
                 <SelectItem key={a.id} value={a.id}>
                   {a.numeComplet}
                 </SelectItem>
