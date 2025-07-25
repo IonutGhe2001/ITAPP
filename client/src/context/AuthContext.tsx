@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 interface AuthContextType {
   isAuthenticated: boolean;
   token: string | null;
+  loading: boolean;
   login: (token: string) => void;
   logout: () => void;
 }
