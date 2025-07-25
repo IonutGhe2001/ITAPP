@@ -17,7 +17,6 @@ import {
   type Eveniment,
   type EvenimentData,
 } from "@/services/evenimenteService";
-import { useAuth } from "@/store/authStore";
 import {
   BarChartIcon,
   FlashlightIcon,
@@ -33,25 +32,23 @@ export default function Dashboard() {
   const [editing, setEditing] = useState<Eveniment | null>(null);
   const [formDate, setFormDate] = useState<Date | null>(null);
   const [showFormModal, setShowFormModal] = useState(false);
-  const token = useAuth((state) => state.token);
+  
 
   useEffect(() => {
-    if (!token) return;
-    fetchEvenimente(token)
+    fetchEvenimente()
       .then(setEvenimente)
       .catch(console.error);
-  }, [token]);
+  }, []);
 
   const handleCreate = async (data: EvenimentData) => {
-    if (!token) return;
-    const nou = await createEveniment(data, token);
+   const nou = await createEveniment(data);
     setEvenimente((prev) => [...prev, nou]);
     setShowFormModal(false);
   };
 
   const handleUpdate = async (id: number | null, data: EvenimentData) => {
-    if (!token || id === null) return;
-    const updated = await updateEveniment(id, data, token);
+     if (id === null) return;
+    const updated = await updateEveniment(id, data);
     setEvenimente((prev) =>
       prev.map((e) => (e.id === id ? updated : e))
     );
@@ -60,8 +57,7 @@ export default function Dashboard() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!token) return;
-    await deleteEveniment(id, token);
+    await deleteEveniment(id);
     setEvenimente((prev) => prev.filter((e) => e.id !== id));
   };
 

@@ -9,7 +9,7 @@ import {
   type Eveniment,
   type EvenimentData,
 } from "@/services/evenimenteService";
-import { useAuth } from "@/store/authStore";
+
 
 import EventCalendar from "./upcoming-events/EventCalendar";
 import EventList from "./upcoming-events/EventList";
@@ -21,24 +21,22 @@ export default function UpcomingEvents() {
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(new Date());
   const [evenimente, setEvenimente] = useState<Eveniment[]>([]);
   const [editing, setEditing] = useState<Eveniment | null>(null);
-  const token = useAuth((state) => state.token);
+  
 
   useEffect(() => {
-    if (!token) return;
-    fetchEvenimente(token)
+    fetchEvenimente()
       .then(setEvenimente)
       .catch(console.error);
-  }, [token]);
+  }, []);
 
   const handleCreate = async (data: EvenimentData) => {
-    if (!token) return;
-    const nou = await createEveniment(data, token);
+     const nou = await createEveniment(data);
     setEvenimente((prev) => [...prev, nou]);
   };
 
   const handleUpdate = async (id: number | null, data: EvenimentData) => {
-    if (!token || id === null) return;
-    const updated = await updateEveniment(id, data, token);
+    if (id === null) return;
+    const updated = await updateEveniment(id, data);
     setEvenimente((prev) =>
       prev.map((e) => (e.id === id ? updated : e))
     );
@@ -46,8 +44,7 @@ export default function UpcomingEvents() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!token) return;
-    await deleteEveniment(id, token);
+    await deleteEveniment(id);
     setEvenimente((prev) => prev.filter((e) => e.id !== id));
   };
 

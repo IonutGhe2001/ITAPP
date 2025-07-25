@@ -12,37 +12,21 @@ export type Eveniment = EvenimentData & {
 };
 
 // 🔍 Obține toate evenimentele
-export const fetchEvenimente = (token: string): Promise<Eveniment[]> => {
-  return api.get("/evenimente", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }).then(res => res.data);
+export const fetchEvenimente = (): Promise<Eveniment[]> => {
+  return api.get("/evenimente").then(res => res.data);
 };
 
 // ➕ Creează un nou eveniment
-export const createEveniment = (data: EvenimentData, token: string): Promise<Eveniment> => {
-  return api.post("/evenimente", data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }).then(res => res.data);
+export const createEveniment = (data: EvenimentData): Promise<Eveniment> => {
+  return api.post("/evenimente", data).then(res => res.data);
 };
 
 // 📝 Actualizează un eveniment existent
-export const updateEveniment = (id: number, data: EvenimentData, token: string): Promise<Eveniment> => {
-  return api.patch(`/evenimente/${id}`, data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }).then(res => res.data);
+export const updateEveniment = (id: number, data: EvenimentData): Promise<Eveniment> => {
+  return api.patch(`/evenimente/${id}`, data).then(res => res.data);
 };
 
 // ❌ Șterge un eveniment
-export const deleteEveniment = (id: number, token: string): Promise<void> => {
-  return api.delete(`/evenimente/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }).then(res => res.data);
+export const deleteEveniment = (id: number): Promise<void> => {
+  return api.delete(`/evenimente/${id}`).then(res => res.data);
 };
