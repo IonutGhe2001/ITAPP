@@ -21,12 +21,12 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      const response = await api.post("/auth/login", {
+      await api.post("/auth/login", {
         email,
         password: parola,
       });
-       authContext.login(response.data.token);
-      authStore.setToken(response.data.token);
+      authContext.login("logged-in");
+      authStore.setToken("logged-in");
       navigate("/");
     } catch (err) {
       setError("Email sau parolă incorectă");

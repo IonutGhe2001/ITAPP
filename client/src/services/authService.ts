@@ -1,13 +1,10 @@
 import api from "./api";
 
 export const login = async (email: string, password: string) => {
-  const response = await api.post("/auth/login", { email, password });
-  return response.data.token;
+  await api.post("/auth/login", { email, password });
 };
 
 export const getCurrentUser = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) return null;
   try {
    const res = await api.get("/auth/me");
     return res.data;
@@ -24,8 +21,6 @@ export const updateCurrentUser = async (data: Partial<{
   telefon?: string;
   profilePicture?: string;
 }>) => {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("Neautentificat");
 
    const res = await api.patch("/auth/me", data);
 

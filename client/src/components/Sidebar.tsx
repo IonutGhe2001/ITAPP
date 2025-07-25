@@ -10,7 +10,6 @@ export default function Sidebar() {
      ${isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`;
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
     navigate("/login");
   };
 
