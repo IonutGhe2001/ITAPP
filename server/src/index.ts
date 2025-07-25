@@ -21,12 +21,14 @@ dotenv.config();
 const app = express();
 
 // Global Middlewares
-const allowedOrigins = (process.env.CORS_ORIGIN || "")
+// When using credentials the origin cannot be "*". Default to the frontend
+// development URL if no environment variable is provided.
+const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
   .split(",")
   .filter(Boolean);
 app.use(
   cors({
-    origin: allowedOrigins.length ? allowedOrigins : "*",
+    origin: allowedOrigins,
     credentials: true,
   })
 );
