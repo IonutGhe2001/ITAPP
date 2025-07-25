@@ -52,10 +52,19 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
   const handleSubmit = async () => {
     if (!validate()) return;
 
+     let metadata: any = undefined;
+    if (formData.metadata.trim()) {
+      try {
+        metadata = JSON.parse(formData.metadata);
+      } catch {
+        metadata = formData.metadata;
+      }
+    }
+
     const payload = {
       ...formData,
       angajatId: formData.angajatId === "none" ? null : formData.angajatId,
-      metadata: formData.metadata || undefined,
+      metadata,
     };
 
     try {

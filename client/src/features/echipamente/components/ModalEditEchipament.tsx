@@ -68,12 +68,21 @@ function ModalEditEchipament({
   const handleSubmit = async () => {
     if (!validate()) return;
 
+     let metadata: any = undefined;
+    if (formData.metadata.trim()) {
+      try {
+        metadata = JSON.parse(formData.metadata);
+      } catch {
+        metadata = formData.metadata;
+      }
+    }
+
     const payload = {
       nume: formData.nume.trim(),
       tip: formData.tip.trim(),
       serie: formData.serie.trim(),
       angajatId: formData.angajatId === "none" ? null : formData.angajatId,
-       metadata: formData.metadata || undefined,
+      metadata,
     };
 
     try {
@@ -135,12 +144,6 @@ function ModalEditEchipament({
           </div>
           <div>
             <Label>Angajat</Label>
-            <Input
-              placeholder="Caută..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="mb-2"
-            />
             <Select
               value={formData.angajatId}
               onValueChange={(value) => setFormData({ ...formData, angajatId: value })}
@@ -149,6 +152,15 @@ function ModalEditEchipament({
                 <SelectValue placeholder="Atribuie angajat (opțional)" />
               </SelectTrigger>
               <SelectContent>
+                <div className="p-2">
+                  <Input
+                    placeholder="Caută..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    className="mb-2"
+                  />
+                </div>
                 <SelectItem value="none">Neatribuit</SelectItem>
                 {angajati
                   .filter((a: Angajat) => a.numeComplet.toLowerCase().includes(search.toLowerCase()))
