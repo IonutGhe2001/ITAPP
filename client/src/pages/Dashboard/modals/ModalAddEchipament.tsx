@@ -138,7 +138,7 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
               <SelectContent>
                 <SelectItem value="none">Neatribuit</SelectItem>
                {angajati
-                  filter((a: Angajat) =>
+                  .filter((a: Angajat) =>
                     a.numeComplet.toLowerCase().includes(search.toLowerCase())
                   )
                   .map((a: Angajat) => (
