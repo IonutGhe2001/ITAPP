@@ -1,4 +1,4 @@
-import { useEffect, useState, memo } from "react";
+import React, { useEffect, useState, memo, Suspense } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +18,7 @@ import {
 import { useUpdateEchipament } from "@/services/echipamenteService";
 import { useAngajati } from "@/services/angajatiService";
 import { useToast } from "@/hooks/use-toast/useToast";
+const ModalAddColeg = React.lazy(() => import("@/pages/Dashboard/modals/ModalAddColeg"));
 import type { ModalEditEchipamentProps, Angajat } from "@/features/echipamente/types";
 
 function ModalEditEchipament({
@@ -28,12 +29,15 @@ function ModalEditEchipament({
   const [formData, setFormData] = useState({
     nume: "",
     serie: "",
-    tip: "laptop",
+    tip: "",
     angajatId: "none",
+    metadata: "",
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
    const { data: angajati = [] } = useAngajati();
+  const [search, setSearch] = useState("");
+  const [showColegModal, setShowColegModal] = useState(false);
   const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
   
@@ -43,8 +47,9 @@ function ModalEditEchipament({
       setFormData({
         nume: echipament.nume || "",
         serie: echipament.serie || "",
-        tip: echipament.tip || "laptop",
+        tip: echipament.tip || "",
         angajatId: echipament.angajatId || "none",
+        metadata: echipament.metadata || "",
       });
     }
   }, [echipament]);
@@ -55,7 +60,7 @@ function ModalEditEchipament({
     const newErrors: { [key: string]: string } = {};
     if (!formData.nume.trim()) newErrors.nume = "Numele este obligatoriu.";
     if (!formData.serie.trim()) newErrors.serie = "Seria este obligatorie.";
-    if (!["laptop", "telefon", "sim"].includes(formData.tip)) newErrors.tip = "Tip invalid.";
+    if (!formData.tip.trim()) newErrors.tip = "Tip invalid.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -68,6 +73,7 @@ function ModalEditEchipament({
       tip: formData.tip.trim(),
       serie: formData.serie.trim(),
       angajatId: formData.angajatId === "none" ? null : formData.angajatId,
+       metadata: formData.metadata || undefined,
     };
 
     try {
@@ -112,23 +118,28 @@ function ModalEditEchipament({
           </div>
           <div>
             <Label>Tip</Label>
-            <Select
+            <Input
               value={formData.tip}
-              onValueChange={(value) => setFormData({ ...formData, tip: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selectează tipul" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="laptop">Laptop</SelectItem>
-                <SelectItem value="telefon">Telefon</SelectItem>
-                <SelectItem value="sim">Cartelă SIM</SelectItem>
-              </SelectContent>
-            </Select>
+              onChange={(e) => setFormData({ ...formData, tip: e.target.value })}
+            />
             {errors.tip && <p className="text-sm text-red-500">{errors.tip}</p>}
           </div>
           <div>
+            <Label>Detalii (opțional)</Label>
+            <textarea
+              className="border border-gray-300 rounded-lg w-full p-2 text-sm"
+              value={formData.metadata}
+              onChange={(e) => setFormData({ ...formData, metadata: e.target.value })}
+            />
+          </div>
+          <div>
             <Label>Angajat</Label>
+            <Input
+              placeholder="Caută..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="mb-2"
+            />
             <Select
               value={formData.angajatId}
               onValueChange={(value) => setFormData({ ...formData, angajatId: value })}
@@ -138,18 +149,32 @@ function ModalEditEchipament({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">Neatribuit</SelectItem>
-                {angajati.map((a: Angajat) => (
-                  <SelectItem key={a.id} value={a.id}>
-                    {a.numeComplet}
-                  </SelectItem>
-                ))}
+                {angajati
+                  .filter((a: Angajat) => a.numeComplet.toLowerCase().includes(search.toLowerCase()))
+                  .map((a: Angajat) => (
+                    <SelectItem key={a.id} value={a.id}>
+                      {a.numeComplet}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
+            <button
+              type="button"
+              onClick={() => setShowColegModal(true)}
+              className="text-xs text-primary mt-1 hover:underline"
+            >
+              Adaugă coleg nou
+            </button>
           </div>
           <Button onClick={handleSubmit}>Salvează</Button>
         </div>
       </DialogContent>
     </Dialog>
+    <Suspense fallback={null}>
+      {showColegModal && (
+        <ModalAddColeg onClose={() => setShowColegModal(false)} />
+      )}
+    </Suspense>
   );
 }
 

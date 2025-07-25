@@ -1,12 +1,12 @@
 import { memo, useMemo } from "react";
 import type { EquipmentTabsProps } from "@/features/echipamente/types";
 
-function EquipmentTabs({ active, onChange }: EquipmentTabsProps) {
-  const tabs = useMemo(() => ["toate", "laptop", "telefon", "sim"], []);
+function EquipmentTabs({ active, onChange, tabs }: EquipmentTabsProps) {
+  const list = useMemo(() => tabs, [tabs])
 
   return (
     <div className="flex gap-2 mb-6">
-      {tabs.map((tip) => (
+      {list.map((tip) => (
         <button
           key={tip}
           onClick={() => onChange(tip)}

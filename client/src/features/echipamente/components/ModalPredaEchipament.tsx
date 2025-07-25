@@ -23,7 +23,7 @@ function ModalPredaEchipament({ echipament, onClose, onSubmit }: ModalPredaEchip
   const handleSubmit = () => {
     if (!angajatId) return alert("Selectează un angajat!");
 
-    onSubmit({ ...echipament, angajatId, stare: "asignat" }); 
+    onSubmit({ ...echipament, angajatId, stare: "predat" }); 
     onClose();
   };
 

@@ -17,6 +17,7 @@ export default function Echipamente() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [tip, setTip] = useState("toate");
+  const types = Array.from(new Set(echipamente.map((e: Echipament) => e.tip)));
 
   const [selected, setSelected] = useState<any | null>(null);
 
@@ -73,7 +74,7 @@ export default function Echipamente() {
     <div className="p-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
-          <EquipmentTabs active={tip} onChange={setTip} />
+          <EquipmentTabs active={tip} onChange={setTip} tabs={["toate", ...types]} />
           <EquipmentFilter
             search={search}
             status={status}

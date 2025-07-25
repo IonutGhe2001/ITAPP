@@ -46,6 +46,7 @@ export interface EquipmentListProps {
 export interface EquipmentTabsProps {
   active: string;
   onChange: (value: string) => void;
+  tabs: string[];
 }
 
 export interface ModalEditEchipamentProps {
