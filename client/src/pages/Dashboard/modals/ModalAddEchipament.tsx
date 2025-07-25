@@ -122,12 +122,6 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
 
           <div>
             <Label>Angajat</Label>
-            <Input
-              placeholder="Caută..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="mb-2"
-            />
             <Select
               value={formData.angajatId}
               onValueChange={(value) => setFormData({ ...formData, angajatId: value })}
@@ -136,6 +130,15 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
                 <SelectValue placeholder="Atribuie unui angajat (opțional)" />
               </SelectTrigger>
               <SelectContent>
+                <div className="p-2">
+                  <Input
+                    placeholder="Caută..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    className="mb-2"
+                  />
+                </div>
                 <SelectItem value="none">Neatribuit</SelectItem>
                {angajati
                   .filter((a: Angajat) =>
