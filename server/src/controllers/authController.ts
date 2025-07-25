@@ -61,3 +61,8 @@ export const register = async (req: Request, res: Response) => {
     return res.status(400).json({ error: err.message || "Eroare la creare cont" });
   }
 };
+
+export const logout = (_req: Request, res: Response) => {
+  res.clearCookie("token");
+  return res.json({ success: true });
+};
