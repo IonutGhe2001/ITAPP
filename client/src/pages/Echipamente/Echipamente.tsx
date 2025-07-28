@@ -11,15 +11,12 @@ import EquipmentList from "../../features/echipamente/components/EquipmentList";
 import ModalEditEchipament from "../../features/echipamente/components/ModalEditEchipament";
 import ImportEchipamente from "../../features/echipamente/ImportEchipamente";
 import Container from "@/components/Container";
-import { useSearch } from "@/context/SearchContext";
 
 export default function Echipamente() {
  const {
     data: echipamente = [],
     refetch,
   } = useEchipamente() as { data: Echipament[] | undefined; refetch: () => void };
-
-   const { query } = useSearch();
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -45,7 +42,7 @@ export default function Echipamente() {
    if (status === "disponibil" && e.angajatId) return false;
     if (status === "predat" && !e.angajatId) return false;
 
-    const q = (search.trim() || query.trim()).toLowerCase();
+    const q = search.trim().toLowerCase();
     if (q) {
       if (!e.nume.toLowerCase().includes(q) && !e.serie?.toLowerCase().includes(q)) {
         return false;

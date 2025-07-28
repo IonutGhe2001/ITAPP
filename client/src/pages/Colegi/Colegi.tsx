@@ -8,13 +8,11 @@ import {
 } from "lucide-react";
 import ModalAsigneazaEchipament from "./ModalAsigneazaEchipament";
 import Container from "@/components/Container";
-import { useSearch } from "@/context/SearchContext";
 
 export default function Colegi() {
   const { data: colegi = [], refetch } = useAngajati();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [selectedAngajatId, setSelectedAngajatId] = useState<string | null>(null);
-  const { query } = useSearch();
 
   const toggleExpand = (id: string) => {
     setExpanded((prev: string | null) => (prev === id ? null : id));
@@ -26,16 +24,7 @@ export default function Colegi() {
     sim: <NetworkIcon className="w-4 h-4 text-primary" />,
   };
 
-  const filtered = colegi.filter((coleg: Angajat) => {
-    const q = query.trim().toLowerCase();
-    if (!q) return true;
-    return (
-      coleg.numeComplet.toLowerCase().includes(q) ||
-      coleg.functie.toLowerCase().includes(q) ||
-      coleg.email?.toLowerCase().includes(q) ||
-      coleg.telefon?.toLowerCase().includes(q)
-    );
-  });
+  const filtered = colegi;
 
   return (
     <Container className="py-6 space-y-6">

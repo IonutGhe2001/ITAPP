@@ -1,6 +1,6 @@
 import { FaBell } from "react-icons/fa";
 import { Search, Menu } from "lucide-react";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSearch } from "@/context/SearchContext";
 import { Button } from "@components/ui/button";
@@ -23,6 +23,13 @@ export default function Header() {
   const { query, setQuery } = useSearch();
 
   const { user, loading } = useUser();
+
+  const handleSearchSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (query.trim()) {
+      navigate(`/search?q=${encodeURIComponent(query)}`);
+    }
+  };
 
   const handleLogout = () => {
     removeToken();
@@ -52,7 +59,7 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="relative hidden md:block">
+         <form onSubmit={handleSearchSubmit} className="relative hidden md:block">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <input
             type="text"
@@ -61,7 +68,7 @@ export default function Header() {
              value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-        </div>
+        </form>
 
         <Button variant="ghost" size="icon" className="hover:bg-muted">
           <FaBell className="text-muted-foreground" />
