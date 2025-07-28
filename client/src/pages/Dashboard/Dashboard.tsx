@@ -10,6 +10,13 @@ import EventList from "./sections/upcoming-events/EventList";
 import EventForm from "./sections/upcoming-events/EventForm";
 import { useState, useEffect } from "react";
 import {
+  addDays,
+  addWeeks,
+  addMonths,
+  differenceInCalendarDays,
+  startOfDay,
+} from "date-fns";
+import {
   fetchEvenimente,
   createEveniment,
   deleteEveniment,
@@ -26,6 +33,49 @@ import {
 } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import Container from "@/components/Container";
+
+function occursOn(event: Eveniment, day: Date) {
+  const eventDate = startOfDay(new Date(event.data));
+  const target = startOfDay(day);
+  if (target < eventDate) return false;
+  switch (event.recurrence) {
+    case "daily":
+      return true;
+    case "weekly":
+      return differenceInCalendarDays(target, eventDate) % 7 === 0;
+    case "monthly":
+      return eventDate.getDate() === target.getDate();
+    default:
+      return eventDate.getTime() === target.getTime();
+  }
+}
+
+function computeHighlightDates(events: Eveniment[]) {
+  const today = startOfDay(new Date());
+  const end = addMonths(today, 3);
+  const dates: Date[] = [];
+  events.forEach((e) => {
+    let current = startOfDay(new Date(e.data));
+    while (current <= end) {
+      dates.push(current);
+      switch (e.recurrence) {
+        case "daily":
+          current = addDays(current, 1);
+          break;
+        case "weekly":
+          current = addWeeks(current, 1);
+          break;
+        case "monthly":
+          current = addMonths(current, 1);
+          break;
+        default:
+          current = addMonths(end, 1);
+          break;
+      }
+    }
+  });
+  return dates;
+}
 
 export default function Dashboard() {
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(new Date());
@@ -75,7 +125,7 @@ export default function Dashboard() {
   };
 
   const eventsInDay = evenimente.filter(
-    (e) => new Date(e.data).toDateString() === selectedDay?.toDateString()
+    (e) => selectedDay && occursOn(e, selectedDay)
   );
 
   return (
@@ -94,7 +144,7 @@ export default function Dashboard() {
               selected={selectedDay}
               onSelect={setSelectedDay}
               onDoubleClick={handleDayDoubleClick}
-              highlightDates={evenimente.map((e) => new Date(e.data))}
+              highlightDates={computeHighlightDates(evenimente)}
             />
           </div>
           <div className="flex-1 space-y-4">

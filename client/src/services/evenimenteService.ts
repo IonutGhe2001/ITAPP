@@ -5,6 +5,7 @@ export type EvenimentData = {
   titlu: string;
   ora: string | null;
   data: Date;
+   recurrence?: "none" | "daily" | "weekly" | "monthly";
 };
 
 export type Eveniment = EvenimentData & {

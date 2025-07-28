@@ -25,6 +25,7 @@ const EventForm: FC<Props> = ({ selectedDay, initial, onSave, onCancel }) => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [allDay, setAllDay] = useState(false);
+  const [recurrence, setRecurrence] = useState<"none" | "daily" | "weekly" | "monthly">("none");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -38,11 +39,13 @@ const EventForm: FC<Props> = ({ selectedDay, initial, onSave, onCancel }) => {
       } else {
         setAllDay(true);
       }
+      setRecurrence(initial.recurrence ?? "none");
     } else {
       setTitlu("");
       setStartTime("");
       setEndTime("");
       setAllDay(false);
+      setRecurrence("none");
     }
   }, [initial]);
 
@@ -75,6 +78,7 @@ const EventForm: FC<Props> = ({ selectedDay, initial, onSave, onCancel }) => {
       titlu,
       ora,
       data: selectedDay,
+      recurrence,
     };
 
     onSave(initial?.id ?? null, data);
@@ -139,6 +143,21 @@ const EventForm: FC<Props> = ({ selectedDay, initial, onSave, onCancel }) => {
         </div>
       )}
 
+<div>
+        <Label htmlFor="recurrence">Recurență</Label>
+        <select
+          id="recurrence"
+          value={recurrence}
+          onChange={(e) => setRecurrence(e.target.value as any)}
+          className="border rounded px-3 py-2 w-full"
+        >
+          <option value="none">O singură dată</option>
+          <option value="daily">Zilnic</option>
+          <option value="weekly">Săptămânal</option>
+          <option value="monthly">Lunar</option>
+        </select>
+      </div>
+      
       <div className="flex justify-end gap-2 pt-2">
         {initial && (
           <Button type="button" variant="ghost" onClick={onCancel}>

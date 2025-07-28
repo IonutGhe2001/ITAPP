@@ -7,6 +7,7 @@ type Eveniment = {
   titlu: string;
   ora: string | null;
   data: Date;
+  recurrence?: "none" | "daily" | "weekly" | "monthly";
 };
 
 type EventListProps = {
@@ -39,6 +40,11 @@ export default function EventList({ events, onEdit, onDelete }: EventListProps) 
               <div className="flex items-center gap-2">
                 <h4 className="font-semibold text-foreground">{event.titlu}</h4>
                 {isToday && <Badge variant="outline">Astăzi</Badge>}
+                {event.recurrence && event.recurrence !== "none" && (
+                  <Badge variant="secondary" className="ml-1">
+                    {event.recurrence}
+                  </Badge>
+                )}
               </div>
               <p className="text-sm text-muted-foreground italic">
                 {event.ora ? `Ora ${event.ora}` : `Eveniment toată ziua (${ziua})`}
