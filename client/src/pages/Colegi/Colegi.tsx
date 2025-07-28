@@ -1,27 +1,25 @@
-import { useState, type JSX } from "react";
+import { useState } from "react";
 import { useAngajati } from "../../services/angajatiService";
 import type { Angajat, Echipament } from "@/features/echipamente/types";
-import {
-  LaptopIcon,
-  SmartphoneIcon,
-  NetworkIcon,
-} from "lucide-react";
+import { getEquipmentIcon } from "@/utils/equipmentIcons";
 import ModalAsigneazaEchipament from "./ModalAsigneazaEchipament";
 import Container from "@/components/Container";
 
 export default function Colegi() {
   const { data: colegi = [], refetch } = useAngajati();
-  const [expanded, setExpanded] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [selectedAngajatId, setSelectedAngajatId] = useState<string | null>(null);
 
   const toggleExpand = (id: string) => {
-    setExpanded((prev: string | null) => (prev === id ? null : id));
-  };
-
-  const iconMap: Record<string, JSX.Element> = {
-    laptop: <LaptopIcon className="w-4 h-4 text-primary" />,
-    telefon: <SmartphoneIcon className="w-4 h-4 text-primary" />,
-    sim: <NetworkIcon className="w-4 h-4 text-primary" />,
+     setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
   };
 
   const filtered = colegi;
@@ -53,7 +51,7 @@ export default function Colegi() {
                 onClick={() => toggleExpand(coleg.id)}
                 className="text-sm text-primary hover:underline self-start"
               >
-                {expanded === coleg.id ? "Ascunde echipamente" : "Vezi echipamente"}
+                {expanded.has(coleg.id) ? "Ascunde echipamente" : "Vezi echipamente"}
               </button>
 
               <button
@@ -63,7 +61,7 @@ export default function Colegi() {
                 Asignează echipament
               </button>
             </div>
-            {expanded === coleg.id && (
+            {expanded.has(coleg.id) && (
               <ul className="space-y-2 mt-2">
                 {coleg.echipamente.length === 0 ? (
                   <li className="text-gray-400 italic">
@@ -75,7 +73,7 @@ export default function Colegi() {
                       key={e.id}
                       className="flex items-start gap-3 text-sm border border-gray-100 rounded-lg p-2 shadow-sm bg-gray-50"
                     >
-                      <div className="pt-0.5">{iconMap[e.tip] || "🔧"}</div>
+                     <div className="pt-0.5">{getEquipmentIcon(e.tip)}</div>
                       <div className="flex-1">
                         <p className="font-medium text-gray-800">{e.nume}</p>
                         <p className="text-xs text-gray-500">Serie: {e.serie}</p>
@@ -98,7 +96,7 @@ export default function Colegi() {
             onClose={() => setSelectedAngajatId(null)}
             onSuccess={() => {
               refetch();
-              setExpanded(null);
+              setExpanded(new Set());
               setSelectedAngajatId(null);
             }}
           />

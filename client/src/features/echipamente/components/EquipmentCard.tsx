@@ -1,6 +1,6 @@
 import { useState, memo, useMemo } from "react";
-import { FaLaptop, FaMobileAlt, FaSimCard } from "react-icons/fa";
 import { PencilIcon, TrashIcon } from "lucide-react";
+import { getEquipmentIcon } from "@/utils/equipmentIcons";
 import ModalPredaEchipament from "@/features/echipamente/components/ModalPredaEchipament";
 import {
   Dialog,
@@ -10,19 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import type { EquipmentCardProps } from "@/features/echipamente/types";
-
-function getIcon(tip: string) {
-  const baseStyle = "text-2xl text-primary";
-  switch (tip) {
-    case "telefon":
-      return <FaMobileAlt className={baseStyle} />;
-    case "sim":
-      return <FaSimCard className={baseStyle} />;
-    case "laptop":
-    default:
-      return <FaLaptop className={baseStyle} />;
-  }
-}
 
 function EquipmentCard({
   echipament,
@@ -39,7 +26,10 @@ function EquipmentCard({
     onRefresh?.();
   };
 
-  const icon = useMemo(() => getIcon(echipament.tip), [echipament.tip]);
+   const icon = useMemo(
+    () => getEquipmentIcon(echipament.tip, "text-2xl text-primary"),
+    [echipament.tip]
+  );
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-5 flex items-center justify-between transition hover:shadow-lg">
