@@ -1,8 +1,9 @@
 import { prisma } from "../lib/prisma";
+import { levenshtein } from "../utils/levenshtein";
 
 export const globalSearch = async (query: string) => {
   const q = query.trim();
-  if (!q) return { echipamente: [], angajati: [] };
+ if (!q) return { echipamente: [], angajati: [], suggestions: [] };
 
   const echipamente = await prisma.echipament.findMany({
     where: {
@@ -32,5 +33,50 @@ export const globalSearch = async (query: string) => {
     },
   });
 
+   if (!echipamente.length && !angajati.length) {
+    const suggestions = await computeSuggestions(q);
+    return { echipamente, angajati, suggestions };
+  }
+
   return { echipamente, angajati };
+};
+const MAX_SUGGESTION_ITEMS = 5;
+const SEARCH_SAMPLE_SIZE = 50;
+
+const computeSuggestions = async (query: string) => {
+  const q = query.toLowerCase();
+  const equipments = await prisma.echipament.findMany({
+    take: SEARCH_SAMPLE_SIZE,
+    select: { id: true, nume: true, serie: true },
+  });
+  const equipmentSuggestions = equipments
+    .map((e) => ({
+      item: e,
+      score: Math.min(
+        levenshtein(e.nume.toLowerCase(), q),
+        levenshtein(e.serie.toLowerCase(), q)
+      ),
+    }))
+    .sort((a, b) => a.score - b.score)
+    .slice(0, MAX_SUGGESTION_ITEMS)
+    .map((e) => e.item);
+
+  const employees = await prisma.angajat.findMany({
+    take: SEARCH_SAMPLE_SIZE,
+    select: { id: true, numeComplet: true, functie: true, email: true },
+  });
+  const employeeSuggestions = employees
+    .map((a) => ({
+      item: a,
+      score: Math.min(
+        levenshtein(a.numeComplet.toLowerCase(), q),
+        levenshtein((a.functie || '').toLowerCase(), q),
+        levenshtein((a.email || '').toLowerCase(), q)
+      ),
+    }))
+    .sort((a, b) => a.score - b.score)
+    .slice(0, MAX_SUGGESTION_ITEMS)
+    .map((a) => a.item);
+
+  return { echipamente: equipmentSuggestions, angajati: employeeSuggestions };
 };
