@@ -2,7 +2,7 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import Container from "../components/Container";
 import { Outlet } from "react-router-dom";
-import { UserProvider } from "@/context/UserContext";
+import { UserProvider } from "@/store/UserContext";
 import { SearchProvider } from "@/context/SearchContext";
 
 export default function AppLayout() {

@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
-import { useUser } from "@/context/UserContext";
+import { useUser } from "@/store/UserContext";
 import { removeToken } from "@/utils/storage"; 
 import pageTitles from "@/constants/pageTitles";
 import MobileSidebar from "@/components/MobileSideBar"; 

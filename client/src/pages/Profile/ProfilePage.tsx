@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Pencil } from "lucide-react";
 import { updateCurrentUser } from "@/services/authService";
-import { useUser } from "@/context/UserContext";
-import type { User } from "@/context/UserContext";
+import { useUser } from "@/store/UserContext";
+import type { User } from "@/store/UserContext";
 import { useToast } from "@/hooks/use-toast/useToast";
 import Container from "@/components/Container";
 
