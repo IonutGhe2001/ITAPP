@@ -38,7 +38,11 @@ export default function Echipamente() {
   const updateMutation = useUpdateEchipament();
 
   const filtered = echipamente.filter((e: Echipament) => {
-    if (tip !== "toate" && e.tip !== tip) return false;
+    if (
+      tip !== "toate" &&
+      e.tip.trim().toLowerCase() !== tip.trim().toLowerCase()
+    )
+      return false;
    if (status === "disponibil" && e.angajatId) return false;
     if (status === "predat" && !e.angajatId) return false;
 

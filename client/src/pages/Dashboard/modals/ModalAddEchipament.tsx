@@ -62,7 +62,9 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
     }
 
     const payload = {
-      ...formData,
+      nume: formData.nume.trim(),
+      tip: formData.tip.trim(),
+      serie: formData.serie.trim(),
       angajatId: formData.angajatId === "none" ? null : formData.angajatId,
       metadata,
     };
