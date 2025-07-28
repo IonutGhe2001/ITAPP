@@ -1,7 +1,7 @@
 import { useState, memo, useMemo } from "react";
 import { PencilIcon, TrashIcon } from "lucide-react";
 import { getEquipmentIcon } from "@/utils/equipmentIcons";
-import ModalPredaEchipament from "@/features/echipamente/components/ModalPredaEchipament";
+import { ModalPredaEchipament } from "@/features/echipamente";
 import {
   Dialog,
   DialogContent,

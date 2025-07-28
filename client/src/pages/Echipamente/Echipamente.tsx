@@ -5,10 +5,12 @@ import {
   useDeleteEchipament,
   useUpdateEchipament,
 } from "../../services/echipamenteService";
-import EquipmentFilter from "../../features/echipamente/components/EquipmentFilter";
-import EquipmentList from "../../features/echipamente/components/EquipmentList";
-import ModalEditEchipament from "../../features/echipamente/components/ModalEditEchipament";
-import ImportEchipamente from "../../features/echipamente/ImportEchipamente";
+import {
+  EquipmentFilter,
+  EquipmentList,
+  ModalEditEchipament,
+  ImportEchipamente,
+} from "@/features/echipamente";
 import Container from "@/components/Container";
 
 export default function Echipamente() {

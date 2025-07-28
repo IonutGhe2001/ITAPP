@@ -2,7 +2,7 @@ import { useState, useEffect, type FC } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast/useToast";
+import { useToast } from "@/hooks/useToast";
 import type { Eveniment, EvenimentData } from "@/services/evenimenteService";
 
 const ORA_OPTIONS = [

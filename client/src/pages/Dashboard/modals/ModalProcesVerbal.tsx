@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { getAngajati } from "@/services/angajatiService";
 import api from "@/services/api";
-import { useToast } from "@/hooks/use-toast/useToast";
+import { useToast } from "@/hooks/useToast";
 
 interface ModalProcesVerbalProps {
   onClose: () => void;

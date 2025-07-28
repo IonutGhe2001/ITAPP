@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import api from "@/services/api";
-import { useToast } from "@/hooks/use-toast/useToast";
+import { useToast } from "@/hooks/useToast";
 
 interface ModalCreateUserProps {
   onClose: () => void;

@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { useUpdateEchipament } from "@/services/echipamenteService";
 import { useAngajati } from "@/services/angajatiService";
-import { useToast } from "@/hooks/use-toast/useToast";
+import { useToast } from "@/hooks/useToast";
 const ModalAddColeg = React.lazy(() => import("@/pages/Dashboard/modals/ModalAddColeg"));
 import type { ModalEditEchipamentProps, Angajat } from "@/features/echipamente/types";
 

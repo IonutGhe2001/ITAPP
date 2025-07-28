@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { UploadCloud, Download } from "lucide-react";
-import { useToast } from "@/hooks/use-toast/useToast";
+import { useToast } from "@/hooks/useToast";
 
 function ImportEchipamente({ onImportSuccess }: { onImportSuccess?: () => void }) {
   const [file, setFile] = useState<File | null>(null);
