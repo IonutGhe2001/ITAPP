@@ -5,7 +5,6 @@ import {
   useDeleteEchipament,
   useUpdateEchipament,
 } from "../../services/echipamenteService";
-import EquipmentTabs from "../../features/echipamente/components/EquipmentTabs";
 import EquipmentFilter from "../../features/echipamente/components/EquipmentFilter";
 import EquipmentList from "../../features/echipamente/components/EquipmentList";
 import ModalEditEchipament from "../../features/echipamente/components/ModalEditEchipament";
@@ -20,17 +19,6 @@ export default function Echipamente() {
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
-  const [tip, setTip] = useState("toate");
-  const types = (() => {
-    const map = new Map<string, string>();
-    echipamente.forEach((e: Echipament) => {
-      const key = e.tip.trim().toLowerCase();
-      if (!map.has(key)) {
-        map.set(key, e.tip.trim());
-      }
-    });
-    return Array.from(map.values());
-  })();
 
   const [selected, setSelected] = useState<any | null>(null);
 
@@ -38,11 +26,6 @@ export default function Echipamente() {
   const updateMutation = useUpdateEchipament();
 
   const filtered = echipamente.filter((e: Echipament) => {
-    if (
-      tip !== "toate" &&
-      e.tip.trim().toLowerCase() !== tip.trim().toLowerCase()
-    )
-      return false;
    if (status === "disponibil" && e.angajatId) return false;
     if (status === "predat" && !e.angajatId) return false;
 
@@ -94,11 +77,7 @@ export default function Echipamente() {
     <Container className="py-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
-          <EquipmentTabs
-            active={tip}
-            onChange={(value: string) => setTip(value)}
-            tabs={["toate", ...types]}
-          />
+          
           <EquipmentFilter
             search={search}
             status={status}

@@ -14,7 +14,7 @@ function EquipmentFilter({
         placeholder="Caută după nume sau serie"
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
-        className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/2"
+        className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-3/4"
       />
       <select
         value={status}
