@@ -1,8 +1,7 @@
 import { NavLink } from "react-router-dom";
-import { sidebarRoutes } from "../routes/sidebarRoutes";
+import { sidebarRoutes } from "../../routes/sidebarRoutes";
 import { LogOut } from "lucide-react";
-import { useAuth as useAuthContext } from "@/context/AuthContext";
-import { useAuth as useAuthStore } from "@/store/authStore";
+import { useAuth } from "@/context/AuthContext";
 import { logout as logoutRequest } from "@/services/authService";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
@@ -12,8 +11,7 @@ interface MobileSidebarProps {
 }
 
 export default function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
-  const authContext = useAuthContext();
-  const authStore = useAuthStore();
+  const auth = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -21,8 +19,7 @@ export default function MobileSidebar({ open, onOpenChange }: MobileSidebarProps
     } catch {
       // ignore network errors
     }
-    authContext.logout();
-    authStore.logout();
+    auth.logout();
     onOpenChange(false);
   };
 

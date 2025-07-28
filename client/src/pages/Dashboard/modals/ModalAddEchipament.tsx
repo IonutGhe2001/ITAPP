@@ -17,10 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Angajat } from "@/features/echipamente/types";
+import type { Angajat } from "@/features/equipment/types";
 const ModalAddColeg = React.lazy(() => import("./ModalAddColeg"));
-import { useCreateEchipament } from "@/services/echipamenteService";
-import { useAngajati } from "@/services/angajatiService";
+import { useCreateEchipament } from "@/features/equipment";
+import { useAngajati } from "@/features/employees";
 import { useToast } from "@/hooks/use-toast/useToast";
 
 

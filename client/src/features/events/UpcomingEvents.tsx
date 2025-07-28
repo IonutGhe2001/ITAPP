@@ -8,13 +8,13 @@ import {
   updateEveniment,
   type Eveniment,
   type EvenimentData,
-} from "@/services/evenimenteService";
+} from "@/features/events";
 
 
 import EventCalendar from "./upcoming-events/EventCalendar";
 import EventList from "./upcoming-events/EventList";
 import EventForm from "./upcoming-events/EventForm";
-import DashboardSectionCard from "@/components/DashboardSectionCard";
+import DashboardSectionCard from "@layouts/components/DashboardSectionCard";
 import { CalendarCheckIcon } from "lucide-react";
 
 export default function UpcomingEvents() {

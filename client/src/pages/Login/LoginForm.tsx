@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import api from "../../services/api";
-import { useAuth as useAuthContext } from "@/context/AuthContext";
-import { useAuth as useAuthStore } from "@/store/authStore";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -12,8 +11,7 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-   const authContext = useAuthContext();
-  const authStore = useAuthStore();
+ const auth = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,8 +23,7 @@ export default function LoginForm() {
         email,
         password: parola,
       });
-      authContext.login("logged-in");
-      authStore.setToken("logged-in");
+      auth.login("logged-in");
       navigate("/");
     } catch (err) {
       setError("Email sau parolă incorectă");

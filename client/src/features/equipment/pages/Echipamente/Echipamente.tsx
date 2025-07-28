@@ -1,16 +1,16 @@
 import { useState } from "react";
-import type { Echipament } from "@/features/echipamente/types";
+import type { Echipament } from "@/features/equipment/types";
 import {
     useEchipamente,
   useDeleteEchipament,
   useUpdateEchipament,
-} from "../../services/echipamenteService";
+} from "@/features/equipment";
 import {
   EquipmentFilter,
   EquipmentList,
   ModalEditEchipament,
   ImportEchipamente,
-} from "@/features/echipamente";
+} from "@/features/equipment";
 import Container from "@/components/Container";
 
 export default function Echipamente() {

@@ -1,14 +1,12 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { sidebarRoutes } from "../routes/sidebarRoutes";
+import { sidebarRoutes } from "../../routes/sidebarRoutes";
 import { LogOut } from "lucide-react";
-import { useAuth as useAuthContext } from "@/context/AuthContext";
-import { useAuth as useAuthStore } from "@/store/authStore";
+import { useAuth } from "@/context/AuthContext";
 import { logout as logoutRequest } from "@/services/authService";
 
 export default function Sidebar() {
   const navigate = useNavigate();
-  const authContext = useAuthContext();
-  const authStore = useAuthStore();
+  const auth = useAuth();
 
   const navItemClass = ({ isActive }: { isActive: boolean }) =>
     `group flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium
@@ -20,8 +18,7 @@ export default function Sidebar() {
     } catch (err) {
       // ignore network errors
     }
-    authContext.logout();
-    authStore.logout();
+    auth.logout();
     navigate("/login");
   };
 

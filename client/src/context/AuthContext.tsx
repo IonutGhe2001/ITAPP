@@ -1,5 +1,16 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import { logout as logoutRequest } from "@/services/authService";
+import {
+  getToken,
+  setToken as storeToken,
+  removeToken,
+} from "@/utils/storage";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -12,11 +23,12 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setTokenState] = useState<string | null>(getToken());
   const [loading, setLoading] = useState(true);
 
   const login = (newToken: string) => {
-    setToken(newToken);
+    storeToken(newToken);
+    setTokenState(newToken);
   };
 
   const logout = async () => {
@@ -25,7 +37,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (e) {
       // ignore errors
     }
-    setToken(null);
+    removeToken();
+    setTokenState(null);
   };
 
   useEffect(() => {
@@ -34,11 +47,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     })
       .then((res) => {
         if (res.ok) {
-          setToken("logged-in");
+          login("logged-in");
         }
       })
       .catch(() => {
-        setToken(null);
+        removeToken();
+        setTokenState(null);
       })
       .finally(() => setLoading(false));
   }, []);

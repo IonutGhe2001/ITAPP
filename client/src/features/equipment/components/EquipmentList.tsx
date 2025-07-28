@@ -2,7 +2,7 @@ import { memo } from "react";
 import { useEffect, useRef, useState } from "react";
 import { FixedSizeList as List } from "react-window";
 import EquipmentCard from "./EquipmentCard";
-import type { EquipmentListProps, Echipament } from "@/features/echipamente/types";
+import type { EquipmentListProps, Echipament } from "@/features/equipment/types";
 
 
 function EquipmentList({

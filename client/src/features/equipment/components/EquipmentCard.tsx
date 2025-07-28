@@ -1,7 +1,7 @@
 import { useState, memo, useMemo } from "react";
 import { PencilIcon, TrashIcon } from "lucide-react";
 import { getEquipmentIcon } from "@/utils/equipmentIcons";
-import { ModalPredaEchipament } from "@/features/echipamente";
+import { ModalPredaEchipament } from "@/features/equipment";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import type { EquipmentCardProps } from "@/features/echipamente/types";
+import type { EquipmentCardProps } from "@/features/equipment/types";
 
 function EquipmentCard({
   echipament,

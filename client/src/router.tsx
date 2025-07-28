@@ -5,8 +5,8 @@ import { useAuth } from "@/context/AuthContext";
 
 const LoginPage = lazy(() => import("./pages/Login/Login"));
 const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard"));
-const Echipamente = lazy(() => import("./pages/Echipamente/Echipamente"));
-const Colegi = lazy(() => import("./pages/Colegi/Colegi"));
+const Echipamente = lazy(() => import("./features/equipment/pages/Echipamente/Echipamente"));
+const Colegi = lazy(() => import("./features/employees/pages/Colegi/Colegi"));
 const AppLayout = lazy(() => import("./layouts/AppLayout"));
 const ProfilePage = lazy(() => import("./pages/Profile/ProfilePage"));
 const SearchPage = lazy(() => import("./pages/Search/Search"));

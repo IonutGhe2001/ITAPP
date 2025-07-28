@@ -1,5 +1,5 @@
 import { memo } from "react";
-import type { EquipmentFilterProps } from "@/features/echipamente/types";
+import type { EquipmentFilterProps } from "@/features/equipment/types";
 
 function EquipmentFilter({
   search,

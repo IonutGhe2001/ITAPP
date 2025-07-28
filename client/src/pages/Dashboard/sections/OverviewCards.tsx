@@ -7,8 +7,8 @@ import {
   CheckCircle2Icon,
   MinusCircleIcon,
 } from "lucide-react";
-import { useAngajati } from "@/services/angajatiService";
-import { useEchipamente } from "@/services/echipamenteService";
+import { useAngajati } from "@/features/employees";
+import { useEchipamente } from "@/features/equipment";
 
 type Echipament = {
   id: string;

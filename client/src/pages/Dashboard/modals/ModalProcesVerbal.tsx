@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getAngajati } from "@/services/angajatiService";
+import { getAngajati } from "@/features/employees";
 import api from "@/services/api";
 import { useToast } from "@/hooks/use-toast/useToast";
 

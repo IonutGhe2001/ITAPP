@@ -1,14 +1,11 @@
 "use client";
 
-import DashboardSectionCard from "@/components/DashboardSectionCard";
+import DashboardSectionCard from "@layouts/components/DashboardSectionCard";
 import NavigationShortcuts from "./sections/NavigationShortcuts";
 import OverviewCards from "./sections/OverviewCards";
 import QuickActions from "./sections/QuickActions";
 import RecentUpdates from "./sections/RecentUpdates";
-import EventCalendar from "./sections/upcoming-events/EventCalendar";
-import EventList from "./sections/upcoming-events/EventList";
-import EventForm from "./sections/upcoming-events/EventForm";
-import { useState, useEffect } from "react";
+import { EventCalendar, EventList, EventForm } from "@/features/events";
 import {
   addDays,
   addWeeks,
@@ -23,7 +20,7 @@ import {
   updateEveniment,
   type Eveniment,
   type EvenimentData,
-} from "@/services/evenimenteService";
+} from "@/features/events";
 import {
   BarChartIcon,
   FlashlightIcon,

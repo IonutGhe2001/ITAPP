@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useCreateAngajat } from "@/services/angajatiService";
+import { useCreateAngajat } from "@/features/employees";
 import { useToast } from "@/hooks/use-toast/useToast";
 
 export default function ModalAddColeg({ onClose }: { onClose: () => void }) {

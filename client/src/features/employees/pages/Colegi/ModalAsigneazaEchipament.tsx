@@ -1,7 +1,7 @@
 
 import { useState } from "react";
-import { useEchipamente, useUpdateEchipament } from "../../services/echipamenteService";
-import type { Echipament } from "@/features/echipamente/types";
+import { useEchipamente, useUpdateEchipament } from "@/features/equipment";
+import type { Echipament } from "@/features/equipment/types";
 
 export default function ModalAsigneazaEchipament({
   angajatId,

@@ -13,8 +13,8 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { useAngajati } from "@/services/angajatiService";
-import type { ModalPredaEchipamentProps, Angajat } from "@/features/echipamente/types";
+import { useAngajati } from "@/features/employees";
+import type { ModalPredaEchipamentProps, Angajat } from "@/features/equipment/types";
 
 function ModalPredaEchipament({ echipament, onClose, onSubmit }: ModalPredaEchipamentProps) {
   const { data: angajati = [] } = useAngajati();

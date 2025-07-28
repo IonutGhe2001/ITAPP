@@ -15,11 +15,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useUpdateEchipament } from "@/services/echipamenteService";
-import { useAngajati } from "@/services/angajatiService";
+import { useUpdateEchipament } from "@/features/equipment";
+import { useAngajati } from "@/features/employees";
 import { useToast } from "@/hooks/use-toast/useToast";
 const ModalAddColeg = React.lazy(() => import("@/pages/Dashboard/modals/ModalAddColeg"));
-import type { ModalEditEchipamentProps, Angajat } from "@/features/echipamente/types";
+import type { ModalEditEchipamentProps, Angajat } from "@/features/equipment/types";
 
 function ModalEditEchipament({
   echipament,
