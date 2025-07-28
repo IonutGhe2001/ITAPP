@@ -9,12 +9,7 @@ import {
 } from "lucide-react";
 import { useAngajati } from "@/features/employees";
 import { useEchipamente } from "@/features/equipment";
-
-type Echipament = {
-  id: string;
-  tip: string;
-  stare: string;
-};
+import type { Echipament } from "@/features/equipment";
 
 export default function OverviewCards() {
  const { data: angajati } = useAngajati();

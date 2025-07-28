@@ -1,6 +1,7 @@
 "use client";
 
 import DashboardSectionCard from "@layouts/components/DashboardSectionCard";
+import { useState, useEffect } from "react";
 import NavigationShortcuts from "./sections/NavigationShortcuts";
 import OverviewCards from "./sections/OverviewCards";
 import QuickActions from "./sections/QuickActions";
@@ -180,7 +181,11 @@ export default function Dashboard() {
             <EventForm
               selectedDay={formDate}
               initial={editing}
-              onSave={editing ? handleUpdate : (_id, data) => handleCreate(data)}
+               onSave={
+                editing
+                  ? handleUpdate
+                  : (_id: number | null, data: EvenimentData) => handleCreate(data)
+              }
               onCancel={() => setShowFormModal(false)}
             />
           )}

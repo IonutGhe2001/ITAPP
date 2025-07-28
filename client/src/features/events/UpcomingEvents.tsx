@@ -11,9 +11,9 @@ import {
 } from "@/features/events";
 
 
-import EventCalendar from "./upcoming-events/EventCalendar";
-import EventList from "./upcoming-events/EventList";
-import EventForm from "./upcoming-events/EventForm";
+import EventCalendar from "./components/upcoming-events/EventCalendar";
+import EventList from "./components/upcoming-events/EventList";
+import EventForm from "./components/upcoming-events/EventForm";
 import DashboardSectionCard from "@layouts/components/DashboardSectionCard";
 import { CalendarCheckIcon } from "lucide-react";
 
@@ -71,7 +71,11 @@ export default function UpcomingEvents() {
           <EventForm
             selectedDay={selectedDay || new Date()}
             initial={editing}
-            onSave={editing ? handleUpdate : (_id, data) => handleCreate(data)}
+            onSave={
+              editing
+                ? handleUpdate
+                : (_id: number | null, data: EvenimentData) => handleCreate(data)
+            }
             onCancel={() => setEditing(null)}
           />
         </div>

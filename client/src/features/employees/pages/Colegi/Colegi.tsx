@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAngajati } from "@/features/employees";
 import type { Angajat, Echipament } from "@/features/equipment/types";
 import { getEquipmentIcon } from "@/utils/equipmentIcons";
-import ModalAsigneazaEchipament from "../../../../pages/Colegi/ModalAsigneazaEchipament";
+import ModalAsigneazaEchipament from "./ModalAsigneazaEchipament";
 import Container from "@/components/Container";
 
 export default function Colegi() {
