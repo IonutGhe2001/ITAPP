@@ -13,7 +13,11 @@ export const createEchipament = (data: {
   angajatId?: string | null;
   metadata?: any;
 }) => {
-  const finalStare = data.angajatId ? "predat" : "disponibil";
+  const finalStare = data.stare
+    ? data.stare
+    : data.angajatId
+    ? "predat"
+    : "disponibil";
 
   return prisma.echipament.create({
     data: {
