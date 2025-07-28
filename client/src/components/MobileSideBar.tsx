@@ -33,7 +33,9 @@ export default function MobileSidebar({ open, onOpenChange }: MobileSidebarProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="fixed inset-y-0 left-0 top-0 w-60 p-6 bg-background border-r border-border rounded-none shadow-sm focus:outline-none">
+      <DialogContent
+        className="fixed inset-y-0 left-0 top-0 w-60 max-w-[50vw] translate-x-0 translate-y-0 p-6 bg-background border-r border-border rounded-none shadow-sm focus:outline-none"
+      >
         <div className="text-2xl font-extrabold text-primary mb-8 tracking-tight pl-1 select-none">
           IT <span className="text-foreground">APP</span>
         </div>
