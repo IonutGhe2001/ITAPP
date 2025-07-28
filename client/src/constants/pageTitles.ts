@@ -3,6 +3,7 @@ const pageTitles: Record<string, string> = {
   "/echipamente": "Echipamente",
   "/colegi": "Colegi",
   "/profil": "Profil",
+  "/search": "Căutare",
 };
 
 export default pageTitles;
