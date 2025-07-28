@@ -15,6 +15,7 @@ import angajatiRoutes from "./routes/angajati";
 import evenimenteRoutes from "./routes/evenimente";
 import proceseVerbaleRoutes from "./routes/proceseVerbale";
 import importRoutes from "./routes/import";
+import searchRoutes from "./routes/search";
 
 
 dotenv.config();
@@ -64,6 +65,7 @@ app.use("/api/angajati", angajatiRoutes);
 app.use("/api/evenimente", evenimenteRoutes);
 app.use("/api/procese-verbale", proceseVerbaleRoutes);
 app.use("/api/import", importRoutes);
+app.use("/api/search", searchRoutes);
 
 // Error handler middleware (final)
 app.use(errorHandler);
