@@ -8,11 +8,13 @@ import {
 } from "lucide-react";
 import ModalAsigneazaEchipament from "./ModalAsigneazaEchipament";
 import Container from "@/components/Container";
+import { useSearch } from "@/context/SearchContext";
 
 export default function Colegi() {
   const { data: colegi = [], refetch } = useAngajati();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [selectedAngajatId, setSelectedAngajatId] = useState<string | null>(null);
+  const { query } = useSearch();
 
   const toggleExpand = (id: string) => {
     setExpanded((prev: string | null) => (prev === id ? null : id));
@@ -24,10 +26,21 @@ export default function Colegi() {
     sim: <NetworkIcon className="w-4 h-4 text-primary" />,
   };
 
+  const filtered = colegi.filter((coleg: Angajat) => {
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      coleg.numeComplet.toLowerCase().includes(q) ||
+      coleg.functie.toLowerCase().includes(q) ||
+      coleg.email?.toLowerCase().includes(q) ||
+      coleg.telefon?.toLowerCase().includes(q)
+    );
+  });
+
   return (
     <Container className="py-6 space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-         {colegi.map((coleg: Angajat & { echipamente: Echipament[] }) => (
+         {filtered.map((coleg: Angajat & { echipamente: Echipament[] }) => (
           <div
             key={coleg.id}
             className="bg-white rounded-xl shadow-md p-4 flex flex-col gap-4"

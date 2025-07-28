@@ -2,6 +2,7 @@ import { FaBell } from "react-icons/fa";
 import { Search, Menu } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSearch } from "@/context/SearchContext";
 import { Button } from "@components/ui/button";
 import {
   DropdownMenu,
@@ -19,6 +20,7 @@ export default function Header() {
   const navigate = useNavigate();
   const title = pageTitles[location.pathname] || "Pagina";
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { query, setQuery } = useSearch();
 
   const { user, loading } = useUser();
 
@@ -56,6 +58,8 @@ export default function Header() {
             type="text"
             placeholder="Caută..."
             className="pl-9 pr-4 py-2 text-sm bg-muted text-foreground rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary"
+             value={query}
+            onChange={(e) => setQuery(e.target.value)}
           />
         </div>
 
