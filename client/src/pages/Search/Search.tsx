@@ -14,9 +14,24 @@ export default function SearchResults() {
     }
   }, [q, refetch]);
 
+   const noResults = !data?.echipamente?.length && !data?.angajati?.length;
+
   return (
     <Container className="py-6 space-y-6">
       <h2 className="text-xl font-semibold">Rezultate pentru "{q}"</h2>
+      {noResults && data?.suggestions && (
+        <div className="mb-4 text-sm text-gray-700">
+          <p className="mb-2">Nu am găsit rezultate. Poate ai vrut să cauți:</p>
+          <ul className="list-disc ml-5 space-y-1">
+            {data.suggestions.echipamente.map((e: any) => (
+              <li key={e.id}>{e.nume}</li>
+            ))}
+            {data.suggestions.angajati.map((a: any) => (
+              <li key={a.id}>{a.numeComplet}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       <div className="space-y-4">
         <div>
           <h3 className="font-semibold mb-2">Echipamente</h3>
