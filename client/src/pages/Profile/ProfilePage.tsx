@@ -3,7 +3,7 @@ import { Pencil } from "lucide-react";
 import { updateCurrentUser } from "@/services/authService";
 import { useUser } from "@/context/UserContext";
 import type { User } from "@/context/UserContext";
-import { useToast } from "@/hooks/useToast";
+import { useToast } from "@/hooks/use-toast/useToast";
 import Container from "@/components/Container";
 
 const fallbackImage = "/profile.png";

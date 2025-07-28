@@ -21,7 +21,7 @@ import type { Angajat } from "@/features/echipamente/types";
 const ModalAddColeg = React.lazy(() => import("./ModalAddColeg"));
 import { useCreateEchipament } from "@/services/echipamenteService";
 import { useAngajati } from "@/services/angajatiService";
-import { useToast } from "@/hooks/useToast";
+import { useToast } from "@/hooks/use-toast/useToast";
 
 
 export default function ModalAddEchipament({ onClose }: { onClose: () => void }) {

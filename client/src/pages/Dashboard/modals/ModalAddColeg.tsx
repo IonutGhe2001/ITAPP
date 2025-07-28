@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useCreateAngajat } from "@/services/angajatiService";
-import { useToast } from "@/hooks/useToast";
+import { useToast } from "@/hooks/use-toast/useToast";
 
 export default function ModalAddColeg({ onClose }: { onClose: () => void }) {
   const [formData, setFormData] = useState({
