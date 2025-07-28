@@ -33,8 +33,10 @@ export interface EquipmentCardProps {
 export interface EquipmentFilterProps {
   search: string;
   status: string;
+  sort: string;
   onSearchChange: (value: string) => void;
   onStatusChange: (value: string) => void;
+  onSortChange: (value: string) => void;
 }
 
 export interface EquipmentListProps {

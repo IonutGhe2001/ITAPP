@@ -19,24 +19,30 @@ export default function Echipamente() {
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+const [sort, setSort] = useState("asc");
 
   const [selected, setSelected] = useState<any | null>(null);
 
   const deleteMutation = useDeleteEchipament();
   const updateMutation = useUpdateEchipament();
 
-  const filtered = echipamente.filter((e: Echipament) => {
-   if (status && e.stare !== status) return false;
+   const filtered = echipamente
+    .filter((e: Echipament) => {
+      if (status && e.stare !== status) return false;
 
     const q = search.trim().toLowerCase();
-    if (q) {
-      if (!e.nume.toLowerCase().includes(q) && !e.serie?.toLowerCase().includes(q)) {
-        return false;
+      if (q) {
+        if (!e.nume.toLowerCase().includes(q) && !e.serie?.toLowerCase().includes(q)) {
+          return false;
+        }
       }
-    }
-
-  return true;
-  });
+    return true;
+    })
+    .sort((a: Echipament, b: Echipament) =>
+      sort === "asc"
+        ? a.nume.localeCompare(b.nume)
+        : b.nume.localeCompare(a.nume)
+    );
 
   const handleDelete = async (id: string) => {
     await deleteMutation.mutateAsync(id);
@@ -80,8 +86,10 @@ export default function Echipamente() {
           <EquipmentFilter
             search={search}
             status={status}
-             onSearchChange={(value: string) => setSearch(value)}
+             sort={sort}
+            onSearchChange={(value: string) => setSearch(value)}
             onStatusChange={(value: string) => setStatus(value)}
+            onSortChange={(value: string) => setSort(value)}
           />
           <EquipmentList
             echipamente={filtered}
