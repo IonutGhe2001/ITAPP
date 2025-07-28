@@ -14,12 +14,13 @@ export const getEvenimente = async (req: Request, res: Response, next: NextFunct
 export const createEveniment = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = Number((req.user as any).id);
-    const { titlu, data, ora } = req.body;
+    const { titlu, data, ora, recurrence } = req.body;
     const eveniment = await evenimentService.createEveniment({
       titlu,
       ora,
       data: new Date(data),
       userId,
+      recurrence,
     });
     res.status(201).json(eveniment);
   } catch (err) {
@@ -30,7 +31,12 @@ export const createEveniment = async (req: Request, res: Response, next: NextFun
 export const updateEveniment = async (req: Request, res: Response) => {
   const userId = Number((req.user as any).id);
   const { id } = req.params;
-  const result = await evenimentService.updateEveniment(Number(id), userId, req.body);
+  const { data, ...rest } = req.body;
+  const payload = {
+    ...rest,
+    ...(data ? { data: new Date(data) } : {}),
+  };
+  const result = await evenimentService.updateEveniment(Number(id), userId, payload);
   if (!result) return res.status(404).json({ message: "Evenimentul nu a fost găsit." });
   res.json(result);
 };

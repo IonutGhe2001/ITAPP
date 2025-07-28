@@ -10,19 +10,31 @@ export const createEveniment = (data: {
   data: Date;
   ora: string;
   userId: number;
+  recurrence?: string;
 }) => {
-  return prisma.eveniment.create({ data });
+   return prisma.eveniment.create({
+    data: {
+      ...data,
+      recurrence: data.recurrence ?? "none",
+    },
+  });
 };
 
 export const updateEveniment = async (
   id: number,
   userId: number,
-  data: { titlu?: string; ora?: string; data?: Date }
+  data: { titlu?: string; ora?: string; data?: Date; recurrence?: string }
 ) => {
   const eveniment = await prisma.eveniment.findUnique({ where: { id } });
   if (!eveniment || eveniment.userId !== userId) return null;
 
-  return prisma.eveniment.update({ where: { id }, data });
+  return prisma.eveniment.update({
+    where: { id },
+    data: {
+      ...data,
+      ...(data.recurrence !== undefined && { recurrence: data.recurrence }),
+    },
+  });
 };
 
 export const deleteEveniment = async (id: number, userId: number) => {
