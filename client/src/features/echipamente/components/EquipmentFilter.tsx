@@ -24,6 +24,7 @@ function EquipmentFilter({
         <option value="">Toate statusurile</option>
         <option value="disponibil">Disponibile</option>
         <option value="predat">Predate</option>
+        <option value="mentenanta">În mentenanță</option>
       </select>
     </div>
   );

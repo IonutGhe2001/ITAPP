@@ -26,8 +26,7 @@ export default function Echipamente() {
   const updateMutation = useUpdateEchipament();
 
   const filtered = echipamente.filter((e: Echipament) => {
-   if (status === "disponibil" && e.angajatId) return false;
-    if (status === "predat" && !e.angajatId) return false;
+   if (status && e.stare !== status) return false;
 
     const q = search.trim().toLowerCase();
     if (q) {

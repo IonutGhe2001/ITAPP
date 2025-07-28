@@ -52,6 +52,8 @@ function EquipmentCard({
           className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${
             echipament.stare === "disponibil"
               ? "bg-green-100 text-green-800"
+              : echipament.stare === "mentenanta"
+              ? "bg-yellow-100 text-yellow-800"
               : "bg-blue-100 text-blue-800"
           }`}
         >
@@ -76,6 +78,24 @@ function EquipmentCard({
           </button>
         )}
 
+{echipament.stare === "mentenanta" ? (
+          <button
+            onClick={() => onEdit?.({ ...echipament, stare: "disponibil" })}
+            className="text-xs text-blue-600 hover:underline"
+            title="Finalizează mentenanța"
+          >
+            Disponibil
+          </button>
+        ) : (
+          <button
+            onClick={() => onEdit?.({ ...echipament, stare: "mentenanta" })}
+            className="text-xs text-yellow-600 hover:underline"
+            title="Trimite în mentenanță"
+          >
+            Mentenanță
+          </button>
+        )}
+        
         <div className="flex gap-2">
           <button onClick={() => onEdit?.({ ...echipament, __editMode: true })} title="Editează">
   <PencilIcon className="w-4 h-4 text-primary hover:text-primary-dark" />
