@@ -23,7 +23,7 @@ export default function Echipamente() {
   const [status, setStatus] = useState("");
 const [sort, setSort] = useState("asc");
 
-  const [selected, setSelected] = useState<any | null>(null);
+const [selected, setSelected] = useState<(Echipament & { __editMode?: boolean }) | null>(null);
 
   const deleteMutation = useDeleteEchipament();
   const updateMutation = useUpdateEchipament();

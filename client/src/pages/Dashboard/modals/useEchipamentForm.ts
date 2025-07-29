@@ -43,7 +43,7 @@ export function useEchipamentForm(initial?: Partial<EchipamentFormData>) {
   }
 
   const buildPayload = () => {
-    let metadata: any = undefined
+    let metadata: unknown = undefined
     if (formData.metadata.trim()) {
       try {
         metadata = JSON.parse(formData.metadata)

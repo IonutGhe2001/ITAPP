@@ -1,5 +1,6 @@
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import type { Dispatch, SetStateAction } from 'react'
 import {
   Select,
   SelectContent,
@@ -8,16 +9,11 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import type { Angajat } from '@/features/equipment/types'
+import type { EchipamentFormData } from '@/pages/Dashboard/modals/useEchipamentForm'
 
 export interface EchipamentFormProps {
-  formData: {
-    nume: string
-    serie: string
-    tip: string
-    angajatId: string
-    metadata: string
-  }
-  setFormData: (data: any) => void
+ formData: EchipamentFormData
+  setFormData: Dispatch<SetStateAction<EchipamentFormData>>
   errors: Record<string, string>
   search: string
   setSearch: (s: string) => void
