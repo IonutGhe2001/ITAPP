@@ -26,7 +26,10 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     const baseUrl =
       import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL;
     const url = baseUrl.replace(/\/api$/, "");
-    socket = io(url, { withCredentials: true });
+    socket = io(url, {
+      withCredentials: true,
+      reconnectionAttempts: 5,
+    });
 
     socket.on("update", (update: Omit<Notification, 'read'>) => {
       const notification = { ...update, read: false };
@@ -34,9 +37,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       setNotifications((prev) => [notification, ...prev]);
       setUnreadCount((c) => c + 1);
     });
-
-    socket.on("connect_error", fetchNotifications);
-    socket.on("disconnect", fetchNotifications);
+    
 
     return () => {
       socket?.disconnect();
