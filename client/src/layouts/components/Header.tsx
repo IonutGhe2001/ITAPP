@@ -2,7 +2,7 @@ import { FaBell } from "react-icons/fa";
 import { Search, Menu } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useSearch } from "@/context/SearchContext";
+import { useSearch } from "@/context/use-search";
 import { Button } from "@components/ui/button";
 import {
   DropdownMenu,
@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
-import { useUser } from "@/store/UserContext";
+import { useUser } from "@/store/use-user";
 import { removeToken } from "@/utils/storage"; 
 import pageTitles from "@/constants/pageTitles";
 import MobileSidebar from "@layouts/components/MobileSideBar";

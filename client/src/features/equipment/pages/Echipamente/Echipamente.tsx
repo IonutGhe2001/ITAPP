@@ -70,9 +70,10 @@ const [sort, setSort] = useState("asc");
 
       try {
          const res = await updateMutation.mutateAsync({ id: data.id, data: payload });
-        if (!res || !(res as any).id) throw new Error("Obiectul returnat nu este valid");
-      } catch (error: any) {
-        console.error("❌ Eroare la update rapid:", error.response?.data || error.message);
+        if (!res || !res.id) throw new Error("Obiectul returnat nu este valid");
+      } catch (error: unknown) {
+        const err = error as { response?: { data?: unknown }; message?: string };
+        console.error("❌ Eroare la update rapid:", err.response?.data || err.message);
         alert("A apărut o eroare la actualizarea echipamentului.");
       }
     } else {

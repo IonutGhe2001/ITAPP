@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { getAngajati } from "@/features/employees";
 import api from "@/services/api";
-import { useToast } from "@/hooks/use-toast/useToast";
+import { useToast } from "@/hooks/use-toast/use-toast-hook";
 
 interface ModalProcesVerbalProps {
   onClose: () => void;
@@ -53,8 +53,8 @@ export default function ModalProcesVerbal({ onClose }: ModalProcesVerbalProps) {
     const url = URL.createObjectURL(file);
     setPdfUrl(url);
     toast({ title: "Proces verbal generat", description: "PDF-ul a fost creat cu succes." });
-  } catch (err) {
-    console.error("Eroare la generare proces verbal", err);
+  } catch (_err) {
+    console.error("Eroare la generare proces verbal", _err);
     toast({ title: "Eroare", description: "Eroare la generarea PDF-ului.", variant: "destructive" });
   } finally {
     setLoading(false);

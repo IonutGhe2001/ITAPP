@@ -20,7 +20,15 @@ export interface Echipament {
     numeComplet: string;
     id: string;
   };
-  [key: string]: any;
+  metadata?: Record<string, unknown>;
+}
+
+export interface EchipamentInput {
+  nume: string;
+  tip: string;
+  serie: string;
+  angajatId: string | null;
+  metadata?: unknown;
 }
 
 export interface EquipmentCardProps {
@@ -60,5 +68,5 @@ export interface ModalEditEchipamentProps {
 export interface ModalPredaEchipamentProps {
   echipament: Echipament;
   onClose: () => void;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: Echipament) => void;
 }

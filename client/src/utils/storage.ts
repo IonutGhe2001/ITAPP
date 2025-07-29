@@ -1,3 +1,4 @@
+import type { User } from "@/types/user"
 
 export function getToken(): string | null {
   return localStorage.getItem("token");
@@ -11,12 +12,12 @@ export function removeToken(): void {
   localStorage.removeItem("token");
 }
 
-export function getUser(): any | null {
-const raw = localStorage.getItem("user");
-  return raw ? JSON.parse(raw) : null;
+export function getUser(): User | null {
+  const raw = localStorage.getItem("user")
+  return raw ? (JSON.parse(raw) as User) : null
 }
 
-export function setUser(user: any): void {
+export function setUser(user: User): void {
   localStorage.setItem("user", JSON.stringify(user));
 }
 

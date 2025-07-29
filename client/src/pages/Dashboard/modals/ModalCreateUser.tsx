@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import api from "@/services/api";
-import { useToast } from "@/hooks/use-toast/useToast";
+import { useToast } from "@/hooks/use-toast/use-toast-hook";
 
 interface ModalCreateUserProps {
   onClose: () => void;
@@ -60,7 +60,7 @@ export default function ModalCreateUser({ onClose }: ModalCreateUserProps) {
         description: "Utilizatorul a fost înregistrat cu succes.",
       });
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Eroare la creare cont:", err);
       toast({
         title: "Eroare",

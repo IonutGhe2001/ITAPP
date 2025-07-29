@@ -17,11 +17,11 @@ import {
 } from "@/components/ui/select";
 import { useUpdateEchipament } from "@/features/equipment";
 import { useAngajati } from "@/features/employees";
-import { useToast } from "@/hooks/use-toast/useToast";
+import { useToast } from "@/hooks/use-toast/use-toast-hook";
 import { useEchipamentForm } from "@/pages/Dashboard/modals/useEchipamentForm";
 import EchipamentForm from "./EchipamentForm";
 const ModalAddColeg = React.lazy(() => import("@/pages/Dashboard/modals/ModalAddColeg"));
-import type { ModalEditEchipamentProps, Angajat } from "@/features/equipment/types";
+import type { ModalEditEchipamentProps, Angajat, Echipament } from "@/features/equipment/types";
 
 function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipamentProps) {
   const {
@@ -63,9 +63,9 @@ function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipa
         title: "Echipament salvat",
         description: "Modificările au fost salvate cu succes.",
       });
-      onUpdated(updated as any);
+      onUpdated(updated as Echipament);
       onClose();
-    } catch (error) {
+    } catch {
       toast({
         title: "Eroare la salvare",
         description: "Actualizarea echipamentului a eșuat.",

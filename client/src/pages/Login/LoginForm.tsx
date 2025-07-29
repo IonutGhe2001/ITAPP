@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import api from "../../services/api";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/use-auth";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -25,7 +25,7 @@ export default function LoginForm() {
       });
       auth.login("logged-in");
       navigate("/");
-    } catch (err) {
+    } catch {
       setError("Email sau parolă incorectă");
     } finally {
       setLoading(false);

@@ -1,3 +1,6 @@
-export { AuthProvider, useAuth } from './AuthContext';
-export { SearchProvider, useSearch } from './SearchContext';
-export { UserProvider, useUser } from '../store/UserContext';
+export { AuthProvider } from './AuthContext';
+export { useAuth } from './use-auth';
+export { SearchProvider } from './SearchContext';
+export { useSearch } from './use-search';
+export { UserProvider } from '../store/UserContext';
+export { useUser } from '../store/use-user';

@@ -1,24 +1,8 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/services/authService";
-import { getUser, setUser as setUserStorage } from "@/utils/storage"; 
-
-export type User = {
-  nume: string;
-  prenume: string;
-  functie: string;
-  profilePicture?: string;
-  email?: string;
-  telefon?: string;
-};
-
-type UserContextType = {
-  user: User | null;
-  setUser: (user: User | null) => void;
-  refreshUser: () => Promise<void>;
-  loading: boolean;
-};
-
-const UserContext = createContext<UserContextType | undefined>(undefined);
+import { getUser, setUser as setUserStorage } from "@/utils/storage";
+import type { User } from "@/types/user";
+import { UserContext } from "./user-context";
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(getUser()); 
@@ -40,10 +24,4 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       {children}
     </UserContext.Provider>
   );
-};
-
-export const useUser = () => {
-  const context = useContext(UserContext);
-  if (!context) throw new Error("useUser must be used within UserProvider");
-  return context;
-};
+}

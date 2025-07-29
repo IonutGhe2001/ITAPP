@@ -3,6 +3,12 @@ import { Button } from "@/components/ui/button";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
+const variantStyles = {
+  default: "bg-primary text-primary-foreground hover:bg-primary/90",
+  accent: "bg-accent text-accent-foreground hover:bg-accent/80",
+  muted: "bg-muted text-muted-foreground hover:bg-muted/70",
+} as const;
+
 type ActionButtonProps = {
   icon: ReactNode;
   label: string;
@@ -18,11 +24,7 @@ function ActionButton({
   className = "",
   variant = "default",
 }: ActionButtonProps) {
-  const variantStyles = {
-    default: "bg-primary text-primary-foreground hover:bg-primary/90",
-    accent: "bg-accent text-accent-foreground hover:bg-accent/80",
-    muted: "bg-muted text-muted-foreground hover:bg-muted/70",
- } as const;
+  
   const variantClass = useMemo(() => variantStyles[variant], [variant]);
 
   return (

@@ -12,7 +12,7 @@ import type { Angajat } from "@/features/equipment/types";
 const ModalAddColeg = React.lazy(() => import("./ModalAddColeg"));
 import { useCreateEchipament } from "@/features/equipment";
 import { useAngajati } from "@/features/employees";
-import { useToast } from "@/hooks/use-toast/useToast";
+import { useToast } from "@/hooks/use-toast/use-toast-hook";
 import { useEchipamentForm } from "./useEchipamentForm";
 import EchipamentForm from "@/features/equipment/components/EchipamentForm";
 
@@ -51,7 +51,7 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
         description: "Echipamentul a fost salvat cu succes.",
       });
       onClose();
-    } catch (err) {
+    } catch {
       toast({
         title: "Eroare",
         description: "Eroare la adăugare echipament.",

@@ -1,6 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/services/api";
 
+export interface AngajatInput {
+  numeComplet: string
+  functie: string
+  email?: string
+  telefon?: string
+}
+
+
 export const getAngajati = () => api.get("/angajati");
 
 export const useAngajati = () =>
@@ -12,7 +20,7 @@ export const useAngajati = () =>
 export const useCreateAngajat = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => api.post("/angajati", data),
+   mutationFn: (data: AngajatInput) => api.post("/angajati", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["angajati"] });
     },
@@ -22,7 +30,7 @@ export const useCreateAngajat = () => {
 export const useUpdateAngajat = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) =>
+    mutationFn: ({ id, data }: { id: string; data: AngajatInput }) =>
       api.put(`/angajati/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["angajati"] });

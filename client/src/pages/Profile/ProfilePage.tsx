@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Pencil } from "lucide-react";
 import { updateCurrentUser } from "@/services/authService";
-import { useUser } from "@/store/UserContext";
-import type { User } from "@/store/UserContext";
-import { useToast } from "@/hooks/use-toast/useToast";
+import { useUser } from "@/store/use-user";
+import type { User } from "@/types/user";
+import { useToast } from "@/hooks/use-toast/use-toast-hook";
 import Container from "@/components/Container";
 
 const fallbackImage = "/profile.png";
@@ -46,8 +46,8 @@ export default function ProfilePage() {
   title: "Profil actualizat",
   description: "Modificările au fost salvate cu succes.",
 });
-    } catch (err) {
-      console.error("Eroare la salvare:", err);
+    } catch (_err) {
+      console.error("Eroare la salvare:", _err);
       alert("A apărut o eroare la salvarea profilului.");
     } finally {
       setIsSaving(false);

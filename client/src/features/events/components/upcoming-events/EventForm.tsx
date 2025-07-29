@@ -2,7 +2,7 @@ import { useState, useEffect, type FC } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast/useToast";
+import { useToast } from "@/hooks/use-toast/use-toast-hook";
 import type { Eveniment, EvenimentData } from "@/features/events";
 
 const ORA_OPTIONS = [
@@ -148,7 +148,9 @@ const EventForm: FC<Props> = ({ selectedDay, initial, onSave, onCancel }) => {
         <select
           id="recurrence"
           value={recurrence}
-          onChange={(e) => setRecurrence(e.target.value as any)}
+          onChange={(e) =>
+            setRecurrence(e.target.value as "none" | "daily" | "weekly" | "monthly")
+          }
           className="border rounded px-3 py-2 w-full"
         >
           <option value="none">O singură dată</option>

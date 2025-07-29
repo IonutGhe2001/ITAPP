@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useCreateAngajat } from "@/features/employees";
-import { useToast } from "@/hooks/use-toast/useToast";
+import { useToast } from "@/hooks/use-toast/use-toast-hook";
 
 export default function ModalAddColeg({ onClose }: { onClose: () => void }) {
   const [formData, setFormData] = useState({
@@ -35,7 +35,7 @@ export default function ModalAddColeg({ onClose }: { onClose: () => void }) {
       await createMutation.mutateAsync(formData);
       toast({ title: "Coleg adăugat", description: "Coleg adăugat cu succes." });
       onClose();
-    } catch (err) {
+    } catch {
       toast({ title: "Eroare", description: "Eroare la adăugare coleg.", variant: "destructive" });
     }
   };

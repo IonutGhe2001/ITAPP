@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/services/api";
+import type { Echipament, EchipamentInput } from "./types";
 
 export const useEchipamente = () =>
   useQuery({
@@ -10,7 +11,7 @@ export const useEchipamente = () =>
 export const useCreateEchipament = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => api.post("/echipamente", data),
+    mutationFn: (data: EchipamentInput) => api.post("/echipamente", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["echipamente"] });
     },
@@ -20,8 +21,8 @@ export const useCreateEchipament = () => {
 export const useUpdateEchipament = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) =>
-      api.put(`/echipamente/${id}`, data).then((r) => r.data),
+    mutationFn: ({ id, data }: { id: string; data: EchipamentInput }) =>
+      api.put(`/echipamente/${id}`, data).then((r) => r.data as Echipament),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["echipamente"] });
     },

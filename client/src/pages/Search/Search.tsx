@@ -23,10 +23,10 @@ export default function SearchResults() {
         <div className="mb-4 text-sm text-gray-700">
           <p className="mb-2">Nu am găsit rezultate. Poate ai vrut să cauți:</p>
           <ul className="list-disc ml-5 space-y-1">
-            {data.suggestions.echipamente.map((e: any) => (
+            {data.suggestions.echipamente.map((e) => (
               <li key={e.id}>{e.nume}</li>
             ))}
-            {data.suggestions.angajati.map((a: any) => (
+            {data.suggestions.angajati.map((a) => (
               <li key={a.id}>{a.numeComplet}</li>
             ))}
           </ul>
@@ -37,7 +37,7 @@ export default function SearchResults() {
           <h3 className="font-semibold mb-2">Echipamente</h3>
           {data?.echipamente?.length ? (
             <ul className="space-y-2">
-              {data.echipamente.map((e: any) => (
+              {data.echipamente.map((e) => (
                 <li key={e.id} className="p-2 border rounded-md bg-white shadow">
                   <div className="font-medium">{e.nume}</div>
                   <div className="text-sm text-gray-600">Serie: {e.serie}</div>
@@ -57,7 +57,7 @@ export default function SearchResults() {
           <h3 className="font-semibold mb-2">Colegi</h3>
           {data?.angajati?.length ? (
             <ul className="space-y-2">
-              {data.angajati.map((c: any) => (
+               {data.angajati.map((c) => (
                 <li key={c.id} className="p-2 border rounded-md bg-white shadow">
                   <div className="font-medium">{c.numeComplet}</div>
                   <div className="text-sm text-gray-600">{c.functie}</div>
