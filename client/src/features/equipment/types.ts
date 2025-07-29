@@ -28,12 +28,22 @@ export interface EchipamentInput {
   tip: string;
   serie: string;
   angajatId: string | null;
+  stare?: string;
+  metadata?: unknown;
+}
+
+export interface EchipamentUpdateInput {
+  nume?: string;
+  tip?: string;
+  serie?: string;
+  angajatId?: string | null;
+  stare?: string;
   metadata?: unknown;
 }
 
 export interface EquipmentCardProps {
   echipament: Echipament;
-  onEdit?: (echipament: Echipament) => void;
+  onEdit?: (echipament: Echipament & { __editMode?: boolean }) => void;
   onDelete?: (id: string) => void;
   onRefresh?: () => void;
 }
@@ -49,7 +59,7 @@ export interface EquipmentFilterProps {
 
 export interface EquipmentListProps {
   echipamente: Echipament[];
-  onEdit?: (echipament: Echipament) => void;
+  onEdit?: (echipament: Echipament & { __editMode?: boolean }) => void;
   onDelete?: (id: string) => void;
 }
 

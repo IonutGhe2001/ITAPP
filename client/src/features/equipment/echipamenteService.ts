@@ -1,6 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/services/api";
-import type { Echipament, EchipamentInput } from "./types";
+import type {
+  Echipament,
+  EchipamentInput,
+  EchipamentUpdateInput,
+} from "./types";
+
 
 export const useEchipamente = () =>
   useQuery({
@@ -21,7 +26,7 @@ export const useCreateEchipament = () => {
 export const useUpdateEchipament = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: EchipamentInput }) =>
+    mutationFn: ({ id, data }: { id: string; data: EchipamentUpdateInput }) =>
       api.put(`/echipamente/${id}`, data).then((r) => r.data as Echipament),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["echipamente"] });

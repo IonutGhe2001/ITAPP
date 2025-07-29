@@ -62,9 +62,10 @@ export default function ModalCreateUser({ onClose }: ModalCreateUserProps) {
       onClose();
     } catch (err: unknown) {
       console.error("Eroare la creare cont:", err);
+      const e = err as { response?: { data?: { error?: string } } };
       toast({
         title: "Eroare",
-        description: err.response?.data?.error || "Nu s-a putut crea contul.",
+        description: e.response?.data?.error || "Nu s-a putut crea contul.",
         variant: "destructive",
       });
     } finally {
