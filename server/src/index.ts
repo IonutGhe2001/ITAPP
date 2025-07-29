@@ -1,4 +1,5 @@
 import express from "express";
+import http from "http";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
@@ -7,7 +8,8 @@ import path from "path";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/errorHandler";
-import { logRequest } from "./utils/logger"; 
+import { logRequest } from "./utils/logger";
+import { initWebSocket } from "./lib/websocket";
 
 import authRoutes from "./routes/auth";
 import echipamenteRoutes from "./routes/echipamente";
@@ -16,11 +18,13 @@ import evenimenteRoutes from "./routes/evenimente";
 import proceseVerbaleRoutes from "./routes/proceseVerbale";
 import importRoutes from "./routes/import";
 import searchRoutes from "./routes/search";
+import updatesRoutes from "./routes/updates";
 
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
 
 // Global Middlewares
 // When using credentials the origin cannot be "*". Default to the frontend
@@ -28,6 +32,7 @@ const app = express();
 const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
   .split(",")
   .filter(Boolean);
+  initWebSocket(server, allowedOrigins);
 app.use(
   cors({
     origin: allowedOrigins,
@@ -66,9 +71,10 @@ app.use("/api/evenimente", evenimenteRoutes);
 app.use("/api/procese-verbale", proceseVerbaleRoutes);
 app.use("/api/import", importRoutes);
 app.use("/api/search", searchRoutes);
+app.use("/api/updates", updatesRoutes);
 
 // Error handler middleware (final)
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

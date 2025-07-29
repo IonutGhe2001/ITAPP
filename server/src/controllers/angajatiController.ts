@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import * as angajatService from "../services/angajat.service";
+import { emitUpdate } from "../lib/websocket";
 
 export const getAngajati = async (_: Request, res: Response, next: NextFunction) => {
   try {
@@ -14,6 +15,10 @@ export const createAngajat = async (req: Request, res: Response, next: NextFunct
   try {
     const angajat = await angajatService.createAngajat(req.body);
     res.status(201).json(angajat);
+    emitUpdate({
+      type: "Coleg",
+      message: `Coleg nou: ${angajat.numeComplet}`,
+    });
   } catch (err) {
     next(err);
   }

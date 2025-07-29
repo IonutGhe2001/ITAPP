@@ -9,4 +9,18 @@ export const search = async (req: Request, res: Response, next: NextFunction) =>
   } catch (err) {
     next(err);
   }
+  };
+
+export const suggestions = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const q = (req.query.q as string) || "";
+    const results = await searchService.getSuggestions(q);
+    res.json(results);
+  } catch (err) {
+    next(err);
+  }
 };

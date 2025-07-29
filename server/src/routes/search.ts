@@ -6,5 +6,6 @@ const router = express.Router();
 
 router.use(authenticate);
 router.get("/", controller.search);
+router.get("/suggestions", controller.suggestions);
 
 export default router;

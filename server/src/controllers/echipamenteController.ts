@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import * as echipamentService from "../services/echipament.service";
+import { emitUpdate } from "../lib/websocket";
 
 export const getEchipamente = async (_: Request, res: Response, next: NextFunction) => {
   try {
@@ -14,6 +15,10 @@ export const createEchipament = async (req: Request, res: Response, next: NextFu
   try {
     const echipament = await echipamentService.createEchipament(req.body);
     res.status(201).json(echipament);
+    emitUpdate({
+      type: "Echipament",
+      message: `Echipament adăugat: ${echipament.nume}`,
+    });
   } catch (err) {
     next(err);
   }
