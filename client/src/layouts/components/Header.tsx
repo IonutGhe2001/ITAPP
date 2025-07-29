@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSearch } from "@/context/use-search";
 import { Button } from "@components/ui/button";
+import ThemeToggle from "@components/ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -73,6 +74,8 @@ export default function Header() {
         <Button variant="ghost" size="icon" className="hover:bg-muted">
           <FaBell className="text-muted-foreground" />
         </Button>
+
+<ThemeToggle />
 
         {user && (
           <DropdownMenu>

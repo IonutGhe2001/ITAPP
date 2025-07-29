@@ -5,16 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useUpdateEchipament } from "@/features/equipment";
 import { useAngajati } from "@/features/employees";
 import { useToast } from "@/hooks/use-toast/use-toast-hook";
