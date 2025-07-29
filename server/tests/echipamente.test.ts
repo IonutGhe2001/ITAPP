@@ -2,6 +2,7 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
+import { beforeAll, afterEach, describe, it, expect, jest } from '@jest/globals';
 jest.mock('../src/services/echipament.service', () => ({
   getEchipamente: jest.fn(),
   createEchipament: jest.fn(),
@@ -37,7 +38,7 @@ afterEach(() => {
 
 describe('Echipamente Routes', () => {
   it('get echipamente', async () => {
-    (echipService.getEchipamente as jest.Mock).mockResolvedValue([{ id: '1' }]);
+    (echipService.getEchipamente as jest.MockedFunction<typeof echipService.getEchipamente>).mockResolvedValue([{ id: '1' }]);
 
     const res = await request(app)
       .get('/api/echipamente')
@@ -48,7 +49,7 @@ describe('Echipamente Routes', () => {
   });
 
   it('create echipament', async () => {
-    (echipService.createEchipament as jest.Mock).mockResolvedValue({ id: '1', nume: 'Lap' });
+    (echipService.createEchipament as jest.MockedFunction<typeof echipService.createEchipament>).mockResolvedValue({ id: '1', nume: 'Lap' });
 
     const res = await request(app)
       .post('/api/echipamente')

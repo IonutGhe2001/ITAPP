@@ -1,6 +1,7 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import request from 'supertest';
+import { beforeAll, afterEach, describe, it, expect, jest } from '@jest/globals';
 jest.mock('../src/services/auth.service', () => ({
   authenticateUser: jest.fn(),
 }));
@@ -23,7 +24,7 @@ afterEach(() => {
 
 describe('Auth Routes', () => {
   it('login success', async () => {
-    (authService.authenticateUser as jest.Mock).mockResolvedValue('token123');
+    (authService.authenticateUser as jest.MockedFunction<typeof authService.authenticateUser>).mockResolvedValue('token123');
 
     const res = await request(app)
       .post('/api/auth/login')
@@ -36,7 +37,7 @@ describe('Auth Routes', () => {
   });
 
   it('login failure', async () => {
-    (authService.authenticateUser as jest.Mock).mockResolvedValue(null);
+    (authService.authenticateUser as jest.MockedFunction<typeof authService.authenticateUser>).mockResolvedValue(null);
 
     const res = await request(app)
       .post('/api/auth/login')
