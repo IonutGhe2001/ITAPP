@@ -11,13 +11,13 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Email sau parolă incorecte" });
     }
 
-      res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-    });
+     res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
 
-    return res.json({ success: true });
+    return res.json({ success: true, token });
   } catch (err) {
     return res.status(500).json({ message: "Eroare internă" });
   }
