@@ -2,6 +2,7 @@
 
 import { useMemo, useCallback } from "react";
 import { Bar } from "react-chartjs-2";
+import PieChartSummary, { type PieChartItem } from "@/components/charts/PieChartSummary";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -43,6 +44,14 @@ const angajatiCount = stats?.angajati ?? 0;
     [navigate]
   );
 
+  const handleSliceClick = useCallback(
+    (item: PieChartItem) => {
+      if (item.label === "Angajați") navigate("/colegi");
+      else navigate("/echipamente");
+    },
+    [navigate]
+  );
+
   const chartData = useMemo(
     () => {
       void resolvedTheme;
@@ -64,6 +73,13 @@ const angajatiCount = stats?.angajati ?? 0;
     },
     [angajatiCount, total, disponibile, predate, resolvedTheme]
   );
+
+  const pieItems: PieChartItem[] = [
+    { label: "Angajați", value: angajatiCount },
+    { label: "Echipamente", value: total },
+    { label: "Disponibile", value: disponibile },
+    { label: "Predate", value: predate },
+  ];
 
   const options = useMemo(() => {
     void resolvedTheme;
@@ -89,8 +105,13 @@ const angajatiCount = stats?.angajati ?? 0;
   }, [resolvedTheme, handleBarClick]);
 
   return (
-    <div className="w-full h-64">
-      <Bar data={chartData} options={options} />
+     <div className="w-full h-64 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="h-full">
+        <Bar data={chartData} options={options} />
+      </div>
+      <div className="h-full">
+        <PieChartSummary items={pieItems} onSliceClick={handleSliceClick} />
+      </div>
     </div>
   );
 }
