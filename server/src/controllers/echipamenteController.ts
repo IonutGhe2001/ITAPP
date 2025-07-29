@@ -29,6 +29,10 @@ export const updateEchipament = async (req: Request, res: Response, next: NextFu
     const { id } = req.params;
     const updated = await echipamentService.updateEchipament(id, req.body);
     res.json(updated);
+    emitUpdate({
+      type: "Echipament",
+      message: "Echipament actualizat",
+    });
   } catch (err) {
     next(err);
   }
@@ -39,6 +43,19 @@ export const deleteEchipament = async (req: Request, res: Response, next: NextFu
     const { id } = req.params;
     await echipamentService.deleteEchipament(id);
     res.json({ message: "Echipament șters cu succes." });
+     emitUpdate({
+      type: "Echipament",
+      message: "Echipament șters",
+    });
+  } catch (err) {
+    next(err);
+  }
+  };
+
+export const getStats = async (_: Request, res: Response, next: NextFunction) => {
+  try {
+    const stats = await echipamentService.getStats();
+    res.json(stats);
   } catch (err) {
     next(err);
   }

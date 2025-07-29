@@ -57,3 +57,14 @@ return prisma.echipament.update({
 export const deleteEchipament = (id: string) => {
   return prisma.echipament.delete({ where: { id } });
 };
+
+export const getStats = async () => {
+  const [echipamente, disponibile, predate, angajati] = await Promise.all([
+    prisma.echipament.count(),
+    prisma.echipament.count({ where: { stare: "disponibil" } }),
+    prisma.echipament.count({ where: { angajatId: { not: null } } }),
+    prisma.angajat.count(),
+  ]);
+
+  return { echipamente, disponibile, predate, angajati };
+};

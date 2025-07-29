@@ -29,6 +29,10 @@ export const updateAngajat = async (req: Request, res: Response, next: NextFunct
     const { id } = req.params;
     const updated = await angajatService.updateAngajat(id, req.body);
     res.json(updated);
+    emitUpdate({
+      type: "Coleg",
+      message: "Coleg actualizat",
+    });
   } catch (err) {
     next(err);
   }
@@ -39,6 +43,10 @@ export const deleteAngajat = async (req: Request, res: Response, next: NextFunct
     const { id } = req.params;
     await angajatService.deleteAngajat(id);
     res.json({ message: "Angajat șters cu succes." });
+     emitUpdate({
+      type: "Coleg",
+      message: "Coleg șters",
+    });
   } catch (err) {
     next(err);
   }

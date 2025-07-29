@@ -9,6 +9,7 @@ const router = express.Router();
 router.use(authenticate);
 
 router.get("/", controller.getEchipamente);
+router.get("/stats", controller.getStats);
 router.post(
   "/",
   authorizeRoles("admin"),
