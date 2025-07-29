@@ -2,7 +2,7 @@
 
 import { useMemo, useCallback } from "react";
 import { Bar } from "react-chartjs-2";
-import PieChartSummary, { type PieChartItem } from "@/components/charts/PieChartSummary";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { useOverviewStats } from "@/services/statsService";
 
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, ChartDataLabels);
 
 const getCssVar = (name: string) =>
   typeof window !== "undefined"
@@ -39,14 +39,6 @@ const angajatiCount = stats?.angajati ?? 0;
       if (!elements.length) return;
       const index = elements[0].index;
       if (index === 0) navigate("/colegi");
-      else navigate("/echipamente");
-    },
-    [navigate]
-  );
-
-  const handleSliceClick = useCallback(
-    (item: PieChartItem) => {
-      if (item.label === "Angajați") navigate("/colegi");
       else navigate("/echipamente");
     },
     [navigate]
@@ -74,14 +66,7 @@ const angajatiCount = stats?.angajati ?? 0;
     [angajatiCount, total, disponibile, predate, resolvedTheme]
   );
 
-  const pieItems: PieChartItem[] = [
-    { label: "Angajați", value: angajatiCount },
-    { label: "Echipamente", value: total },
-    { label: "Disponibile", value: disponibile },
-    { label: "Predate", value: predate },
-  ];
-
-  const options = useMemo(() => {
+  const options = useMemo<ChartOptions<"bar">>(() => {
     void resolvedTheme;
     const textColor = `hsl(${getCssVar("--foreground")})`;
     const gridColor = `hsl(${getCssVar("--border")})`;
@@ -89,7 +74,15 @@ const angajatiCount = stats?.angajati ?? 0;
       responsive: true,
       maintainAspectRatio: false,
       onClick: handleBarClick,
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+          color: textColor,
+          anchor: "end",
+          align: "top",
+          font: { weight: "bold" },
+        },
+      },
       scales: {
         x: {
           ticks: { color: textColor },
@@ -105,13 +98,8 @@ const angajatiCount = stats?.angajati ?? 0;
   }, [resolvedTheme, handleBarClick]);
 
   return (
-     <div className="w-full h-64 grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div className="h-full">
-        <Bar data={chartData} options={options} />
-      </div>
-      <div className="h-full">
-        <PieChartSummary items={pieItems} onSliceClick={handleSliceClick} />
-      </div>
+     <div className="w-full h-64">
+      <Bar data={chartData} options={options} />
     </div>
   );
 }
