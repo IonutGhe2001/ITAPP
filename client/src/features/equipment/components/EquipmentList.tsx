@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { FixedSizeList as List } from "react-window";
 import EquipmentCard from "./EquipmentCard";
 import type { EquipmentListProps, Echipament } from "@/features/equipment/types";
@@ -13,15 +13,20 @@ function EquipmentList({
     const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
 
-  useEffect(() => {
-    const updateWidth = () => {
-      if (containerRef.current) {
-        setWidth(containerRef.current.offsetWidth);
-      }
-    };
+ useLayoutEffect(() => {
+    const node = containerRef.current;
+    if (!node) return;
+
+    const updateWidth = () => setWidth(node.offsetWidth);
+
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(node);
     updateWidth();
     window.addEventListener("resize", updateWidth);
-    return () => window.removeEventListener("resize", updateWidth);
+     return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateWidth);
+    };
   }, []);
 
   if (echipamente.length === 0) {
