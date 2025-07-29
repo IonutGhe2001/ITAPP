@@ -1,4 +1,4 @@
-import React, { useEffect, useState, memo, Suspense } from "react";
+import React, { memo, Suspense } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,72 +18,44 @@ import {
 import { useUpdateEchipament } from "@/features/equipment";
 import { useAngajati } from "@/features/employees";
 import { useToast } from "@/hooks/use-toast/useToast";
+import { useEchipamentForm } from "@/pages/Dashboard/modals/useEchipamentForm";
+import EchipamentForm from "./EchipamentForm";
 const ModalAddColeg = React.lazy(() => import("@/pages/Dashboard/modals/ModalAddColeg"));
 import type { ModalEditEchipamentProps, Angajat } from "@/features/equipment/types";
 
-function ModalEditEchipament({
-  echipament,
-  onClose,
-  onUpdated,
-}: ModalEditEchipamentProps) {
-  const [formData, setFormData] = useState({
-    nume: "",
-    serie: "",
-    tip: "",
-    angajatId: "none",
-    metadata: "",
+function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipamentProps) {
+  const {
+    formData,
+    setFormData,
+    errors,
+    search,
+    setSearch,
+    showColegModal,
+    setShowColegModal,
+    validate,
+    buildPayload,
+  } = useEchipamentForm({
+    nume: echipament.nume,
+    serie: echipament.serie,
+    tip: echipament.tip,
+    angajatId: echipament.angajatId || 'none',
+    metadata: echipament.metadata || '',
   });
 
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-   const { data: angajati = [] } = useAngajati();
-  const [search, setSearch] = useState("");
-  const [showColegModal, setShowColegModal] = useState(false);
+  const { data: angajati = [] } = useAngajati();
   const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
   
 
-  useEffect(() => {
-    if (echipament) {
-      setFormData({
-        nume: echipament.nume || "",
-        serie: echipament.serie || "",
-        tip: echipament.tip || "",
-        angajatId: echipament.angajatId || "none",
-        metadata: echipament.metadata || "",
-      });
-    }
-  }, [echipament]);
-
-
-
-  const validate = () => {
-    const newErrors: { [key: string]: string } = {};
-    if (!formData.nume.trim()) newErrors.nume = "Numele este obligatoriu.";
-    if (!formData.serie.trim()) newErrors.serie = "Seria este obligatorie.";
-    if (!formData.tip.trim()) newErrors.tip = "Tip invalid.";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = async () => {
-    if (!validate()) return;
+    if (!validate({
+      nume: "Numele este obligatoriu.",
+      serie: "Seria este obligatorie.",
+      tip: "Tip invalid.",
+    }))
+      return;
 
-     let metadata: any = undefined;
-    if (formData.metadata.trim()) {
-      try {
-        metadata = JSON.parse(formData.metadata);
-      } catch {
-        metadata = formData.metadata;
-      }
-    }
-
-    const payload = {
-      nume: formData.nume.trim(),
-      tip: formData.tip.trim(),
-      serie: formData.serie.trim(),
-      angajatId: formData.angajatId === "none" ? null : formData.angajatId,
-      metadata,
-    };
+   const payload = buildPayload();
 
     try {
       const updated = await updateMutation.mutateAsync({ id: echipament.id, data: payload });
@@ -109,78 +81,16 @@ function ModalEditEchipament({
           <DialogHeader>
             <DialogTitle>Editează echipamentul</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-          <div>
-            <Label>Nume echipament</Label>
-            <Input
-              value={formData.nume}
-              onChange={(e) => setFormData({ ...formData, nume: e.target.value })}
-            />
-            {errors.nume && <p className="text-sm text-red-500">{errors.nume}</p>}
-          </div>
-          <div>
-            <Label>Seria</Label>
-            <Input
-              value={formData.serie}
-              onChange={(e) => setFormData({ ...formData, serie: e.target.value })}
-            />
-            {errors.serie && <p className="text-sm text-red-500">{errors.serie}</p>}
-          </div>
-          <div>
-            <Label>Tip</Label>
-            <Input
-              value={formData.tip}
-              onChange={(e) => setFormData({ ...formData, tip: e.target.value })}
-            />
-            {errors.tip && <p className="text-sm text-red-500">{errors.tip}</p>}
-          </div>
-          <div>
-            <Label>Detalii (opțional)</Label>
-            <textarea
-              className="border border-gray-300 rounded-lg w-full p-2 text-sm"
-              value={formData.metadata}
-              onChange={(e) => setFormData({ ...formData, metadata: e.target.value })}
-            />
-          </div>
-          <div>
-            <Label>Angajat</Label>
-            <Select
-              value={formData.angajatId}
-              onValueChange={(value) => setFormData({ ...formData, angajatId: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Atribuie angajat (opțional)" />
-              </SelectTrigger>
-              <SelectContent>
-                <div className="p-2">
-                  <Input
-                    placeholder="Caută..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    onKeyDown={(e) => e.stopPropagation()}
-                    className="mb-2"
-                  />
-                </div>
-                <SelectItem value="none">Neatribuit</SelectItem>
-                {angajati
-                  .filter((a: Angajat) => a.numeComplet.toLowerCase().includes(search.toLowerCase()))
-                  .map((a: Angajat) => (
-                    <SelectItem key={a.id} value={a.id}>
-                      {a.numeComplet}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-            <button
-              type="button"
-              onClick={() => setShowColegModal(true)}
-              className="text-xs text-primary mt-1 hover:underline"
-            >
-              Adaugă coleg nou
-            </button>
-          </div>
-              <Button onClick={handleSubmit}>Salvează</Button>
-          </div>
+          <EchipamentForm
+            formData={formData}
+            setFormData={setFormData}
+            errors={errors}
+            search={search}
+            setSearch={setSearch}
+            angajati={angajati as Angajat[]}
+            onAddColeg={() => setShowColegModal(true)}
+          />
+          <Button onClick={handleSubmit}>Salvează</Button>
         </DialogContent>
       </Dialog>
       <Suspense fallback={null}>
