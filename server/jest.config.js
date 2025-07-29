@@ -8,4 +8,9 @@ module.exports = {
     '^@middlewares/(.*)$': '<rootDir>/src/middlewares/$1',
     '^@validators/(.*)$': '<rootDir>/src/validators/$1',
   },
+globals: {
+    'ts-jest': {
+      tsconfig: 'tsconfig.test.json',
+    },
+  },
 };
