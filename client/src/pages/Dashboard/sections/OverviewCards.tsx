@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -9,11 +9,12 @@ import {
   BarElement,
   Tooltip,
   Legend,
+  type ChartOptions,
 } from "chart.js";
 import { useTheme } from "@components/ui/theme-provider-utils";
-import { useAngajati } from "@/features/employees";
-import { useEchipamente } from "@/features/equipment";
-import type { Echipament } from "@/features/equipment";
+import { useNavigate } from "react-router-dom";
+import { useOverviewStats } from "@/services/statsService";
+
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
@@ -23,16 +24,26 @@ const getCssVar = (name: string) =>
     : "";
 
 export default function OverviewCards() {
-  const { data: angajati } = useAngajati();
-  const { data: echipamente } = useEchipamente();
+const navigate = useNavigate();
+  const { data: stats } = useOverviewStats();
 
-  const angajatiCount = angajati?.length ?? 0;
-  const total = echipamente?.length ?? 0;
-  const disponibile = echipamente?.filter((e: Echipament) => e.stare === "disponibil").length ?? 0;
-  const predate = echipamente?.filter((e: Echipament) => e.angajatId).length ?? 0;
+const angajatiCount = stats?.angajati ?? 0;
+  const total = stats?.echipamente ?? 0;
+  const disponibile = stats?.disponibile ?? 0;
+  const predate = stats?.predate ?? 0;
   const { resolvedTheme } = useTheme();
 
-  const data = useMemo(
+  const handleBarClick = useCallback<NonNullable<ChartOptions<"bar">["onClick"]>>(
+    (_event, elements) => {
+      if (!elements.length) return;
+      const index = elements[0].index;
+      if (index === 0) navigate("/colegi");
+      else navigate("/echipamente");
+    },
+    [navigate]
+  );
+
+  const chartData = useMemo(
     () => {
       void resolvedTheme;
       return {
@@ -61,6 +72,7 @@ export default function OverviewCards() {
     return {
       responsive: true,
       maintainAspectRatio: false,
+      onClick: handleBarClick,
       plugins: { legend: { display: false } },
       scales: {
         x: {
@@ -74,11 +86,11 @@ export default function OverviewCards() {
         },
       },
     };
-  }, [resolvedTheme]);
+  }, [resolvedTheme, handleBarClick]);
 
   return (
     <div className="w-full h-64">
-      <Bar data={data} options={options} />
+      <Bar data={chartData} options={options} />
     </div>
   );
 }

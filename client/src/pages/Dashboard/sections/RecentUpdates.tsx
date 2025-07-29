@@ -7,6 +7,7 @@ import { formatDistanceToNow } from "date-fns";
 import { ro } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import { UserIcon, MonitorIcon, PhoneIcon } from "lucide-react";
+import { useToast } from "@/hooks/use-toast/use-toast-hook";
 
 const updateIcons = {
   Echipament: <MonitorIcon className="w-4 h-4" />,
@@ -24,6 +25,8 @@ type Update = {
 export default function RecentUpdates() {
   const [filter] = useState<string | null>(null);
   const [updates, setUpdates] = useState<Update[]>([]);
+  const { toast } = useToast();
+
 
   useEffect(() => {
     let socket: Socket | null = null;
@@ -40,12 +43,13 @@ export default function RecentUpdates() {
     fetchUpdates();
 
     const baseUrl =
-      (import.meta as any).env.VITE_SOCKET_URL ||
-      (import.meta as any).env.VITE_API_URL;
-      const url = baseUrl.replace(/\/api$/, "");
+      import.meta.env.VITE_SOCKET_URL ||
+      import.meta.env.VITE_API_URL;
+    const url = baseUrl.replace(/\/api$/, "");
     socket = io(url, { withCredentials: true });
 
     socket.on("update", (update: Update) => {
+      toast({ title: update.type, description: update.message });
       setUpdates((prev) => [update, ...prev]);
     });
 

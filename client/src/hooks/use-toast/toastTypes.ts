@@ -1,6 +1,6 @@
 import type { ToastActionElement, ToastProps } from "@/components/ui/toast";
 
-export const TOAST_LIMIT = 1;
+export const TOAST_LIMIT = 3;
 export const TOAST_REMOVE_DELAY = 5000;
 
 export type ToasterToast = ToastProps & {
