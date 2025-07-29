@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { creeazaProcesVerbalCuEchipamente } from "../services/procesVerbal.service";
 import { genereazaPDFProcesVerbal } from "../utils/pdfGenerator";
+import { logger } from "@lib/logger";
 
 export const creareProcesVerbal = async (req: Request, res: Response) => {
   try {
@@ -25,7 +26,7 @@ export const creareProcesVerbal = async (req: Request, res: Response) => {
       "Content-Length": pdfBuffer.length,
     }).send(pdfBuffer);
   } catch (error) {
-    console.error("Eroare la creare proces verbal:", error);
+    logger.error("Eroare la creare proces verbal:", error);
     res.status(500).json({ message: "Eroare la generarea procesului verbal." });
   }
 };

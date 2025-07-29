@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import path from "path";
 import compression from "compression";
 import cookieParser from "cookie-parser";
+import { logger } from "@lib/logger";
 import { errorHandler } from "./middlewares/errorHandler";
 import { logRequest } from "./utils/logger";
 import { initWebSocket } from "./lib/websocket";
@@ -77,4 +78,4 @@ app.use("/api/updates", updatesRoutes);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => logger.info(`Server running on port ${PORT}`));

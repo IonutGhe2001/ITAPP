@@ -1,11 +1,12 @@
 import { prisma } from "@lib/prisma";
+import { logger } from "@lib/logger";
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 if (process.env.NODE_ENV === 'production') {
-  console.log('Seeding skipped in production environment');
+  logger.info('Seeding skipped in production environment');
   process.exit(0);
 }
 
@@ -34,12 +35,12 @@ async function main() {
     },
   });
 
-  console.log('✅ User seed creat cu succes (ionut.gheba@creativemed.ro / parola123)');
+  logger.info('✅ User seed creat cu succes (ionut.gheba@creativemed.ro / parola123)');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Eroare la seed:', e);
+    logger.error('❌ Eroare la seed:', e);
     process.exit(1);
   })
   .finally(async () => {

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { updateUser, authenticateUser, registerUser, getUserById } from "../services/auth.service";
+import { logger } from "@lib/logger";
 
 export const login = async (req: Request, res: Response) => {
   try {
@@ -57,7 +58,7 @@ export const register = async (req: Request, res: Response) => {
     const user = await registerUser(req.body);
     return res.status(201).json({ message: "Cont creat cu succes", userId: user.id });
   } catch (err: any) {
-    console.error("Eroare la înregistrare:", err);
+    logger.error("Eroare la înregistrare:", err);
     return res.status(400).json({ error: err.message || "Eroare la creare cont" });
   }
 };

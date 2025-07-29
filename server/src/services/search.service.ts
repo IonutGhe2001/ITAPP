@@ -1,9 +1,37 @@
 import { prisma } from "../lib/prisma";
 import { levenshtein } from "../utils/levenshtein";
 
-export const globalSearch = async (query: string) => {
+export interface EquipmentSuggestion {
+  id: string;
+  nume: string;
+  serie: string;
+}
+
+export interface EmployeeSuggestion {
+  id: string;
+  numeComplet: string;
+  functie: string;
+  email: string | null;
+}
+
+interface SuggestionsResult {
+  echipamente: EquipmentSuggestion[];
+  angajati: EmployeeSuggestion[];
+}
+
+interface GlobalSearchResult {
+  echipamente: any[];
+  angajati: any[];
+  suggestions?: SuggestionsResult;
+}
+
+export const globalSearch = async (
+  query: string
+): Promise<GlobalSearchResult> => {
   const q = query.trim();
- if (!q) return { echipamente: [], angajati: [], suggestions: [] };
+ if (!q) {
+    return { echipamente: [], angajati: [], suggestions: { echipamente: [], angajati: [] } };
+  }
 
   const echipamente = await prisma.echipament.findMany({
     where: {
@@ -41,7 +69,9 @@ export const globalSearch = async (query: string) => {
   return { echipamente, angajati };
 };
 
-export const getSuggestions = async (query: string) => {
+export const getSuggestions = async (
+  query: string
+): Promise<SuggestionsResult> => {
   const q = query.trim();
   if (!q) {
     return { echipamente: [], angajati: [] };
@@ -52,30 +82,32 @@ export const getSuggestions = async (query: string) => {
 const MAX_SUGGESTION_ITEMS = 5;
 const SEARCH_SAMPLE_SIZE = 50;
 
-const computeSuggestions = async (query: string) => {
+const computeSuggestions = async (
+  query: string
+): Promise<SuggestionsResult> => {
   const q = query.toLowerCase();
-  const equipments = await prisma.echipament.findMany({
+  const equipments = (await prisma.echipament.findMany({
     take: SEARCH_SAMPLE_SIZE,
     select: { id: true, nume: true, serie: true },
-  });
+  })) as EquipmentSuggestion[];
   const equipmentSuggestions = equipments
-    .map((e: any) => ({
+    .map((e): { item: EquipmentSuggestion; score: number } => ({
       item: e,
       score: Math.min(
         levenshtein(e.nume.toLowerCase(), q),
         levenshtein(e.serie.toLowerCase(), q)
       ),
     }))
-    .sort((a: any, b: any) => a.score - b.score)
+    .sort((a, b) => a.score - b.score)
     .slice(0, MAX_SUGGESTION_ITEMS)
-    .map((e: any) => e.item);
+    .map((e) => e.item);
 
-  const employees = await prisma.angajat.findMany({
+  const employees = (await prisma.angajat.findMany({
     take: SEARCH_SAMPLE_SIZE,
     select: { id: true, numeComplet: true, functie: true, email: true },
-  });
+  })) as EmployeeSuggestion[];
   const employeeSuggestions = employees
-    .map((a: any) => ({
+    .map((a): { item: EmployeeSuggestion; score: number } => ({
       item: a,
       score: Math.min(
         levenshtein(a.numeComplet.toLowerCase(), q),
@@ -83,9 +115,9 @@ const computeSuggestions = async (query: string) => {
         levenshtein((a.email || '').toLowerCase(), q)
       ),
     }))
-    .sort((a: any, b: any) => a.score - b.score)
+    .sort((a, b) => a.score - b.score)
     .slice(0, MAX_SUGGESTION_ITEMS)
-    .map((a: any) => a.item);
+    .map((a) => a.item);
 
   return { echipamente: equipmentSuggestions, angajati: employeeSuggestions };
 };

@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-export function logRequest(req: Request, res: Response, next: NextFunction) {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+import { logger } from "@lib/logger";
+
+export function logRequest(req: Request, _res: Response, next: NextFunction) {
+  logger.info(`${req.method} ${req.url}`);
   next();
 }

@@ -11,7 +11,7 @@ export const processImportRows = async (rows: ImportRow[]) => {
   const results: any[] = [];
   const errors: { index: number; error: string }[] = [];
 
-  const limit = 10; // procesează 10 rânduri simultan
+  const limit = parseInt(process.env.IMPORT_CONCURRENCY_LIMIT || "10", 10); // procesează 10 rânduri simultan
   for (let i = 0; i < rows.length; i += limit) {
     const chunk = rows.slice(i, i + limit);
 

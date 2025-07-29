@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import * as XLSX from "xlsx";
 import { processImportRows } from "../services/import.service";
 import type { ImportRow } from "../services/import.service";
+import { logger } from "@lib/logger";
 
 export const uploadImportFile = async (req: Request, res: Response) => {
   try {
@@ -23,7 +24,7 @@ const { results, errors } = await processImportRows(rows);
 
     res.json({ importate: results.length, erori: errors });
   } catch (err) {
-    console.error("Import error:", err);
+    logger.error("Import error:", err);
     res.status(500).json({ error: "Eroare server" });
   }
 };

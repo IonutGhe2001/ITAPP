@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "dev": "ts-node-dev src/index.ts",
     "seed": "ts-node prisma/seed.ts"
   },
@@ -29,6 +29,7 @@
     "prisma": "^6.10.1",
     "puppeteer": "^24.12.1",
     "socket.io": "^4.8.1",
+    "winston": "^3.17.0",
     "xlsx": "^0.18.5",
     "zod": "^3.25.67"
   },
@@ -42,8 +43,14 @@
     "@types/multer": "^2.0.0",
     "@types/node": "^24.0.7",
     "@types/xlsx": "^0.0.35",
+    "@types/winston": "^2.4.4",
     "dotenv-cli": "^8.0.0",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "@types/jest": "^29.5.11",
+    "@types/supertest": "^2.0.12",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "supertest": "^6.3.3"
   }
 }
