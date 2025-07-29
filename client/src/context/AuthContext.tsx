@@ -9,6 +9,7 @@ import { AuthContext } from "./auth-context";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setTokenState] = useState<string | null>(getToken());
+  const [loggedInViaCookie, setLoggedInViaCookie] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const login = (newToken: string) => {
@@ -24,6 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     removeToken();
     setTokenState(null);
+    setLoggedInViaCookie(false);
   };
 
   useEffect(() => {
@@ -36,23 +38,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (res.ok) {
           if (!stored) {
             // session valid via cookie
-            login("logged-in");
+            setLoggedInViaCookie(true);
           }
         } else {
           removeToken();
           setTokenState(null);
+          setLoggedInViaCookie(false);
         }
       })
       .catch(() => {
         removeToken();
         setTokenState(null);
+        setLoggedInViaCookie(false);
       })
       .finally(() => setLoading(false));
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated: !!token, token, loading, login, logout }}
+      value={{
+        isAuthenticated: !!token || loggedInViaCookie,
+        token,
+        loading,
+        login,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>
