@@ -1,4 +1,4 @@
-import React, { memo, Suspense } from "react";
+import React, { memo, Suspense, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +15,22 @@ const ModalAddColeg = React.lazy(() => import("@/pages/Dashboard/modals/ModalAdd
 import type { ModalEditEchipamentProps, Angajat, Echipament } from "@/features/equipment/types";
 
 function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipamentProps) {
+  const initialData = useMemo(
+    () => ({
+      nume: echipament.nume,
+      serie: echipament.serie,
+      tip: echipament.tip,
+      angajatId: echipament.angajatId || 'none',
+      metadata:
+        typeof echipament.metadata === 'string'
+          ? echipament.metadata
+          : echipament.metadata
+          ? JSON.stringify(echipament.metadata)
+          : '',
+    }),
+    [echipament]
+  );
+
   const {
     formData,
     setFormData,
@@ -25,18 +41,7 @@ function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipa
     setShowColegModal,
     validate,
     buildPayload,
-  } = useEchipamentForm({
-    nume: echipament.nume,
-    serie: echipament.serie,
-    tip: echipament.tip,
-    angajatId: echipament.angajatId || 'none',
-    metadata:
-      typeof echipament.metadata === 'string'
-        ? echipament.metadata
-        : echipament.metadata
-        ? JSON.stringify(echipament.metadata)
-        : '',
-  });
+  } = useEchipamentForm(initialData);
 
   const { data: angajati = [] } = useAngajati();
   const updateMutation = useUpdateEchipament();
