@@ -30,7 +30,7 @@ describe('Auth Routes', () => {
       .send({ email: 'test@example.com', password: 'pass' });
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ success: true });
+    expect(res.body).toEqual({ success: true, token: 'token123' });
     expect(res.headers['set-cookie']).toBeDefined();
     expect(authService.authenticateUser).toHaveBeenCalledWith('test@example.com', 'pass');
   });
