@@ -1,10 +1,12 @@
 import { FaBell } from "react-icons/fa";
 import { Search, Menu } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSearch } from "@/context/use-search";
 import { Button } from "@components/ui/button";
 import ThemeToggle from "@components/ThemeToggle";
+import { useSearchSuggestions } from "@/services/searchService";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +26,15 @@ export default function Header() {
   const { query, setQuery } = useSearch();
 
   const { user, loading } = useUser();
+const { data: suggestionData } = useSearchSuggestions(query);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const suggestions = useMemo(
+    () => [
+      ...(suggestionData?.echipamente.map((e) => e.nume) || []),
+      ...(suggestionData?.angajati.map((a) => a.numeComplet) || []),
+    ],
+    [suggestionData]
+  );
 
   const handleSearchSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -67,8 +78,49 @@ export default function Header() {
             placeholder="Caută..."
             className="pl-9 pr-4 py-2 text-sm bg-muted text-foreground rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary"
              value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setActiveIndex(-1);
+            }}
+            onKeyDown={(e) => {
+              if (!suggestions.length) return;
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setActiveIndex((i) => Math.min(i + 1, suggestions.length - 1));
+              } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setActiveIndex((i) => Math.max(i - 1, 0));
+              } else if (e.key === "Enter") {
+                if (activeIndex >= 0 && suggestions[activeIndex]) {
+                  e.preventDefault();
+                  const val = suggestions[activeIndex];
+                  setQuery(val);
+                  navigate(`/search?q=${encodeURIComponent(val)}`);
+                }
+              }
+            }}
           />
+          {suggestions.length > 0 && (
+            <ul className="absolute left-0 right-0 mt-1 bg-background border border-border rounded-md shadow z-50">
+              {suggestions.map((s, idx) => (
+                <li
+                  key={idx}
+                  className={cn(
+                    "px-3 py-1 text-sm cursor-pointer",
+                    idx === activeIndex && "bg-muted"
+                  )}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setQuery(s);
+                    navigate(`/search?q=${encodeURIComponent(s)}`);
+                  }}
+                  onMouseEnter={() => setActiveIndex(idx)}
+                >
+                  {s}
+                </li>
+              ))}
+            </ul>
+          )}
         </form>
 
         <Button variant="ghost" size="icon" className="hover:bg-muted">

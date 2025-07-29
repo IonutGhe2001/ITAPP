@@ -1,82 +1,84 @@
 "use client";
 
-import { type JSX } from "react";
+import { useMemo } from "react";
+import { Bar } from "react-chartjs-2";
 import {
-  UsersIcon,
-  LaptopIcon,
-  CheckCircle2Icon,
-  MinusCircleIcon,
-} from "lucide-react";
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { useTheme } from "@components/ui/theme-provider-utils";
 import { useAngajati } from "@/features/employees";
 import { useEchipamente } from "@/features/equipment";
 import type { Echipament } from "@/features/equipment";
 
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
+
+const getCssVar = (name: string) =>
+  typeof window !== "undefined"
+    ? getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+    : "";
+
 export default function OverviewCards() {
- const { data: angajati } = useAngajati();
+  const { data: angajati } = useAngajati();
   const { data: echipamente } = useEchipamente();
 
   const angajatiCount = angajati?.length ?? 0;
   const total = echipamente?.length ?? 0;
   const disponibile = echipamente?.filter((e: Echipament) => e.stare === "disponibil").length ?? 0;
   const predate = echipamente?.filter((e: Echipament) => e.angajatId).length ?? 0;
-  const Card = ({
-    label,
-    value,
-    icon,
-    iconBg,
-    bg,
-  }: {
-    label: string;
-    value: number;
-    icon: JSX.Element;
-    iconBg: string;
-    bg: string;
-  }) => (
-    <div
-      className={`rounded-xl p-4 shadow-sm border border-border flex items-center justify-between min-w-[220px] transition-all duration-300 hover:scale-[1.02] hover:shadow-md ${bg}`}
-    >
-      <div>
-        <p className="text-sm text-muted-foreground mb-1">{label}</p>
-        <p className="text-3xl font-bold text-foreground">{value}</p>
-      </div>
-      <div
-        className={`w-10 h-10 rounded-full flex items-center justify-center ${iconBg}`}
-      >
-        {icon}
-      </div>
-    </div>
+  const { resolvedTheme } = useTheme();
+
+  const data = useMemo(
+    () => {
+      void resolvedTheme;
+      return {
+      labels: ["Angajați", "Echipamente", "Disponibile", "Predate"],
+      datasets: [
+        {
+          label: "Număr",
+          data: [angajatiCount, total, disponibile, predate],
+          backgroundColor: [
+            `hsl(${getCssVar("--chart-1")})`,
+            `hsl(${getCssVar("--chart-2")})`,
+            `hsl(${getCssVar("--chart-4")})`,
+            `hsl(${getCssVar("--chart-5")})`,
+          ],
+        },
+      ],
+      };
+    },
+    [angajatiCount, total, disponibile, predate, resolvedTheme]
   );
 
+  const options = useMemo(() => {
+    void resolvedTheme;
+    const textColor = `hsl(${getCssVar("--foreground")})`;
+    const gridColor = `hsl(${getCssVar("--border")})`;
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: {
+          ticks: { color: textColor },
+          grid: { display: false },
+        },
+        y: {
+          ticks: { color: textColor },
+          grid: { color: gridColor },
+          beginAtZero: true,
+        },
+      },
+    };
+  }, [resolvedTheme]);
+
   return (
-    <div className="flex flex-wrap gap-4 justify-center">
-      <Card
-        label="Total angajați"
-        value={angajatiCount}
-        icon={<UsersIcon className="w-5 h-5 text-white" />}
-        iconBg="bg-chart-1"
-        bg="bg-chart-1/10"
-      />
-      <Card
-        label="Total echipamente"
-        value={total}
-        icon={<LaptopIcon className="w-5 h-5 text-white" />}
-        iconBg="bg-chart-2"
-        bg="bg-chart-2/10"
-      />
-      <Card
-        label="Disponibile"
-        value={disponibile}
-        icon={<CheckCircle2Icon className="w-5 h-5 text-white" />}
-        iconBg="bg-green-600"
-        bg="bg-green-100"
-      />
-      <Card
-        label="Predate"
-        value={predate}
-        icon={<MinusCircleIcon className="w-5 h-5 text-white" />}
-        iconBg="bg-red-600"
-        bg="bg-red-100"
-      />
+    <div className="w-full h-64">
+      <Bar data={data} options={options} />
     </div>
   );
 }

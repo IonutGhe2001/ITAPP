@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { io, type Socket } from "socket.io-client";
+import api from "@/services/api";
 import { formatDistanceToNow } from "date-fns";
 import { ro } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
@@ -13,35 +15,47 @@ const updateIcons = {
 };
 
 type Update = {
-  id: number;
+  id: string;
   type: "Coleg" | "Echipament" | "SIM";
   message: string;
-  timestamp: Date;
+  timestamp: string | Date;
 };
-
-const updates: Update[] = [
-  {
-    id: 1,
-    type: "Echipament",
-    message: "Echipament adăugat: Laptop ASUS",
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-  },
-  {
-    id: 2,
-    type: "Coleg",
-    message: "Coleg nou: Ionuț G.",
-    timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
-  },
-  {
-    id: 3,
-    type: "SIM",
-    message: "SIM asociat telefonului",
-    timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000),
-  },
-];
 
 export default function RecentUpdates() {
   const [filter] = useState<string | null>(null);
+  const [updates, setUpdates] = useState<Update[]>([]);
+
+  useEffect(() => {
+    let socket: Socket | null = null;
+
+    const fetchUpdates = async () => {
+      try {
+        const res = await api.get<Update[]>("/updates");
+        setUpdates(res.data);
+      } catch {
+        // ignore
+      }
+    };
+
+    fetchUpdates();
+
+    const url =
+      (import.meta as any).env.VITE_SOCKET_URL ||
+      (import.meta as any).env.VITE_API_URL;
+    socket = io(url, { withCredentials: true });
+
+    socket.on("update", (update: Update) => {
+      setUpdates((prev) => [update, ...prev]);
+    });
+
+    socket.on("connect_error", fetchUpdates);
+    socket.on("disconnect", fetchUpdates);
+
+    return () => {
+      socket?.disconnect();
+    };
+  }, []);
+
 
   const filteredUpdates = updates.filter((u) =>
     filter ? u.type.toLowerCase().includes(filter.toLowerCase()) : true
@@ -62,7 +76,7 @@ export default function RecentUpdates() {
               <div className="flex items-center gap-2">
                 <Badge variant="outline">{update.type}</Badge>
                 <span className="text-xs text-muted-foreground">
-                  {formatDistanceToNow(update.timestamp, { addSuffix: true, locale: ro })}
+                  {formatDistanceToNow(new Date(update.timestamp), { addSuffix: true, locale: ro })}
                 </span>
               </div>
               <p className="text-sm text-foreground leading-tight">

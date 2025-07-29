@@ -17,4 +17,17 @@ export const useGlobalSearch = (query: string) =>
     queryFn: async () =>
       (await api.get("/search", { params: { q: query } })).data,
     enabled: !!query.trim(),
+});
+
+export interface SuggestionsData {
+  echipamente: Echipament[];
+  angajati: Angajat[];
+}
+
+export const useSearchSuggestions = (query: string) =>
+  useQuery<SuggestionsData>({
+    queryKey: ["search-suggestions", query],
+    queryFn: async () =>
+      (await api.get("/search/suggestions", { params: { q: query } })).data,
+    enabled: !!query.trim(),
   });
