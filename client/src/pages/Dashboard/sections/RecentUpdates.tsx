@@ -39,9 +39,10 @@ export default function RecentUpdates() {
 
     fetchUpdates();
 
-    const url =
+    const baseUrl =
       (import.meta as any).env.VITE_SOCKET_URL ||
       (import.meta as any).env.VITE_API_URL;
+      const url = baseUrl.replace(/\/api$/, "");
     socket = io(url, { withCredentials: true });
 
     socket.on("update", (update: Update) => {
