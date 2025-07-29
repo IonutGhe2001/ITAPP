@@ -19,11 +19,14 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      await api.post("/auth/login", {
+      const res = await api.post("/auth/login", {
         email,
         password: parola,
       });
-      auth.login("logged-in");
+      const token = res.data?.token;
+      if (token) {
+        auth.login(token);
+      }
       navigate("/");
     } catch {
       setError("Email sau parolă incorectă");

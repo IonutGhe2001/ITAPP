@@ -27,12 +27,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+     const stored = getToken();
     fetch(import.meta.env.VITE_API_URL + "/auth/me", {
       credentials: "include",
+      headers: stored ? { Authorization: `Bearer ${stored}` } : undefined,
     })
       .then((res) => {
         if (res.ok) {
-          login("logged-in");
+          if (!stored) {
+            // session valid via cookie
+            login("logged-in");
+          }
+        } else {
+          removeToken();
+          setTokenState(null);
         }
       })
       .catch(() => {
