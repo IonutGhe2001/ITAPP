@@ -13,7 +13,7 @@ function EquipmentList({
     const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
 
- useLayoutEffect(() => {
+  useLayoutEffect(() => {
     const node = containerRef.current;
     if (!node) return;
 
@@ -21,9 +21,10 @@ function EquipmentList({
 
     const observer = new ResizeObserver(updateWidth);
     observer.observe(node);
-    updateWidth();
+    // Wait one frame to ensure the container has a width when first displayed
+    requestAnimationFrame(updateWidth);
     window.addEventListener("resize", updateWidth);
-     return () => {
+    return () => {
       observer.disconnect();
       window.removeEventListener("resize", updateWidth);
     };

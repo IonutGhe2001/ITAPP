@@ -78,13 +78,12 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
           />
 
           <Button onClick={handleSubmit}>Salvează</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-    <Suspense fallback={null}>
-      {showColegModal && (
-        <ModalAddColeg onClose={() => setShowColegModal(false)} />
-      )}
+        </DialogContent>
+      </Dialog>
+      <Suspense fallback={null}>
+        {showColegModal && (
+          <ModalAddColeg onClose={() => setShowColegModal(false)} />
+        )}
     </Suspense>
     </>
   );
