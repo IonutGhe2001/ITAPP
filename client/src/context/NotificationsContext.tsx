@@ -9,6 +9,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   const [unreadCount, setUnreadCount] = useState(0);
   const { toast } = useToast();
 
+  
   useEffect(() => {
     let socket: Socket | null = null;
 
@@ -37,12 +38,15 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       setNotifications((prev) => [notification, ...prev]);
       setUnreadCount((c) => c + 1);
     });
-    
+
 
     return () => {
       socket?.disconnect();
     };
-  }, [toast]);
+   // toast comes from a hook and is recreated on each render
+    // but we only want to set up the socket once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const markAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
