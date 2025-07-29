@@ -30,7 +30,12 @@ function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipa
     serie: echipament.serie,
     tip: echipament.tip,
     angajatId: echipament.angajatId || 'none',
-    metadata: echipament.metadata || '',
+    metadata:
+      typeof echipament.metadata === 'string'
+        ? echipament.metadata
+        : echipament.metadata
+        ? JSON.stringify(echipament.metadata)
+        : '',
   });
 
   const { data: angajati = [] } = useAngajati();
