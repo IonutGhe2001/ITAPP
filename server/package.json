@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "dev": "ts-node-dev -r tsconfig-paths/register src/index.ts",
+    "dev": "prisma generate && ts-node-dev -r tsconfig-paths/register src/index.ts",
     "seed": "ts-node prisma/seed.ts"
   },
   "keywords": [],
