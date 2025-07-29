@@ -1,13 +1,14 @@
 import { useState } from "react";
 import type { Echipament } from "@/features/equipment/types";
 import {
-    useEchipamente,
+   useEchipamente,
   useDeleteEchipament,
   useUpdateEchipament,
 } from "@/features/equipment";
 import {
   EquipmentFilter,
   EquipmentList,
+  EquipmentTypeFilter,
   ModalEditEchipament,
   ImportEchipamente,
 } from "@/features/equipment";
@@ -21,16 +22,20 @@ export default function Echipamente() {
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
-const [sort, setSort] = useState("asc");
+const [type, setType] = useState("");
+  const [sort, setSort] = useState("asc");
 
 const [selected, setSelected] = useState<(Echipament & { __editMode?: boolean }) | null>(null);
 
   const deleteMutation = useDeleteEchipament();
   const updateMutation = useUpdateEchipament();
 
-   const filtered = echipamente
+    const types = Array.from(new Set(echipamente.map((e) => e.tip))).sort();
+
+  const filtered = echipamente
     .filter((e: Echipament) => {
       if (status && e.stare !== status) return false;
+      if (type && e.tip !== type) return false;
 
     const q = search.trim().toLowerCase();
       if (q) {
@@ -89,10 +94,15 @@ const [selected, setSelected] = useState<(Echipament & { __editMode?: boolean })
           <EquipmentFilter
             search={search}
             status={status}
-             sort={sort}
+            sort={sort}
             onSearchChange={(value: string) => setSearch(value)}
             onStatusChange={(value: string) => setStatus(value)}
             onSortChange={(value: string) => setSort(value)}
+          />
+          <EquipmentTypeFilter
+            types={types}
+            selected={type}
+            onChange={setType}
           />
           <EquipmentList
             echipamente={filtered}
