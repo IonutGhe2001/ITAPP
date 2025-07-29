@@ -32,15 +32,15 @@ function EquipmentCard({
   );
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-5 flex items-center justify-between transition hover:shadow-lg">
+    <div className="bg-card rounded-2xl shadow-md p-5 flex items-center justify-between transition hover:shadow-lg">
       <div className="flex items-center gap-4">
         <div>{icon}</div>
         <div className="text-sm space-y-1">
-          <p className="font-semibold text-gray-900">{echipament.nume}</p>
-          <p className="text-xs text-gray-600">Serie: {echipament.serie}</p>
-          <p className="text-xs text-gray-600">Tip: {echipament.tip}</p>
+          <p className="font-semibold text-foreground">{echipament.nume}</p>
+          <p className="text-xs text-muted-foreground">Serie: {echipament.serie}</p>
+          <p className="text-xs text-muted-foreground">Tip: {echipament.tip}</p>
           {echipament.angajat && (
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-muted-foreground">
               Predat la: {echipament.angajat.numeComplet}
             </p>
           )}
@@ -124,7 +124,7 @@ function EquipmentCard({
             <DialogHeader>
               <DialogTitle>Confirmare recuperare</DialogTitle>
             </DialogHeader>
-            <p className="text-sm text-gray-700">
+            <p className="text-sm text-muted-foreground">
               Sigur dorești să recuperezi acest echipament? Acesta va deveni disponibil și va fi disasociat de angajat.
             </p>
             <div className="flex justify-end gap-2 pt-4">

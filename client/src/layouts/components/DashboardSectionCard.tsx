@@ -17,7 +17,7 @@ function DashboardSectionCard({
   return (
    <section
   className={cn(
-    "rounded-2xl bg-white shadow-md border border-border transition-transform hover:shadow-lg hover:-translate-y-1",
+    "rounded-2xl bg-card shadow-md border border-border transition-transform hover:shadow-lg hover:-translate-y-1",
     className
   )}
 >

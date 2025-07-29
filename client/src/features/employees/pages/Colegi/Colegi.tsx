@@ -30,7 +30,7 @@ export default function Colegi() {
          {filtered.map((coleg: Angajat & { echipamente: Echipament[] }) => (
           <div
             key={coleg.id}
-            className="bg-white rounded-xl shadow-md p-4 flex flex-col gap-4"
+            className="bg-card rounded-xl shadow-md p-4 flex flex-col gap-4"
           >
             <div className="flex items-center gap-4">
              <img
@@ -40,10 +40,10 @@ export default function Colegi() {
     className="w-16 h-16 rounded-full"
   />
               <div className="flex-1">
-                <p className="font-semibold text-gray-800">{coleg.numeComplet}</p>
-                <p className="text-sm text-gray-600">{coleg.functie}</p>
-                <p className="text-sm text-gray-600">{coleg.email}</p>
-                <p className="text-sm text-gray-600">{coleg.telefon}</p>
+                <p className="font-semibold text-foreground">{coleg.numeComplet}</p>
+                <p className="text-sm text-muted-foreground">{coleg.functie}</p>
+                <p className="text-sm text-muted-foreground">{coleg.email}</p>
+                <p className="text-sm text-muted-foreground">{coleg.telefon}</p>
               </div>
             </div>
             <div className="flex justify-between items-center gap-4 text-sm">
@@ -64,19 +64,19 @@ export default function Colegi() {
             {expanded.has(coleg.id) && (
               <ul className="space-y-2 mt-2">
                 {coleg.echipamente.length === 0 ? (
-                  <li className="text-gray-400 italic">
+                  <li className="text-muted-foreground italic">
                     Nu are echipamente alocate.
                   </li>
                 ) : (
                   coleg.echipamente.map((e: Echipament) => (
                     <li
                       key={e.id}
-                      className="flex items-start gap-3 text-sm border border-gray-100 rounded-lg p-2 shadow-sm bg-gray-50"
+                       className="flex items-start gap-3 text-sm border border-border rounded-lg p-2 shadow-sm bg-muted"
                     >
                      <div className="pt-0.5">{getEquipmentIcon(e.tip)}</div>
                       <div className="flex-1">
-                        <p className="font-medium text-gray-800">{e.nume}</p>
-                        <p className="text-xs text-gray-500">Serie: {e.serie}</p>
+                        <p className="font-medium text-foreground">{e.nume}</p>
+                        <p className="text-xs text-muted-foreground">Serie: {e.serie}</p>
                       </div>
                       <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full self-center capitalize">
                         {e.tip}

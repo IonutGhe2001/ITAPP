@@ -63,7 +63,7 @@ export default function ProfilePage() {
     <Container className="py-10">
       <h1 className="text-3xl font-bold text-foreground mb-8">Profilul meu</h1>
 
-      <div className="bg-white shadow-md rounded-2xl p-6 flex flex-col items-center gap-6">
+      <div className="bg-card shadow-md rounded-2xl p-6 flex flex-col items-center gap-6">
         <div className="relative">
            <img
               src={user?.profilePicture || fallbackImage}
@@ -74,7 +74,7 @@ export default function ProfilePage() {
           {isEditing && (
             <label
               htmlFor="profile-picture"
-              className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full cursor-pointer shadow"
+              className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2 rounded-full cursor-pointer shadow"
             >
               <Pencil size={16} />
               <input
@@ -112,7 +112,7 @@ export default function ProfilePage() {
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary/80 transition"
+                 className="px-6 py-2 bg-primary text-primary-foreground rounded-xl hover:bg-primary/80 transition"
               >
                 {isSaving ? "Se salvează..." : "Salvează"}
               </button>
@@ -126,7 +126,7 @@ export default function ProfilePage() {
           ) : (
             <button
               onClick={() => setIsEditing(true)}
-              className="px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary/80 transition"
+              className="px-6 py-2 bg-primary text-primary-foreground rounded-xl hover:bg-primary/80 transition"
             >
               Editează
             </button>

@@ -20,7 +20,7 @@ export default function SearchResults() {
     <Container className="py-6 space-y-6">
       <h2 className="text-xl font-semibold">Rezultate pentru "{q}"</h2>
       {noResults && data?.suggestions && (
-        <div className="mb-4 text-sm text-gray-700">
+         <div className="mb-4 text-sm text-muted-foreground">
           <p className="mb-2">Nu am găsit rezultate. Poate ai vrut să cauți:</p>
           <ul className="list-disc ml-5 space-y-1">
             {data.suggestions.echipamente.map((e) => (
@@ -38,11 +38,11 @@ export default function SearchResults() {
           {data?.echipamente?.length ? (
             <ul className="space-y-2">
               {data.echipamente.map((e) => (
-                <li key={e.id} className="p-2 border rounded-md bg-white shadow">
+                <li key={e.id} className="p-2 border rounded-md bg-card shadow">
                   <div className="font-medium">{e.nume}</div>
-                  <div className="text-sm text-gray-600">Serie: {e.serie}</div>
+                  <div className="text-sm text-muted-foreground">Serie: {e.serie}</div>
                   {e.angajat && (
-                    <div className="text-xs text-gray-500">
+                   <div className="text-xs text-muted-foreground">
                       Alocat: {e.angajat.numeComplet}
                     </div>
                   )}
@@ -50,7 +50,7 @@ export default function SearchResults() {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-gray-500">Nu s-au găsit echipamente.</p>
+            <p className="text-sm text-muted-foreground">Nu s-au găsit echipamente.</p>
           )}
         </div>
         <div>
@@ -58,15 +58,15 @@ export default function SearchResults() {
           {data?.angajati?.length ? (
             <ul className="space-y-2">
                {data.angajati.map((c) => (
-                <li key={c.id} className="p-2 border rounded-md bg-white shadow">
+                <li key={c.id} className="p-2 border rounded-md bg-card shadow">
                   <div className="font-medium">{c.numeComplet}</div>
-                  <div className="text-sm text-gray-600">{c.functie}</div>
-                  <div className="text-xs text-gray-500">{c.email}</div>
+                  <div className="text-sm text-muted-foreground">{c.functie}</div>
+                  <div className="text-xs text-muted-foreground">{c.email}</div>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-gray-500">Nu s-au găsit colegi.</p>
+            <p className="text-sm text-muted-foreground">Nu s-au găsit colegi.</p>
           )}
         </div>
       </div>
