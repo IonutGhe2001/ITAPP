@@ -19,7 +19,7 @@ export const updateCurrentUser = async (data: Partial<{
   prenume: string;
   functie: string;
   telefon?: string;
-  profilePicture?: string;
+  profilePicture?: string | null;
 }>) => {
 
    const res = await api.patch("/auth/me", data);

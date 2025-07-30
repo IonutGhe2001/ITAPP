@@ -4,6 +4,7 @@ import type { Angajat, Echipament } from "@/features/equipment/types";
 import { getEquipmentIcon } from "@/utils/equipmentIcons";
 import ModalAsigneazaEchipament from "./ModalAsigneazaEchipament";
 import Container from "@/components/Container";
+import Avatar from "@/components/Avatar";
 
 export default function Colegi() {
   const { data: colegi = [], refetch } = useAngajati();
@@ -33,12 +34,10 @@ export default function Colegi() {
             className="bg-card rounded-xl shadow-md p-4 flex flex-col gap-4"
           >
             <div className="flex items-center gap-4">
-             <img
-   src="/profile.png"
-    alt="avatar"
-    loading="lazy"
-    className="w-16 h-16 rounded-full"
-  />
+             <Avatar
+                name={coleg.numeComplet}
+                className="w-16 h-16"
+              />
               <div className="flex-1">
                 <p className="font-semibold text-foreground">{coleg.numeComplet}</p>
                 <p className="text-sm text-muted-foreground">{coleg.functie}</p>

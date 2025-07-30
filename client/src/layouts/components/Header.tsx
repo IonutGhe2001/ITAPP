@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useSearch } from "@/context/use-search";
 import { Button } from "@components/ui/button";
 import ThemeToggle from "@components/ThemeToggle";
+import Avatar from "@/components/Avatar";
 import { useSearchSuggestions } from "@/services/searchService";
 import { cn } from "@/lib/utils";
 import {
@@ -167,12 +168,11 @@ const { notifications, unreadCount, markAllRead } = useNotifications();
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 px-2 hover:bg-muted">
-                 <img
-                    src={user.profilePicture || "/profile.png"}
-                    alt="User"
-                    loading="lazy"
-                    className="w-8 h-8 rounded-full object-cover border border-border"
-                  />
+                 <Avatar
+                  src={user.profilePicture ?? undefined}
+                  name={`${user.nume} ${user.prenume}`}
+                  className="w-8 h-8 border border-border"
+                />
                 <div className="hidden md:flex flex-col text-left">
                   <span className="text-sm font-semibold">
                     {user.nume} {user.prenume?.charAt(0)}.

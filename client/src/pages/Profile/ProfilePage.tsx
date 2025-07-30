@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { Pencil } from "lucide-react";
+import { Pencil, X } from "lucide-react";
 import { updateCurrentUser } from "@/services/authService";
 import { useUser } from "@/store/use-user";
 import type { User } from "@/types/user";
 import { useToast } from "@/hooks/use-toast/use-toast-hook";
 import Container from "@/components/Container";
-
-const fallbackImage = "/profile.png";
+import Avatar from "@/components/Avatar";
 
 export default function ProfilePage() {
   const { user, setUser } = useUser();
@@ -20,11 +19,17 @@ export default function ProfilePage() {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-  if (user) {
-    setUser({ ...user, profilePicture: reader.result as string });
-  }
-};
+        if (user) {
+          setUser({ ...user, profilePicture: reader.result as string });
+        }
+      };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    if (user) {
+      setUser({ ...user, profilePicture: null });
     }
   };
 
@@ -65,26 +70,36 @@ export default function ProfilePage() {
 
       <div className="bg-card shadow-md rounded-2xl p-6 flex flex-col items-center gap-6">
         <div className="relative">
-           <img
-              src={user?.profilePicture || fallbackImage}
-              alt="Profil"
-              loading="lazy"
-              className="w-32 h-32 rounded-full object-cover border-4 border-primary shadow"
-            />
+           <Avatar
+            src={user?.profilePicture ?? undefined}
+            name={`${user?.nume ?? ""} ${user?.prenume ?? ""}`}
+            className="w-32 h-32 border-4 border-primary shadow"
+          />
           {isEditing && (
-            <label
-              htmlFor="profile-picture"
-              className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2 rounded-full cursor-pointer shadow"
-            >
-              <Pencil size={16} />
-              <input
-                id="profile-picture"
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-            </label>
+            <>
+              <label
+                htmlFor="profile-picture"
+                className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2 rounded-full cursor-pointer shadow"
+              >
+                <Pencil size={16} />
+                <input
+                  id="profile-picture"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </label>
+              {user?.profilePicture && (
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="absolute top-0 right-0 bg-destructive text-destructive-foreground p-1 rounded-full shadow"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </>
           )}
         </div>
 
