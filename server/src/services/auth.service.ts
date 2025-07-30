@@ -67,7 +67,16 @@ export const registerUser = async (input: {
   return newUser;
 };
 
-export const updateUser = (id: string, data: Partial<{ nume: string; prenume: string; functie: string; telefon: string; profilePicture: string; }>) => {
+export const updateUser = (
+  id: string,
+  data: Partial<{
+    nume: string;
+    prenume: string;
+    functie: string;
+    telefon: string;
+    profilePicture: string | null;
+  }>
+) => {
   return prisma.user.update({
     where: { id: Number(id) },
     data,
