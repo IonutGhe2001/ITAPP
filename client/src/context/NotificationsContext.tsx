@@ -17,7 +17,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
 
     const fetchNotifications = async () => {
       try {
-        const res = await api.get<Omit<Notification, 'read'>[]>("/updates");
+        const res = await api.get<Omit<Notification, 'read'>[]>("/updates?limit=10");
         setNotifications(res.data.map((n) => ({ ...n, read: true })));
       } catch {
         // ignore

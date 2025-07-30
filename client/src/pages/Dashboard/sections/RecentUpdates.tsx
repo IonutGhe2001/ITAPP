@@ -33,7 +33,7 @@ export default function RecentUpdates() {
 
     const fetchUpdates = async () => {
       try {
-        const res = await api.get<Update[]>("/updates");
+        const res = await api.get<Update[]>("/updates?limit=10");
         setUpdates(res.data);
       } catch {
         // ignore
