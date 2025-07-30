@@ -21,6 +21,7 @@ import MobileSidebar from "@layouts/components/MobileSideBar";
 import { useNotifications } from "@/context/use-notifications";
 import { formatDistanceToNow } from "date-fns";
 import { ro } from "date-fns/locale";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const updateIcons = {
   Echipament: <MonitorIcon className="w-4 h-4" />,
@@ -33,6 +34,7 @@ export default function Header() {
   const navigate = useNavigate();
   const title = pageTitles[location.pathname] || "Pagina";
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const { query, setQuery } = useSearch();
 
   const { user, loading } = useUser();
@@ -82,7 +84,14 @@ const { notifications, unreadCount, markAllRead, removeNotification, clearRead }
       </div>
 
       <div className="flex items-center gap-4">
-         <form onSubmit={handleSearchSubmit} className="relative hidden md:block">
+         <button
+          className="md:hidden text-muted-foreground"
+          onClick={() => setMobileSearchOpen(true)}
+        >
+          <Search className="w-5 h-5" />
+          <span className="sr-only">Deschide căutarea</span>
+        </button>
+        <form onSubmit={handleSearchSubmit} className="relative hidden md:block">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <input
             type="text"
@@ -216,6 +225,62 @@ const { notifications, unreadCount, markAllRead, removeNotification, clearRead }
       </div>
     </header>
     <MobileSidebar open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} />
+    <Dialog open={mobileSearchOpen} onOpenChange={setMobileSearchOpen}>
+      <DialogContent className="p-4">
+        <form onSubmit={handleSearchSubmit} className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Caută..."
+            className="pl-9 pr-4 py-2 text-sm bg-muted text-foreground rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary w-full"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setActiveIndex(-1);
+            }}
+            onKeyDown={(e) => {
+              if (!suggestions.length) return;
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setActiveIndex((i) => Math.min(i + 1, suggestions.length - 1));
+              } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setActiveIndex((i) => Math.max(i - 1, 0));
+              } else if (e.key === "Enter") {
+                if (activeIndex >= 0 && suggestions[activeIndex]) {
+                  e.preventDefault();
+                  const val = suggestions[activeIndex];
+                  setQuery(val);
+                  navigate(`/search?q=${encodeURIComponent(val)}`);
+                }
+              }
+            }}
+          />
+          {suggestions.length > 0 && (
+            <ul className="absolute left-0 right-0 mt-1 bg-background border border-border rounded-md shadow z-50 max-h-60 overflow-y-auto">
+              {suggestions.map((s, idx) => (
+                <li
+                  key={idx}
+                  className={cn(
+                    "px-3 py-1 text-sm cursor-pointer",
+                    idx === activeIndex && "bg-muted"
+                  )}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setQuery(s);
+                    navigate(`/search?q=${encodeURIComponent(s)}`);
+                    setMobileSearchOpen(false);
+                  }}
+                  onMouseEnter={() => setActiveIndex(idx)}
+                >
+                  {s}
+                </li>
+              ))}
+            </ul>
+          )}
+        </form>
+      </DialogContent>
+    </Dialog>
     </>
   );
 }

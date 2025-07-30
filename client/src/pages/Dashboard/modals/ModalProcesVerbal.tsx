@@ -95,7 +95,7 @@ export default function ModalProcesVerbal({ onClose }: ModalProcesVerbalProps) {
           {pdfUrl && (
             <div className="mt-4">
               <Label>Preview PDF</Label>
-              <iframe src={pdfUrl} className="w-full h-[500px] border" />
+              <iframe src={pdfUrl} className="w-full h-[60vh] max-h-[500px] border" />
             </div>
           )}
         </div>

@@ -12,21 +12,25 @@ function EquipmentList({
 }: EquipmentListProps) {
     const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
+  const [height, setHeight] = useState(0);
 
   useLayoutEffect(() => {
     const node = containerRef.current;
     if (!node) return;
 
-    const updateWidth = () => setWidth(node.offsetWidth);
+    const updateSize = () => {
+      setWidth(node.offsetWidth);
+      setHeight(node.offsetHeight);
+    };
 
-    const observer = new ResizeObserver(updateWidth);
+    const observer = new ResizeObserver(updateSize);
     observer.observe(node);
-    // Wait one frame to ensure the container has a width when first displayed
-    requestAnimationFrame(updateWidth);
-    window.addEventListener("resize", updateWidth);
+   // Wait one frame to ensure the container has dimensions when first displayed
+    requestAnimationFrame(updateSize);
+    window.addEventListener("resize", updateSize);
     return () => {
       observer.disconnect();
-      window.removeEventListener("resize", updateWidth);
+      window.removeEventListener("resize", updateSize);
     };
   }, []);
 
@@ -61,10 +65,10 @@ function EquipmentList({
   const ITEM_HEIGHT = 190;
 
   return (
-    <div ref={containerRef} className="h-[600px]">
-      {width > 0 && (
+    <div ref={containerRef} className="max-h-[600px] h-[60vh]">
+      {width > 0 && height > 0 && (
         <List
-          height={600}
+          height={height}
           width={width}
           itemCount={echipamente.length}
           itemSize={ITEM_HEIGHT}

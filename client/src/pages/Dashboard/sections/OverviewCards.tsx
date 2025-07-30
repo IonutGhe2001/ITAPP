@@ -98,7 +98,7 @@ const angajatiCount = stats?.angajati ?? 0;
   }, [resolvedTheme, handleBarClick]);
 
   return (
-     <div className="w-full h-64">
+     <div className="w-full h-64 sm:h-72 md:h-80">
       <Bar data={chartData} options={options} />
     </div>
   );

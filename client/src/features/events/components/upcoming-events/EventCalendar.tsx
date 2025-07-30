@@ -41,7 +41,7 @@ export default function EventCalendar({
   };
 
   return (
-    <div className="min-w-[350px] rounded-xl border border-border bg-card shadow-sm p-4 sm:p-6">
+    <div className="w-full min-w-[250px] sm:min-w-[350px] rounded-xl border border-border bg-card shadow-sm p-4 sm:p-6">
       <DayPicker
         mode="single"
         selected={selected}
