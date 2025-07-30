@@ -25,8 +25,19 @@ export const processImportRows = async (rows: ImportRow[]) => {
             throw new Error("Campuri obligatorii lipsa");
           }
 
-          const existing = await prisma.echipament.findUnique({ where: { serie } });
-          if (existing) throw new Error(`Serie duplicata: ${serie}`);
+          const existing = await prisma.echipament.findFirst({
+            where: { tip, serie },
+          });
+          if (existing) throw new Error(`Serie duplicata pentru tipul ${tip}: ${serie}`);
+
+          if (email) {
+            const hasSameType = await prisma.echipament.findFirst({
+              where: { angajat: { email }, tip },
+            });
+            if (hasSameType) {
+              throw new Error(`Angajatul are deja echipament de tip ${tip}`);
+            }
+          }
 
           let angajatId: string | null = null;
           if (email) {

@@ -34,14 +34,16 @@ model Angajat {
 model Echipament {
   id         String    @id @default(uuid())
   nume       String
-  tip        String    
-  serie      String    @unique
+  tip        String
+  serie      String
   stare      String
-  metadata   Json?    
+  metadata   Json?   
   angajatId  String?
   angajat    Angajat?  @relation(fields: [angajatId], references: [id])
   createdAt  DateTime  @default(now())
   proceseVerbale ProcesVerbal[] @relation("EchipamenteProcesVerbal")
+
+  @@unique([tip, serie])
 }
 
 model Eveniment {

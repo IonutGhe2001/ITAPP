@@ -8,7 +8,7 @@ export const getEchipamente = () => {
 export const createEchipament = (data: {
   nume: string;
   tip: string;
-  stare?: string; 
+  stare?: string;
   serie: string;
   angajatId?: string | null;
   metadata?: any;
@@ -19,11 +19,37 @@ export const createEchipament = (data: {
     ? "predat"
     : "disponibil";
 
-  return prisma.echipament.create({
-    data: {
-      ...data,
-      stare: finalStare,
-    },
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.echipament.findFirst({
+      where: { tip: data.tip, serie: data.serie },
+    });
+    if (existing) {
+      const error: any = new Error(
+        "Există deja un echipament cu această serie pentru acest tip."
+      );
+      error.status = 409;
+      throw error;
+    }
+
+    if (data.angajatId) {
+      const eqSameType = await tx.echipament.findFirst({
+        where: { angajatId: data.angajatId, tip: data.tip },
+      });
+      if (eqSameType) {
+        const error: any = new Error(
+          "Angajatul are deja un echipament de acest tip."
+        );
+        error.status = 409;
+        throw error;
+      }
+    }
+
+    return tx.echipament.create({
+      data: {
+        ...data,
+        stare: finalStare,
+      },
+    });
   });
 };
 
@@ -38,20 +64,54 @@ export const updateEchipament = (
     metadata?: any;
   }
 ) => {
-return prisma.echipament.update({
-  where: { id },
-  data: {
-    ...(data.nume !== undefined && { nume: data.nume }),
-    ...(data.tip !== undefined && { tip: data.tip }),
-    ...(data.serie !== undefined && { serie: data.serie }),
-    ...(data.stare !== undefined && { stare: data.stare }),
-    ...(data.angajatId !== undefined && { angajatId: data.angajatId }),
-    ...(data.metadata !== undefined && { metadata: data.metadata }),
-  },
-  include: {
-    angajat: true, 
-  },
-});
+ return prisma.$transaction(async (tx) => {
+    const current = await tx.echipament.findUnique({ where: { id } });
+    if (!current) throw new Error("Echipament inexistent");
+
+    const newTip = data.tip ?? current.tip;
+    const newSerie = data.serie ?? current.serie;
+
+    if (newTip !== current.tip || newSerie !== current.serie) {
+      const duplicate = await tx.echipament.findFirst({
+        where: { tip: newTip, serie: newSerie, NOT: { id } },
+      });
+      if (duplicate) {
+        const error: any = new Error(
+          "Există deja un echipament cu această serie pentru acest tip."
+        );
+        error.status = 409;
+        throw error;
+      }
+    }
+
+    if (data.angajatId) {
+      const eqSameType = await tx.echipament.findFirst({
+        where: { angajatId: data.angajatId, tip: newTip, NOT: { id } },
+      });
+      if (eqSameType) {
+        const error: any = new Error(
+          "Angajatul are deja un echipament de acest tip."
+        );
+        error.status = 409;
+        throw error;
+      }
+    }
+
+    return tx.echipament.update({
+      where: { id },
+      data: {
+        ...(data.nume !== undefined && { nume: data.nume }),
+        ...(data.tip !== undefined && { tip: data.tip }),
+        ...(data.serie !== undefined && { serie: data.serie }),
+        ...(data.stare !== undefined && { stare: data.stare }),
+        ...(data.angajatId !== undefined && { angajatId: data.angajatId }),
+        ...(data.metadata !== undefined && { metadata: data.metadata }),
+      },
+      include: {
+        angajat: true,
+      },
+    });
+  });
 };
 
 export const deleteEchipament = (id: string) => {
