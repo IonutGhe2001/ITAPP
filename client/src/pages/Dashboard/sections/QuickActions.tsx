@@ -44,7 +44,7 @@ export default function QuickActions() {
         <Button
           onClick={() => setShowColegModal(true)}
           variant="outline"
-          className="min-w-[150px] w-full flex flex-col items-center justify-center gap-2 rounded-2xl border bg-chart-1/10 px-6 py-4 text-sm font-medium text-foreground hover:scale-105 transition-all text-center"
+          className="w-full h-[100px] min-w-[150px] flex flex-col items-center justify-center gap-2 rounded-2xl border bg-chart-3/10 px-4 py-2 text-sm font-medium text-foreground hover:scale-105 transition-all whitespace-normal break-words text-center"
         >
           <UserPlusIcon className="w-5 h-5" />
           <span className="whitespace-normal break-words leading-tight">Adaugă coleg</span>
@@ -53,7 +53,7 @@ export default function QuickActions() {
         <Button
           onClick={() => setShowEchipamentModal(true)}
           variant="outline"
-          className="min-w-[150px] w-full flex flex-col items-center justify-center gap-2 rounded-2xl border bg-chart-2/10 px-6 py-4 text-sm font-medium text-foreground hover:scale-105 transition-all text-center"
+          className="w-full h-[100px] min-w-[150px] flex flex-col items-center justify-center gap-2 rounded-2xl border bg-chart-3/10 px-4 py-2 text-sm font-medium text-foreground hover:scale-105 transition-all whitespace-normal break-words text-center"
         >
           <LaptopIcon className="w-5 h-5" />
           <span className="whitespace-normal break-words leading-tight">Adaugă echipament</span>
@@ -62,7 +62,7 @@ export default function QuickActions() {
         <Button
           onClick={() => setShowProcesModal(true)}
           variant="outline"
-          className="min-w-[150px] w-full flex flex-col items-center justify-center gap-2 rounded-2xl border bg-chart-3/10 px-6 py-4 text-sm font-medium text-foreground hover:scale-105 transition-all text-center"
+          className="w-full h-[100px] min-w-[150px] flex flex-col items-center justify-center gap-2 rounded-2xl border bg-chart-3/10 px-4 py-2 text-sm font-medium text-foreground hover:scale-105 transition-all whitespace-normal break-words text-center"
         >
          <FileTextIcon className="w-5 h-5" />
           <span className="whitespace-normal break-words leading-tight">Generează proces verbal</span>
@@ -71,7 +71,7 @@ export default function QuickActions() {
         <Button
           onClick={() => setShowCreateUserModal(true)}
           variant="outline"
-          className="min-w-[150px] w-full flex flex-col items-center justify-center gap-2 rounded-2xl border bg-chart-4/10 px-6 py-4 text-sm font-medium text-foreground hover:scale-105 transition-all text-center"
+          className="w-full h-[100px] min-w-[150px] flex flex-col items-center justify-center gap-2 rounded-2xl border bg-chart-3/10 px-4 py-2 text-sm font-medium text-foreground hover:scale-105 transition-all whitespace-normal break-words text-center"
         >
         <UserCogIcon className="w-5 h-5" />
           <span className="whitespace-normal break-words leading-tight">Creează cont</span>
@@ -80,7 +80,7 @@ export default function QuickActions() {
         <Button
           onClick={handleExportJSON}
           variant="outline"
-          className="min-w-[150px] w-full flex flex-col items-center justify-center gap-2 rounded-2xl border bg-muted/10 px-6 py-4 text-sm font-medium text-foreground hover:scale-105 transition-all text-center"
+          className="w-full h-[100px] min-w-[150px] flex flex-col items-center justify-center gap-2 rounded-2xl border bg-chart-3/10 px-4 py-2 text-sm font-medium text-foreground hover:scale-105 transition-all whitespace-normal break-words text-center"
         >
           <DownloadIcon className="w-5 h-5" />
           <span className="whitespace-normal break-words leading-tight">Exportă JSON</span>
