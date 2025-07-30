@@ -3,6 +3,7 @@ export interface User {
   prenume: string
   functie: string
   profilePicture?: string | null
+  digitalSignature?: string | null
   email?: string
   telefon?: string
 }

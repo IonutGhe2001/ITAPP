@@ -27,6 +27,25 @@ export default function ProfilePage() {
     }
   };
 
+  const handleSignatureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (user) {
+          setUser({ ...user, digitalSignature: reader.result as string });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveSignature = () => {
+    if (user) {
+      setUser({ ...user, digitalSignature: null });
+    }
+  };
+
   const handleRemoveImage = () => {
     if (user) {
       setUser({ ...user, profilePicture: null });
@@ -103,6 +122,46 @@ export default function ProfilePage() {
           )}
         </div>
 
+<div className="relative">
+          {user?.digitalSignature ? (
+            <img
+              src={user.digitalSignature}
+              alt="Semnătură"
+              className="w-32 max-h-32 object-contain border border-border"
+            />
+          ) : (
+            <div className="w-32 h-32 flex items-center justify-center border border-dashed text-muted-foreground">
+              Fără semnătură
+            </div>
+          )}
+          {isEditing && (
+            <>
+              <label
+                htmlFor="digital-signature"
+                className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2 rounded-full cursor-pointer shadow"
+              >
+                <Pencil size={16} />
+                <input
+                  id="digital-signature"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleSignatureUpload}
+                  className="hidden"
+                />
+              </label>
+              {user?.digitalSignature && (
+                <button
+                  type="button"
+                  onClick={handleRemoveSignature}
+                  className="absolute top-0 right-0 bg-destructive text-destructive-foreground p-1 rounded-full shadow"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </>
+          )}
+        </div>
+        
         <div className="w-full space-y-4">
           {isEditing ? (
             <>
