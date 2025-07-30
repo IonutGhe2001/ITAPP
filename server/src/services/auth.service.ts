@@ -75,6 +75,7 @@ export const updateUser = (
     functie: string;
     telefon: string;
     profilePicture: string | null;
+    digitalSignature: string | null;
   }>
 ) => {
   return prisma.user.update({
@@ -95,6 +96,7 @@ export const getUserById = (id: number) => {
       functie: true,
       telefon: true,
       profilePicture: true,
+      digitalSignature: true,
     },
   });
 };

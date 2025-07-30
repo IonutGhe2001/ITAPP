@@ -36,9 +36,9 @@ export const getMe = async (req: Request, res: Response) => {
 
 export const updateMe = async (req: Request, res: Response) => {
   const userId = (req as any).user.id;
-  const { nume, prenume, functie, telefon, profilePicture } = req.body;
+  const { nume, prenume, functie, telefon, profilePicture, digitalSignature } = req.body;
 
-  const updateData: any = { nume, prenume, functie, telefon, profilePicture };
+  const updateData: any = { nume, prenume, functie, telefon, profilePicture, digitalSignature };
   Object.keys(updateData).forEach((key) => {
     if (updateData[key] === undefined || updateData[key] === "") {
       delete updateData[key];

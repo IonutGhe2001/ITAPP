@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { creeazaProcesVerbalCuEchipamente } from "../services/procesVerbal.service";
 import { genereazaPDFProcesVerbal } from "../utils/pdfGenerator";
 import { logger } from "@lib/logger";
+import { getUserById } from "../services/auth.service";
 
 export const creareProcesVerbal = async (req: Request, res: Response) => {
   try {
@@ -12,12 +13,15 @@ export const creareProcesVerbal = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Angajatul nu a fost găsit." });
     }
 
+    const currentUser = await getUserById(Number((req as any).user.id));
+
     const pdfBuffer = await genereazaPDFProcesVerbal({
       angajat: procesVerbal.angajat,
       echipamente: procesVerbal.echipamente,
       observatii: procesVerbal.observatii || "-",
       data: new Date().toLocaleDateString("ro-RO"),
       firma: "Creative & Innovative Management SRL",
+      digitalSignature: currentUser?.digitalSignature,
     });
 
     res.set({

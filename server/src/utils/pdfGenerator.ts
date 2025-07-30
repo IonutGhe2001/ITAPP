@@ -17,8 +17,18 @@ export const genereazaPDFProcesVerbal = async (data: any): Promise<Buffer> => {
   const templateHtml = fs.readFileSync(templatePath, "utf-8");
   const compiledTemplate = handlebars.compile(templateHtml);
 
+  let signatureBase64: string | undefined;
+  if (data.digitalSignature) {
+    if (data.digitalSignature.startsWith("data:")) {
+      signatureBase64 = data.digitalSignature;
+    } else {
+      signatureBase64 = `data:image/png;base64,${Buffer.from(data.digitalSignature).toString("base64")}`;
+    }
+  }
+
   const html = compiledTemplate({
     ...data,
+    digitalSignature: signatureBase64,
     headerImg: imgToBase64(headerImagePath),
     footerImg: imgToBase64(footerImagePath)
   });

@@ -118,7 +118,13 @@
       </table>
 
       <div class="signatures">
-        <div>Am predat,<br /><br />______________</div>
+        <div>Am predat,<br /><br />
+          {{#if digitalSignature}}
+            <img src="{{digitalSignature}}" style="max-height:80px;" />
+          {{else}}
+            ______________
+          {{/if}}
+        </div>
         <div>Am primit,<br /><br />______________</div>
       </div>
     </div>
