@@ -1,5 +1,12 @@
 import { useRef, forwardRef, useImperativeHandle } from "react";
 import SignatureCanvas from "react-signature-canvas";
+import trimCanvasModule from "trim-canvas";
+
+type TrimCanvas = (canvas: HTMLCanvasElement) => HTMLCanvasElement;
+
+const trimCanvas: TrimCanvas =
+  (trimCanvasModule as unknown as { default: TrimCanvas }).default ??
+  (trimCanvasModule as unknown as TrimCanvas);
 
 export interface SignaturePadHandle {
   clear: () => void;
@@ -15,7 +22,9 @@ const SignaturePad = forwardRef<SignaturePadHandle>((_props, ref) => {
     },
     getImage: () => {
       if (!padRef.current || padRef.current.isEmpty()) return null;
-      return padRef.current.getTrimmedCanvas().toDataURL("image/png");
+         const canvas = padRef.current.getCanvas();
+      const trimmed = trimCanvas(canvas);
+      return trimmed.toDataURL("image/png");
     },
   }));
 
