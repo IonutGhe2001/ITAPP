@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Pencil, X } from "lucide-react";
 import { updateCurrentUser } from "@/services/authService";
 import { useUser } from "@/store/use-user";
@@ -6,6 +6,10 @@ import type { User } from "@/types/user";
 import { useToast } from "@/hooks/use-toast/use-toast-hook";
 import Container from "@/components/Container";
 import Avatar from "@/components/Avatar";
+import SignaturePad, { type SignaturePadHandle } from "@/components/SignaturePad";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+
 
 export default function ProfilePage() {
   const { user, setUser } = useUser();
@@ -27,18 +31,8 @@ export default function ProfilePage() {
     }
   };
 
-  const handleSignatureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (user) {
-          setUser({ ...user, digitalSignature: reader.result as string });
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const [signatureOpen, setSignatureOpen] = useState(false);
+  const padRef = useRef<SignaturePadHandle>(null);
 
   const handleRemoveSignature = () => {
     if (user) {
@@ -136,19 +130,13 @@ export default function ProfilePage() {
           )}
           {isEditing && (
             <>
-              <label
-                htmlFor="digital-signature"
+               <button
+                type="button"
+                onClick={() => setSignatureOpen(true)}
                 className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2 rounded-full cursor-pointer shadow"
               >
                 <Pencil size={16} />
-                <input
-                  id="digital-signature"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleSignatureUpload}
-                  className="hidden"
-                />
-              </label>
+                </button>
               {user?.digitalSignature && (
                 <button
                   type="button"
@@ -207,6 +195,28 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+      <Dialog open={signatureOpen} onOpenChange={setSignatureOpen}>
+        <DialogContent>
+          <SignaturePad ref={padRef} />
+          <div className="flex justify-end gap-2 mt-4">
+            <Button type="button" variant="ghost" onClick={() => padRef.current?.clear()}>
+              Curăță
+            </Button>
+            <Button
+              type="button"
+              onClick={() => {
+                const img = padRef.current?.getImage();
+                if (img && user) {
+                  setUser({ ...user, digitalSignature: img });
+                }
+                setSignatureOpen(false);
+              }}
+            >
+              Salvează
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Container>
   );
 }
