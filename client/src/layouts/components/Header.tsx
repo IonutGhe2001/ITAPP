@@ -1,5 +1,5 @@
 import { FaBell } from "react-icons/fa";
-import { Search, Menu, UserIcon, MonitorIcon, PhoneIcon } from "lucide-react";
+import { Search, Menu, UserIcon, MonitorIcon, PhoneIcon, TrashIcon } from "lucide-react";
 import { useState, type FormEvent, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSearch } from "@/context/use-search";
@@ -37,7 +37,7 @@ export default function Header() {
 
   const { user, loading } = useUser();
 const { data: suggestionData } = useSearchSuggestions(query);
-const { notifications, unreadCount, markAllRead } = useNotifications();
+const { notifications, unreadCount, markAllRead, removeNotification, clearRead } = useNotifications();
   const [activeIndex, setActiveIndex] = useState(-1);
   const suggestions = useMemo(
     () => [
@@ -134,7 +134,15 @@ const { notifications, unreadCount, markAllRead } = useNotifications();
           )}
         </form>
 
-        <DropdownMenu onOpenChange={(open) => open && markAllRead()}>
+        <DropdownMenu
+          onOpenChange={(open) => {
+            if (open) {
+              markAllRead();
+            } else {
+              clearRead();
+            }
+          }}
+        >
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative hover:bg-muted">
               <FaBell className="text-muted-foreground" />
@@ -148,14 +156,20 @@ const { notifications, unreadCount, markAllRead } = useNotifications();
               <DropdownMenuItem disabled>Nu există notificări</DropdownMenuItem>
             ) : (
               notifications.map((n) => (
-                <DropdownMenuItem key={n.id} className="flex gap-3">
+                <DropdownMenuItem key={n.id} className="flex gap-3 items-start">
                   <div className="mt-1">{updateIcons[n.type]}</div>
-                  <div className="flex flex-col">
+                  <div className="flex flex-col flex-1">
                     <span className="text-sm">{n.message}</span>
                     <span className="text-xs text-muted-foreground">
-                      {formatDistanceToNow(new Date(n.timestamp), { addSuffix: true, locale: ro })}
+                      {formatDistanceToNow(new Date(n.timestamp), {
+                        addSuffix: true,
+                        locale: ro,
+                      })}
                     </span>
                   </div>
+                  <button onClick={() => removeNotification(n.id)} className="ml-auto">
+                    <TrashIcon className="w-4 h-4 text-primary hover:text-primary-dark" />
+                  </button>
                 </DropdownMenuItem>
               ))
             )}

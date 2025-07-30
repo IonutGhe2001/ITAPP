@@ -59,8 +59,30 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     setUnreadCount(0);
   };
 
+  const removeNotification = (id: string) => {
+    setNotifications((prev) => {
+      const target = prev.find((n) => n.id === id);
+      if (target && !target.read) {
+        setUnreadCount((c) => Math.max(c - 1, 0));
+      }
+      return prev.filter((n) => n.id !== id);
+    });
+  };
+
+  const clearRead = () => {
+    setNotifications((prev) => prev.filter((n) => !n.read));
+  };
+
   return (
-    <NotificationsContext.Provider value={{ notifications, unreadCount, markAllRead }}>
+    <NotificationsContext.Provider
+      value={{
+        notifications,
+        unreadCount,
+        markAllRead,
+        removeNotification,
+        clearRead,
+      }}
+    >
       {children}
     </NotificationsContext.Provider>
   );

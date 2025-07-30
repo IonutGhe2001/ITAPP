@@ -12,6 +12,8 @@ export type NotificationsContextType = {
   notifications: Notification[];
   unreadCount: number;
   markAllRead: () => void;
+  removeNotification: (id: string) => void;
+  clearRead: () => void;
 };
 
 export const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
