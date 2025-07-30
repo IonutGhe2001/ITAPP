@@ -32,6 +32,9 @@ export default function EchipamentForm({
 }: EchipamentFormProps) {
   return (
     <div className="space-y-4">
+      {errors.general && (
+        <p className="text-sm text-red-500">{errors.general}</p>
+      )}
       <div>
         <Label>Nume echipament</Label>
         <Input
@@ -100,6 +103,9 @@ export default function EchipamentForm({
         >
           Adaugă coleg nou
         </button>
+        {errors.angajatId && (
+          <p className="text-sm text-red-500 mt-1">{errors.angajatId}</p>
+        )}
       </div>
     </div>
   )

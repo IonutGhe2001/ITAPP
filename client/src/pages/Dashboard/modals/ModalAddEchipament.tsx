@@ -22,6 +22,7 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
     formData,
     setFormData,
     errors,
+    setErrors,
     search,
     setSearch,
     showColegModal,
@@ -49,11 +50,7 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
       (e) => e.tip === payload.tip && e.serie === payload.serie
     );
     if (duplicate) {
-      toast({
-        title: "Avertizare",
-        description: "Un echipament cu aceeasi serie exista deja.",
-        variant: "destructive",
-      });
+      setErrors((prev) => ({ ...prev, serie: "Un echipament cu aceasta serie exista deja." }));
       return;
     }
 
@@ -62,11 +59,7 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
         (e) => e.angajatId === payload.angajatId && e.tip === payload.tip
       );
       if (eqSameType) {
-        toast({
-          title: "Avertizare",
-          description: "Angajatul are deja un echipament de acest tip.",
-          variant: "destructive",
-        });
+        setErrors((prev) => ({ ...prev, angajatId: "Angajatul are deja un echipament de acest tip." }));
         return;
       }
     }

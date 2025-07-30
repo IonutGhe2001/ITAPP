@@ -36,6 +36,7 @@ function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipa
     formData,
     setFormData,
     errors,
+    setErrors,
     search,
     setSearch,
     showColegModal,
@@ -67,11 +68,7 @@ function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipa
         e.id !== echipament.id
     );
     if (duplicate) {
-      toast({
-        title: "Avertizare",
-        description: "Un echipament cu aceeasi serie exista deja.",
-        variant: "destructive",
-      });
+     setErrors((prev) => ({ ...prev, serie: "Un echipament cu aceasta serie exista deja." }));
       return;
     }
 
@@ -83,11 +80,7 @@ function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipa
           e.id !== echipament.id
       );
       if (eqSameType) {
-        toast({
-          title: "Avertizare",
-          description: "Angajatul are deja un echipament de acest tip.",
-          variant: "destructive",
-        });
+       setErrors((prev) => ({ ...prev, angajatId: "Angajatul are deja un echipament de acest tip." }));
         return;
       }
     }

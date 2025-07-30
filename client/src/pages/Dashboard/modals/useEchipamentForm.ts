@@ -64,6 +64,7 @@ export function useEchipamentForm(initial?: Partial<EchipamentFormData>) {
     formData,
     setFormData,
     errors,
+    setErrors,
     search,
     setSearch,
     showColegModal,
