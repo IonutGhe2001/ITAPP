@@ -18,7 +18,12 @@ export default function Echipamente() {
  const {
     data: echipamente = [],
     refetch,
-  } = useEchipamente() as { data: Echipament[] | undefined; refetch: () => void };
+  isLoading,
+  } = useEchipamente() as {
+    data: Echipament[] | undefined
+    refetch: () => void
+    isLoading: boolean
+  }
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -29,6 +34,14 @@ const [selected, setSelected] = useState<(Echipament & { __editMode?: boolean })
 
   const deleteMutation = useDeleteEchipament();
   const updateMutation = useUpdateEchipament();
+
+   if (isLoading && echipamente.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary border-t-transparent"></div>
+      </div>
+    )
+  }
 
     const types = Array.from(new Set(echipamente.map((e) => e.tip))).sort();
 
