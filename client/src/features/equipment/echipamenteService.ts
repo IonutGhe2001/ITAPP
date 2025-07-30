@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import api from "@/services/api";
 import {
   getEchipamenteCache,
@@ -11,15 +12,21 @@ import type {
 } from "./types";
 
 
-export const useEchipamente = () =>
-  useQuery({
+export const useEchipamente = () => {
+  const query = useQuery<Echipament[], Error, Echipament[], string[]>({
     queryKey: ["echipamente"],
     queryFn: async () => (await api.get("/echipamente")).data as Echipament[],
-    initialData: getEchipamenteCache(),
-    onSuccess: (data: Echipament[]) => {
-      setEchipamenteCache(data)
-    },
+    initialData: getEchipamenteCache() ?? [],
   })
+
+  useEffect(() => {
+    if (query.data) {
+      setEchipamenteCache(query.data)
+    }
+  }, [query.data])
+
+  return query
+}
 
 export const useCreateEchipament = () => {
   const queryClient = useQueryClient();
