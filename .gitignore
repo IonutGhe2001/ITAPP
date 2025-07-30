@@ -33,7 +33,7 @@ server/.env.local
 
 # Prisma DB files
 server/prisma/dev.db*
-server/prisma/migrations/*/migration.sql
+# Allow committing prisma migrations
 server/prisma/*.sqlite*
 server/prisma/*.db
 
