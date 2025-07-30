@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useUpdateEchipament } from "@/features/equipment";
+import { useUpdateEchipament, useEchipamente } from "@/features/equipment";
 import { useAngajati } from "@/features/employees";
 import { useToast } from "@/hooks/use-toast/use-toast-hook";
 import { getApiErrorMessage } from "@/utils/apiError";
@@ -45,6 +45,7 @@ function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipa
   } = useEchipamentForm(initialData);
 
   const { data: angajati = [] } = useAngajati();
+  const { data: echipamente = [] } = useEchipamente();
   const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
   
@@ -57,7 +58,39 @@ function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipa
     }))
       return;
 
-   const payload = buildPayload();
+  const payload = buildPayload();
+
+    const duplicate = echipamente.find(
+      (e) =>
+        e.tip === payload.tip &&
+        e.serie === payload.serie &&
+        e.id !== echipament.id
+    );
+    if (duplicate) {
+      toast({
+        title: "Avertizare",
+        description: "Un echipament cu aceeasi serie exista deja.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (payload.angajatId) {
+      const eqSameType = echipamente.find(
+        (e) =>
+          e.angajatId === payload.angajatId &&
+          e.tip === payload.tip &&
+          e.id !== echipament.id
+      );
+      if (eqSameType) {
+        toast({
+          title: "Avertizare",
+          description: "Angajatul are deja un echipament de acest tip.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
 
     try {
       const updated = await updateMutation.mutateAsync({ id: echipament.id, data: payload });

@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import type { Angajat } from "@/features/equipment/types";
 const ModalAddColeg = React.lazy(() => import("./ModalAddColeg"));
-import { useCreateEchipament } from "@/features/equipment";
+import { useCreateEchipament, useEchipamente } from "@/features/equipment";
 import { useAngajati } from "@/features/employees";
 import { useToast } from "@/hooks/use-toast/use-toast-hook";
 import { useEchipamentForm } from "./useEchipamentForm";
@@ -31,6 +31,7 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
   } = useEchipamentForm();
 
   const { data: angajati = [] } = useAngajati();
+  const { data: echipamente = [] } = useEchipamente();
   const createMutation = useCreateEchipament();
   const { toast } = useToast();
 
@@ -43,6 +44,32 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
       return;
 
     const payload = buildPayload();
+
+    const duplicate = echipamente.find(
+      (e) => e.tip === payload.tip && e.serie === payload.serie
+    );
+    if (duplicate) {
+      toast({
+        title: "Avertizare",
+        description: "Un echipament cu aceeasi serie exista deja.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (payload.angajatId) {
+      const eqSameType = echipamente.find(
+        (e) => e.angajatId === payload.angajatId && e.tip === payload.tip
+      );
+      if (eqSameType) {
+        toast({
+          title: "Avertizare",
+          description: "Angajatul are deja un echipament de acest tip.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
 
     try {
       await createMutation.mutateAsync(payload);
