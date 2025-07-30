@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Expand, X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -29,6 +30,7 @@ export default function ModalProcesVerbal({ onClose }: ModalProcesVerbalProps) {
   const [selectedId, setSelectedId] = useState<string>("");
   const [pdfUrl, setPdfUrl] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -95,7 +97,33 @@ export default function ModalProcesVerbal({ onClose }: ModalProcesVerbalProps) {
           {pdfUrl && (
             <div className="mt-4">
               <Label>Preview PDF</Label>
-              <iframe src={pdfUrl} className="w-full h-[60vh] max-h-[500px] border" />
+              <div className="relative">
+                <iframe src={pdfUrl} className="w-full h-[60vh] max-h-[500px] border" />
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  onClick={() => setFullscreen(true)}
+                  className="absolute right-2 top-2"
+                >
+                  <Expand className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {fullscreen && (
+            <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center">
+              <div className="relative w-full h-full">
+                <iframe src={pdfUrl} className="w-full h-full" />
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  onClick={() => setFullscreen(false)}
+                  className="absolute right-4 top-4"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           )}
         </div>
