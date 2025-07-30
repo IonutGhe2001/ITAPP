@@ -1,4 +1,4 @@
-import { useState, useEffect, type FC } from "react";
+import { useState, useEffect, useMemo, type FC } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +27,22 @@ const EventForm: FC<Props> = ({ selectedDay, initial, onSave, onCancel }) => {
   const [allDay, setAllDay] = useState(false);
   const [recurrence, setRecurrence] = useState<"none" | "daily" | "weekly" | "monthly">("none");
   const { toast } = useToast();
+
+  const validOraOptions = useMemo(() => {
+    const today = new Date();
+    const isToday = selectedDay.toDateString() === today.toDateString();
+
+    if (!isToday) {
+      return ORA_OPTIONS;
+    }
+
+    const currentMinutes = today.getHours() * 60 + today.getMinutes();
+
+    return ORA_OPTIONS.filter((opt) => {
+      const [h, m] = opt.split(":").map(Number);
+      return h * 60 + m >= currentMinutes;
+    });
+  }, [selectedDay]);
 
   useEffect(() => {
     if (initial) {
@@ -136,7 +152,7 @@ const EventForm: FC<Props> = ({ selectedDay, initial, onSave, onCancel }) => {
             />
           </div>
           <datalist id="time-options">
-            {ORA_OPTIONS.map((opt) => (
+            {validOraOptions.map((opt) => (
               <option key={opt} value={opt} />
             ))}
           </datalist>
