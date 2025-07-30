@@ -3,14 +3,16 @@ import { io, type Socket } from "socket.io-client";
 import api from "@/services/api";
 import { useToast } from "@/hooks/use-toast/use-toast-hook";
 import { NotificationsContext, type Notification } from "./notifications-context";
+import { useAuth } from "./use-auth";
 
 export function NotificationsProvider({ children }: { children: ReactNode }) {
+  const { isAuthenticated } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const { toast } = useToast();
 
-  
   useEffect(() => {
+    if (!isAuthenticated) return;
     let socket: Socket | null = null;
 
     const fetchNotifications = async () => {
@@ -44,9 +46,13 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       socket?.disconnect();
     };
    // toast comes from a hook and is recreated on each render
-    // but we only want to set up the socket once on mount
+    // but we only want to set up the socket when authenticated
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isAuthenticated]);
+
+  if (!isAuthenticated) {
+    return <>{children}</>;
+  }
 
   const markAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
