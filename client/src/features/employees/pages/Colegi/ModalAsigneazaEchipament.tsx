@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useEchipamente, useUpdateEchipament } from "@/features/equipment";
 import type { Echipament } from "@/features/equipment/types";
+import { useToast } from "@/hooks/use-toast/use-toast-hook";
+import { getApiErrorMessage } from "@/utils/apiError";
 
 export default function ModalAsigneazaEchipament({
   angajatId,
@@ -14,18 +16,27 @@ export default function ModalAsigneazaEchipament({
 }) {
   const { data: echipamente = [] } = useEchipamente();
   const updateMutation = useUpdateEchipament();
+  const { toast } = useToast();
   const [selectedId, setSelectedId] = useState("");
 
   const handleAssign = async () => {
     if (!selectedId) return;
 
-     await updateMutation.mutateAsync({
-      id: selectedId,
-      data: { angajatId, stare: "predat" },
-    });
+     try {
+      await updateMutation.mutateAsync({
+        id: selectedId,
+        data: { angajatId, stare: "predat" },
+      });
 
     onClose();
-    onSuccess?.();
+      onSuccess?.();
+    } catch (err) {
+      toast({
+        title: "Eroare la asignare",
+        description: getApiErrorMessage(err),
+        variant: "destructive",
+      });
+    }
   };
 
   return (

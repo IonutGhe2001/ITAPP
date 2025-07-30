@@ -1,10 +1,12 @@
 import { useState } from "react";
 import type { Echipament } from "@/features/equipment/types";
 import {
-   useEchipamente,
+  useEchipamente,
   useDeleteEchipament,
   useUpdateEchipament,
 } from "@/features/equipment";
+import { useToast } from "@/hooks/use-toast/use-toast-hook";
+import { getApiErrorMessage } from "@/utils/apiError";
 import {
   EquipmentFilter,
   EquipmentList,
@@ -34,6 +36,7 @@ const [selected, setSelected] = useState<(Echipament & { __editMode?: boolean })
 
   const deleteMutation = useDeleteEchipament();
   const updateMutation = useUpdateEchipament();
+  const { toast } = useToast();
 
    if (isLoading && echipamente.length === 0) {
     return (
@@ -87,12 +90,15 @@ const [selected, setSelected] = useState<(Echipament & { __editMode?: boolean })
       });
 
       try {
-         const res = await updateMutation.mutateAsync({ id: data.id, data: payload });
+        const res = await updateMutation.mutateAsync({ id: data.id, data: payload });
         if (!res || !res.id) throw new Error("Obiectul returnat nu este valid");
-      } catch (error: unknown) {
-        const err = error as { response?: { data?: unknown }; message?: string };
-        console.error("❌ Eroare la update rapid:", err.response?.data || err.message);
-        alert("A apărut o eroare la actualizarea echipamentului.");
+      } catch (err) {
+        console.error("❌ Eroare la update rapid:", err);
+        toast({
+          title: "Eroare la actualizare",
+          description: getApiErrorMessage(err),
+          variant: "destructive",
+        });
       }
     } else {
       setSelected(data);

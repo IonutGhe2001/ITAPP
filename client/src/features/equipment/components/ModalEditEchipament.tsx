@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useUpdateEchipament } from "@/features/equipment";
 import { useAngajati } from "@/features/employees";
 import { useToast } from "@/hooks/use-toast/use-toast-hook";
+import { getApiErrorMessage } from "@/utils/apiError";
 import { useEchipamentForm } from "@/pages/Dashboard/modals/useEchipamentForm";
 import EchipamentForm from "./EchipamentForm";
 const ModalAddColeg = React.lazy(() => import("@/pages/Dashboard/modals/ModalAddColeg"));
@@ -66,10 +67,10 @@ function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipa
       });
       onUpdated(updated as Echipament);
       onClose();
-    } catch {
+    } catch (err) {
       toast({
         title: "Eroare la salvare",
-        description: "Actualizarea echipamentului a eșuat.",
+        description: getApiErrorMessage(err),
         variant: "destructive",
       });
     }
