@@ -7,11 +7,12 @@ import { getUserById } from "../services/auth.service";
 
 export const creareProcesVerbal = async (req: Request, res: Response) => {
   try {
-    const { angajatId, observatii, tip } = req.body;
+    const { angajatId, observatii, tip, echipamentIds } = req.body;
     const procesVerbal = await creeazaProcesVerbalCuEchipamente(
       angajatId,
       observatii,
-      tip as ProcesVerbalTip
+      tip as ProcesVerbalTip,
+      echipamentIds
     );
 
     if (!procesVerbal) {

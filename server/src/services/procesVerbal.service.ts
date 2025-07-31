@@ -5,7 +5,8 @@ import { ProcesVerbalTip } from "@prisma/client";
 export const creeazaProcesVerbalCuEchipamente = async (
   angajatId: string,
   observatii?: string | null,
-  tip: ProcesVerbalTip = ProcesVerbalTip.PREDARE_PRIMIRE
+  tip: ProcesVerbalTip = ProcesVerbalTip.PREDARE_PRIMIRE,
+  echipamentIds?: string[]
 ) => {
   const angajat = await prisma.angajat.findUnique({
     where: { id: angajatId },
@@ -14,13 +15,20 @@ export const creeazaProcesVerbalCuEchipamente = async (
 
   if (!angajat) return null;
 
+  const idsToConnect = (echipamentIds
+    ? angajat.echipamente.filter((eq: { id: string }) =>
+        echipamentIds.includes(eq.id)
+      )
+    : angajat.echipamente
+  ).map((eq: { id: string }) => ({ id: eq.id }));
+
   const procesVerbal = await prisma.procesVerbal.create({
     data: {
       angajatId: angajat.id,
       observatii: observatii || null,
       tip,
       echipamente: {
-       connect: angajat.echipamente.map((eq: { id: string }) => ({ id: eq.id })),
+      connect: idsToConnect,
       },
     },
     include: {
