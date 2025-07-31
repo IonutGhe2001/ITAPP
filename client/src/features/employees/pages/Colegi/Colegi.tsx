@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect, useRef } from "react";
+import React, { useState, useLayoutEffect, useRef, Suspense } from "react";
 import {
   useAngajati,
   useDeleteAngajat,
@@ -12,6 +12,9 @@ import Container from "@/components/Container";
 import Avatar from "@/components/Avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+const ModalAddColeg = React.lazy(() =>
+  import("@/pages/Dashboard/modals/ModalAddColeg")
+);
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -34,6 +37,7 @@ export default function Colegi() {
   >(null);
   const [editColeg, setEditColeg] = useState<Angajat | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Angajat | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
   const deleteMutation = useDeleteAngajat();
   const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
@@ -283,7 +287,7 @@ export default function Colegi() {
       </div>
 
       <div ref={containerRef} className="h-[60vh] max-h-[600px]">
-        {width > 0 && height > 0 && (
+        {width > 0 && height > 0 && filtered.length > 0 && (
           <List
             ref={listRef}
             height={height}
@@ -294,6 +298,22 @@ export default function Colegi() {
           >
             {Row}
           </List>
+        )}
+        {width > 0 && height > 0 && filtered.length === 0 && (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center text-sm text-muted-foreground">
+              <p>
+                {search.trim()
+                  ? "Nu s-au găsit colegi."
+                  : "Nu există colegi înregistrați."}
+              </p>
+              {search.trim() && (
+                <Button className="mt-2" onClick={() => setShowAddModal(true)}>
+                  Adaugă coleg nou
+                </Button>
+              )}
+            </div>
+          </div>
         )}
       </div>
 
@@ -370,6 +390,14 @@ export default function Colegi() {
           </DialogContent>
         </Dialog>
       )}
+       <Suspense fallback={null}>
+        {showAddModal && (
+          <ModalAddColeg
+            onClose={() => setShowAddModal(false)}
+            defaultName={search.trim()}
+          />
+        )}
+      </Suspense>
     </Container>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, Suspense } from "react";
 import type { Echipament } from "@/features/equipment/types";
 import {
   useEchipamente,
@@ -15,6 +15,10 @@ import {
   ImportEchipamente,
 } from "@/features/equipment";
 import Container from "@/components/Container";
+import { Button } from "@/components/ui/button";
+const ModalAddEchipament = React.lazy(() =>
+  import("@/pages/Dashboard/modals/ModalAddEchipament")
+);
 
 export default function Echipamente() {
  const {
@@ -33,6 +37,7 @@ const [type, setType] = useState("");
   const [sort, setSort] = useState("asc");
 
 const [selected, setSelected] = useState<(Echipament & { __editMode?: boolean }) | null>(null);
+const [showAddModal, setShowAddModal] = useState(false);
 
   const deleteMutation = useDeleteEchipament();
   const updateMutation = useUpdateEchipament();
@@ -123,11 +128,23 @@ const [selected, setSelected] = useState<(Echipament & { __editMode?: boolean })
             selected={type}
             onChange={setType}
           />
-          <EquipmentList
-            echipamente={filtered}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
+          {filtered.length === 0 && search.trim() ? (
+            <div className="text-center text-sm text-muted-foreground py-10">
+              <p>Nu s-au găsit echipamente.</p>
+              <Button
+                className="mt-2"
+                onClick={() => setShowAddModal(true)}
+              >
+                Adaugă echipament nou
+              </Button>
+            </div>
+          ) : (
+            <EquipmentList
+              echipamente={filtered}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          )}
         </div>
         <div>
           <ImportEchipamente onImportSuccess={() => refetch()} />
@@ -141,6 +158,14 @@ const [selected, setSelected] = useState<(Echipament & { __editMode?: boolean })
             onUpdated={() => setSelected(null)}
           />
       )}
+      <Suspense fallback={null}>
+        {showAddModal && (
+          <ModalAddEchipament
+            onClose={() => setShowAddModal(false)}
+            defaultName={search.trim()}
+          />
+        )}
+      </Suspense>
     </Container>
   );
 }

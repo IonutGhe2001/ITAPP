@@ -8,9 +8,15 @@ import { Button } from "@/components/ui/button";
 import { useCreateAngajat } from "@/features/employees";
 import { useToast } from "@/hooks/use-toast/use-toast-hook";
 
-export default function ModalAddColeg({ onClose }: { onClose: () => void }) {
+export default function ModalAddColeg({
+  onClose,
+  defaultName = "",
+}: {
+  onClose: () => void
+  defaultName?: string
+}) {
   const [formData, setFormData] = useState({
-    numeComplet: "",
+    numeComplet: defaultName,
     functie: "",
     email: "",
     telefon: "",

@@ -17,7 +17,13 @@ import { useEchipamentForm } from "./useEchipamentForm";
 import EchipamentForm from "@/features/equipment/components/EchipamentForm";
 
 
-export default function ModalAddEchipament({ onClose }: { onClose: () => void }) {
+export default function ModalAddEchipament({
+  onClose,
+  defaultName = "",
+}: {
+  onClose: () => void
+  defaultName?: string
+}) {
   const {
     formData,
     setFormData,
@@ -29,7 +35,7 @@ export default function ModalAddEchipament({ onClose }: { onClose: () => void })
     setShowColegModal,
     validate,
     buildPayload,
-  } = useEchipamentForm();
+   } = useEchipamentForm({ nume: defaultName });
 
   const { data: angajati = [] } = useAngajati();
   const { data: echipamente = [] } = useEchipamente();
