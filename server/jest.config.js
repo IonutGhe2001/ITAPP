@@ -2,6 +2,9 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   testMatch: ['**/?(*.)+(test).[tj]s'],
+  transform: {
+    '^.+\\.[tj]s$': 'ts-jest',
+  },
   moduleNameMapper: {
     '^@lib/(.*)$': '<rootDir>/src/lib/$1',
     '^@services/(.*)$': '<rootDir>/src/services/$1',
