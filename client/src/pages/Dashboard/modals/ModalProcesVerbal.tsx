@@ -28,6 +28,7 @@ interface ModalProcesVerbalProps {
 export default function ModalProcesVerbal({ onClose }: ModalProcesVerbalProps) {
   const [angajati, setAngajati] = useState<{ id: string; numeComplet: string }[]>([]);
   const [selectedId, setSelectedId] = useState<string>("");
+  const [tip, setTip] = useState<string>("PREDARE_PRIMIRE");
   const [pdfUrl, setPdfUrl] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
@@ -45,10 +46,9 @@ export default function ModalProcesVerbal({ onClose }: ModalProcesVerbalProps) {
   try {
      const res = await api.post(
       "/procese-verbale",
-      { angajatId: selectedId },
+      { angajatId: selectedId, tip },
       {
         responseType: "blob",
-        
       }
     );
     const file = new Blob([res.data], { type: "application/pdf" });
@@ -86,6 +86,20 @@ export default function ModalProcesVerbal({ onClose }: ModalProcesVerbalProps) {
             </Select>
           </div>
 
+          <div>
+            <Label htmlFor="tip">Tip proces verbal</Label>
+            <Select value={tip} onValueChange={setTip}>
+              <SelectTrigger id="tip">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="PREDARE_PRIMIRE">Predare-primire</SelectItem>
+                <SelectItem value="RESTITUIRE">Restituire</SelectItem>
+                <SelectItem value="SCHIMB">Schimb</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
           <Button
             onClick={genereazaProces}
             disabled={!selectedId || loading}
