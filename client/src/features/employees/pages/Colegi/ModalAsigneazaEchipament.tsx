@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useEchipamente, useUpdateEchipament } from "@/features/equipment";
 import type { Echipament } from "@/features/equipment/types";
+import { genereazaProcesVerbal, type ProcesVerbalTip } from "@/features/proceseVerbale";
 import { useToast } from "@/hooks/use-toast/use-toast-hook";
 import { getApiErrorMessage } from "@/utils/apiError";
 
@@ -29,8 +30,11 @@ export default function ModalAsigneazaEchipament({
     if (!selectedId) return;
 
      try {
+      let tip: ProcesVerbalTip = "PREDARE_PRIMIRE";
+
       if (onReplace && oldEchipamentId) {
         await onReplace(oldEchipamentId, selectedId);
+        tip = "SCHIMB";
       } else {
         await updateMutation.mutateAsync({
           id: selectedId,
@@ -38,7 +42,15 @@ export default function ModalAsigneazaEchipament({
         });
       }
 
-    onClose();
+    try {
+        const url = await genereazaProcesVerbal(angajatId, tip);
+        window.open(url, "_blank");
+        toast({ title: "Proces verbal generat" });
+      } catch {
+        toast({ title: "Proces verbal generare eșuată", variant: "destructive" });
+      }
+
+      onClose();
       onSuccess?.();
     } catch (err) {
       toast({

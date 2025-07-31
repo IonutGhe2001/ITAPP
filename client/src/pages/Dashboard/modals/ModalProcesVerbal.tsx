@@ -10,13 +10,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Expand, X } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { getAngajati } from "@/features/employees";
 import api from "@/services/api";
 import { useToast } from "@/hooks/use-toast/use-toast-hook";
@@ -28,7 +21,6 @@ interface ModalProcesVerbalProps {
 export default function ModalProcesVerbal({ onClose }: ModalProcesVerbalProps) {
   const [angajati, setAngajati] = useState<{ id: string; numeComplet: string }[]>([]);
   const [selectedId, setSelectedId] = useState<string>("");
-  const [tip, setTip] = useState<string>("PREDARE_PRIMIRE");
   const [pdfUrl, setPdfUrl] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
@@ -46,7 +38,7 @@ export default function ModalProcesVerbal({ onClose }: ModalProcesVerbalProps) {
   try {
      const res = await api.post(
       "/procese-verbale",
-      { angajatId: selectedId, tip },
+      { angajatId: selectedId },
       {
         responseType: "blob",
       }
@@ -82,20 +74,6 @@ export default function ModalProcesVerbal({ onClose }: ModalProcesVerbalProps) {
                     {angajat.numeComplet}
                   </SelectItem>
                 ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="tip">Tip proces verbal</Label>
-            <Select value={tip} onValueChange={setTip}>
-              <SelectTrigger id="tip">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="PREDARE_PRIMIRE">Predare-primire</SelectItem>
-                <SelectItem value="RESTITUIRE">Restituire</SelectItem>
-                <SelectItem value="SCHIMB">Schimb</SelectItem>
               </SelectContent>
             </Select>
           </div>

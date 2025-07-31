@@ -5,6 +5,7 @@ import {
 } from "@/features/employees";
 import type { Angajat, Echipament } from "@/features/equipment/types";
 import { useUpdateEchipament } from "@/features/equipment";
+import { genereazaProcesVerbal } from "@/features/proceseVerbale";
 import { getEquipmentIcon } from "@/utils/equipmentIcons";
 import ModalAsigneazaEchipament from "./ModalAsigneazaEchipament";
 import ModalEditColeg from "./ModalEditColeg";
@@ -108,13 +109,19 @@ export default function Colegi() {
     }
   };
 
-  const handleRemoveEquipment = async (id: string) => {
+  const handleRemoveEquipment = async (eqId: string, colegId: string) => {
     try {
       await updateMutation.mutateAsync({
-        id,
+        id: eqId,
         data: { angajatId: null, stare: "disponibil" },
       });
       toast({ title: "Echipament eliberat" });
+      try {
+        const url = await genereazaProcesVerbal(colegId, "RESTITUIRE");
+        window.open(url, "_blank");
+      } catch {
+        /* ignore */
+      }
       refetch();
     } catch {
       toast({
@@ -213,7 +220,7 @@ export default function Colegi() {
                       </span>
                       <div className="flex gap-1">
                         <button
-                          onClick={() => handleRemoveEquipment(e.id)}
+                          onClick={() => handleRemoveEquipment(e.id, coleg.id)}
                           className="text-[10px] text-red-600 hover:underline"
                         >
                           Elimină
@@ -343,6 +350,12 @@ export default function Colegi() {
               id: newId,
               data: { angajatId: replaceData.colegId, stare: "predat" },
             });
+            try {
+              const url = await genereazaProcesVerbal(replaceData.colegId, "SCHIMB");
+              window.open(url, "_blank");
+            } catch {
+              /* ignore */
+            }
             toast({ title: "Echipament schimbat" });
           }}
           onClose={() => setReplaceData(null)}
