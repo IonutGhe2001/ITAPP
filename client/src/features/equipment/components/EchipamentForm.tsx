@@ -1,6 +1,8 @@
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
 import type { Dispatch, SetStateAction } from 'react'
+import { useState } from 'react'
 import {
   Select,
   SelectContent,
@@ -30,6 +32,10 @@ export default function EchipamentForm({
   angajati,
   onAddColeg,
 }: EchipamentFormProps) {
+  const [selectOpen, setSelectOpen] = useState(false)
+  const filteredAngajati = angajati.filter((a) =>
+    a.numeComplet.toLowerCase().includes(search.toLowerCase())
+  )
   return (
     <div className="space-y-4">
       {errors.general && (
@@ -72,6 +78,8 @@ export default function EchipamentForm({
         <Select
           value={formData.angajatId}
           onValueChange={(value) => setFormData({ ...formData, angajatId: value })}
+          open={selectOpen}
+          onOpenChange={setSelectOpen}
         >
           <SelectTrigger>
             <SelectValue placeholder="Atribuie angajat (opțional)" />
@@ -86,14 +94,32 @@ export default function EchipamentForm({
                 className="mb-2"
               />
             </div>
-            <SelectItem value="none">Neatribuit</SelectItem>
-            {angajati
-              .filter((a) => a.numeComplet.toLowerCase().includes(search.toLowerCase()))
-              .map((a) => (
-                <SelectItem key={a.id} value={a.id}>
-                  {a.numeComplet}
-                </SelectItem>
-              ))}
+            {filteredAngajati.length > 0 ? (
+              <>
+                <SelectItem value="none">Neatribuit</SelectItem>
+                {filteredAngajati.map((a) => (
+                  <SelectItem key={a.id} value={a.id}>
+                    {a.numeComplet}
+                  </SelectItem>
+                ))}
+              </>
+            ) : (
+              <div className="p-2 text-center text-sm text-muted-foreground">
+                <p>Nu s-au găsit colegi.</p>
+                <Button
+                  size="sm"
+                  className="mt-2 w-full"
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setSelectOpen(false)
+                    onAddColeg()
+                  }}
+                >
+                  Adaugă coleg nou
+                </Button>
+              </div>
+            )}
           </SelectContent>
         </Select>
         <button
