@@ -139,8 +139,23 @@ export default function Colegi() {
         : b.numeComplet.localeCompare(a.numeComplet)
     );
 
-  return (
-    {expanded.has(coleg.id) ? "Ascunde echipamente" : "Vezi echipamente"}
+  const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
+    const coleg = filtered[index];
+    const rowRef = useRef<HTMLDivElement>(null);
+
+    useLayoutEffect(() => {
+      if (rowRef.current) {
+        setSize(index, rowRef.current.getBoundingClientRect().height);
+      }
+    }, [index, coleg]);
+
+    return (
+      <div style={style}>
+        <div ref={rowRef} className="relative bg-card rounded-xl shadow-md p-4 flex flex-col gap-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="absolute top-2 right-2 p-1 rounded hover:bg-muted">
+                <MoreHorizontal className="w-4 h-4" />
               </button>
              </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
