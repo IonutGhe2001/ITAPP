@@ -42,11 +42,20 @@ export const getMe = async (req: Request, res: Response) => {
 
 export const updateMe = async (req: Request, res: Response) => {
   const userId = req.user!.id;
-  const { nume, prenume, functie, telefon, profilePicture, digitalSignature } = req.body;
-const updateData: UserUpdateData = { nume, prenume, functie, telefon, profilePicture, digitalSignature };
+  const { nume, prenume, functie, telefon, profilePicture, digitalSignature } =
+    req.body;
+  const updateData: UserUpdateData = {
+    nume,
+    prenume,
+    functie,
+    telefon,
+    profilePicture,
+    digitalSignature,
+  };
   Object.keys(updateData).forEach((key) => {
-    if (updateData[key] === undefined || updateData[key] === "") {
-      delete updateData[key];
+    const typedKey = key as keyof UserUpdateData;
+    if (updateData[typedKey] === undefined || updateData[typedKey] === "") {
+      delete updateData[typedKey];
     }
   });
 

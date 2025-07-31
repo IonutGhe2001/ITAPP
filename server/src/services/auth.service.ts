@@ -74,11 +74,11 @@ export interface UserUpdateData {
 }
 
 export const updateUser = (
-  id: string,
+  id: number,
   data: Partial<UserUpdateData>
 ) => {
   return prisma.user.update({
-    where: { id: Number(id) },
+    where: { id },
     data,
   });
 };
