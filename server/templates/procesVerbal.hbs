@@ -176,29 +176,39 @@
       {{/unless}}
 
       <div class="signatures">
-        <div>
-          {{#if (eq tip "RESTITUIRE")}}
-            Am predat,
-          {{else if (eq tip "SCHIMB")}}
-            Am primit vechiul echipament și am predat înlocuitorul,
-          {{else}}
-            Am predat,
-          {{/if}}<br /><br />
-          {{#if digitalSignature}}
-            <img src="{{digitalSignature}}" style="max-height:80px;" />
-          {{else}}
-            ______________
-          {{/if}}
-        </div>
-        <div>
-          {{#if (eq tip "RESTITUIRE")}}
-            Am primit,
-          {{else if (eq tip "SCHIMB")}}
-            Am predat vechiul echipament și am primit înlocuitorul,
-          {{else}}
-            Am primit,
-          {{/if}}<br /><br />______________
-        </div>
+       {{#if (eq tip "RESTITUIRE")}}
+          <div>
+            Am primit,<br /><br />
+            {{#if digitalSignature}}
+              <img src="{{digitalSignature}}" style="max-height:80px;" />
+            {{else}}
+              ______________
+            {{/if}}
+          </div>
+          <div>
+            Am predat,<br /><br />______________
+          </div>
+        {{else}}
+          <div>
+            {{#if (eq tip "SCHIMB")}}
+              Am primit vechiul echipament și am predat înlocuitorul,
+            {{else}}
+              Am predat,
+            {{/if}}<br /><br />
+            {{#if digitalSignature}}
+              <img src="{{digitalSignature}}" style="max-height:80px;" />
+            {{else}}
+              ______________
+            {{/if}}
+          </div>
+          <div>
+            {{#if (eq tip "SCHIMB")}}
+              Am predat vechiul echipament și am primit înlocuitorul,
+            {{else}}
+              Am primit,
+            {{/if}}<br /><br />______________
+          </div>
+        {{/if}}
       </div>
     </div>
 
