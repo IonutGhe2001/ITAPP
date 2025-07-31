@@ -145,12 +145,12 @@ export default function Colegi() {
 
     useLayoutEffect(() => {
       if (rowRef.current) {
-        setSize(index, rowRef.current.getBoundingClientRect().height);
+       setSize(index, rowRef.current.getBoundingClientRect().height + 16);
       }
     }, [index, coleg]);
 
     return (
-      <div style={style}>
+      <div style={style} className="py-2">
         <div ref={rowRef} className="relative bg-card rounded-xl shadow-md p-4 flex flex-col gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -250,7 +250,7 @@ export default function Colegi() {
 
   return (
     <Container className="py-6 space-y-6">
-      <div className="sticky top-0 z-10 bg-background space-y-4 pb-4">
+      <div className="sticky top-0 z-10 space-y-4 pb-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <input
             type="text"
