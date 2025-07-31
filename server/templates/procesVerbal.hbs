@@ -98,11 +98,55 @@
         {{/if}}
       </h2>
 
-      <div class="content">
-        Realizat astăzi în data de {{data}} în două exemplare, între
-        <strong>{{firma}}</strong>, cu sediul în Jud. Ilfov, Oraş Pantelimon, Strada RĂSCOALEI, Nr. 46
-        și <strong>{{angajat.numeComplet}}</strong>.
-      </div>
+      {{#if echipamentePredate.length}}
+        <div class="content">Echipamente returnate:</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Denumire echipament</th>
+              <th>SN</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each echipamentePredate}}
+              <tr>
+                <td>{{tip}} {{nume}}</td>
+                <td>{{serie}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      {{/if}}
+
+      {{#if echipamentePrimite.length}}
+        <div class="content">Echipamente primite:</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Denumire echipament</th>
+              <th>SN</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each echipamentePrimite}}
+              <tr>
+                <td>{{tip}} {{nume}}</td>
+                <td>{{serie}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      {{/if}}
+
+      {{#unless echipamentePredate.length}}
+      {{#unless echipamentePrimite.length}}
+        <div class="content">
+           {{#if (eq tip "RESTITUIRE")}}
+            Primul a primit iar ultimul a predat următoarele echipamente de lucru:
+          {{else}}
+            Primul a predat iar ultimul a primit următoarele echipamente de lucru:
+          {{/if}}
+        </div>
 
       <div class="content">
          {{#if (eq tip "RESTITUIRE")}}
@@ -115,21 +159,23 @@
       </div>
 
       <table>
-        <thead>
-          <tr>
-            <th>Denumire echipament</th>
-            <th>SN</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{#each echipamente}}
+          <thead>
             <tr>
-              <td>{{tip}} {{nume}}</td>
-              <td>{{serie}}</td>
+             <th>Denumire echipament</th>
+              <th>SN</th>
             </tr>
-          {{/each}}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {{#each echipamente}}
+              <tr>
+                <td>{{tip}} {{nume}}</td>
+                <td>{{serie}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      {{/unless}}
+      {{/unless}}
 
       <div class="signatures">
         <div>
