@@ -12,13 +12,7 @@ import Container from "@/components/Container";
 import Avatar from "@/components/Avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreVertical } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast/use-toast-hook";
 
 export default function Colegi() {
@@ -82,8 +76,28 @@ export default function Colegi() {
          {filtered.map((coleg: Angajat & { echipamente: Echipament[] }) => (
           <div
             key={coleg.id}
-            className="bg-card rounded-xl shadow-md p-4 flex flex-col gap-4"
+            className="relative bg-card rounded-xl shadow-md p-4 flex flex-col gap-4"
           >
+            <div className="absolute top-2 left-2 flex gap-2">
+              <button
+                onClick={() => setEditColeg(coleg)}
+                className="p-1 rounded hover:bg-muted"
+                title="Editează"
+              >
+                <Pencil className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() =>
+                  coleg.echipamente.length > 0
+                    ? setConfirmDelete(coleg)
+                    : handleDelete(coleg.id)
+                }
+                className="p-1 rounded hover:bg-muted"
+                title="Șterge"
+              >
+                <Trash2 className="w-4 h-4 text-destructive" />
+              </button>
+            </div>
             <div className="flex items-center gap-4">
              <Avatar
                 name={coleg.numeComplet}
@@ -96,45 +110,7 @@ export default function Colegi() {
                 <p className="text-sm text-muted-foreground">{coleg.telefon}</p>
               </div>
             </div>
-            <div className="flex justify-between items-center gap-4 text-sm">
-              <button
-                onClick={() => toggleExpand(coleg.id)}
-                className="text-sm text-primary hover:underline self-start"
-              >
-                {expanded.has(coleg.id) ? "Ascunde echipamente" : "Vezi echipamente"}
-              </button>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setSelectedAngajatId(coleg.id)}
-                  className="text-sm text-primary hover:underline"
-                >
-                  Asignează echipament
-                </button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => setEditColeg(coleg)}>
-                      Editează
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        coleg.echipamente.length > 0
-                          ? setConfirmDelete(coleg)
-                          : handleDelete(coleg.id)
-                      }
-                      className="text-red-600 focus:text-red-600"
-                    >
-                      Șterge
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
+            
             {expanded.has(coleg.id) && (
               <ul className="space-y-2 mt-2">
                 {coleg.echipamente.length === 0 ? (
@@ -178,6 +154,20 @@ export default function Colegi() {
                 )}
               </ul>
             )}
+            <div className="flex justify-between items-center gap-4 text-sm mt-auto">
+              <button
+                onClick={() => toggleExpand(coleg.id)}
+                className="text-sm text-primary hover:underline self-start"
+              >
+                {expanded.has(coleg.id) ? "Ascunde echipamente" : "Vezi echipamente"}
+              </button>
+              <button
+                onClick={() => setSelectedAngajatId(coleg.id)}
+                className="text-sm text-primary hover:underline"
+              >
+                Asignează echipament
+              </button>
+            </div>
           </div>
         ))}
       </div>
