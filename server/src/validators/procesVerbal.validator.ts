@@ -7,4 +7,6 @@ export const createProcesVerbalSchema = Joi.object({
     .valid("PREDARE_PRIMIRE", "RESTITUIRE", "SCHIMB")
     .optional(),
   echipamentIds: Joi.array().items(Joi.string().uuid()).optional(),
+  echipamentePredate: Joi.array().items(Joi.string().uuid()).optional(),
+  echipamentePrimite: Joi.array().items(Joi.string().uuid()).optional(),
 });

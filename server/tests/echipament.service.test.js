@@ -44,7 +44,7 @@ describe('updateEchipament proces verbal', () => {
   it('creates PREDARE_PRIMIRE when assigning equipment', async () => {
     tx.echipament.findUnique.mockResolvedValue({ id: 'e1', tip: 'T', serie: 'S', angajatId: null });
     tx.echipament.update.mockResolvedValue({ id: 'e1', angajatId: 'a1' });
-    creeazaProcesVerbalCuEchipamente.mockResolvedValue({ id: 'pv1' });
+    creeazaProcesVerbalCuEchipamente.mockResolvedValue({ procesVerbal: { id: 'pv1' } });
 
     const res = await updateEchipament('e1', { angajatId: 'a1' });
 
@@ -55,7 +55,7 @@ describe('updateEchipament proces verbal', () => {
   it('creates RESTITUIRE when removing employee', async () => {
     tx.echipament.findUnique.mockResolvedValue({ id: 'e1', tip: 'T', serie: 'S', angajatId: 'a1' });
     tx.echipament.update.mockResolvedValue({ id: 'e1', angajatId: null });
-    creeazaProcesVerbalCuEchipamente.mockResolvedValue({ id: 'pv2' });
+    creeazaProcesVerbalCuEchipamente.mockResolvedValue({ procesVerbal: { id: 'pv2' } });
 
     const res = await updateEchipament('e1', { angajatId: null });
 
@@ -66,7 +66,7 @@ describe('updateEchipament proces verbal', () => {
   it('creates SCHIMB when changing employee', async () => {
     tx.echipament.findUnique.mockResolvedValue({ id: 'e1', tip: 'T', serie: 'S', angajatId: 'a1' });
     tx.echipament.update.mockResolvedValue({ id: 'e1', angajatId: 'a2' });
-    creeazaProcesVerbalCuEchipamente.mockResolvedValue({ id: 'pv3' });
+    creeazaProcesVerbalCuEchipamente.mockResolvedValue({ procesVerbal: { id: 'pv3' } });
 
     const res = await updateEchipament('e1', { angajatId: 'a2' });
 

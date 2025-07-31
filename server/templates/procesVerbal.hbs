@@ -107,6 +107,8 @@
       <div class="content">
          {{#if (eq tip "RESTITUIRE")}}
           Primul a primit iar ultimul a predat următoarele echipamente de lucru:
+          {{else if (eq tip "SCHIMB")}}
+          Angajatul a predat echipamentul vechi și a primit echipamentul de înlocuire:
         {{else}}
           Primul a predat iar ultimul a primit următoarele echipamente de lucru:
         {{/if}}
@@ -131,14 +133,28 @@
 
       <div class="signatures">
         <div>
-          {{#if (eq tip "RESTITUIRE")}}Am primit,{{else}}Am predat,{{/if}}<br /><br />
+          {{#if (eq tip "RESTITUIRE")}}
+            Am primit,
+          {{else if (eq tip "SCHIMB")}}
+            Am predat vechiul echipament și am primit înlocuitorul,
+          {{else}}
+            Am predat,
+          {{/if}}<br /><br />
           {{#if digitalSignature}}
             <img src="{{digitalSignature}}" style="max-height:80px;" />
           {{else}}
             ______________
           {{/if}}
         </div>
-        <div>{{#if (eq tip "RESTITUIRE")}}Am predat,{{else}}Am primit,{{/if}}<br /><br />______________</div>
+        <div>
+          {{#if (eq tip "RESTITUIRE")}}
+            Am predat,
+          {{else if (eq tip "SCHIMB")}}
+            Am primit vechiul echipament și am predat înlocuitorul,
+          {{else}}
+            Am primit,
+          {{/if}}<br /><br />______________
+        </div>
       </div>
     </div>
 

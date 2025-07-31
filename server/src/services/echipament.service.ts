@@ -136,11 +136,12 @@ export const updateEchipament = async (
   
   let procesVerbal = null;
   if (pvAngajatId && pvTip) {
-    procesVerbal = await creeazaProcesVerbalCuEchipamente(
+    const result = await creeazaProcesVerbalCuEchipamente(
       pvAngajatId,
       undefined,
       pvTip
     );
+    procesVerbal = result ? result.procesVerbal : null;
   }
 
   return { echipament: updated, procesVerbal };

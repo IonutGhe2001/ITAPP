@@ -6,7 +6,9 @@ export const creeazaProcesVerbalCuEchipamente = async (
   angajatId: string,
   observatii?: string | null,
   tip: ProcesVerbalTip = ProcesVerbalTip.PREDARE_PRIMIRE,
-  echipamentIds?: string[]
+  echipamentIds?: string[],
+  echipamentePredateIds?: string[],
+  echipamentePrimiteIds?: string[]
 ) => {
   const angajat = await prisma.angajat.findUnique({
     where: { id: angajatId },
@@ -37,5 +39,19 @@ export const creeazaProcesVerbalCuEchipamente = async (
     },
   });
 
-  return procesVerbal;
+  const echipamentePredate =
+    echipamentePredateIds && echipamentePredateIds.length
+      ? await prisma.echipament.findMany({
+          where: { id: { in: echipamentePredateIds } },
+        })
+      : [];
+
+  const echipamentePrimite =
+    echipamentePrimiteIds && echipamentePrimiteIds.length
+      ? await prisma.echipament.findMany({
+          where: { id: { in: echipamentePrimiteIds } },
+        })
+      : [];
+
+  return { procesVerbal, echipamentePredate, echipamentePrimite };
 };

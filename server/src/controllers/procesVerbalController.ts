@@ -7,23 +7,29 @@ import { getUserById } from "../services/auth.service";
 
 export const creareProcesVerbal = async (req: Request, res: Response) => {
   try {
-    const { angajatId, observatii, tip, echipamentIds } = req.body;
-    const procesVerbal = await creeazaProcesVerbalCuEchipamente(
+     const { angajatId, observatii, tip, echipamentIds, echipamentePredate, echipamentePrimite } = req.body;
+    const result = await creeazaProcesVerbalCuEchipamente(
       angajatId,
       observatii,
       tip as ProcesVerbalTip,
-      echipamentIds
+      echipamentIds,
+      echipamentePredate,
+      echipamentePrimite
     );
 
-    if (!procesVerbal) {
+    if (!result) {
       return res.status(404).json({ message: "Angajatul nu a fost găsit." });
     }
+
+    const { procesVerbal, echipamentePredate: predate, echipamentePrimite: primite } = result;
 
     const currentUser = await getUserById(Number((req as any).user.id));
 
     const pdfBuffer = await genereazaPDFProcesVerbal({
       angajat: procesVerbal.angajat,
       echipamente: procesVerbal.echipamente,
+      echipamentePredate: predate,
+      echipamentePrimite: primite,
       observatii: procesVerbal.observatii || "-",
       tip: procesVerbal.tip,
       data: new Date().toLocaleDateString("ro-RO"),
