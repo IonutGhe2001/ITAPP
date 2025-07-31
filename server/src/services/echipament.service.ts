@@ -1,4 +1,6 @@
 import { prisma } from "../lib/prisma";
+import { ProcesVerbalTip } from "@prisma/client";
+import { creeazaProcesVerbalCuEchipamente } from "./procesVerbal.service";
 
 
 export const getEchipamente = () => {
@@ -53,7 +55,7 @@ export const createEchipament = (data: {
   });
 };
 
-export const updateEchipament = (
+export const updateEchipament = async (
   id: string,
   data: {
     nume?: string;
@@ -64,12 +66,31 @@ export const updateEchipament = (
     metadata?: any;
   }
 ) => {
- return prisma.$transaction(async (tx) => {
+ let pvAngajatId: string | null = null;
+  let pvTip: ProcesVerbalTip | null = null;
+
+  const updated = await prisma.$transaction(async (tx) => {
     const current = await tx.echipament.findUnique({ where: { id } });
     if (!current) throw new Error("Echipament inexistent");
 
+    const newAngajatId =
+      data.angajatId !== undefined ? data.angajatId : current.angajatId;
+
     const newTip = data.tip ?? current.tip;
     const newSerie = data.serie ?? current.serie;
+
+    if (current.angajatId !== newAngajatId) {
+      if (!current.angajatId && newAngajatId) {
+        pvTip = ProcesVerbalTip.PREDARE_PRIMIRE;
+        pvAngajatId = newAngajatId;
+      } else if (current.angajatId && !newAngajatId) {
+        pvTip = ProcesVerbalTip.RESTITUIRE;
+        pvAngajatId = current.angajatId;
+      } else if (current.angajatId && newAngajatId && current.angajatId !== newAngajatId) {
+        pvTip = ProcesVerbalTip.SCHIMB;
+        pvAngajatId = newAngajatId;
+      }
+    }
 
     if (newTip !== current.tip || newSerie !== current.serie) {
       const duplicate = await tx.echipament.findFirst({
@@ -112,6 +133,17 @@ export const updateEchipament = (
       },
     });
   });
+  
+  let procesVerbal = null;
+  if (pvAngajatId && pvTip) {
+    procesVerbal = await creeazaProcesVerbalCuEchipamente(
+      pvAngajatId,
+      undefined,
+      pvTip
+    );
+  }
+
+  return { echipament: updated, procesVerbal };
 };
 
 export const deleteEchipament = (id: string) => {
