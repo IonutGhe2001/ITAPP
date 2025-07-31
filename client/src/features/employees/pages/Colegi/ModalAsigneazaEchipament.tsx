@@ -43,7 +43,11 @@ export default function ModalAsigneazaEchipament({
       }
 
     try {
-        const url = await genereazaProcesVerbal(angajatId, tip);
+        const url = await genereazaProcesVerbal(angajatId, tip,
+          tip === "SCHIMB" && oldEchipamentId
+            ? { predate: [oldEchipamentId], primite: [selectedId] }
+            : undefined
+        );
         window.open(url, "_blank");
         toast({ title: "Proces verbal generat" });
       } catch {

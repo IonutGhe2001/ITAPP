@@ -4,11 +4,17 @@ import api from '@/services/api';
 
 export async function genereazaProcesVerbal(
   angajatId: string,
-  tip: ProcesVerbalTip
+   tip: ProcesVerbalTip,
+  opts?: { predate?: string[]; primite?: string[] }
 ): Promise<string> {
   const res = await api.post(
     '/procese-verbale',
-    { angajatId, tip },
+    {
+      angajatId,
+      tip,
+      echipamentePredate: opts?.predate,
+      echipamentePrimite: opts?.primite,
+    },
     { responseType: 'blob' }
   );
   const file = new Blob([res.data], { type: 'application/pdf' });

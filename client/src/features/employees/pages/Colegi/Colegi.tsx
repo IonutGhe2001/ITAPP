@@ -117,7 +117,9 @@ export default function Colegi() {
       });
       toast({ title: "Echipament eliberat" });
       try {
-        const url = await genereazaProcesVerbal(colegId, "RESTITUIRE");
+        const url = await genereazaProcesVerbal(colegId, "RESTITUIRE", {
+          predate: [eqId],
+        });
         window.open(url, "_blank");
       } catch {
         /* ignore */
@@ -351,7 +353,10 @@ export default function Colegi() {
               data: { angajatId: replaceData.colegId, stare: "predat" },
             });
             try {
-              const url = await genereazaProcesVerbal(replaceData.colegId, "SCHIMB");
+              const url = await genereazaProcesVerbal(replaceData.colegId, "SCHIMB", {
+                predate: [oldId],
+                primite: [newId],
+              });
               window.open(url, "_blank");
             } catch {
               /* ignore */
