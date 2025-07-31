@@ -9,10 +9,16 @@ export default function ModalAsigneazaEchipament({
   angajatId,
   onClose,
   onSuccess,
+  filterTip,
+  oldEchipamentId,
+  onReplace,
 }: {
   angajatId: string;
   onClose: () => void;
   onSuccess?: () => void;
+  filterTip?: string;
+  oldEchipamentId?: string;
+  onReplace?: (oldId: string, newId: string) => Promise<void> | void;
 }) {
   const { data: echipamente = [] } = useEchipamente();
   const updateMutation = useUpdateEchipament();
@@ -23,10 +29,14 @@ export default function ModalAsigneazaEchipament({
     if (!selectedId) return;
 
      try {
-      await updateMutation.mutateAsync({
-        id: selectedId,
-        data: { angajatId, stare: "predat" },
-      });
+      if (onReplace && oldEchipamentId) {
+        await onReplace(oldEchipamentId, selectedId);
+      } else {
+        await updateMutation.mutateAsync({
+          id: selectedId,
+          data: { angajatId, stare: "predat" },
+        });
+      }
 
     onClose();
       onSuccess?.();
@@ -51,7 +61,11 @@ export default function ModalAsigneazaEchipament({
         >
           <option value="">Selectează echipament disponibil</option>
            {echipamente
-            .filter((e: Echipament) => e.stare === "disponibil")
+            .filter(
+              (e: Echipament) =>
+                e.stare === "disponibil" &&
+                (!filterTip || e.tip === filterTip)
+            )
             .map((e: Echipament) => (
             <option key={e.id} value={e.id}>
               {e.nume} – Serie: {e.serie}

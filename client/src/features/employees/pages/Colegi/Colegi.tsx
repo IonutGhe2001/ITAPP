@@ -4,6 +4,7 @@ import {
   useDeleteAngajat,
 } from "@/features/employees";
 import type { Angajat, Echipament } from "@/features/equipment/types";
+import { useUpdateEchipament } from "@/features/equipment";
 import { getEquipmentIcon } from "@/utils/equipmentIcons";
 import ModalAsigneazaEchipament from "./ModalAsigneazaEchipament";
 import ModalEditColeg from "./ModalEditColeg";
@@ -24,9 +25,13 @@ export default function Colegi() {
   const { data: colegi = [], refetch } = useAngajati();
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [selectedAngajatId, setSelectedAngajatId] = useState<string | null>(null);
+  const [replaceData, setReplaceData] = useState<
+    { colegId: string; equipmentId: string; type: string } | null
+  >(null);
   const [editColeg, setEditColeg] = useState<Angajat | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Angajat | null>(null);
   const deleteMutation = useDeleteAngajat();
+  const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
 
   const toggleExpand = (id: string) => {
@@ -49,6 +54,23 @@ export default function Colegi() {
       setExpanded(new Set());
     } catch {
       toast({ title: "Eroare", description: "Nu s-a putut șterge colegul", variant: "destructive" });
+    }
+  };
+
+  const handleRemoveEquipment = async (id: string) => {
+    try {
+      await updateMutation.mutateAsync({
+        id,
+        data: { angajatId: null, stare: "disponibil" },
+      });
+      toast({ title: "Echipament eliberat" });
+      refetch();
+    } catch {
+      toast({
+        title: "Eroare",
+        description: "Nu s-a putut actualiza echipamentul",
+        variant: "destructive",
+      });
     }
   };
 
@@ -130,9 +152,27 @@ export default function Colegi() {
                         <p className="font-medium text-foreground">{e.nume}</p>
                         <p className="text-xs text-muted-foreground">Serie: {e.serie}</p>
                       </div>
-                      <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full self-center capitalize">
-                        {e.tip}
-                      </span>
+                      <div className="flex flex-col items-end gap-1">
+                        <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full self-center capitalize">
+                          {e.tip}
+                        </span>
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => handleRemoveEquipment(e.id)}
+                            className="text-[10px] text-red-600 hover:underline"
+                          >
+                            Elimină
+                          </button>
+                          <button
+                            onClick={() =>
+                              setReplaceData({ colegId: coleg.id, equipmentId: e.id, type: e.tip })
+                            }
+                            className="text-[10px] text-primary hover:underline"
+                          >
+                            Schimbă
+                          </button>
+                        </div>
+                      </div>
                     </li>
                   ))
                 )}
@@ -152,6 +192,31 @@ export default function Colegi() {
               setSelectedAngajatId(null);
             }}
           />
+      )}
+
+      {replaceData && (
+        <ModalAsigneazaEchipament
+          angajatId={replaceData.colegId}
+          filterTip={replaceData.type}
+          oldEchipamentId={replaceData.equipmentId}
+          onReplace={async (oldId, newId) => {
+            await updateMutation.mutateAsync({
+              id: oldId,
+              data: { angajatId: null, stare: "disponibil" },
+            });
+            await updateMutation.mutateAsync({
+              id: newId,
+              data: { angajatId: replaceData.colegId, stare: "predat" },
+            });
+            toast({ title: "Echipament schimbat" });
+          }}
+          onClose={() => setReplaceData(null)}
+          onSuccess={() => {
+            refetch();
+            setExpanded(new Set());
+            setReplaceData(null);
+          }}
+        />
       )}
 
       {editColeg && (
