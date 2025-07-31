@@ -8,6 +8,12 @@ export interface AngajatInput {
   telefon?: string
 }
 
+export interface AngajatUpdateInput {
+  numeComplet?: string
+  functie?: string
+  email?: string
+  telefon?: string
+}
 
 export const getAngajati = () => api.get("/angajati");
 
@@ -30,7 +36,7 @@ export const useCreateAngajat = () => {
 export const useUpdateAngajat = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: AngajatInput }) =>
+    mutationFn: ({ id, data }: { id: string; data: AngajatUpdateInput }) =>
       api.put(`/angajati/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["angajati"] });
