@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense } from "react";
+import React, { Suspense, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +24,8 @@ export default function ModalAddEchipament({
   onClose: () => void
   defaultName?: string
 }) {
+  const initialData = useMemo(() => ({ nume: defaultName }), [defaultName]);
+
   const {
     formData,
     setFormData,
@@ -35,7 +37,7 @@ export default function ModalAddEchipament({
     setShowColegModal,
     validate,
     buildPayload,
-   } = useEchipamentForm({ nume: defaultName });
+   } = useEchipamentForm(initialData);
 
   const { data: angajati = [] } = useAngajati();
   const { data: echipamente = [] } = useEchipamente();
