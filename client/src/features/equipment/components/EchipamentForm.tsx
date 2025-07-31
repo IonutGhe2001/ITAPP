@@ -122,13 +122,7 @@ export default function EchipamentForm({
             )}
           </SelectContent>
         </Select>
-        <button
-          type="button"
-          onClick={onAddColeg}
-          className="text-xs text-primary mt-1 hover:underline"
-        >
-          Adaugă coleg nou
-        </button>
+        
         {errors.angajatId && (
           <p className="text-sm text-red-500 mt-1">{errors.angajatId}</p>
         )}
