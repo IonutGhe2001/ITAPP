@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import { ValidationError as JoiValidationError } from "joi";
-import { Prisma } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { logger } from "@lib/logger";
 

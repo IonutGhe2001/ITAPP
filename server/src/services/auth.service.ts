@@ -1,4 +1,3 @@
-import { PrismaClient, Prisma } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
 import { prisma } from "../lib/prisma";

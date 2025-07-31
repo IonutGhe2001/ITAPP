@@ -21,7 +21,7 @@ export const createEchipament = (data: {
     ? "predat"
     : "disponibil";
 
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: any) => {
     const existing = await tx.echipament.findFirst({
       where: { tip: data.tip, serie: data.serie },
     });
@@ -69,7 +69,7 @@ export const updateEchipament = async (
  let pvAngajatId: string | null = null;
   let pvTip: ProcesVerbalTip | null = null;
 
-  const updated = await prisma.$transaction(async (tx) => {
+  const updated = await prisma.$transaction(async (tx: any) => {
     const current = await tx.echipament.findUnique({ where: { id } });
     if (!current) throw new Error("Echipament inexistent");
 
