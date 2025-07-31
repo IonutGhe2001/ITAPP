@@ -2,8 +2,14 @@ import { Request, Response, NextFunction } from "express";
 import { ValidationError as JoiValidationError } from "joi";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { logger } from "@lib/logger";
+import type { CustomError } from "../types/error";
 
-export function errorHandler(err: any, req: Request, res: Response, next: NextFunction) {
+export function errorHandler(
+  err: CustomError,
+  _req: Request,
+  res: Response,
+  _next: NextFunction
+) {
   logger.error(err);
 
   // Joi validation

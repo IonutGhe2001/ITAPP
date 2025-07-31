@@ -13,7 +13,7 @@ export const uploadImportFile = async (req: Request, res: Response) => {
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
-const rows: ImportRow[] = rawRows.map((row: any) => ({
+const rows: ImportRow[] = rawRows.map((row: Record<string, unknown>) => ({
   "Nume Echipament": String(row["Nume Echipament"] ?? ""),
   Tip: String(row["Tip"] ?? ""),
   Serie: String(row["Serie"] ?? ""),

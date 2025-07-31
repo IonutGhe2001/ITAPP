@@ -23,7 +23,7 @@ export const creareProcesVerbal = async (req: Request, res: Response) => {
 
     const { procesVerbal, echipamentePredate: predate, echipamentePrimite: primite } = result;
 
-    const currentUser = await getUserById(Number((req as any).user.id));
+    const currentUser = await getUserById(Number(req.user!.id));
 
     const pdfBuffer = await genereazaPDFProcesVerbal({
       angajat: procesVerbal.angajat,

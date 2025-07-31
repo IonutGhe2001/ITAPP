@@ -25,8 +25,11 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as AuthPayload;
-    (req as any).user = decoded;
+   const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET as string
+    ) as AuthPayload;
+    req.user = decoded;
     next();
   } catch (err) {
     return res.status(401).json({ message: "Token invalid" });
@@ -35,7 +38,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
 
 export const authorizeRoles = (...roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const user = (req as any).user;
+    const user = req.user;
 
     if (!user || !roles.includes(user.role)) {
       return res.status(403).json({ message: "Acces interzis: rol insuficient" });

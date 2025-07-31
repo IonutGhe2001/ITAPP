@@ -1,5 +1,11 @@
 import { Request, Response } from "express";
-import { updateUser, authenticateUser, registerUser, getUserById } from "../services/auth.service";
+import {
+  updateUser,
+  authenticateUser,
+  registerUser,
+  getUserById,
+  UserUpdateData,
+} from "../services/auth.service";
 import { logger } from "@lib/logger";
 
 export const login = async (req: Request, res: Response) => {
@@ -24,7 +30,7 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const getMe = async (req: Request, res: Response) => {
-  const userId = (req as any).user.id;
+  const userId = req.user!.id;
   try {
     const user = await getUserById(Number(userId));
     if (!user) return res.status(404).json({ message: "Utilizatorul nu a fost găsit" });
@@ -35,10 +41,9 @@ export const getMe = async (req: Request, res: Response) => {
 };
 
 export const updateMe = async (req: Request, res: Response) => {
-  const userId = (req as any).user.id;
+  const userId = req.user!.id;
   const { nume, prenume, functie, telefon, profilePicture, digitalSignature } = req.body;
-
-  const updateData: any = { nume, prenume, functie, telefon, profilePicture, digitalSignature };
+const updateData: UserUpdateData = { nume, prenume, functie, telefon, profilePicture, digitalSignature };
   Object.keys(updateData).forEach((key) => {
     if (updateData[key] === undefined || updateData[key] === "") {
       delete updateData[key];
@@ -48,8 +53,9 @@ export const updateMe = async (req: Request, res: Response) => {
   try {
     const updatedUser = await updateUser(userId, updateData);
     return res.json(updatedUser);
-  } catch (err: any) {
-    return res.status(400).json({ message: err.message || "Eroare la actualizarea profilului" });
+  } catch (err) {
+    const error = err as Error;
+    return res.status(400).json({ message: error.message || "Eroare la actualizarea profilului" });
   }
 };
 
@@ -57,9 +63,10 @@ export const register = async (req: Request, res: Response) => {
   try {
     const user = await registerUser(req.body);
     return res.status(201).json({ message: "Cont creat cu succes", userId: user.id });
-  } catch (err: any) {
-    logger.error("Eroare la înregistrare:", err);
-    return res.status(400).json({ error: err.message || "Eroare la creare cont" });
+  } catch (err) {
+    const error = err as Error;
+    logger.error("Eroare la înregistrare:", error);
+    return res.status(400).json({ error: error.message || "Eroare la creare cont" });
   }
 };
 

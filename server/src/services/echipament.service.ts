@@ -2,6 +2,77 @@ import { prisma } from "../lib/prisma";
 import { ProcesVerbalTip } from "@prisma/client";
 import { creeazaProcesVerbalCuEchipamente } from "./procesVerbal.service";
 
+const validateEchipamentUpdate = async (
+  tx: any,
+  id: string,
+  current: any,
+  data: { tip?: string; serie?: string; angajatId?: string | null }
+) => {
+  const newAngajatId =
+    data.angajatId !== undefined ? data.angajatId : current.angajatId;
+  const newTip = data.tip ?? current.tip;
+  const newSerie = data.serie ?? current.serie;
+
+  if (newTip !== current.tip || newSerie !== current.serie) {
+    const duplicate = await tx.echipament.findFirst({
+      where: { tip: newTip, serie: newSerie, NOT: { id } },
+    });
+    if (duplicate) {
+      const error: any = new Error(
+        "Există deja un echipament cu această serie pentru acest tip."
+      );
+      error.status = 409;
+      throw error;
+    }
+  }
+
+  if (data.angajatId) {
+    const eqSameType = await tx.echipament.findFirst({
+      where: { angajatId: data.angajatId, tip: newTip, NOT: { id } },
+    });
+    if (eqSameType) {
+      const error: any = new Error(
+        "Angajatul are deja un echipament de acest tip."
+      );
+      error.status = 409;
+      throw error;
+    }
+  }
+
+  return { newAngajatId };
+};
+
+const handleProcesVerbal = async (
+  currentAngajatId: string | null,
+  newAngajatId: string | null
+) => {
+  let pvTip: ProcesVerbalTip | null = null;
+  let pvAngajatId: string | null = null;
+
+  if (currentAngajatId !== newAngajatId) {
+    if (!currentAngajatId && newAngajatId) {
+      pvTip = ProcesVerbalTip.PREDARE_PRIMIRE;
+      pvAngajatId = newAngajatId;
+    } else if (currentAngajatId && !newAngajatId) {
+      pvTip = ProcesVerbalTip.RESTITUIRE;
+      pvAngajatId = currentAngajatId;
+    } else if (currentAngajatId && newAngajatId && currentAngajatId !== newAngajatId) {
+      pvTip = ProcesVerbalTip.SCHIMB;
+      pvAngajatId = newAngajatId;
+    }
+  }
+
+  if (pvAngajatId && pvTip) {
+    const result = await creeazaProcesVerbalCuEchipamente(
+      pvAngajatId,
+      undefined,
+      pvTip
+    );
+    return result ? result.procesVerbal : null;
+  }
+
+  return null;
+};
 
 export const getEchipamente = () => {
   return prisma.echipament.findMany({ include: { angajat: true } });
@@ -66,57 +137,22 @@ export const updateEchipament = async (
     metadata?: any;
   }
 ) => {
- let pvAngajatId: string | null = null;
-  let pvTip: ProcesVerbalTip | null = null;
+
+  let currentAngajatId: string | null = null;
+  let newAngajatId: string | null = null;
 
   const updated = await prisma.$transaction(async (tx: any) => {
     const current = await tx.echipament.findUnique({ where: { id } });
     if (!current) throw new Error("Echipament inexistent");
 
-    const newAngajatId =
-      data.angajatId !== undefined ? data.angajatId : current.angajatId;
-
-    const newTip = data.tip ?? current.tip;
-    const newSerie = data.serie ?? current.serie;
-
-    if (current.angajatId !== newAngajatId) {
-      if (!current.angajatId && newAngajatId) {
-        pvTip = ProcesVerbalTip.PREDARE_PRIMIRE;
-        pvAngajatId = newAngajatId;
-      } else if (current.angajatId && !newAngajatId) {
-        pvTip = ProcesVerbalTip.RESTITUIRE;
-        pvAngajatId = current.angajatId;
-      } else if (current.angajatId && newAngajatId && current.angajatId !== newAngajatId) {
-        pvTip = ProcesVerbalTip.SCHIMB;
-        pvAngajatId = newAngajatId;
-      }
-    }
-
-    if (newTip !== current.tip || newSerie !== current.serie) {
-      const duplicate = await tx.echipament.findFirst({
-        where: { tip: newTip, serie: newSerie, NOT: { id } },
-      });
-      if (duplicate) {
-        const error: any = new Error(
-          "Există deja un echipament cu această serie pentru acest tip."
-        );
-        error.status = 409;
-        throw error;
-      }
-    }
-
-    if (data.angajatId) {
-      const eqSameType = await tx.echipament.findFirst({
-        where: { angajatId: data.angajatId, tip: newTip, NOT: { id } },
-      });
-      if (eqSameType) {
-        const error: any = new Error(
-          "Angajatul are deja un echipament de acest tip."
-        );
-        error.status = 409;
-        throw error;
-      }
-    }
+    currentAngajatId = current.angajatId;
+    const { newAngajatId: computedAngajatId } = await validateEchipamentUpdate(
+      tx,
+      id,
+      current,
+      data
+    );
+    newAngajatId = computedAngajatId;
 
     return tx.echipament.update({
       where: { id },
@@ -134,15 +170,7 @@ export const updateEchipament = async (
     });
   });
   
-  let procesVerbal = null;
-  if (pvAngajatId && pvTip) {
-    const result = await creeazaProcesVerbalCuEchipamente(
-      pvAngajatId,
-      undefined,
-      pvTip
-    );
-    procesVerbal = result ? result.procesVerbal : null;
-  }
+  const procesVerbal = await handleProcesVerbal(currentAngajatId, newAngajatId);
 
   return { echipament: updated, procesVerbal };
 };

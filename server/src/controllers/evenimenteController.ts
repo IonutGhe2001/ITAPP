@@ -3,7 +3,7 @@ import * as evenimentService from "../services/eveniment.service";
 
 export const getEvenimente = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = Number((req.user as any).id);
+    const userId = Number(req.user!.id);
     const evenimente = await evenimentService.getEvenimenteByUser(userId);
     res.json(evenimente);
   } catch (err) {
@@ -13,7 +13,7 @@ export const getEvenimente = async (req: Request, res: Response, next: NextFunct
 
 export const createEveniment = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = Number((req.user as any).id);
+    const userId = Number(req.user!.id);
     const { titlu, data, ora, recurrence } = req.body;
     const eveniment = await evenimentService.createEveniment({
       titlu,
@@ -29,7 +29,7 @@ export const createEveniment = async (req: Request, res: Response, next: NextFun
 };
 
 export const updateEveniment = async (req: Request, res: Response) => {
-  const userId = Number((req.user as any).id);
+  const userId = Number(req.user!.id);
   const { id } = req.params;
   const { data, ...rest } = req.body;
   const payload = {
@@ -42,7 +42,7 @@ export const updateEveniment = async (req: Request, res: Response) => {
 };
 
 export const deleteEveniment = async (req: Request, res: Response) => {
-  const userId = Number((req.user as any).id);
+  const userId = Number(req.user!.id);
   const { id } = req.params;
   const success = await evenimentService.deleteEveniment(Number(id), userId);
   if (!success) return res.status(404).json({ message: "Evenimentul nu a fost găsit." });

@@ -83,9 +83,7 @@
 </head>
 <body>
   <div class="page">
-    <div class="header">
-      <img src="{{headerImg}}" alt="Header" />
-    </div>
+    {{> header}}
 
     <div class="main">
       <h2>
@@ -106,42 +104,12 @@
 
       {{#if echipamentePredate.length}}
         <div class="content">Echipamente returnate:</div>
-        <table>
-          <thead>
-            <tr>
-              <th>Denumire echipament</th>
-              <th>SN</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#each echipamentePredate}}
-              <tr>
-                <td>{{tip}} {{nume}}</td>
-                <td>{{serie}}</td>
-              </tr>
-            {{/each}}
-          </tbody>
-        </table>
+        {{> equipmentTable items=echipamentePredate}}
       {{/if}}
 
       {{#if echipamentePrimite.length}}
         <div class="content">Echipamente primite:</div>
-        <table>
-          <thead>
-            <tr>
-              <th>Denumire echipament</th>
-              <th>SN</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#each echipamentePrimite}}
-              <tr>
-                <td>{{tip}} {{nume}}</td>
-                <td>{{serie}}</td>
-              </tr>
-            {{/each}}
-          </tbody>
-        </table>
+        {{> equipmentTable items=echipamentePrimite}}
       {{/if}}
 
       {{#unless echipamentePredate.length}}
@@ -156,22 +124,7 @@
           {{/if}}
         </div>
 
-      <table>
-          <thead>
-            <tr>
-             <th>Denumire echipament</th>
-              <th>SN</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#each echipamente}}
-              <tr>
-                <td>{{tip}} {{nume}}</td>
-                <td>{{serie}}</td>
-              </tr>
-            {{/each}}
-          </tbody>
-        </table>
+      {{> equipmentTable items=echipamente}}
       {{/unless}}
       {{/unless}}
 
@@ -212,9 +165,7 @@
       </div>
     </div>
 
-    <div class="footer">
-      <img src="{{footerImg}}" alt="Footer" />
-    </div>
+    {{> footer}}
   </div>
 </body>
 </html>

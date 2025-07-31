@@ -2,8 +2,6 @@ import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
 import { prisma } from "../lib/prisma";
 
-
-
 export const authenticateUser = async (email: string, password: string): Promise<string | null> => {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return null;
@@ -66,16 +64,18 @@ export const registerUser = async (input: {
   return newUser;
 };
 
+export interface UserUpdateData {
+  nume?: string;
+  prenume?: string;
+  functie?: string;
+  telefon?: string;
+  profilePicture?: string | null;
+  digitalSignature?: string | null;
+}
+
 export const updateUser = (
   id: string,
-  data: Partial<{
-    nume: string;
-    prenume: string;
-    functie: string;
-    telefon: string;
-    profilePicture: string | null;
-    digitalSignature: string | null;
-  }>
+  data: Partial<UserUpdateData>
 ) => {
   return prisma.user.update({
     where: { id: Number(id) },

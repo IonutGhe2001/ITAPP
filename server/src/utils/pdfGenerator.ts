@@ -5,8 +5,18 @@ import path from "path";
 import { Buffer } from "buffer";
 
 const templatePath = path.join(__dirname, "../../templates/procesVerbal.hbs");
+const partialsDir = path.join(__dirname, "../../templates/partials");
 const headerImagePath = path.join(__dirname, "../../public/assets/header.png");
 const footerImagePath = path.join(__dirname, "../../public/assets/footer.png");
+
+const registerPartials = () => {
+  const partials = ["header.hbs", "footer.hbs", "equipmentTable.hbs"];
+  partials.forEach((p) => {
+    const name = path.basename(p, ".hbs");
+    const content = fs.readFileSync(path.join(partialsDir, p), "utf-8");
+    handlebars.registerPartial(name, content);
+  });
+};
 
 const imgToBase64 = (imgPath: string): string => {
   const image = fs.readFileSync(imgPath);
@@ -16,6 +26,7 @@ const imgToBase64 = (imgPath: string): string => {
 export const genereazaPDFProcesVerbal = async (data: any): Promise<Buffer> => {
   const templateHtml = fs.readFileSync(templatePath, "utf-8");
   handlebars.registerHelper("eq", (a, b) => a === b);
+  registerPartials();
   const compiledTemplate = handlebars.compile(templateHtml);
 
   let signatureBase64: string | undefined;
