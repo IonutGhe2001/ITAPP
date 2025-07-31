@@ -11,6 +11,13 @@ import Container from "@/components/Container";
 import Avatar from "@/components/Avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreVertical } from "lucide-react";
 import { useToast } from "@/hooks/use-toast/use-toast-hook";
 
 export default function Colegi() {
@@ -75,29 +82,35 @@ export default function Colegi() {
                 {expanded.has(coleg.id) ? "Ascunde echipamente" : "Vezi echipamente"}
               </button>
 
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => setSelectedAngajatId(coleg.id)}
                   className="text-sm text-primary hover:underline"
                 >
                   Asignează echipament
                 </button>
-                <button
-                  onClick={() => setEditColeg(coleg)}
-                  className="text-sm text-primary hover:underline"
-                >
-                  Editează
-                </button>
-                <button
-                  onClick={() =>
-                    coleg.echipamente.length > 0
-                      ? setConfirmDelete(coleg)
-                      : handleDelete(coleg.id)
-                  }
-                  className="text-sm text-red-600 hover:underline"
-                >
-                  Șterge
-                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <MoreVertical className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => setEditColeg(coleg)}>
+                      Editează
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        coleg.echipamente.length > 0
+                          ? setConfirmDelete(coleg)
+                          : handleDelete(coleg.id)
+                      }
+                      className="text-red-600 focus:text-red-600"
+                    >
+                      Șterge
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
             {expanded.has(coleg.id) && (
