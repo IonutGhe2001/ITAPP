@@ -12,7 +12,13 @@ import Container from "@/components/Container";
 import Avatar from "@/components/Avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { Pencil, Trash2, MoreHorizontal } from "lucide-react";
 import { useToast } from "@/hooks/use-toast/use-toast-hook";
 
 export default function Colegi() {
@@ -78,26 +84,30 @@ export default function Colegi() {
             key={coleg.id}
             className="relative bg-card rounded-xl shadow-md p-4 flex flex-col gap-4"
           >
-            <div className="absolute top-2 left-2 flex gap-2">
-              <button
-                onClick={() => setEditColeg(coleg)}
-                className="p-1 rounded hover:bg-muted"
-                title="Editează"
-              >
-                <Pencil className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() =>
-                  coleg.echipamente.length > 0
-                    ? setConfirmDelete(coleg)
-                    : handleDelete(coleg.id)
-                }
-                className="p-1 rounded hover:bg-muted"
-                title="Șterge"
-              >
-                <Trash2 className="w-4 h-4 text-destructive" />
-              </button>
-            </div>
+           <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="absolute top-2 right-2 p-1 rounded hover:bg-muted">
+                  <MoreHorizontal className="w-4 h-4" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setEditColeg(coleg)}>
+                  <Pencil className="w-4 h-4" />
+                  <span>Editează</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    coleg.echipamente.length > 0
+                      ? setConfirmDelete(coleg)
+                      : handleDelete(coleg.id)
+                  }
+                  className="text-destructive"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>Șterge</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <div className="flex items-center gap-4">
              <Avatar
                 name={coleg.numeComplet}
