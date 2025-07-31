@@ -36,10 +36,19 @@ export const createAngajat = (data: {
   return prisma.angajat.create({ data });
 };
 
-export const updateAngajat = (id: string, data: { email?: string; telefon?: string }) => {
+export const updateAngajat = (
+  id: string,
+  data: { numeComplet?: string; functie?: string; email?: string; telefon?: string }
+) => {
   return prisma.angajat.update({ where: { id }, data });
 };
 
 export const deleteAngajat = (id: string) => {
-  return prisma.angajat.delete({ where: { id } });
+  return prisma.$transaction([
+    prisma.echipament.updateMany({
+      where: { angajatId: id },
+      data: { angajatId: null, stare: "disponibil" },
+    }),
+    prisma.angajat.delete({ where: { id } }),
+  ]);
 };
