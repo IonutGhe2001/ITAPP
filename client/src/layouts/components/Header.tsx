@@ -1,33 +1,22 @@
-import { FaBell } from "react-icons/fa";
-import { Search, Menu, UserIcon, MonitorIcon, PhoneIcon, TrashIcon } from "lucide-react";
-import { useState, type FormEvent, useMemo } from "react";
+import { Search, Menu } from "lucide-react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useSearch } from "@/context/use-search";
 import { Button } from "@components/ui/button";
 import ThemeToggle from "@components/ThemeToggle";
 import Avatar from "@/components/Avatar";
-import { useSearchSuggestions } from "@/services/searchService";
-import { cn } from "@/lib/utils";
+import { useUser } from "@/store/use-user";
+import { removeToken } from "@/utils/storage";
+import pageTitles from "@/constants/pageTitles";
+import MobileSidebar from "@layouts/components/MobileSideBar";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import SearchInput from "@/components/SearchInput";
+import NotificationsMenu from "@layouts/components/NotificationsMenu";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
-import { useUser } from "@/store/use-user";
-import { removeToken } from "@/utils/storage"; 
-import pageTitles from "@/constants/pageTitles";
-import MobileSidebar from "@layouts/components/MobileSideBar";
-import { useNotifications } from "@/context/use-notifications";
-import { formatDistanceToNow } from "date-fns";
-import { ro } from "date-fns/locale";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-
-const updateIcons = {
-  Echipament: <MonitorIcon className="w-4 h-4" />,
-  Coleg: <UserIcon className="w-4 h-4" />,
-  SIM: <PhoneIcon className="w-4 h-4" />,
-};
 
 export default function Header() {
   const location = useLocation();
@@ -35,26 +24,8 @@ export default function Header() {
   const title = pageTitles[location.pathname] || "Pagina";
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-  const { query, setQuery } = useSearch();
 
   const { user, loading } = useUser();
-const { data: suggestionData } = useSearchSuggestions(query);
-const { notifications, unreadCount, markAllRead, removeNotification, clearRead } = useNotifications();
-  const [activeIndex, setActiveIndex] = useState(-1);
-  const suggestions = useMemo(
-    () => [
-      ...(suggestionData?.echipamente.map((e) => e.nume) || []),
-      ...(suggestionData?.angajati.map((a) => a.numeComplet) || []),
-    ],
-    [suggestionData]
-  );
-
-  const handleSearchSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (query.trim()) {
-      navigate(`/search?q=${encodeURIComponent(query)}`);
-    }
-  };
 
   const handleLogout = () => {
     removeToken();
@@ -91,99 +62,10 @@ const { notifications, unreadCount, markAllRead, removeNotification, clearRead }
           <Search className="w-5 h-5" />
           <span className="sr-only">Deschide căutarea</span>
         </button>
-        <form onSubmit={handleSearchSubmit} className="relative hidden md:block">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-          <input
-            type="text"
-            placeholder="Caută..."
-            className="pl-9 pr-4 py-2 text-sm bg-muted text-foreground rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary"
-             value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setActiveIndex(-1);
-            }}
-            onKeyDown={(e) => {
-              if (!suggestions.length) return;
-              if (e.key === "ArrowDown") {
-                e.preventDefault();
-                setActiveIndex((i) => Math.min(i + 1, suggestions.length - 1));
-              } else if (e.key === "ArrowUp") {
-                e.preventDefault();
-                setActiveIndex((i) => Math.max(i - 1, 0));
-              } else if (e.key === "Enter") {
-                if (activeIndex >= 0 && suggestions[activeIndex]) {
-                  e.preventDefault();
-                  const val = suggestions[activeIndex];
-                  setQuery(val);
-                  navigate(`/search?q=${encodeURIComponent(val)}`);
-                }
-              }
-            }}
-          />
-          {suggestions.length > 0 && (
-            <ul className="absolute left-0 right-0 mt-1 bg-background border border-border rounded-md shadow z-50">
-              {suggestions.map((s, idx) => (
-                <li
-                  key={idx}
-                  className={cn(
-                    "px-3 py-1 text-sm cursor-pointer",
-                    idx === activeIndex && "bg-muted"
-                  )}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    setQuery(s);
-                    navigate(`/search?q=${encodeURIComponent(s)}`);
-                  }}
-                  onMouseEnter={() => setActiveIndex(idx)}
-                >
-                  {s}
-                </li>
-              ))}
-            </ul>
-          )}
-        </form>
 
-        <DropdownMenu
-          onOpenChange={(open) => {
-            if (open) {
-              markAllRead();
-            } else {
-              clearRead();
-            }
-          }}
-        >
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative hover:bg-muted">
-              <FaBell className="text-muted-foreground" />
-              {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full"></span>
-              )}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80 max-h-96 overflow-y-auto">
-            {notifications.length === 0 ? (
-              <DropdownMenuItem disabled>Nu există notificări</DropdownMenuItem>
-            ) : (
-              notifications.map((n) => (
-                <DropdownMenuItem key={n.id} className="flex gap-3 items-start">
-                  <div className="mt-1">{updateIcons[n.type]}</div>
-                  <div className="flex flex-col flex-1">
-                    <span className="text-sm">{n.message}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {formatDistanceToNow(new Date(n.timestamp), {
-                        addSuffix: true,
-                        locale: ro,
-                      })}
-                    </span>
-                  </div>
-                  <button onClick={() => removeNotification(n.id)} className="ml-auto">
-                    <TrashIcon className="w-4 h-4 text-primary hover:text-primary-dark" />
-                  </button>
-                </DropdownMenuItem>
-              ))
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <SearchInput className="hidden md:block" />
+
+        <NotificationsMenu />
 
 <ThemeToggle />
 
@@ -227,58 +109,7 @@ const { notifications, unreadCount, markAllRead, removeNotification, clearRead }
     <MobileSidebar open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} />
     <Dialog open={mobileSearchOpen} onOpenChange={setMobileSearchOpen}>
       <DialogContent className="p-4">
-        <form onSubmit={handleSearchSubmit} className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-          <input
-            type="text"
-            placeholder="Caută..."
-            className="pl-9 pr-4 py-2 text-sm bg-muted text-foreground rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary w-full"
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setActiveIndex(-1);
-            }}
-            onKeyDown={(e) => {
-              if (!suggestions.length) return;
-              if (e.key === "ArrowDown") {
-                e.preventDefault();
-                setActiveIndex((i) => Math.min(i + 1, suggestions.length - 1));
-              } else if (e.key === "ArrowUp") {
-                e.preventDefault();
-                setActiveIndex((i) => Math.max(i - 1, 0));
-              } else if (e.key === "Enter") {
-                if (activeIndex >= 0 && suggestions[activeIndex]) {
-                  e.preventDefault();
-                  const val = suggestions[activeIndex];
-                  setQuery(val);
-                  navigate(`/search?q=${encodeURIComponent(val)}`);
-                }
-              }
-            }}
-          />
-          {suggestions.length > 0 && (
-            <ul className="absolute left-0 right-0 mt-1 bg-background border border-border rounded-md shadow z-50 max-h-60 overflow-y-auto">
-              {suggestions.map((s, idx) => (
-                <li
-                  key={idx}
-                  className={cn(
-                    "px-3 py-1 text-sm cursor-pointer",
-                    idx === activeIndex && "bg-muted"
-                  )}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    setQuery(s);
-                    navigate(`/search?q=${encodeURIComponent(s)}`);
-                    setMobileSearchOpen(false);
-                  }}
-                  onMouseEnter={() => setActiveIndex(idx)}
-                >
-                  {s}
-                </li>
-              ))}
-            </ul>
-          )}
-        </form>
+        <SearchInput onSelect={() => setMobileSearchOpen(false)} />
       </DialogContent>
     </Dialog>
     </>
