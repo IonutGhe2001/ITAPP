@@ -15,6 +15,7 @@ const imgToBase64 = (imgPath: string): string => {
 
 export const genereazaPDFProcesVerbal = async (data: any): Promise<Buffer> => {
   const templateHtml = fs.readFileSync(templatePath, "utf-8");
+  handlebars.registerHelper("eq", (a, b) => a === b);
   const compiledTemplate = handlebars.compile(templateHtml);
 
   let signatureBase64: string | undefined;

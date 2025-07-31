@@ -63,4 +63,11 @@ model ProcesVerbal {
   echipamente  Echipament[]  @relation("EchipamenteProcesVerbal")
   dataGenerare DateTime      @default(now())
   observatii   String?
+  tip          ProcesVerbalTip @default(PREDARE_PRIMIRE)
+}
+
+enum ProcesVerbalTip {
+  PREDARE_PRIMIRE
+  RESTITUIRE
+  SCHIMB
 }

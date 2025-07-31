@@ -88,7 +88,15 @@
     </div>
 
     <div class="main">
-      <h2>PROCES VERBAL DE PREDARE – PRIMIRE ECHIPAMENTE</h2>
+      <h2>
+        {{#if (eq tip "RESTITUIRE")}}
+          PROCES VERBAL DE RESTITUIRE ECHIPAMENTE
+        {{else if (eq tip "SCHIMB")}}
+          PROCES VERBAL DE SCHIMB ECHIPAMENTE
+        {{else}}
+          PROCES VERBAL DE PREDARE – PRIMIRE ECHIPAMENTE
+        {{/if}}
+      </h2>
 
       <div class="content">
         Realizat astăzi în data de {{data}} în două exemplare, între
@@ -97,7 +105,11 @@
       </div>
 
       <div class="content">
-        Primul a predat iar ultimul a primit următoarele echipamente de lucru:
+         {{#if (eq tip "RESTITUIRE")}}
+          Primul a primit iar ultimul a predat următoarele echipamente de lucru:
+        {{else}}
+          Primul a predat iar ultimul a primit următoarele echipamente de lucru:
+        {{/if}}
       </div>
 
       <table>
@@ -118,14 +130,15 @@
       </table>
 
       <div class="signatures">
-        <div>Am predat,<br /><br />
+        <div>
+          {{#if (eq tip "RESTITUIRE")}}Am primit,{{else}}Am predat,{{/if}}<br /><br />
           {{#if digitalSignature}}
             <img src="{{digitalSignature}}" style="max-height:80px;" />
           {{else}}
             ______________
           {{/if}}
         </div>
-        <div>Am primit,<br /><br />______________</div>
+        <div>{{#if (eq tip "RESTITUIRE")}}Am predat,{{else}}Am primit,{{/if}}<br /><br />______________</div>
       </div>
     </div>
 
