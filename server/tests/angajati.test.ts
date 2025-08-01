@@ -109,7 +109,7 @@ describe('Angajati Routes', () => {
     });
     expect(emitUpdate).toHaveBeenCalledWith({
       type: 'Coleg',
-      message: 'Cont e-mail creat',
+      message: 'Cont e-mail marcat ca creat',
       importance: 'normal',
     });
   });

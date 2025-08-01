@@ -81,7 +81,7 @@ export const createEmailAccount = async (
     res.json(updated);
     emitUpdate({
       type: "Coleg",
-      message: "Cont e-mail creat",
+      message: "Cont e-mail marcat ca creat",
       importance: 'normal',
     });
   } catch (err) {
