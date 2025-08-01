@@ -14,8 +14,12 @@ interface ModalCreateEmailProps {
 }
 
 export default function ModalCreateEmail({ coleg, onClose, onSuccess }: ModalCreateEmailProps) {
-  const [formData, setFormData] = useState({ email: coleg.email || "", responsible: "", link: "" });
-  const [errors, setErrors] = useState<{ email?: string; responsible?: string }>({});
+  const [formData, setFormData] = useState({
+    email: coleg.email || "",
+    responsible: "",
+    link: "",
+  });
+  const [errors, setErrors] = useState<{ responsible?: string }>({});
   const mutation = useCreateEmailAccount();
   const { toast } = useToast();
 
@@ -26,9 +30,6 @@ export default function ModalCreateEmail({ coleg, onClose, onSuccess }: ModalCre
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs: typeof errors = {};
-    if (!formData.email || !formData.email.includes("@")) {
-      errs.email = "Emailul nu este valid.";
-    }
     if (!formData.responsible) {
       errs.responsible = "Responsabilul este necesar.";
     }
@@ -36,10 +37,14 @@ export default function ModalCreateEmail({ coleg, onClose, onSuccess }: ModalCre
     if (Object.keys(errs).length) return;
     try {
       await mutation.mutateAsync({ id: coleg.id, ...formData });
-      toast({ title: "Cont e-mail creat" });
+      toast({ title: "Cont e-mail marcat ca creat" });
       onSuccess();
     } catch {
-      toast({ title: "Eroare", description: "Nu s-a putut crea contul", variant: "destructive" });
+      toast({
+        title: "Eroare",
+        description: "Nu s-a putut marca contul ca creat",
+        variant: "destructive",
+      });
     }
   };
 
@@ -47,13 +52,12 @@ export default function ModalCreateEmail({ coleg, onClose, onSuccess }: ModalCre
     <Dialog open onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Creează cont e-mail</DialogTitle>
+          <DialogTitle>Marchează cont e-mail creat</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label>Adresă e-mail</Label>
-            <Input name="email" value={formData.email} onChange={handleChange} />
-            {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
+            <Input name="email" value={formData.email} readOnly />
           </div>
           <div className="space-y-2">
             <Label>Responsabil</Label>
@@ -68,7 +72,7 @@ export default function ModalCreateEmail({ coleg, onClose, onSuccess }: ModalCre
             <Button type="button" variant="outline" onClick={onClose}>
               Anulează
             </Button>
-            <Button type="submit">Creează</Button>
+            <Button type="submit">Marchează</Button>
           </div>
         </form>
       </DialogContent>

@@ -204,12 +204,12 @@ export default function ColegRow({
                 Generează PV
               </button>
             )}
-            {coleg.emailAccountStatus !== "CREATED" && (
+            {coleg.emailAccountStatus === "PENDING" && (
               <button
                 onClick={() => setCreateEmail(coleg)}
                 className="text-sm text-primary hover:underline"
               >
-                Creează cont e-mail
+                 Marchează cont e-mail creat
               </button>
             )}
             <button
