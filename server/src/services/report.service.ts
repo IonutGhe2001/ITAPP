@@ -1,11 +1,75 @@
-import express from "express";
-import * as controller from "../controllers/reportController";
-import { authenticate, authorizeRoles } from "../middlewares/authMiddleware";
+import { prisma } from "@lib/prisma";
 
-const router = express.Router();
+interface ReportQuery {
+  department?: string;
+  startDate?: string;
+  endDate?: string;
+  status?: string;
+}
 
-router.use(authenticate);
-router.get("/equipment", authorizeRoles("admin"), controller.equipmentReport);
-router.get("/onboarding", authorizeRoles("admin"), controller.onboardingReport);
+export const getEquipmentReport = async ({
+  department,
+  startDate,
+  endDate,
+  status,
+}: ReportQuery) => {
+  const where: any = {};
+  if (status) {
+    // equipment status is stored in the `stare` field
+    where.stare = status;
+  }
+  if (startDate || endDate) {
+    where.createdAt = {};
+    if (startDate) {
+      where.createdAt.gte = new Date(startDate);
+    }
+    if (endDate) {
+      where.createdAt.lte = new Date(endDate);
+    }
+  }
+  // department filtering is not directly supported for equipment; ignore for now
 
-export default router;
+const grouped = await prisma.echipament.groupBy({
+    by: ["stare"],
+    _count: { _all: true },
+    where,
+  });
+
+  return grouped.map((g: { stare: string; _count: { _all: number } }) => ({ type: g.stare, count: g._count._all }));
+};
+
+export const getOnboardingReport = async ({
+  department,
+  startDate,
+  endDate,
+  status,
+}: ReportQuery) => {
+  const where: any = {};
+  if (department) {
+    where.department = department;
+  }
+  if (startDate || endDate) {
+    where.createdAt = {};
+    if (startDate) {
+      where.createdAt.gte = new Date(startDate);
+    }
+    if (endDate) {
+      where.createdAt.lte = new Date(endDate);
+    }
+  }
+
+  const onboardings = await prisma.onboarding.findMany({ where });
+  const counts: Record<string, number> = {};
+  for (const ob of onboardings) {
+    const tasks = (ob.tasks as any[]) || [];
+    const completed = tasks.length > 0 && tasks.every((t) => t.completed);
+    const stat = completed ? "completed" : "in_progress";
+    counts[stat] = (counts[stat] || 0) + 1;
+  }
+
+  let result = Object.entries(counts).map(([s, c]) => ({ status: s, count: c }));
+  if (status) {
+    result = result.filter((r) => r.status === status);
+  }
+  return result;
+};
