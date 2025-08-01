@@ -23,7 +23,7 @@ function ModalPredaEchipament({ echipament, onClose, onSubmit }: ModalPredaEchip
   const handleSubmit = () => {
     if (!angajatId) return alert("Selectează un angajat!");
 
-    onSubmit({ ...echipament, angajatId, stare: "predat" }); 
+     onSubmit({ ...echipament, angajatId, stare: "alocat" });
     onClose();
   };
 
@@ -31,7 +31,7 @@ function ModalPredaEchipament({ echipament, onClose, onSubmit }: ModalPredaEchip
     <Dialog open onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Predă echipamentul</DialogTitle>
+          <DialogTitle>Alocă echipamentul</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <Select value={angajatId} onValueChange={(val) => setAngajatId(val)}>
@@ -48,7 +48,7 @@ function ModalPredaEchipament({ echipament, onClose, onSubmit }: ModalPredaEchip
           </Select>
 
           <Button className="w-full" onClick={handleSubmit}>
-            Confirmă predarea
+            Confirmă alocarea
           </Button>
         </div>
       </DialogContent>

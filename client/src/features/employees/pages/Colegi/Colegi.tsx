@@ -28,6 +28,7 @@ export default function Colegi() {
   >(null);
   const [editColeg, setEditColeg] = useState<Angajat | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Angajat | null>(null);
+  const [createEmailFor, setCreateEmailFor] = useState<Angajat | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const deleteMutation = useDeleteAngajat();
   const updateMutation = useUpdateEchipament();
@@ -158,7 +159,7 @@ export default function Colegi() {
     try {
       await updateMutation.mutateAsync({
         id: eqId,
-        data: { angajatId: null, stare: "disponibil" },
+         data: { angajatId: null, stare: "in_stoc" },
       });
       const { pvGenerationMode } = await getConfig();
         if (pvGenerationMode === "auto") {
@@ -268,6 +269,7 @@ export default function Colegi() {
                 setSize={setSize}
                 pendingPV={pendingPV[filtered[index].id]}
                 onGeneratePV={handleGeneratePV}
+                setCreateEmail={setCreateEmailFor}
               />
             )}
           </List>
@@ -306,6 +308,8 @@ export default function Colegi() {
         setExpanded={setExpanded}
         handleDelete={handleDelete}
         onPVChange={addPendingPV}
+        createEmailFor={createEmailFor}
+        setCreateEmailFor={setCreateEmailFor}
       />
     </Container>
   );

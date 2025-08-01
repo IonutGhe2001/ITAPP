@@ -7,9 +7,11 @@ const LoginPage = lazy(() => import("./pages/Login/Login"));
 const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard"));
 const Echipamente = lazy(() => import("./features/equipment/pages/Echipamente/Echipamente"));
 const Colegi = lazy(() => import("./features/employees/pages/Colegi/Colegi"));
+const EmployeeForm = lazy(() => import("./features/employees/pages/EmployeeForm/EmployeeForm"));
 const AppLayout = lazy(() => import("./layouts/AppLayout"));
 const ProfilePage = lazy(() => import("./pages/Profile/ProfilePage"));
 const SearchPage = lazy(() => import("./pages/Search/Search"));
+const OnboardingPage = lazy(() => import("./pages/Onboarding/OnboardingPage"));
 
 // Componentă pentru rute protejate
 function ProtectedRoute({ children }: { children: JSX.Element }) {
@@ -48,8 +50,10 @@ export default function AppRouter() {
             <Route index element={<Dashboard />} />
             <Route path="echipamente" element={<Echipamente />} />
             <Route path="colegi" element={<Colegi />} />
+            <Route path="employee-form" element={<EmployeeForm />} />
             <Route path="profil" element={<ProfilePage />} />
             <Route path="search" element={<SearchPage />} />
+            <Route path="onboarding" element={<OnboardingPage />} />
           </Route>
         </Routes>
       </Suspense>

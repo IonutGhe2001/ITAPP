@@ -49,7 +49,7 @@ export default function ModalAsigneazaEchipament({
       } else {
         await updateMutation.mutateAsync({
           id: selectedId,
-          data: { angajatId, stare: "predat" },
+          data: { angajatId, stare: "alocat" },
         });
         onPendingPV?.({ primite: [selectedId] });
         toast({
@@ -101,11 +101,11 @@ export default function ModalAsigneazaEchipament({
           onChange={(e) => setSelectedId(e.target.value)}
           className="w-full border border-border rounded-lg px-4 py-2 bg-background text-foreground"
         >
-          <option value="">Selectează echipament disponibil</option>
+          <option value="">Selectează echipament în stoc</option>
            {echipamente
             .filter(
               (e: Echipament) =>
-                e.stare === "disponibil" && (!filterTip || e.tip === filterTip)
+                e.stare === "in_stoc" && (!filterTip || e.tip === filterTip)
             )
             .map((e: Echipament) => (
             <option key={e.id} value={e.id}>

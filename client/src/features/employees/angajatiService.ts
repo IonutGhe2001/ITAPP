@@ -6,6 +6,11 @@ export interface AngajatInput {
   functie: string
   email?: string
   telefon?: string
+  dataAngajare?: Date
+  cDataUsername?: string
+  cDataId?: string
+  cDataNotes?: string
+  cDataCreated?: boolean
 }
 
 export interface AngajatUpdateInput {
@@ -13,6 +18,11 @@ export interface AngajatUpdateInput {
   functie?: string
   email?: string
   telefon?: string
+  dataAngajare?: Date
+  cDataUsername?: string
+  cDataId?: string
+  cDataNotes?: string
+  cDataCreated?: boolean
 }
 
 export const getAngajati = () => api.get("/angajati");
@@ -48,6 +58,17 @@ export const useDeleteAngajat = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete(`/angajati/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["angajati"] });
+    },
+  });
+};
+
+export const useCreateEmailAccount = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, email, responsible, link }: { id: string; email: string; responsible: string; link?: string }) =>
+      api.post(`/angajati/${id}/email-account`, { email, responsible, link }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["angajati"] });
     },

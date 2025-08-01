@@ -3,8 +3,8 @@ import api from "./api";
 
 export interface OverviewStats {
   echipamente: number;
-  disponibile: number;
-  predate: number;
+  inStoc: number;
+  alocate: number;
   angajati: number;
 }
 

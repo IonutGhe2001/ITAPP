@@ -4,6 +4,7 @@ const pageTitles: Record<string, string> = {
   "/colegi": "Colegi",
   "/profil": "Profil",
   "/search": "Căutare",
+  "/onboarding": "Onboarding",
 };
 
 export default pageTitles;

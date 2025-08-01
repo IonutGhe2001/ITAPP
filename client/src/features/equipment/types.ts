@@ -4,14 +4,24 @@ export interface Angajat {
   functie: string;
   email?: string;
   telefon?: string;
+  cDataUsername?: string;
+  cDataId?: string;
+  cDataNotes?: string;
+  cDataCreated: boolean;
+  emailAccountStatus?: "PENDING" | "CREATED";
+  emailAccountCreatedAt?: string;
+  emailAccountResponsible?: string;
+  emailAccountLink?: string;
 }
+
+export type EquipmentStatus = "in_stoc" | "alocat" | "in_comanda" | "mentenanta";
 
 export interface Echipament {
   id: string;
   nume: string;
   tip: string;
   serie: string;
-  stare: string;
+  stare: EquipmentStatus;
   angajatId?: string | null;
   /**
    * Included when the backend query joins the related angajat.
@@ -28,7 +38,7 @@ export interface EchipamentInput {
   tip: string;
   serie: string;
   angajatId: string | null;
-  stare?: string;
+  stare?: EquipmentStatus;
   metadata?: unknown;
 }
 
@@ -37,7 +47,7 @@ export interface EchipamentUpdateInput {
   tip?: string;
   serie?: string;
   angajatId?: string | null;
-  stare?: string;
+  stare?: EquipmentStatus;
   metadata?: unknown;
 }
 

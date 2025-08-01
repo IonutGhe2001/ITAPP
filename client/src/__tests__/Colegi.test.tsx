@@ -6,6 +6,8 @@ import Colegi from '../features/employees/pages/Colegi/Colegi';
 vi.mock('@/features/employees', () => ({
   useAngajati: () => ({ data: [], refetch: vi.fn() }),
   useDeleteAngajat: () => ({ mutateAsync: vi.fn() }),
+  useUpdateAngajat: () => ({ mutate: vi.fn() }),
+  useCreateEmailAccount: () => ({ mutateAsync: vi.fn() }),
 }));
 
 vi.mock('@/features/equipment', () => ({

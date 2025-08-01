@@ -20,6 +20,10 @@ export default function ModalAddColeg({
     functie: "",
     email: "",
     telefon: "",
+    cDataUsername: "",
+    cDataId: "",
+    cDataNotes: "",
+    cDataCreated: false,
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { toast } = useToast();
@@ -53,18 +57,56 @@ export default function ModalAddColeg({
           <DialogTitle>Adaugă coleg</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          {["numeComplet", "functie", "email", "telefon"].map((field) => (
+          {(
+            [
+              "numeComplet",
+              "functie",
+              "email",
+              "telefon",
+              "cDataUsername",
+              "cDataId",
+              "cDataNotes",
+            ] as const
+          ).map((field) => (
             <div key={field}>
-              <Label htmlFor={field}>{field === "numeComplet" ? "Nume complet" : field.charAt(0).toUpperCase() + field.slice(1)}</Label>
+               <Label htmlFor={field}>
+                {(
+                  {
+                    numeComplet: "Nume complet",
+                    functie: "Funcție",
+                    email: "Email",
+                    telefon: "Telefon",
+                    cDataUsername: "c-data username",
+                    cDataId: "c-data ID",
+                    cDataNotes: "Note/Link c-data",
+                  } as Record<string, string>
+                )[field]}
+              </Label>
               <Input
                 id={field}
-                value={formData[field as keyof typeof formData]}
+               value={formData[field as keyof typeof formData] as any}
                 onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
               />
-              {errors[field] && <p className="text-xs text-red-500 mt-1">{errors[field]}</p>}
+              {errors[field] && (
+                <p className="text-xs text-red-500 mt-1">{errors[field]}</p>
+              )}
             </div>
           ))}
-          <Button onClick={handleSubmit} className="w-full bg-primary text-white hover:bg-primary/90">
+          <div className="flex items-center space-x-2">
+            <input
+              id="cDataCreated"
+              type="checkbox"
+              checked={formData.cDataCreated}
+              onChange={(e) =>
+                setFormData({ ...formData, cDataCreated: e.target.checked })
+              }
+            />
+            <Label htmlFor="cDataCreated">Cont c-data creat</Label>
+          </div>
+          <Button
+            onClick={handleSubmit}
+            className="w-full bg-primary text-white hover:bg-primary/90"
+          >
             Salvează
           </Button>
         </div>

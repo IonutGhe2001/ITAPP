@@ -30,8 +30,8 @@ const navigate = useNavigate();
 
 const angajatiCount = stats?.angajati ?? 0;
   const total = stats?.echipamente ?? 0;
-  const disponibile = stats?.disponibile ?? 0;
-  const predate = stats?.predate ?? 0;
+  const inStoc = stats?.inStoc ?? 0;
+  const alocate = stats?.alocate ?? 0;
   const { resolvedTheme } = useTheme();
 
   const handleBarClick = useCallback<NonNullable<ChartOptions<"bar">["onClick"]>>(
@@ -48,11 +48,11 @@ const angajatiCount = stats?.angajati ?? 0;
     () => {
       void resolvedTheme;
       return {
-      labels: ["Angajați", "Echipamente", "Disponibile", "Predate"],
+      labels: ["Angajați", "Echipamente", "În stoc", "Alocate"],
       datasets: [
         {
           label: "Număr",
-          data: [angajatiCount, total, disponibile, predate],
+          data: [angajatiCount, total, inStoc, alocate],
           backgroundColor: [
             `hsl(${getCssVar("--chart-1")})`,
             `hsl(${getCssVar("--chart-2")})`,
@@ -63,7 +63,7 @@ const angajatiCount = stats?.angajati ?? 0;
       ],
       };
     },
-    [angajatiCount, total, disponibile, predate, resolvedTheme]
+    [angajatiCount, total, inStoc, alocate, resolvedTheme]
   );
 
   const options = useMemo<ChartOptions<"bar">>(() => {

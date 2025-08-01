@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2, MoreHorizontal, AlertCircle } from "lucide-react";
 import { getEquipmentIcon } from "@/utils/equipmentIcons";
 import type { Angajat, Echipament } from "@/features/equipment/types";
+import { useUpdateAngajat } from "@/features/employees";
 
 interface ReplaceData {
   colegId: string;
@@ -32,6 +33,7 @@ interface ColegRowProps {
   setSize: (index: number, size: number) => void;
   pendingPV?: { predate: string[]; primite: string[] };
   onGeneratePV: (colegId: string) => void;
+  setCreateEmail: (c: Angajat) => void;
 }
 
 export default function ColegRow({
@@ -49,8 +51,10 @@ export default function ColegRow({
   setSize,
   pendingPV,
   onGeneratePV,
+  setCreateEmail,
 }: ColegRowProps) {
   const rowRef = useRef<HTMLDivElement>(null);
+  const updateAngajat = useUpdateAngajat();
 
   useLayoutEffect(() => {
     if (rowRef.current) {
@@ -90,8 +94,52 @@ export default function ColegRow({
           <div className="flex-1">
             <p className="font-semibold text-foreground">{coleg.numeComplet}</p>
             <p className="text-sm text-muted-foreground">{coleg.functie}</p>
-            <p className="text-sm text-muted-foreground">{coleg.email}</p>
+            <p className="text-sm text-muted-foreground">
+              {coleg.email}
+              {coleg.emailAccountStatus === "PENDING" && " (pendinte)"}
+            </p>
+            {coleg.emailAccountStatus === "CREATED" && coleg.emailAccountLink && (
+              <a
+                href={coleg.emailAccountLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-primary underline"
+              >
+                Deschide e-mail
+              </a>
+            )}
             <p className="text-sm text-muted-foreground">{coleg.telefon}</p>
+            {coleg.cDataUsername && (
+              <p className="text-sm text-muted-foreground">
+                c-data user: {coleg.cDataUsername}
+              </p>
+            )}
+            {coleg.cDataId && (
+              <p className="text-sm text-muted-foreground">
+                c-data ID: {coleg.cDataId}
+              </p>
+            )}
+            {coleg.cDataNotes && (
+              <p className="text-sm text-muted-foreground break-all">
+                {coleg.cDataNotes}
+              </p>
+            )}
+            <p className="text-sm text-muted-foreground">
+              Cont c-data: {coleg.cDataCreated ? "Creat" : "Necreat"}
+              {!coleg.cDataCreated && (
+                <button
+                  onClick={() =>
+                    updateAngajat.mutate({
+                      id: coleg.id,
+                      data: { cDataCreated: true },
+                    })
+                  }
+                  className="ml-2 text-primary hover:underline text-xs"
+                >
+                  Marchează creat
+                </button>
+              )}
+            </p>
             {pendingPV && (pendingPV.predate.length > 0 || pendingPV.primite.length > 0) && (
               <Badge variant="destructive" className="mt-1 flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" /> Proces verbal în așteptare
@@ -154,6 +202,14 @@ export default function ColegRow({
                 className="text-sm text-primary hover:underline"
               >
                 Generează PV
+              </button>
+            )}
+            {coleg.emailAccountStatus !== "CREATED" && (
+              <button
+                onClick={() => setCreateEmail(coleg)}
+                className="text-sm text-primary hover:underline"
+              >
+                Creează cont e-mail
               </button>
             )}
             <button

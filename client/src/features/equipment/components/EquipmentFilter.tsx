@@ -24,8 +24,8 @@ function EquipmentFilter({
         className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/4"
       >
         <option value="">Toate statusurile</option>
-        <option value="disponibil">Disponibile</option>
-        <option value="predat">Predate</option>
+        <option value="in_stoc">În stoc</option>
+        <option value="alocat">Alocate</option>
         <option value="mentenanta">În mentenanță</option>
       </select>
       <select

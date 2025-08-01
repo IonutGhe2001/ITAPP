@@ -21,7 +21,7 @@ function EquipmentCard({
   const [confirmRecupereaza, setConfirmRecupereaza] = useState(false);
 
   const handleConfirmRecupereaza = () => {
-    onEdit?.({ ...echipament, angajatId: null, stare: "disponibil" });
+    onEdit?.({ ...echipament, angajatId: null, stare: "in_stoc" });
     setConfirmRecupereaza(false);
     onRefresh?.();
   };
@@ -50,23 +50,23 @@ function EquipmentCard({
       <div className="flex flex-col items-end gap-2">
         <span
           className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${
-            echipament.stare === "disponibil"
+            echipament.stare === "in_stoc"
               ? "bg-green-100 text-green-800"
               : echipament.stare === "mentenanta"
               ? "bg-yellow-100 text-yellow-800"
               : "bg-blue-100 text-blue-800"
           }`}
         >
-          {echipament.stare}
+          {echipament.stare.replace("_", " ")}
         </span>
 
-        {echipament.stare === "disponibil" ? (
+        {echipament.stare === "in_stoc" ? (
           <button
             onClick={() => setShowModal(true)}
             className="text-xs text-blue-600 hover:underline"
-            title="Predă echipamentul"
+            title="Alocă echipamentul"
           >
-            Predă
+            Alocă
           </button>
         ) : (
           <button
@@ -80,11 +80,11 @@ function EquipmentCard({
 
 {echipament.stare === "mentenanta" ? (
           <button
-            onClick={() => onEdit?.({ ...echipament, stare: "disponibil" })}
+            onClick={() => onEdit?.({ ...echipament, stare: "in_stoc" })}
             className="text-xs text-blue-600 hover:underline"
-            title="Finalizează mentenanța"
+            title="Marchează în stoc"
           >
-            Disponibil
+            În stoc
           </button>
         ) : (
           <button
@@ -125,7 +125,7 @@ function EquipmentCard({
               <DialogTitle>Confirmare recuperare</DialogTitle>
             </DialogHeader>
             <p className="text-sm text-muted-foreground">
-              Sigur dorești să recuperezi acest echipament? Acesta va deveni disponibil și va fi disasociat de angajat.
+              Sigur dorești să recuperezi acest echipament? Acesta va reveni în stoc și va fi disasociat de angajat.
             </p>
             <div className="flex justify-end gap-2 pt-4">
               <Button variant="outline" onClick={() => setConfirmRecupereaza(false)}>
