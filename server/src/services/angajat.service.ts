@@ -1,5 +1,4 @@
 import { prisma } from "../lib/prisma";
-import { Prisma } from "@prisma/client";
 
 export const getAngajati = () => {
   return prisma.angajat.findMany({
@@ -61,7 +60,7 @@ export const deleteAngajat = (id: string) => {
           data: echipamente.map((eq: { id: string }) => ({
             angajatId: id,
             echipamentId: eq.id,
-            tip: Prisma.EquipmentChangeType.RETURN,
+            tip: 'RETURN',
           })),
         });
       }
