@@ -5,6 +5,7 @@ export interface Update {
   id: string;
   type: 'Echipament' | 'Coleg' | 'SIM';
   message: string;
+  importance?: 'high' | 'normal';
   timestamp: Date;
 }
 
@@ -21,6 +22,7 @@ export const emitUpdate = (update: Omit<Update, 'id' | 'timestamp'>) => {
   const finalUpdate: Update = {
     id: Date.now().toString(),
     timestamp: new Date(),
+    importance: 'normal',
     ...update,
   };
   updates.push(finalUpdate);
@@ -28,4 +30,13 @@ export const emitUpdate = (update: Omit<Update, 'id' | 'timestamp'>) => {
   io?.emit('update', finalUpdate);
 };
 
-export const getRecentUpdates = () => updates.slice().reverse();
+/**
+ * Returns recent updates in reverse chronological order.
+ * When `importance` is set to `"high"`, only high-importance updates are returned.
+ */
+export const getRecentUpdates = (importance?: 'high' | 'normal') => {
+  const filtered = importance === 'high'
+    ? updates.filter((u) => u.importance === 'high')
+    : updates;
+  return filtered.slice().reverse();
+};

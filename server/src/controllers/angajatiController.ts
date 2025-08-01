@@ -11,6 +11,7 @@ export const getAngajati = async (_: Request, res: Response, next: NextFunction)
   }
 };
 
+
 export const createAngajat = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const angajat = await angajatService.createAngajat(req.body);
@@ -18,6 +19,7 @@ export const createAngajat = async (req: Request, res: Response, next: NextFunct
     emitUpdate({
       type: "Coleg",
       message: `Coleg nou: ${angajat.numeComplet}`,
+      importance: 'high',
     });
   } catch (err) {
     next(err);
@@ -32,6 +34,7 @@ export const updateAngajat = async (req: Request, res: Response, next: NextFunct
     emitUpdate({
       type: "Coleg",
       message: "Coleg actualizat",
+      importance: 'normal',
     });
   } catch (err) {
     next(err);
@@ -46,6 +49,7 @@ export const deleteAngajat = async (req: Request, res: Response, next: NextFunct
      emitUpdate({
       type: "Coleg",
       message: "Coleg șters",
+      importance: 'high',
     });
   } catch (err) {
     next(err);

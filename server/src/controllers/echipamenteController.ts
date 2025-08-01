@@ -18,6 +18,7 @@ export const createEchipament = async (req: Request, res: Response, next: NextFu
     emitUpdate({
       type: "Echipament",
       message: `Echipament adăugat: ${echipament.nume}`,
+      importance: 'high',
     });
   } catch (err) {
     next(err);
@@ -32,6 +33,7 @@ export const updateEchipament = async (req: Request, res: Response, next: NextFu
     emitUpdate({
       type: "Echipament",
       message: "Echipament actualizat",
+      importance: 'normal',
     });
   } catch (err) {
     next(err);
@@ -46,6 +48,7 @@ export const deleteEchipament = async (req: Request, res: Response, next: NextFu
      emitUpdate({
       type: "Echipament",
       message: "Echipament șters",
+      importance: 'high',
     });
   } catch (err) {
     next(err);

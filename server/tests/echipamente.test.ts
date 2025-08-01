@@ -6,8 +6,12 @@ import { beforeAll, afterEach, describe, it, expect, jest } from '@jest/globals'
 jest.mock('../src/services/echipament.service', () => ({
   getEchipamente: jest.fn(),
   createEchipament: jest.fn(),
+  updateEchipament: jest.fn(),
+  deleteEchipament: jest.fn(),
 }));
+jest.mock('../src/lib/websocket', () => ({ emitUpdate: jest.fn() }));
 const echipService = require('../src/services/echipament.service');
+const { emitUpdate } = require('../src/lib/websocket');
 // load route after mocking services
 const echipRoutes = require('../src/routes/echipamente').default;
 
@@ -59,5 +63,42 @@ describe('Echipamente Routes', () => {
     expect(res.status).toBe(201);
     expect(res.body).toEqual({ id: '1', nume: 'Lap' });
     expect(echipService.createEchipament).toHaveBeenCalled();
+    expect(emitUpdate).toHaveBeenCalledWith({
+      type: 'Echipament',
+      message: 'Echipament adăugat: Lap',
+      importance: 'high',
+    });
+  });
+ it('update echipament', async () => {
+    (echipService.updateEchipament as jest.MockedFunction<typeof echipService.updateEchipament>).mockResolvedValue({ id: '1', nume: 'Lap2' });
+
+    const res = await request(app)
+      .put('/api/echipamente/1')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ nume: 'Lap2' });
+
+    expect(res.status).toBe(200);
+    expect(echipService.updateEchipament).toHaveBeenCalled();
+    expect(emitUpdate).toHaveBeenCalledWith({
+      type: 'Echipament',
+      message: 'Echipament actualizat',
+      importance: 'normal',
+    });
+  });
+
+  it('delete echipament', async () => {
+    (echipService.deleteEchipament as jest.MockedFunction<typeof echipService.deleteEchipament>).mockResolvedValue(null);
+
+    const res = await request(app)
+      .delete('/api/echipamente/1')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(echipService.deleteEchipament).toHaveBeenCalledWith('1');
+    expect(emitUpdate).toHaveBeenCalledWith({
+      type: 'Echipament',
+      message: 'Echipament șters',
+      importance: 'high',
+    });
   });
 });

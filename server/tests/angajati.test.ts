@@ -5,9 +5,13 @@ import jwt from 'jsonwebtoken';
 import { beforeAll, afterEach, describe, it, expect, jest } from '@jest/globals';
 
 jest.mock('../src/services/angajat.service', () => ({
+  createAngajat: jest.fn(),
+  updateAngajat: jest.fn(),
   deleteAngajat: jest.fn(),
 }));
+jest.mock('../src/lib/websocket', () => ({ emitUpdate: jest.fn() }));
 const angajatService = require('../src/services/angajat.service');
+const { emitUpdate } = require('../src/lib/websocket');
 const angajatRoutes = require('../src/routes/angajati').default;
 
 const app = express();
@@ -36,6 +40,40 @@ afterEach(() => {
 });
 
 describe('Angajati Routes', () => {
+  it('create angajat', async () => {
+    (angajatService.createAngajat as jest.MockedFunction<typeof angajatService.createAngajat>).mockResolvedValue({ id: '1', numeComplet: 'Ion Pop', functie: 'Dev' });
+
+    const res = await request(app)
+      .post('/api/angajati')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ numeComplet: 'Ion Pop', functie: 'Dev' });
+
+    expect(res.status).toBe(201);
+    expect(angajatService.createAngajat).toHaveBeenCalled();
+    expect(emitUpdate).toHaveBeenCalledWith({
+      type: 'Coleg',
+      message: 'Coleg nou: Ion Pop',
+      importance: 'high',
+    });
+  });
+
+  it('update angajat', async () => {
+    (angajatService.updateAngajat as jest.MockedFunction<typeof angajatService.updateAngajat>).mockResolvedValue({ id: '1' });
+
+    const res = await request(app)
+      .put('/api/angajati/1')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ functie: 'Manager' });
+
+    expect(res.status).toBe(200);
+    expect(angajatService.updateAngajat).toHaveBeenCalled();
+    expect(emitUpdate).toHaveBeenCalledWith({
+      type: 'Coleg',
+      message: 'Coleg actualizat',
+      importance: 'normal',
+    });
+  });
+
   it('delete angajat', async () => {
     (angajatService.deleteAngajat as jest.MockedFunction<typeof angajatService.deleteAngajat>).mockResolvedValue(null);
 
@@ -45,5 +83,10 @@ describe('Angajati Routes', () => {
 
     expect(res.status).toBe(200);
     expect(angajatService.deleteAngajat).toHaveBeenCalledWith('123');
+    expect(emitUpdate).toHaveBeenCalledWith({
+      type: 'Coleg',
+      message: 'Coleg șters',
+      importance: 'high',
+    });
   });
 });
