@@ -5,6 +5,7 @@ export type Notification = {
   type: "Coleg" | "Echipament" | "SIM";
   message: string;
   timestamp: string | Date;
+  importance: 'normal' | 'high';
   read: boolean;
 };
 

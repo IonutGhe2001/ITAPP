@@ -20,6 +20,7 @@ type Update = {
   type: "Coleg" | "Echipament" | "SIM";
   message: string;
   timestamp: string | Date;
+  importance: 'normal' | 'high';
 };
 
 export default function RecentUpdates() {
