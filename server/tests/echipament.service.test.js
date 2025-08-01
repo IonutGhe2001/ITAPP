@@ -1,18 +1,4 @@
-const ProcesVerbalTip = {
-  PREDARE_PRIMIRE: 'PREDARE_PRIMIRE',
-  RESTITUIRE: 'RESTITUIRE',
-  SCHIMB: 'SCHIMB',
-} as const;
 let tx: any;
-
-jest.mock('@prisma/client', () => ({
-  ProcesVerbalTip: {
-    PREDARE_PRIMIRE: 'PREDARE_PRIMIRE',
-    RESTITUIRE: 'RESTITUIRE',
-    SCHIMB: 'SCHIMB',
-  },
-  PrismaClient: jest.fn(),
-}));
 
 jest.mock('../src/lib/prisma', () => {
   tx = {
@@ -40,37 +26,37 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe('updateEchipament proces verbal', () => {
-  it('creates PREDARE_PRIMIRE when assigning equipment', async () => {
+describe('updateEchipament', () => {
+  it('assigns equipment to employee without generating proces verbal', async () => {
     tx.echipament.findUnique.mockResolvedValue({ id: 'e1', tip: 'T', serie: 'S', angajatId: null });
     tx.echipament.update.mockResolvedValue({ id: 'e1', angajatId: 'a1' });
     creeazaProcesVerbalCuEchipamente.mockResolvedValue({ procesVerbal: { id: 'pv1' } });
 
     const res = await updateEchipament('e1', { angajatId: 'a1' });
 
-    expect(creeazaProcesVerbalCuEchipamente).toHaveBeenCalledWith('a1', undefined, ProcesVerbalTip.PREDARE_PRIMIRE);
-    expect(res).toEqual({ echipament: { id: 'e1', angajatId: 'a1' }, procesVerbal: { id: 'pv1' } });
+    expect(creeazaProcesVerbalCuEchipamente).not.toHaveBeenCalled();
+    expect(res).toEqual({ id: 'e1', angajatId: 'a1' });
   });
 
-  it('creates RESTITUIRE when removing employee', async () => {
+  it('removes employee without generating proces verbal', async () => {
     tx.echipament.findUnique.mockResolvedValue({ id: 'e1', tip: 'T', serie: 'S', angajatId: 'a1' });
     tx.echipament.update.mockResolvedValue({ id: 'e1', angajatId: null });
     creeazaProcesVerbalCuEchipamente.mockResolvedValue({ procesVerbal: { id: 'pv2' } });
 
     const res = await updateEchipament('e1', { angajatId: null });
 
-    expect(creeazaProcesVerbalCuEchipamente).toHaveBeenCalledWith('a1', undefined, ProcesVerbalTip.RESTITUIRE);
-    expect(res).toEqual({ echipament: { id: 'e1', angajatId: null }, procesVerbal: { id: 'pv2' } });
+    expect(creeazaProcesVerbalCuEchipamente).not.toHaveBeenCalled();
+    expect(res).toEqual({ id: 'e1', angajatId: null });
   });
 
-  it('creates SCHIMB when changing employee', async () => {
+  it('changes employee without generating proces verbal', async () => {
     tx.echipament.findUnique.mockResolvedValue({ id: 'e1', tip: 'T', serie: 'S', angajatId: 'a1' });
     tx.echipament.update.mockResolvedValue({ id: 'e1', angajatId: 'a2' });
     creeazaProcesVerbalCuEchipamente.mockResolvedValue({ procesVerbal: { id: 'pv3' } });
 
     const res = await updateEchipament('e1', { angajatId: 'a2' });
 
-    expect(creeazaProcesVerbalCuEchipamente).toHaveBeenCalledWith('a2', undefined, ProcesVerbalTip.SCHIMB);
-    expect(res).toEqual({ echipament: { id: 'e1', angajatId: 'a2' }, procesVerbal: { id: 'pv3' } });
+    expect(creeazaProcesVerbalCuEchipamente).not.toHaveBeenCalled();
+    expect(res).toEqual({ id: 'e1', angajatId: 'a2' });
   });
 });
