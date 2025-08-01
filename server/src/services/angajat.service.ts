@@ -9,6 +9,9 @@ export const getAngajati = () => {
       dataAngajare: true,
       email: true,
       telefon: true,
+      departmentConfigId: true,
+      checklist: true,
+      licenses: true,
       cDataUsername: true,
       cDataId: true,
       cDataNotes: true,
@@ -35,27 +38,42 @@ export const getAngajati = () => {
   });
 };
 
-export const createAngajat = (data: {
+export const createAngajat = async (data: {
   numeComplet: string;
   functie: string;
   email?: string;
   telefon?: string;
+  departmentConfigId?: string;
   dataAngajare?: Date;
   cDataUsername?: string;
   cDataId?: string;
   cDataNotes?: string;
   cDataCreated?: boolean;
 }) => {
-  return prisma.angajat.create({ data });
+  let checklist: string[] = [];
+  let licenses: string[] = [];
+  if (data.departmentConfigId) {
+    const config = await prisma.departmentConfig.findUnique({
+      where: { id: data.departmentConfigId },
+    });
+    if (config) {
+      checklist = config.defaultRequirements;
+      licenses = config.defaultLicenses;
+    }
+  }
+  return prisma.angajat.create({
+    data: { ...data, checklist, licenses },
+  });
 };
 
-export const updateAngajat = (
+export const updateAngajat = async (
   id: string,
   data: {
     numeComplet?: string;
     functie?: string;
     email?: string;
     telefon?: string;
+    departmentConfigId?: string;
     dataAngajare?: Date 
     cDataUsername?: string;
     cDataId?: string;
@@ -63,7 +81,33 @@ export const updateAngajat = (
     cDataCreated?: boolean;
   }
 ) => {
-  return prisma.angajat.update({ where: { id }, data });
+  const updateData: any = { ...data };
+  if (data.departmentConfigId) {
+    const config = await prisma.departmentConfig.findUnique({
+      where: { id: data.departmentConfigId },
+    });
+    if (config) {
+      updateData.checklist = config.defaultRequirements;
+      updateData.licenses = config.defaultLicenses;
+    }
+  }
+  return prisma.angajat.update({ where: { id }, data: updateData });
+};
+
+export const getAngajatById = (id: string) => {
+  return prisma.angajat.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      numeComplet: true,
+      functie: true,
+      email: true,
+      telefon: true,
+      departmentConfigId: true,
+      checklist: true,
+      licenses: true,
+    },
+  });
 };
 
 export const deleteAngajat = (id: string) => {

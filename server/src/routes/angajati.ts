@@ -13,6 +13,7 @@ const router = express.Router();
 router.use(authenticate);
 
 router.get("/", controller.getAngajati);
+router.get("/:id", controller.getAngajatById);
 router.post(
   "/",
   authorizeRoles("admin"),

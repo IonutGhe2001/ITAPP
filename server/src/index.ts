@@ -22,6 +22,7 @@ import searchRoutes from "./routes/search";
 import updatesRoutes from "./routes/updates";
 import equipmentChangesRoutes from "./routes/equipmentChanges";
 import configRoutes from "./routes/config";
+import departmentConfigRoutes from "./routes/departmentConfig";
 import reportsRoutes from "./routes/reports";
 import purchaseRequestRoutes from "./routes/purchaseRequests";
 import onboardingRoutes from "./routes/onboarding";
@@ -90,6 +91,7 @@ app.use("/api/updates", updatesRoutes);
 app.use("/api/purchase-requests", purchaseRequestRoutes);
 app.use("/api/equipment-changes", equipmentChangesRoutes);
 app.use("/config", configRoutes);
+app.use("/api/department-configs", departmentConfigRoutes);
 app.use("/api/reports", reportsRoutes);
 app.use("/api/onboarding", onboardingRoutes);
 

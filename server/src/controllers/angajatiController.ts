@@ -11,6 +11,15 @@ export const getAngajati = async (_: Request, res: Response, next: NextFunction)
   }
 };
 
+export const getAngajatById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const angajat = await angajatService.getAngajatById(id);
+    res.json(angajat);
+  } catch (err) {
+    next(err);
+  }
+};
 
 export const createAngajat = async (req: Request, res: Response, next: NextFunction) => {
   try {

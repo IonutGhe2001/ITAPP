@@ -21,6 +21,14 @@ model User {
   createdAt      DateTime @default(now())
 }
 
+model DepartmentConfig {
+  id                 String   @id @default(uuid())
+  name               String
+  defaultLicenses    String[] @default([])
+  defaultRequirements String[] @default([])
+  angajati           Angajat[]
+}
+
 model Angajat {
   id          String       @id @default(uuid())
   numeComplet String
@@ -40,6 +48,10 @@ model Angajat {
   createdAt   DateTime     @default(now())
   proceseVerbale ProcesVerbal[]
   equipmentChanges EquipmentChange[]
+  departmentConfigId String?
+  departmentConfig   DepartmentConfig? @relation(fields: [departmentConfigId], references: [id])
+  checklist          String[] @default([])
+  licenses           String[] @default([])
   onboarding   Onboarding[]
 }
 

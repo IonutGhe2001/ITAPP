@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken';
 import { beforeAll, afterEach, describe, it, expect, jest } from '@jest/globals';
 
 jest.mock('../src/services/angajat.service', () => ({
+  getAngajati: jest.fn(),
+  getAngajatById: jest.fn(),
   createAngajat: jest.fn(),
   updateAngajat: jest.fn(),
   deleteAngajat: jest.fn(),
