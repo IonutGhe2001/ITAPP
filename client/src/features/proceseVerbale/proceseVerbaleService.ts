@@ -5,18 +5,22 @@ import api from '@/services/api';
 export async function genereazaProcesVerbal(
   angajatId: string,
    tip: ProcesVerbalTip,
-  opts?: { predate?: string[]; primite?: string[] }
+  opts?: { predate?: string[]; primite?: string[]; fromChanges?: boolean }
 ): Promise<string> {
-  const res = await api.post(
-    '/procese-verbale',
-    {
-      angajatId,
-      tip,
-      echipamentePredate: opts?.predate,
-      echipamentePrimite: opts?.primite,
-    },
-    { responseType: 'blob' }
-  );
+  const url = opts?.fromChanges
+    ? '/procese-verbale/from-changes'
+    : '/procese-verbale';
+
+  const body = opts?.fromChanges
+    ? { angajatId }
+    : {
+        angajatId,
+        tip,
+        echipamentePredate: opts?.predate,
+        echipamentePrimite: opts?.primite,
+      };
+
+  const res = await api.post(url, body, { responseType: 'blob' });
   const file = new Blob([res.data], { type: 'application/pdf' });
   return URL.createObjectURL(file);
 }

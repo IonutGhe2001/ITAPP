@@ -16,6 +16,14 @@ vi.mock('@/features/proceseVerbale', () => ({
   genereazaProcesVerbal: vi.fn(),
 }));
 
+vi.mock('@/services/configService', () => ({
+  getConfig: vi.fn().mockResolvedValue({ pvGenerationMode: 'auto' }),
+}));
+
+vi.mock('@/features/proceseVerbale/pvQueue', () => ({
+  queueProcesVerbal: vi.fn(),
+}));
+
 vi.mock('@/utils/equipmentIcons', () => ({
   getEquipmentIcon: () => null,
 }));

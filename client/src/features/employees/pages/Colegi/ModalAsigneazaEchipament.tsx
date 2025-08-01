@@ -1,8 +1,8 @@
-
 import { useState } from "react";
 import { useEchipamente, useUpdateEchipament } from "@/features/equipment";
 import type { Echipament } from "@/features/equipment/types";
-import { genereazaProcesVerbal, type ProcesVerbalTip } from "@/features/proceseVerbale";
+import { queueProcesVerbal } from "@/features/proceseVerbale/pvQueue";
+import { getConfig } from "@/services/configService";
 import { useToast } from "@/hooks/use-toast/use-toast-hook";
 import { getApiErrorMessage } from "@/utils/apiError";
 
@@ -13,6 +13,7 @@ export default function ModalAsigneazaEchipament({
   filterTip,
   oldEchipamentId,
   onReplace,
+  onPendingPV,
 }: {
   angajatId: string;
   onClose: () => void;
@@ -20,6 +21,7 @@ export default function ModalAsigneazaEchipament({
   filterTip?: string;
   oldEchipamentId?: string;
   onReplace?: (oldId: string, newId: string) => Promise<void> | void;
+  onPendingPV?: (data: { predate?: string[]; primite?: string[] }) => void;
 }) {
   const { data: echipamente = [] } = useEchipamente();
   const updateMutation = useUpdateEchipament();
@@ -30,11 +32,10 @@ export default function ModalAsigneazaEchipament({
     if (!selectedId) return;
 
      try {
-      let tip: ProcesVerbalTip = "PREDARE_PRIMIRE";
-
       if (onReplace && oldEchipamentId) {
         await onReplace(oldEchipamentId, selectedId);
-        tip = "SCHIMB";
+        onPendingPV?.({ predate: [oldEchipamentId], primite: [selectedId] });
+        toast({ title: "Echipament schimbat", description: "Proces verbal în așteptare" });
       } else {
         await updateMutation.mutateAsync({
           id: selectedId,
@@ -42,16 +43,31 @@ export default function ModalAsigneazaEchipament({
         });
       }
 
-    try {
-        const url = await genereazaProcesVerbal(angajatId, tip,
-          tip === "SCHIMB" && oldEchipamentId
-            ? { predate: [oldEchipamentId], primite: [selectedId] }
-            : undefined
-        );
-        window.open(url, "_blank");
-        toast({ title: "Proces verbal generat" });
-      } catch {
-        toast({ title: "Proces verbal generare eșuată", variant: "destructive" });
+       try {
+        const { pvGenerationMode } = await getConfig();
+        if (pvGenerationMode === "auto") {
+          const url = await genereazaProcesVerbal(
+            angajatId,
+            tip,
+            tip === "SCHIMB" && oldEchipamentId
+              ? { predate: [oldEchipamentId], primite: [selectedId] }
+              : undefined
+          );
+          window.open(url, "_blank");
+          toast({ title: "Proces verbal generat" });
+        } else {
+          queueProcesVerbal(
+            angajatId,
+            tip,
+            tip === "SCHIMB" && oldEchipamentId
+              ? { predate: [oldEchipamentId], primite: [selectedId] }
+              : undefined
+          );
+          toast({ title: "Proces verbal în așteptare" });
+        }
+
+    onPendingPV?.({ primite: [selectedId] });
+        toast({ title: "Echipament asignat", description: "Proces verbal în așteptare" });
       }
 
       onClose();
@@ -79,8 +95,7 @@ export default function ModalAsigneazaEchipament({
            {echipamente
             .filter(
               (e: Echipament) =>
-                e.stare === "disponibil" &&
-                (!filterTip || e.tip === filterTip)
+                e.stare === "disponibil" && (!filterTip || e.tip === filterTip)
             )
             .map((e: Echipament) => (
             <option key={e.id} value={e.id}>

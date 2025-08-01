@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import ModalAsigneazaEchipament from "./ModalAsigneazaEchipament";
 import ModalEditColeg from "./ModalEditColeg";
 import { useUpdateEchipament } from "@/features/equipment";
-import { genereazaProcesVerbal } from "@/features/proceseVerbale";
+import { queueProcesVerbal } from "@/features/proceseVerbale/pvQueue";
+import { getConfig } from "@/services/configService";
 import type { Angajat } from "@/features/equipment/types";
-import { useToast } from "@/hooks/use-toast/use-toast-hook";
 
 const ModalAddColeg = React.lazy(() => import("@/pages/Dashboard/modals/ModalAddColeg"));
 
@@ -31,6 +31,7 @@ interface ColegModalsProps {
   refetch: () => void;
   setExpanded: React.Dispatch<React.SetStateAction<Set<string>>>;
   handleDelete: (id: string) => void;
+  onPVChange: (colegId: string, change: { predate?: string[]; primite?: string[] }) => void;
 }
 
 export default function ColegModals({
@@ -48,9 +49,9 @@ export default function ColegModals({
   refetch,
   setExpanded,
   handleDelete,
+  onPVChange,
 }: ColegModalsProps) {
   const updateMutation = useUpdateEchipament();
-  const { toast } = useToast();
 
   return (
     <>
@@ -58,6 +59,7 @@ export default function ColegModals({
         <ModalAsigneazaEchipament
           angajatId={selectedAngajatId}
           onClose={() => setSelectedAngajatId(null)}
+          onPendingPV={(change) => onPVChange(selectedAngajatId, change)}
           onSuccess={() => {
             refetch();
             setExpanded(new Set());
@@ -79,17 +81,21 @@ export default function ColegModals({
               id: newId,
               data: { angajatId: replaceData.colegId, stare: "predat" },
             });
-            try {
-              const url = await genereazaProcesVerbal(replaceData.colegId, "SCHIMB", {
-                predate: [oldId],
-                primite: [newId],
-              });
-              window.open(url, "_blank");
-            } catch {
-              /* ignore */
-            }
-            toast({ title: "Echipament schimbat" });
+            const { pvGenerationMode } = await getConfig();
+              if (pvGenerationMode === "auto") {
+                const url = await genereazaProcesVerbal(replaceData.colegId, "SCHIMB", {
+                  predate: [oldId],
+                  primite: [newId],
+                });
+                window.open(url, "_blank");
+              } else {
+                queueProcesVerbal(replaceData.colegId, "SCHIMB", {
+                  predate: [oldId],
+                  primite: [newId],
+                });
+              }
           }}
+          onPendingPV={(change) => onPVChange(replaceData.colegId, change)}
           onClose={() => setReplaceData(null)}
           onSuccess={() => {
             refetch();

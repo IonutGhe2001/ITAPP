@@ -6,5 +6,9 @@ class ResizeObserver {
   disconnect() {}
 }
 
-(globalThis as any).ResizeObserver =
-  (globalThis as any).ResizeObserver || ResizeObserver;
+interface GlobalWithResizeObserver {
+  ResizeObserver: typeof ResizeObserver;
+}
+
+(globalThis as GlobalWithResizeObserver).ResizeObserver =
+  (globalThis as GlobalWithResizeObserver).ResizeObserver || ResizeObserver;

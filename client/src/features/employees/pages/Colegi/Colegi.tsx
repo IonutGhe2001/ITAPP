@@ -5,7 +5,9 @@ import {
 } from "@/features/employees";
 import type { Angajat, Echipament } from "@/features/equipment/types";
 import { useUpdateEchipament } from "@/features/equipment";
-import { genereazaProcesVerbal } from "@/features/proceseVerbale";
+import { genereazaProcesVerbal, type ProcesVerbalTip } from "@/features/proceseVerbale";
+import { queueProcesVerbal } from "@/features/proceseVerbale/pvQueue";
+import { getConfig } from "@/services/configService";
 import ColegRow from "./ColegRow";
 import ColegModals from "./ColegModals";
 import useColegiFilter from "./useColegiFilter";
@@ -30,6 +32,43 @@ export default function Colegi() {
   const deleteMutation = useDeleteAngajat();
   const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
+  const [pendingPV, setPendingPV] = useState<Record<string, { predate: string[]; primite: string[] }>>({});
+
+  const addPendingPV = (colegId: string, change: { predate?: string[]; primite?: string[] }) => {
+    setPendingPV((prev) => {
+      const current = prev[colegId] || { predate: [], primite: [] };
+      return {
+        ...prev,
+        [colegId]: {
+          predate: [...current.predate, ...(change.predate || [])],
+          primite: [...current.primite, ...(change.primite || [])],
+        },
+      };
+    });
+  };
+
+  const handleGeneratePV = async (colegId: string) => {
+    const data = pendingPV[colegId];
+    if (!data) return;
+    const tip: ProcesVerbalTip =
+      data.predate.length > 0 && data.primite.length > 0
+        ? "SCHIMB"
+        : data.primite.length > 0
+        ? "PREDARE_PRIMIRE"
+        : "RESTITUIRE";
+    try {
+      const url = await genereazaProcesVerbal(colegId, tip, data);
+      window.open(url, "_blank");
+      toast({ title: "Proces verbal generat" });
+      setPendingPV((prev) => {
+        const updated = { ...prev };
+        delete updated[colegId];
+        return updated;
+      });
+    } catch {
+      toast({ title: "Eroare la generarea procesului verbal", variant: "destructive" });
+    }
+  };
 
   const {
     search,
@@ -106,15 +145,17 @@ export default function Colegi() {
         id: eqId,
         data: { angajatId: null, stare: "disponibil" },
       });
-      toast({ title: "Echipament eliberat" });
-      try {
-        const url = await genereazaProcesVerbal(colegId, "RESTITUIRE", {
-          predate: [eqId],
-        });
-        window.open(url, "_blank");
-      } catch {
-        /* ignore */
-      }
+      const { pvGenerationMode } = await getConfig();
+        if (pvGenerationMode === "auto") {
+          const url = await genereazaProcesVerbal(colegId, "RESTITUIRE", {
+            predate: [eqId],
+          });
+          window.open(url, "_blank");
+        } else {
+          queueProcesVerbal(colegId, "RESTITUIRE", { predate: [eqId] });
+        }
+      addPendingPV(colegId, { predate: [eqId] });
+      toast({ title: "Echipament eliberat", description: "Proces verbal în așteptare" });
       refetch();
     } catch {
       toast({
@@ -183,6 +224,8 @@ export default function Colegi() {
                 setSelectedAngajatId={setSelectedAngajatId}
                 setReplaceData={setReplaceData}
                 setSize={setSize}
+                pendingPV={pendingPV[filtered[index].id]}
+                onGeneratePV={handleGeneratePV}
               />
             )}
           </List>
@@ -220,6 +263,7 @@ export default function Colegi() {
         refetch={refetch}
         setExpanded={setExpanded}
         handleDelete={handleDelete}
+        onPVChange={addPendingPV}
       />
     </Container>
   );

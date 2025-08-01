@@ -29,6 +29,8 @@ interface ColegRowProps {
   setSelectedAngajatId: (id: string) => void;
   setReplaceData: (data: ReplaceData) => void;
   setSize: (index: number, size: number) => void;
+  pendingPV?: { predate: string[]; primite: string[] };
+  onGeneratePV: (colegId: string) => void;
 }
 
 export default function ColegRow({
@@ -44,6 +46,8 @@ export default function ColegRow({
   setSelectedAngajatId,
   setReplaceData,
   setSize,
+  pendingPV,
+  onGeneratePV,
 }: ColegRowProps) {
   const rowRef = useRef<HTMLDivElement>(null);
 
@@ -87,6 +91,9 @@ export default function ColegRow({
             <p className="text-sm text-muted-foreground">{coleg.functie}</p>
             <p className="text-sm text-muted-foreground">{coleg.email}</p>
             <p className="text-sm text-muted-foreground">{coleg.telefon}</p>
+            {pendingPV && (pendingPV.predate.length > 0 || pendingPV.primite.length > 0) && (
+              <p className="text-xs text-amber-600">Proces verbal în așteptare</p>
+            )}
           </div>
         </div>
         {expanded && (
@@ -137,12 +144,22 @@ export default function ColegRow({
           >
             {expanded ? "Ascunde echipamente" : "Vezi echipamente"}
           </button>
-          <button
-            onClick={() => setSelectedAngajatId(coleg.id)}
-            className="text-sm text-primary hover:underline"
-          >
-            Asignează echipament
-          </button>
+          <div className="flex gap-4">
+            {pendingPV && (pendingPV.predate.length > 0 || pendingPV.primite.length > 0) && (
+              <button
+                onClick={() => onGeneratePV(coleg.id)}
+                className="text-sm text-primary hover:underline"
+              >
+                Generează PV
+              </button>
+            )}
+            <button
+              onClick={() => setSelectedAngajatId(coleg.id)}
+              className="text-sm text-primary hover:underline"
+            >
+              Asignează echipament
+            </button>
+          </div>
         </div>
       </div>
     </div>
