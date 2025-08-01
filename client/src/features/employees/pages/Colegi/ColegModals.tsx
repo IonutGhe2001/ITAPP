@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import ModalAsigneazaEchipament from "./ModalAsigneazaEchipament";
 import ModalEditColeg from "./ModalEditColeg";
 import { useUpdateEchipament } from "@/features/equipment";
+import { genereazaProcesVerbal } from "@/features/proceseVerbale";
 import { queueProcesVerbal } from "@/features/proceseVerbale/pvQueue";
 import { getConfig } from "@/services/configService";
 import type { Angajat } from "@/features/equipment/types";
