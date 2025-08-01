@@ -6,6 +6,7 @@ export interface AngajatInput {
   functie: string
   email?: string
   telefon?: string
+  departmentConfigId?: string
   dataAngajare?: Date
   cDataUsername?: string
   cDataId?: string
@@ -18,6 +19,7 @@ export interface AngajatUpdateInput {
   functie?: string
   email?: string
   telefon?: string
+  departmentConfigId?: string
   dataAngajare?: Date
   cDataUsername?: string
   cDataId?: string
@@ -25,7 +27,7 @@ export interface AngajatUpdateInput {
   cDataCreated?: boolean
 }
 
-export const getAngajati = () => api.get("/angajati");
+export const getAngajat = (id: string) => api.get(`/angajati/${id}`);
 
 export const useAngajati = () =>
   useQuery({
