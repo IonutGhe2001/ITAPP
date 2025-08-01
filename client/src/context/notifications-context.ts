@@ -5,13 +5,12 @@ export type Notification = {
   type: "Coleg" | "Echipament" | "SIM";
   message: string;
   timestamp: string | Date;
-  importance: 'normal' | 'high';
+  importance: "low" | "medium" | "high";
   read: boolean;
 };
 
 export type NotificationsContextType = {
   notifications: Notification[];
-  unreadCount: number;
   markAllRead: () => void;
   removeNotification: (id: string) => void;
   clearRead: () => void;

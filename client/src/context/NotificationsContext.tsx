@@ -8,7 +8,6 @@ import { useAuth } from "./use-auth";
 export function NotificationsProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -17,7 +16,9 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
 
     const fetchNotifications = async () => {
       try {
-        const res = await api.get<Omit<Notification, 'read'>[]>("/updates?limit=10");
+        const res = await api.get<Omit<Notification, 'read'>[]>(
+          "/updates?limit=10&importance=high"
+        );
         setNotifications(res.data.map((n) => ({ ...n, read: true })));
       } catch {
         // ignore
@@ -34,11 +35,10 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       reconnectionAttempts: 5,
     });
 
-    socket.on("update", (update: Omit<Notification, 'read'>) => {
+    socket.on("notification", (update: Omit<Notification, 'read'>) => {
       const notification = { ...update, read: false };
       toast({ title: update.type, description: update.message });
       setNotifications((prev) => [notification, ...prev]);
-      setUnreadCount((c) => c + 1);
     });
 
 
@@ -56,17 +56,10 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
 
   const markAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    setUnreadCount(0);
   };
 
   const removeNotification = (id: string) => {
-    setNotifications((prev) => {
-      const target = prev.find((n) => n.id === id);
-      if (target && !target.read) {
-        setUnreadCount((c) => Math.max(c - 1, 0));
-      }
-      return prev.filter((n) => n.id !== id);
-    });
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
   const clearRead = () => {
@@ -77,7 +70,6 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     <NotificationsContext.Provider
       value={{
         notifications,
-        unreadCount,
         markAllRead,
         removeNotification,
         clearRead,

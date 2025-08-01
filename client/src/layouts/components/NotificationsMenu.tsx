@@ -18,13 +18,12 @@ const updateIcons = {
 };
 
 export default function NotificationsMenu() {
-  const {
-    notifications,
-    unreadCount,
-    markAllRead,
-    removeNotification,
-    clearRead,
-  } = useNotifications();
+  const { notifications, markAllRead, removeNotification, clearRead } =
+    useNotifications();
+  const importantNotifications = notifications.filter(
+    (n) => n.importance === "high"
+  );
+  const unreadCount = importantNotifications.filter((n) => !n.read).length;
 
   return (
     <DropdownMenu
@@ -45,10 +44,10 @@ export default function NotificationsMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80 max-h-96 overflow-y-auto">
-        {notifications.length === 0 ? (
+        {importantNotifications.length === 0 ? (
           <DropdownMenuItem disabled>Nu există notificări</DropdownMenuItem>
         ) : (
-          notifications.map((n) => (
+          importantNotifications.map((n) => (
             <DropdownMenuItem key={n.id} className="flex gap-3 items-start">
               <div className="mt-1">{updateIcons[n.type]}</div>
               <div className="flex flex-col flex-1">

@@ -11,13 +11,17 @@ vi.mock('@/store/use-user', () => ({
   useUser: () => ({ user: { nume: 'John', prenume: 'Doe', functie: 'Admin' }, loading: false }),
 }));
 
+const notificationsMock: any[] = [];
+const markAllRead = vi.fn();
+const removeNotification = vi.fn();
+const clearRead = vi.fn();
+
 vi.mock('@/context/use-notifications', () => ({
   useNotifications: () => ({
-    notifications: [],
-    unreadCount: 0,
-    markAllRead: vi.fn(),
-    removeNotification: vi.fn(),
-    clearRead: vi.fn(),
+     notifications: notificationsMock,
+    markAllRead,
+    removeNotification,
+    clearRead,
   }),
 }));
 
@@ -30,6 +34,10 @@ vi.mock('@/services/searchService', () => ({
 }));
 
 describe('Header', () => {
+  beforeEach(() => {
+    notificationsMock.length = 0;
+  });
+
   it('renders page title based on route', () => {
     render(
       <MemoryRouter initialEntries={['/colegi']}>
@@ -37,5 +45,22 @@ describe('Header', () => {
       </MemoryRouter>
     );
     expect(screen.getByText('Colegi')).toBeInTheDocument();
+  });
+
+  it('shows indicator for unread important notifications', () => {
+    notificationsMock.push({
+      id: '1',
+      type: 'Coleg',
+      message: 'Important',
+      timestamp: new Date().toISOString(),
+      importance: 'high',
+      read: false,
+    });
+    const { container } = render(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>
+    );
+    expect(container.querySelector('.bg-destructive')).toBeInTheDocument();
   });
 });
