@@ -166,39 +166,66 @@ export default function Colegi() {
     }
   };
 
+   const handleScrollToPending = () => {
+    const firstId = Object.keys(pendingPV)[0];
+    if (!firstId) return;
+    const index = filtered.findIndex((c) => c.id === firstId);
+    if (index >= 0) {
+      listRef.current?.scrollToItem(index, "start");
+      setExpanded(new Set([firstId]));
+    }
+  };
+
   return (
     <Container className="py-6 space-y-6">
-      <div className="sticky top-0 z-10 space-y-4 pb-4">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <input
-            type="text"
-            placeholder="Caută după nume sau funcție"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/2"
-          />
-          <select
-            value={functieFilter}
-            onChange={(e) => setFunctieFilter(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/4"
-          >
-            <option value="">Toate funcțiile</option>
-            {functii.map((f: string) => (
-              <option key={f} value={f}>
-                {f}
-              </option>
-            ))}
-          </select>
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/4"
-          >
-            <option value="asc">Nume A-Z</option>
-            <option value="desc">Nume Z-A</option>
-          </select>
-        </div>
-      </div>
+      {(() => {
+        const pendingCount = Object.keys(pendingPV).length;
+        return (
+          <>
+            {pendingCount > 0 && (
+              <div className="bg-amber-100 text-amber-900 p-3 rounded-lg flex justify-between items-center">
+                <span>
+                  Există {pendingCount} procese verbale în așteptare
+                </span>
+                <button onClick={handleScrollToPending} className="underline">
+                  Vezi detalii
+                </button>
+              </div>
+            )}
+            <div className="sticky top-0 z-10 space-y-4 pb-4">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <input
+                  type="text"
+                  placeholder="Caută după nume sau funcție"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/2"
+                />
+                <select
+                  value={functieFilter}
+                  onChange={(e) => setFunctieFilter(e.target.value)}
+                  className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/4"
+                >
+                  <option value="">Toate funcțiile</option>
+                  {functii.map((f: string) => (
+                    <option key={f} value={f}>
+                      {f}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                  className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/4"
+                >
+                  <option value="asc">Nume A-Z</option>
+                  <option value="desc">Nume Z-A</option>
+                </select>
+              </div>
+            </div>
+          </>
+        );
+      })()}
 
       <div ref={containerRef} className="h-[60vh] max-h-[600px]">
         {width > 0 && height > 0 && filtered.length > 0 && (

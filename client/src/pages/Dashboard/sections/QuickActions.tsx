@@ -1,20 +1,29 @@
 "use client";
 
 import React, { useEffect, useState, Suspense } from "react";
-import { UserPlusIcon, LaptopIcon, FileTextIcon, UserCogIcon, DownloadIcon } from "lucide-react";
+import {
+  UserPlusIcon,
+  LaptopIcon,
+  FileTextIcon,
+  UserCogIcon,
+  DownloadIcon,
+} from "lucide-react";
 const ModalAddColeg = React.lazy(() => import("../modals/ModalAddColeg"));
 const ModalAddEchipament = React.lazy(() => import("../modals/ModalAddEchipament"));
 const ModalProcesVerbal = React.lazy(() => import("../modals/ModalProcesVerbal"));
 const ModalCreateUser = React.lazy(() => import("../modals/ModalCreateUser"));
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { getQueueCount } from "@/features/proceseVerbale/pvQueue";
 
 export default function QuickActions() {
   const [showColegModal, setShowColegModal] = useState(false);
   const [showEchipamentModal, setShowEchipamentModal] = useState(false);
   const [showProcesModal, setShowProcesModal] = useState(false);
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
+  const [count, setCount] = useState(getQueueCount());
 
-  
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key.toLowerCase() === "e") {
@@ -26,7 +35,16 @@ export default function QuickActions() {
     return () => window.removeEventListener("keydown", handleKey);
   }, []);
 
- 
+    useEffect(() => {
+    const update = () => setCount(getQueueCount());
+    window.addEventListener("focus", update);
+    window.addEventListener("storage", update);
+    return () => {
+      window.removeEventListener("focus", update);
+      window.removeEventListener("storage", update);
+    };
+  }, []);
+
   const handleExportJSON = () => {
     const fakeData = { message: "Backup local JSON" };
     const blob = new Blob([JSON.stringify(fakeData, null, 2)], { type: "application/json" });
@@ -62,10 +80,15 @@ export default function QuickActions() {
         <Button
           onClick={() => setShowProcesModal(true)}
           variant="outline"
-          className="w-full h-[100px] min-w-[150px] flex flex-col items-center justify-center gap-2 rounded-2xl border bg-chart-3/10 px-4 py-2 text-sm font-medium text-foreground hover:scale-105 transition-all whitespace-normal break-words text-center"
+          className="relative w-full h-[100px] min-w-[150px] flex flex-col items-center justify-center gap-2 rounded-2xl border bg-chart-3/10 px-4 py-2 text-sm font-medium text-foreground hover:scale-105 transition-all whitespace-normal break-words text-center"
         >
          <FileTextIcon className="w-5 h-5" />
           <span className="whitespace-normal break-words leading-tight">Generează proces verbal</span>
+          {count > 0 && (
+            <Badge variant="destructive" className="absolute -top-2 -right-2">
+              {count}
+            </Badge>
+          )}
         </Button>
 
         <Button

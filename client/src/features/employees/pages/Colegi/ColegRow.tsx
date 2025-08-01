@@ -6,7 +6,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { Pencil, Trash2, MoreHorizontal } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Pencil, Trash2, MoreHorizontal, AlertCircle } from "lucide-react";
 import { getEquipmentIcon } from "@/utils/equipmentIcons";
 import type { Angajat, Echipament } from "@/features/equipment/types";
 
@@ -92,7 +93,9 @@ export default function ColegRow({
             <p className="text-sm text-muted-foreground">{coleg.email}</p>
             <p className="text-sm text-muted-foreground">{coleg.telefon}</p>
             {pendingPV && (pendingPV.predate.length > 0 || pendingPV.primite.length > 0) && (
-              <p className="text-xs text-amber-600">Proces verbal în așteptare</p>
+              <Badge variant="destructive" className="mt-1 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" /> Proces verbal în așteptare
+              </Badge>
             )}
           </div>
         </div>

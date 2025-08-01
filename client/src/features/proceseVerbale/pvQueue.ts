@@ -11,3 +11,7 @@ export function queueProcesVerbal(
   existing.push({ angajatId, tip, ...opts });
   localStorage.setItem(QUEUE_KEY, JSON.stringify(existing));
 }
+
+export function getQueueCount() {
+  return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]').length;
+}
