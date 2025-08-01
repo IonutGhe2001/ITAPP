@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useRef } from "react";
+import { useState, useLayoutEffect, useRef } from "react";
 import {
   useAngajati,
   useDeleteAngajat,
@@ -215,7 +215,7 @@ export default function Colegi() {
                 </select>
                 <select
                   value={sortOrder}
-                  onChange={(e) => setSortOrder(e.target.value)}
+                  onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
                   className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/4"
                 >
                   <option value="asc">Nume A-Z</option>

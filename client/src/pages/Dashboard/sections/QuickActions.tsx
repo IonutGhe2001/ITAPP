@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, lazy } from "react";
 import {
   UserPlusIcon,
   LaptopIcon,
@@ -8,10 +8,10 @@ import {
   UserCogIcon,
   DownloadIcon,
 } from "lucide-react";
-const ModalAddColeg = React.lazy(() => import("../modals/ModalAddColeg"));
-const ModalAddEchipament = React.lazy(() => import("../modals/ModalAddEchipament"));
-const ModalProcesVerbal = React.lazy(() => import("../modals/ModalProcesVerbal"));
-const ModalCreateUser = React.lazy(() => import("../modals/ModalCreateUser"));
+const ModalAddColeg = lazy(() => import("../modals/ModalAddColeg"));
+const ModalAddEchipament = lazy(() => import("../modals/ModalAddEchipament"));
+const ModalProcesVerbal = lazy(() => import("../modals/ModalProcesVerbal"));
+const ModalCreateUser = lazy(() => import("../modals/ModalCreateUser"));
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getQueueCount } from "@/features/proceseVerbale/pvQueue";
