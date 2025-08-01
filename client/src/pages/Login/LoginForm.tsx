@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Eye, EyeOff } from "lucide-react";
 import api from "../../services/api";
 import { useAuth } from "@/context/use-auth";
@@ -7,6 +8,8 @@ import { useAuth } from "@/context/use-auth";
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [parola, setParola] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -17,6 +20,26 @@ export default function LoginForm() {
     e.preventDefault();
     setError("");
     setLoading(true);
+    setEmailError("");
+    setPasswordError("");
+
+    let hasError = false;
+    if (!email) {
+      setEmailError("Introdu adresa de email");
+      hasError = true;
+    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+      setEmailError("Adresa de email nu este validă");
+      hasError = true;
+    }
+
+    if (!parola) {
+      setPasswordError("Introduceți parola");
+      hasError = true;
+    }
+
+    if (hasError) {
+      return;
+    }
 
     try {
       const res = await api.post("/auth/login", {
@@ -36,7 +59,14 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-xs space-y-6">
+   <motion.form
+      onSubmit={handleSubmit}
+      noValidate
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="w-full max-w-xs space-y-6"
+    >
       {error && <div className="text-red-600 text-sm text-center">{error}</div>}
 
       <div className="space-y-1">
@@ -45,12 +75,15 @@ export default function LoginForm() {
           id="email"
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (emailError) setEmailError("");
+          }}
           placeholder="exemplu@firma.com"
           autoComplete="email"
-          className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring ${error ? "border-red-500" : "border-gray-300"}`}
-          required
+          className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring ${emailError ? "border-red-500" : "border-gray-300"}`}
         />
+         {emailError && <p className="text-red-600 text-sm">{emailError}</p>}
       </div>
 
       <div className="space-y-1 relative">
@@ -60,12 +93,14 @@ export default function LoginForm() {
             id="parola"
             type={showPassword ? "text" : "password"}
             value={parola}
-            onChange={(e) => setParola(e.target.value)}
+             onChange={(e) => {
+              setParola(e.target.value);
+              if (passwordError) setPasswordError("");
+            }}
             placeholder="Parolă"
-            autoComplete="new-password"
+            autoComplete="current-password"
             inputMode="text"
-            className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring ${error ? "border-red-500" : "border-gray-300"} pr-12`}
-            required
+            className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring ${passwordError ? "border-red-500" : "border-gray-300"} pr-12`}
           />
           <div className="absolute inset-y-0 right-3 flex items-center">
             <button
@@ -78,6 +113,7 @@ export default function LoginForm() {
             </button>
           </div>
         </div>
+        {passwordError && <p className="text-red-600 text-sm">{passwordError}</p>}
       </div>
 
       <button
@@ -87,6 +123,6 @@ export default function LoginForm() {
       >
         {loading ? "Se autentifică..." : "Sign In"}
       </button>
-    </form>
+    </motion.form>
   );
 }
