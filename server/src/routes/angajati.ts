@@ -1,7 +1,11 @@
 import express from "express";
 import * as controller from "../controllers/angajatiController";
 import { validateRequest } from "../middlewares/validateRequest";
-import { createAngajatSchema, updateAngajatSchema } from "../validators/angajat.validator";
+import {
+  createAngajatSchema,
+  updateAngajatSchema,
+  createEmailAccountSchema,
+} from "../validators/angajat.validator";
 import { authenticate, authorizeRoles } from "../middlewares/authMiddleware";
 
 const router = express.Router();
@@ -20,6 +24,12 @@ router.put(
   authorizeRoles("admin"),
   validateRequest(updateAngajatSchema),
   controller.updateAngajat
+);
+router.post(
+  "/:id/email-account",
+  authorizeRoles("admin"),
+  validateRequest(createEmailAccountSchema),
+  controller.createEmailAccount
 );
 router.delete("/:id", authorizeRoles("admin"), controller.deleteAngajat);
 

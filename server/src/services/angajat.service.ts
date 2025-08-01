@@ -6,8 +6,17 @@ export const getAngajati = () => {
       id: true,
       numeComplet: true,
       functie: true,
+      dataAngajare: true,
       email: true,
       telefon: true,
+      cDataUsername: true,
+      cDataId: true,
+      cDataNotes: true,
+      cDataCreated: true,
+      emailAccountStatus: true,
+      emailAccountCreatedAt: true,
+      emailAccountResponsible: true,
+      emailAccountLink: true,
       echipamente: {
         where: {
           angajatId: {
@@ -31,13 +40,28 @@ export const createAngajat = (data: {
   functie: string;
   email?: string;
   telefon?: string;
+  dataAngajare?: Date;
+  cDataUsername?: string;
+  cDataId?: string;
+  cDataNotes?: string;
+  cDataCreated?: boolean;
 }) => {
   return prisma.angajat.create({ data });
 };
 
 export const updateAngajat = (
   id: string,
-  data: { numeComplet?: string; functie?: string; email?: string; telefon?: string }
+  data: {
+    numeComplet?: string;
+    functie?: string;
+    email?: string;
+    telefon?: string;
+    dataAngajare?: Date 
+    cDataUsername?: string;
+    cDataId?: string;
+    cDataNotes?: string;
+    cDataCreated?: boolean;
+  }
 ) => {
   return prisma.angajat.update({ where: { id }, data });
 };
@@ -52,7 +76,7 @@ export const deleteAngajat = (id: string) => {
     if (echipamente.length) {
       await tx.echipament.updateMany({
         where: { angajatId: id },
-        data: { angajatId: null, stare: "disponibil" },
+        data: { angajatId: null, stare: "in_stoc" },
       });
 
       if (tx.equipmentChange) {
@@ -67,5 +91,21 @@ export const deleteAngajat = (id: string) => {
     }
 
     await tx.angajat.delete({ where: { id } });
+  });
+  };
+
+export const createEmailAccount = (
+  id: string,
+  data: { email: string; responsible: string; link?: string }
+) => {
+  return prisma.angajat.update({
+    where: { id },
+    data: {
+      email: data.email,
+      emailAccountStatus: "CREATED",
+      emailAccountCreatedAt: new Date(),
+      emailAccountResponsible: data.responsible,
+      emailAccountLink: data.link,
+    },
   });
 };

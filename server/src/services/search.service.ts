@@ -12,6 +12,8 @@ export interface EmployeeSuggestion {
   numeComplet: string;
   functie: string;
   email: string | null;
+  cDataUsername: string | null;
+  cDataId: string | null;
 }
 
 interface SuggestionsResult {
@@ -50,6 +52,8 @@ export const globalSearch = async (
         { functie: { contains: q, mode: "insensitive" } },
         { email: { contains: q, mode: "insensitive" } },
         { telefon: { contains: q, mode: "insensitive" } },
+        { cDataUsername: { contains: q, mode: "insensitive" } },
+        { cDataId: { contains: q, mode: "insensitive" } },
       ],
     },
     select: {
@@ -58,6 +62,10 @@ export const globalSearch = async (
       functie: true,
       email: true,
       telefon: true,
+      cDataUsername: true,
+      cDataId: true,
+      cDataNotes: true,
+      cDataCreated: true,
     },
   });
 
@@ -104,7 +112,14 @@ const computeSuggestions = async (
 
   const employees = (await prisma.angajat.findMany({
     take: SEARCH_SAMPLE_SIZE,
-    select: { id: true, numeComplet: true, functie: true, email: true },
+     select: {
+      id: true,
+      numeComplet: true,
+      functie: true,
+      email: true,
+      cDataUsername: true,
+      cDataId: true,
+    },
   })) as EmployeeSuggestion[];
   const employeeSuggestions = employees
     .map((a): { item: EmployeeSuggestion; score: number } => ({
@@ -112,7 +127,9 @@ const computeSuggestions = async (
       score: Math.min(
         levenshtein(a.numeComplet.toLowerCase(), q),
         levenshtein((a.functie || '').toLowerCase(), q),
-        levenshtein((a.email || '').toLowerCase(), q)
+        levenshtein((a.email || '').toLowerCase(), q),
+        levenshtein((a.cDataUsername || '').toLowerCase(), q),
+        levenshtein((a.cDataId || '').toLowerCase(), q)
       ),
     }))
     .sort((a, b) => a.score - b.score)

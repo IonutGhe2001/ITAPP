@@ -27,10 +27,25 @@ model Angajat {
   functie     String
   email       String?
   telefon     String?
+  dataAngajare DateTime @default(now())
+  cDataUsername String?
+  cDataId      String?
+  cDataNotes   String?
+  cDataCreated Boolean     @default(false)
+  emailAccountStatus     EmailAccountStatus @default(PENDING)
+  emailAccountCreatedAt  DateTime?
+  emailAccountResponsible String?
+  emailAccountLink       String?
   echipamente Echipament[]
   createdAt   DateTime     @default(now())
   proceseVerbale ProcesVerbal[]
   equipmentChanges EquipmentChange[]
+  onboarding   Onboarding[]
+}
+
+enum EmailAccountStatus {
+  PENDING
+  CREATED
 }
 
 model Echipament {
@@ -66,6 +81,7 @@ model ProcesVerbal {
   dataGenerare DateTime      @default(now())
   observatii   String?
   tip          ProcesVerbalTip @default(PREDARE_PRIMIRE)
+  documentPath String?
 }
 
 enum ProcesVerbalTip {
@@ -90,4 +106,28 @@ enum EquipmentChangeType {
   ASSIGN
   RETURN
   REPLACE
+  }
+
+model PurchaseRequest {
+  id            String               @id @default(uuid())
+  equipmentType String
+  quantity      Int
+  status        PurchaseRequestStatus @default(PENDING)
+  createdAt     DateTime             @default(now())
+}
+
+enum PurchaseRequestStatus {
+  PENDING
+  ORDERED
+  DELIVERED
+}
+
+model Onboarding {
+  id         String   @id @default(uuid())
+  angajatId  String?
+  angajat    Angajat? @relation(fields: [angajatId], references: [id])
+  department String
+  laptopId   String
+  tasks      Json
+  createdAt  DateTime @default(now())
 }

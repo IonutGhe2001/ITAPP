@@ -62,4 +62,28 @@ export const getStats = async (_: Request, res: Response, next: NextFunction) =>
   } catch (err) {
     next(err);
   }
+  };
+
+export const getAvailableStock = async (_: Request, res: Response, next: NextFunction) => {
+  try {
+    const stock = await echipamentService.getAvailableStock();
+    res.json(stock);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const orderEchipament = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { tip } = req.body;
+    const item = await echipamentService.orderEchipament(tip);
+    res.status(201).json(item);
+    emitUpdate({
+      type: "Echipament",
+      message: `Comandă echipament: ${tip}`,
+      importance: 'high',
+    });
+  } catch (err) {
+    next(err);
+  }
 };

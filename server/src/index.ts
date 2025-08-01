@@ -22,6 +22,11 @@ import searchRoutes from "./routes/search";
 import updatesRoutes from "./routes/updates";
 import equipmentChangesRoutes from "./routes/equipmentChanges";
 import configRoutes from "./routes/config";
+import reportsRoutes from "./routes/reports";
+import purchaseRequestRoutes from "./routes/purchaseRequests";
+import onboardingRoutes from "./routes/onboarding";
+
+
 
 
 dotenv.config();
@@ -63,6 +68,13 @@ app.use(
     etag: false,
   })
 );
+app.use(
+  "/procese-verbale",
+  express.static(path.join(__dirname, "../public/procese-verbale"), {
+    maxAge: "1y",
+    etag: false,
+  })
+);
 app.use("/api/auth/login", loginLimiter);
  app.use(logRequest);
 
@@ -75,8 +87,11 @@ app.use("/api/procese-verbale", proceseVerbaleRoutes);
 app.use("/api/import", importRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/updates", updatesRoutes);
+app.use("/api/purchase-requests", purchaseRequestRoutes);
 app.use("/api/equipment-changes", equipmentChangesRoutes);
 app.use("/config", configRoutes);
+app.use("/api/reports", reportsRoutes);
+app.use("/api/onboarding", onboardingRoutes);
 
 // Error handler middleware (final)
 app.use(errorHandler);

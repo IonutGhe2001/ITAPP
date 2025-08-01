@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "public"."Angajat" ADD COLUMN     "dataAngajare" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

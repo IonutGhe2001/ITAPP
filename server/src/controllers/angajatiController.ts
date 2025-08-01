@@ -54,4 +54,28 @@ export const deleteAngajat = async (req: Request, res: Response, next: NextFunct
   } catch (err) {
     next(err);
   }
+  };
+
+export const createEmailAccount = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const { email, responsible, link } = req.body;
+    const updated = await angajatService.createEmailAccount(id, {
+      email,
+      responsible,
+      link,
+    });
+    res.json(updated);
+    emitUpdate({
+      type: "Coleg",
+      message: "Cont e-mail creat",
+      importance: 'normal',
+    });
+  } catch (err) {
+    next(err);
+  }
 };

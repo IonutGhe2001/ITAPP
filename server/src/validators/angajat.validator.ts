@@ -5,6 +5,11 @@ export const createAngajatSchema = Joi.object({
   functie: Joi.string().min(2).required(),
   email: Joi.string().email().allow(null, ""),
   telefon: Joi.string().min(10).allow(null, ""),
+  dataAngajare: Joi.date().optional(),
+  cDataUsername: Joi.string().allow(null, ""),
+  cDataId: Joi.string().allow(null, ""),
+  cDataNotes: Joi.string().allow(null, ""),
+  cDataCreated: Joi.boolean(),
 });
 
 export const updateAngajatSchema = Joi.object({
@@ -12,4 +17,15 @@ export const updateAngajatSchema = Joi.object({
   functie: Joi.string().min(2),
   email: Joi.string().email().allow(null, ""),
   telefon: Joi.string().min(10).allow(null, ""),
+  dataAngajare: Joi.date().optional(),
+  cDataUsername: Joi.string().allow(null, ""),
+  cDataId: Joi.string().allow(null, ""),
+  cDataNotes: Joi.string().allow(null, ""),
+  cDataCreated: Joi.boolean(),
+  });
+
+export const createEmailAccountSchema = Joi.object({
+  email: Joi.string().email().required(),
+  responsible: Joi.string().min(2).required(),
+  link: Joi.string().uri().allow(null, ""),
 });

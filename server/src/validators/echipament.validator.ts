@@ -4,7 +4,7 @@ export const createEchipamentSchema = Joi.object({
   nume: Joi.string().required(),
   tip: Joi.string().required(),
   stare: Joi.string()
-    .valid("disponibil", "predat", "mentenanta")
+    .valid("in_stoc", "alocat", "in_comanda", "mentenanta")
     .optional(),
   serie: Joi.string().required(),
   angajatId: Joi.string().uuid().allow(null, ""),
@@ -15,7 +15,7 @@ export const updateEchipamentSchema = Joi.object({
   nume: Joi.string().optional(),
   tip: Joi.string().optional(),
    stare: Joi.string()
-    .valid("disponibil", "predat", "mentenanta")
+    .valid("in_stoc", "alocat", "in_comanda", "mentenanta")
     .optional(),
   serie: Joi.string().optional(),
   angajatId: Joi.string().uuid().allow(null, "").optional(),

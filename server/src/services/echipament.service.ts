@@ -52,8 +52,8 @@ export const createEchipament = (data: {
   const finalStare = data.stare
     ? data.stare
     : data.angajatId
-    ? "predat"
-    : "disponibil";
+    ? "alocat"
+    : "in_stoc";
 
   return prisma.$transaction(async (tx: any) => {
     const existing = await tx.echipament.findFirst({
@@ -193,12 +193,34 @@ export const deleteEchipament = (id: string) => {
 };
 
 export const getStats = async () => {
-  const [echipamente, disponibile, predate, angajati] = await Promise.all([
+  const [echipamente, inStocCount, alocateCount, angajati] = await Promise.all([
     prisma.echipament.count(),
-    prisma.echipament.count({ where: { stare: "disponibil" } }),
-    prisma.echipament.count({ where: { angajatId: { not: null } } }),
+     prisma.echipament.count({ where: { stare: "in_stoc" } }),
+    prisma.echipament.count({ where: { stare: "alocat" } }),
     prisma.angajat.count(),
   ]);
 
-  return { echipamente, disponibile, predate, angajati };
+  return { echipamente, inStoc: inStocCount, alocate: alocateCount, angajati };
+};
+
+export const getAvailableStock = async () => {
+  const types = ["Laptop", "Telefon", "SIM"];
+  const stock: Record<string, any[]> = {};
+  for (const t of types) {
+    stock[t] = await prisma.echipament.findMany({
+      where: { tip: t, stare: "in_stoc" },
+    });
+  }
+  return stock;
+};
+
+export const orderEchipament = (tip: string) => {
+  return prisma.echipament.create({
+    data: {
+      nume: `${tip} nou`,
+      tip,
+      serie: `order-${Date.now()}`,
+      stare: "in_comanda",
+    },
+  });
 };

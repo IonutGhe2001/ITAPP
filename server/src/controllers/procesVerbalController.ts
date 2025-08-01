@@ -8,6 +8,9 @@ import { genereazaPDFProcesVerbal } from "../utils/pdfGenerator";
 import { logger } from "@lib/logger";
 import { getUserById } from "../services/auth.service";
 import { prisma } from "../lib/prisma";
+import fs from "fs";
+import path from "path";
+
 
 export const creareProcesVerbal = async (req: Request, res: Response) => {
   try {
@@ -40,12 +43,22 @@ export const creareProcesVerbal = async (req: Request, res: Response) => {
       firma: "Creative & Innovative Management SRL",
       digitalSignature: currentUser?.digitalSignature,
     });
+    const fileName = `proces-verbal-${procesVerbal.id}.pdf`;
+    const filePath = path.join(__dirname, "../../public/procese-verbale", fileName);
+    fs.writeFileSync(filePath, pdfBuffer);
 
-    res.set({
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename=proces-verbal-${procesVerbal.id}.pdf`,
-      "Content-Length": pdfBuffer.length,
-    }).send(pdfBuffer);
+    await prisma.procesVerbal.update({
+      where: { id: procesVerbal.id },
+      data: { documentPath: `/procese-verbale/${fileName}` },
+    });
+
+    res
+      .set({
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `inline; filename=${fileName}`,
+        "Content-Length": pdfBuffer.length,
+      })
+      .send(pdfBuffer);
   } catch (error) {
     logger.error("Eroare la creare proces verbal:", error);
     res.status(500).json({ message: "Eroare la generarea procesului verbal." });
@@ -73,12 +86,22 @@ export const creareProcesVerbalDinSchimbari = async (
       where: { id: { in: schimbariIds } },
       data: { finalized: true },
     });
+    const fileName = `proces-verbal-${procesVerbalId}.pdf`;
+    const filePath = path.join(__dirname, "../../public/procese-verbale", fileName);
+    fs.writeFileSync(filePath, pdfBuffer);
 
-    res.set({
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename=proces-verbal-${procesVerbalId}.pdf`,
-      "Content-Length": pdfBuffer.length,
-    }).send(pdfBuffer);
+    await prisma.procesVerbal.update({
+      where: { id: procesVerbalId },
+      data: { documentPath: `/procese-verbale/${fileName}` },
+    });
+
+    res
+      .set({
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `inline; filename=${fileName}`,
+        "Content-Length": pdfBuffer.length,
+      })
+      .send(pdfBuffer);
   } catch (error) {
     logger.error(
       "Eroare la creare proces verbal din schimbari:",

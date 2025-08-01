@@ -8,6 +8,7 @@ jest.mock('../src/services/angajat.service', () => ({
   createAngajat: jest.fn(),
   updateAngajat: jest.fn(),
   deleteAngajat: jest.fn(),
+  createEmailAccount: jest.fn(),
 }));
 jest.mock('../src/lib/websocket', () => ({ emitUpdate: jest.fn() }));
 const angajatService = require('../src/services/angajat.service');
@@ -87,6 +88,27 @@ describe('Angajati Routes', () => {
       type: 'Coleg',
       message: 'Coleg șters',
       importance: 'high',
+    });
+  });
+
+   it('create email account', async () => {
+    (angajatService.createEmailAccount as jest.MockedFunction<typeof angajatService.createEmailAccount>).mockResolvedValue({ id: '1', email: 'test@test.com' });
+
+    const res = await request(app)
+      .post('/api/angajati/1/email-account')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ email: 'test@test.com', responsible: 'Admin', link: 'http://mail.test' });
+
+    expect(res.status).toBe(200);
+    expect(angajatService.createEmailAccount).toHaveBeenCalledWith('1', {
+      email: 'test@test.com',
+      responsible: 'Admin',
+      link: 'http://mail.test',
+    });
+    expect(emitUpdate).toHaveBeenCalledWith({
+      type: 'Coleg',
+      message: 'Cont e-mail creat',
+      importance: 'normal',
     });
   });
 });
