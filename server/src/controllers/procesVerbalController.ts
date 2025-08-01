@@ -1,9 +1,13 @@
 import { Request, Response } from "express";
-import { creeazaProcesVerbalCuEchipamente } from "../services/procesVerbal.service";
+import {
+  creeazaProcesVerbalCuEchipamente,
+  creeazaProcesVerbalDinSchimbari,
+} from "../services/procesVerbal.service";
 import { ProcesVerbalTip } from "@prisma/client";
 import { genereazaPDFProcesVerbal } from "../utils/pdfGenerator";
 import { logger } from "@lib/logger";
 import { getUserById } from "../services/auth.service";
+import { prisma } from "../lib/prisma";
 
 export const creareProcesVerbal = async (req: Request, res: Response) => {
   try {
@@ -48,3 +52,40 @@ export const creareProcesVerbal = async (req: Request, res: Response) => {
   }
 };
 
+export const creareProcesVerbalDinSchimbari = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { angajatId } = req.body;
+    const result = await creeazaProcesVerbalDinSchimbari(angajatId);
+
+    if (!result) {
+      return res
+        .status(404)
+        .json({ message: "Nu există schimbări de procesat." });
+    }
+
+    const { pdfBuffer, schimbariIds, procesVerbalId } = result;
+
+    // @ts-ignore - equipmentChange may not be typed yet
+    await prisma.equipmentChange.updateMany({
+      where: { id: { in: schimbariIds } },
+      data: { finalized: true },
+    });
+
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `inline; filename=proces-verbal-${procesVerbalId}.pdf`,
+      "Content-Length": pdfBuffer.length,
+    }).send(pdfBuffer);
+  } catch (error) {
+    logger.error(
+      "Eroare la creare proces verbal din schimbari:",
+      error
+    );
+    res
+      .status(500)
+      .json({ message: "Eroare la generarea procesului verbal." });
+  }
+};

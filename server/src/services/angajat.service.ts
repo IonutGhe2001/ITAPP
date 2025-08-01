@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma";
-
+import { EquipmentChangeType } from "@prisma/client";
 
 export const getAngajati = () => {
   return prisma.angajat.findMany({
@@ -44,11 +44,29 @@ export const updateAngajat = (
 };
 
 export const deleteAngajat = (id: string) => {
-  return prisma.$transaction([
-    prisma.echipament.updateMany({
+ return prisma.$transaction(async (tx: any) => {
+    const echipamente = await tx.echipament.findMany({
       where: { angajatId: id },
-      data: { angajatId: null, stare: "disponibil" },
-    }),
-    prisma.angajat.delete({ where: { id } }),
-  ]);
+      dselect: { id: true },
+    });
+
+    if (echipamente.length) {
+      await tx.echipament.updateMany({
+        where: { angajatId: id },
+        data: { angajatId: null, stare: "disponibil" },
+      });
+
+      if (tx.equipmentChange) {
+        await tx.equipmentChange.createMany({
+          data: echipamente.map((eq: { id: string }) => ({
+            angajatId: id,
+            echipamentId: eq.id,
+            tip: EquipmentChangeType.RETURN,
+          })),
+        });
+      }
+    }
+
+    await tx.angajat.delete({ where: { id } });
+  });
 };

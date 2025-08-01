@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma";
+import { EquipmentChangeType } from "@prisma/client";
 // Proces verbal generation is handled separately; avoid importing related services here
 
 const validateEchipamentUpdate = async (
@@ -80,12 +81,24 @@ export const createEchipament = (data: {
       }
     }
 
-    return tx.echipament.create({
+    const echipament = await tx.echipament.create({
       data: {
         ...data,
         stare: finalStare,
       },
     });
+
+    if (echipament.angajatId && tx.equipmentChange) {
+      await tx.equipmentChange.create({
+        data: {
+          angajatId: echipament.angajatId,
+          echipamentId: echipament.id,
+          tip: EquipmentChangeType.ASSIGN,
+        },
+      });
+    }
+
+    return echipament;
   });
 };
 
@@ -107,7 +120,7 @@ export const updateEchipament = async (
 
     await validateEchipamentUpdate(tx, id, current, data);
 
-    return tx.echipament.update({
+   const updated = await tx.echipament.update({
       where: { id },
       data: {
         ...(data.nume !== undefined && { nume: data.nume }),
@@ -121,6 +134,58 @@ export const updateEchipament = async (
         angajat: true,
       },
     });
+    
+    if (tx.equipmentChange) {
+      if (data.angajatId !== undefined && data.angajatId !== current.angajatId) {
+        if (current.angajatId && data.angajatId) {
+          await tx.equipmentChange.create({
+            data: {
+              angajatId: current.angajatId,
+              echipamentId: id,
+              tip: EquipmentChangeType.RETURN,
+            },
+          });
+          await tx.equipmentChange.create({
+            data: {
+              angajatId: data.angajatId,
+              echipamentId: id,
+              tip: EquipmentChangeType.ASSIGN,
+            },
+          });
+        } else if (current.angajatId && !data.angajatId) {
+          await tx.equipmentChange.create({
+            data: {
+              angajatId: current.angajatId,
+              echipamentId: id,
+              tip: EquipmentChangeType.RETURN,
+            },
+          });
+        } else if (!current.angajatId && data.angajatId) {
+          await tx.equipmentChange.create({
+            data: {
+              angajatId: data.angajatId,
+              echipamentId: id,
+              tip: EquipmentChangeType.ASSIGN,
+            },
+          });
+        }
+      } else if (
+        (data.tip && data.tip !== current.tip) ||
+        (data.serie && data.serie !== current.serie)
+      ) {
+        if (current.angajatId) {
+          await tx.equipmentChange.create({
+            data: {
+              angajatId: current.angajatId,
+              echipamentId: id,
+              tip: EquipmentChangeType.REPLACE,
+            },
+          });
+        }
+      }
+    }
+
+    return updated;
   });
 };
 

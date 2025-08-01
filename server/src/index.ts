@@ -20,6 +20,8 @@ import proceseVerbaleRoutes from "./routes/proceseVerbale";
 import importRoutes from "./routes/import";
 import searchRoutes from "./routes/search";
 import updatesRoutes from "./routes/updates";
+import equipmentChangesRoutes from "./routes/equipmentChanges";
+import configRoutes from "./routes/config";
 
 
 dotenv.config();
@@ -73,6 +75,8 @@ app.use("/api/procese-verbale", proceseVerbaleRoutes);
 app.use("/api/import", importRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/updates", updatesRoutes);
+app.use("/api/equipment-changes", equipmentChangesRoutes);
+app.use("/config", configRoutes);
 
 // Error handler middleware (final)
 app.use(errorHandler);

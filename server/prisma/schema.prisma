@@ -29,7 +29,8 @@ model Angajat {
   telefon     String?
   echipamente Echipament[]
   createdAt   DateTime     @default(now())
-   proceseVerbale ProcesVerbal[] 
+  proceseVerbale ProcesVerbal[]
+  equipmentChanges EquipmentChange[]
 }
 
 model Echipament {
@@ -43,6 +44,7 @@ model Echipament {
   angajat    Angajat?  @relation(fields: [angajatId], references: [id])
   createdAt  DateTime  @default(now())
   proceseVerbale ProcesVerbal[] @relation("EchipamenteProcesVerbal")
+  changes      EquipmentChange[]
 
   @@unique([tip, serie])
 }
@@ -70,4 +72,22 @@ enum ProcesVerbalTip {
   PREDARE_PRIMIRE
   RESTITUIRE
   SCHIMB
+}
+
+model EquipmentChange {
+  id           String               @id @default(uuid())
+  angajatId    String
+  echipamentId String
+  tip          EquipmentChangeType
+  includedInPV Boolean              @default(false)
+  createdAt    DateTime             @default(now())
+
+  angajat      Angajat              @relation(fields: [angajatId], references: [id])
+  echipament   Echipament           @relation(fields: [echipamentId], references: [id])
+}
+
+enum EquipmentChangeType {
+  ASSIGN
+  RETURN
+  REPLACE
 }

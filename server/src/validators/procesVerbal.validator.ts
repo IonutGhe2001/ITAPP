@@ -9,4 +9,8 @@ export const createProcesVerbalSchema = Joi.object({
   echipamentIds: Joi.array().items(Joi.string().uuid()).optional(),
   echipamentePredate: Joi.array().items(Joi.string().uuid()).optional(),
   echipamentePrimite: Joi.array().items(Joi.string().uuid()).optional(),
+  });
+
+export const procesVerbalFromChangesSchema = Joi.object({
+  angajatId: Joi.string().uuid().required(),
 });
