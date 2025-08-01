@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect, useRef } from "react";
+import { useState, useLayoutEffect, useRef, useEffect } from "react";
 import {
   useAngajati,
   useDeleteAngajat,
@@ -6,7 +6,7 @@ import {
 import type { Angajat, Echipament } from "@/features/equipment/types";
 import { useUpdateEchipament } from "@/features/equipment";
 import { genereazaProcesVerbal, type ProcesVerbalTip } from "@/features/proceseVerbale";
-import { queueProcesVerbal } from "@/features/proceseVerbale/pvQueue";
+import { queueProcesVerbal, getQueue, removeFromQueue } from "@/features/proceseVerbale/pvQueue";
 import { getConfig } from "@/services/configService";
 import ColegRow from "./ColegRow";
 import ColegModals from "./ColegModals";
@@ -33,6 +33,20 @@ export default function Colegi() {
   const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
   const [pendingPV, setPendingPV] = useState<Record<string, { predate: string[]; primite: string[] }>>({});
+  
+  useEffect(() => {
+    const items = getQueue();
+    if (items.length === 0) return;
+    const grouped: Record<string, { predate: string[]; primite: string[] }> = {};
+    for (const item of items) {
+      const current = grouped[item.angajatId] || { predate: [], primite: [] };
+      grouped[item.angajatId] = {
+        predate: [...current.predate, ...(item.predate || [])],
+        primite: [...current.primite, ...(item.primite || [])],
+      };
+    }
+    setPendingPV(grouped);
+  }, []);
 
   const addPendingPV = (colegId: string, change: { predate?: string[]; primite?: string[] }) => {
     setPendingPV((prev) => {
@@ -65,6 +79,7 @@ export default function Colegi() {
         delete updated[colegId];
         return updated;
       });
+      removeFromQueue(colegId);
     } catch {
       toast({ title: "Eroare la generarea procesului verbal", variant: "destructive" });
     }

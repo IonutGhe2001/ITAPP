@@ -22,6 +22,8 @@ vi.mock('@/services/configService', () => ({
 
 vi.mock('@/features/proceseVerbale/pvQueue', () => ({
   queueProcesVerbal: vi.fn(),
+  getQueue: () => [],
+  removeFromQueue: vi.fn(),
 }));
 
 vi.mock('@/utils/equipmentIcons', () => ({

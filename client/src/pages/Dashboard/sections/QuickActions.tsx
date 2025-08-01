@@ -14,7 +14,13 @@ const ModalProcesVerbal = lazy(() => import("../modals/ModalProcesVerbal"));
 const ModalCreateUser = lazy(() => import("../modals/ModalCreateUser"));
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getQueueCount } from "@/features/proceseVerbale/pvQueue";
+import {
+  getQueueCount,
+  getQueue,
+  clearQueue,
+} from "@/features/proceseVerbale/pvQueue";
+import { genereazaProcesVerbal } from "@/features/proceseVerbale";
+import { useToast } from "@/hooks/use-toast/use-toast-hook";
 
 export default function QuickActions() {
   const [showColegModal, setShowColegModal] = useState(false);
@@ -22,7 +28,7 @@ export default function QuickActions() {
   const [showProcesModal, setShowProcesModal] = useState(false);
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [count, setCount] = useState(getQueueCount());
-
+  const { toast } = useToast();
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -55,6 +61,30 @@ export default function QuickActions() {
     a.click();
     URL.revokeObjectURL(url);
   };
+ 
+  const handleProces = async () => {
+    if (count > 0) {
+      const queue = getQueue();
+      for (const item of queue) {
+        try {
+          const url = await genereazaProcesVerbal(item.angajatId, item.tip, {
+            predate: item.predate,
+            primite: item.primite,
+          });
+          window.open(url, "_blank");
+        } catch {
+          toast({
+            title: "Eroare la generarea procesului verbal",
+            variant: "destructive",
+          });
+        }
+      }
+      clearQueue();
+      setCount(0);
+    } else {
+      setShowProcesModal(true);
+    }
+  };
 
   return (
     <>
@@ -77,11 +107,11 @@ export default function QuickActions() {
           <span className="whitespace-normal break-words leading-tight">Adaugă echipament</span>
         </Button>
 
-        <Button
-          onClick={() => setShowProcesModal(true)}
-          variant="outline"
-          className="relative w-full h-[100px] min-w-[150px] flex flex-col items-center justify-center gap-2 rounded-2xl border bg-chart-3/10 px-4 py-2 text-sm font-medium text-foreground hover:scale-105 transition-all whitespace-normal break-words text-center"
-        >
+       <Button
+            onClick={handleProces}
+            variant="outline"
+            className="relative w-full h-[100px] min-w-[150px] flex flex-col items-center justify-center gap-2 rounded-2xl border bg-chart-3/10 px-4 py-2 text-sm font-medium text-foreground hover:scale-105 transition-all whitespace-normal break-words text-center"
+          >
          <FileTextIcon className="w-5 h-5" />
           <span className="whitespace-normal break-words leading-tight">Generează proces verbal</span>
           {count > 0 && (
