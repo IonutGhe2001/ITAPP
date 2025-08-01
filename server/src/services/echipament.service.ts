@@ -193,14 +193,20 @@ export const deleteEchipament = (id: string) => {
 };
 
 export const getStats = async () => {
-  const [echipamente, inStocCount, alocateCount, angajati] = await Promise.all([
-    prisma.echipament.count(),
-     prisma.echipament.count({ where: { stare: "in_stoc" } }),
-    prisma.echipament.count({ where: { stare: "alocat" } }),
-    prisma.angajat.count(),
-  ]);
+ const [echipamente, inStocCount, alocatCount, angajati] =
+    await Promise.all([
+      prisma.echipament.count(),
+      prisma.echipament.count({ where: { stare: "in_stoc" } }),
+      prisma.echipament.count({ where: { stare: "alocat" } }),
+      prisma.angajat.count(),
+    ]);
 
-  return { echipamente, inStoc: inStocCount, alocate: alocateCount, angajati };
+  return {
+    echipamente,
+    in_stoc: inStocCount,
+    alocat: alocatCount,
+    angajati,
+  };
 };
 
 export const getAvailableStock = async () => {
