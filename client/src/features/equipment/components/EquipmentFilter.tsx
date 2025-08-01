@@ -1,5 +1,9 @@
 import { memo } from "react";
 import type { EquipmentFilterProps } from "@/features/equipment/types";
+import {
+  EQUIPMENT_STATUS,
+  EQUIPMENT_STATUS_LABELS,
+} from "@/features/equipment/types";
 
 function EquipmentFilter({
   search,
@@ -24,9 +28,15 @@ function EquipmentFilter({
         className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/4"
       >
         <option value="">Toate statusurile</option>
-        <option value="in_stoc">În stoc</option>
-        <option value="alocat">Alocate</option>
-        <option value="mentenanta">În mentenanță</option>
+        <option value={EQUIPMENT_STATUS.IN_STOC}>
+          {EQUIPMENT_STATUS_LABELS[EQUIPMENT_STATUS.IN_STOC]}
+        </option>
+        <option value={EQUIPMENT_STATUS.ALOCAT}>
+          {EQUIPMENT_STATUS_LABELS[EQUIPMENT_STATUS.ALOCAT]}
+        </option>
+        <option value={EQUIPMENT_STATUS.MENTENANTA}>
+          {EQUIPMENT_STATUS_LABELS[EQUIPMENT_STATUS.MENTENANTA]}
+        </option>
       </select>
       <select
         value={sort}

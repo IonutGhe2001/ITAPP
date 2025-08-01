@@ -15,6 +15,10 @@ import {
 import { useTheme } from "@components/ui/theme-provider-utils";
 import { useNavigate } from "react-router-dom";
 import { useOverviewStats } from "@/services/statsService";
+import {
+  EQUIPMENT_STATUS,
+  EQUIPMENT_STATUS_LABELS,
+} from "@/features/equipment/types";
 
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, ChartDataLabels);
@@ -30,8 +34,8 @@ const navigate = useNavigate();
 
 const angajatiCount = stats?.angajati ?? 0;
   const total = stats?.echipamente ?? 0;
-  const inStoc = stats?.inStoc ?? 0;
-  const alocate = stats?.alocate ?? 0;
+  const inStoc = stats?.[EQUIPMENT_STATUS.IN_STOC] ?? 0;
+  const alocate = stats?.[EQUIPMENT_STATUS.ALOCAT] ?? 0;
   const { resolvedTheme } = useTheme();
 
   const handleBarClick = useCallback<NonNullable<ChartOptions<"bar">["onClick"]>>(
@@ -48,19 +52,24 @@ const angajatiCount = stats?.angajati ?? 0;
     () => {
       void resolvedTheme;
       return {
-      labels: ["Angajați", "Echipamente", "În stoc", "Alocate"],
-      datasets: [
-        {
-          label: "Număr",
-          data: [angajatiCount, total, inStoc, alocate],
-          backgroundColor: [
-            `hsl(${getCssVar("--chart-1")})`,
-            `hsl(${getCssVar("--chart-2")})`,
-            `hsl(${getCssVar("--chart-4")})`,
-            `hsl(${getCssVar("--chart-5")})`,
-          ],
-        },
-      ],
+     labels: [
+          "Angajați",
+          "Echipamente",
+          EQUIPMENT_STATUS_LABELS[EQUIPMENT_STATUS.IN_STOC],
+          EQUIPMENT_STATUS_LABELS[EQUIPMENT_STATUS.ALOCAT],
+        ],
+        datasets: [
+          {
+            label: "Număr",
+            data: [angajatiCount, total, inStoc, alocate],
+            backgroundColor: [
+              `hsl(${getCssVar("--chart-1")})`,
+              `hsl(${getCssVar("--chart-2")})`,
+              `hsl(${getCssVar("--chart-4")})`,
+              `hsl(${getCssVar("--chart-5")})`,
+            ],
+          },
+        ],
       };
     },
     [angajatiCount, total, inStoc, alocate, resolvedTheme]

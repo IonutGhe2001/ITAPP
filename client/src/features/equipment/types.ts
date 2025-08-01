@@ -14,7 +14,22 @@ export interface Angajat {
   emailAccountLink?: string;
 }
 
-export type EquipmentStatus = "in_stoc" | "alocat" | "in_comanda" | "mentenanta";
+export const EQUIPMENT_STATUS = {
+  IN_STOC: "in_stoc",
+  ALOCAT: "alocat",
+  IN_COMANDA: "in_comanda",
+  MENTENANTA: "mentenanta",
+} as const;
+
+export type EquipmentStatus =
+  (typeof EQUIPMENT_STATUS)[keyof typeof EQUIPMENT_STATUS];
+
+export const EQUIPMENT_STATUS_LABELS: Record<EquipmentStatus, string> = {
+  [EQUIPMENT_STATUS.IN_STOC]: "În stoc",
+  [EQUIPMENT_STATUS.ALOCAT]: "Alocate",
+  [EQUIPMENT_STATUS.IN_COMANDA]: "În comandă",
+  [EQUIPMENT_STATUS.MENTENANTA]: "În mentenanță",
+};
 
 export interface Echipament {
   id: string;
