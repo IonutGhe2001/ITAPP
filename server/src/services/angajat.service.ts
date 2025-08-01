@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma";
-import { EquipmentChangeType } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 export const getAngajati = () => {
   return prisma.angajat.findMany({
@@ -47,7 +47,7 @@ export const deleteAngajat = (id: string) => {
  return prisma.$transaction(async (tx: any) => {
     const echipamente = await tx.echipament.findMany({
       where: { angajatId: id },
-      dselect: { id: true },
+      select: { id: true },
     });
 
     if (echipamente.length) {
@@ -61,7 +61,7 @@ export const deleteAngajat = (id: string) => {
           data: echipamente.map((eq: { id: string }) => ({
             angajatId: id,
             echipamentId: eq.id,
-            tip: EquipmentChangeType.RETURN,
+            tip: Prisma.EquipmentChangeType.RETURN,
           })),
         });
       }

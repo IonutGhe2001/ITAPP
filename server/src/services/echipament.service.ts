@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma";
-import { EquipmentChangeType } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 // Proces verbal generation is handled separately; avoid importing related services here
 
 const validateEchipamentUpdate = async (
@@ -93,7 +93,7 @@ export const createEchipament = (data: {
         data: {
           angajatId: echipament.angajatId,
           echipamentId: echipament.id,
-          tip: EquipmentChangeType.ASSIGN,
+          tip: Prisma.EquipmentChangeType.ASSIGN,
         },
       });
     }
@@ -142,14 +142,14 @@ export const updateEchipament = async (
             data: {
               angajatId: current.angajatId,
               echipamentId: id,
-              tip: EquipmentChangeType.RETURN,
+              tip: Prisma.EquipmentChangeType.RETURN,
             },
           });
           await tx.equipmentChange.create({
             data: {
               angajatId: data.angajatId,
               echipamentId: id,
-              tip: EquipmentChangeType.ASSIGN,
+              tip: Prisma.EquipmentChangeType.ASSIGN,
             },
           });
         } else if (current.angajatId && !data.angajatId) {
@@ -157,7 +157,7 @@ export const updateEchipament = async (
             data: {
               angajatId: current.angajatId,
               echipamentId: id,
-              tip: EquipmentChangeType.RETURN,
+              tip: Prisma.EquipmentChangeType.RETURN,
             },
           });
         } else if (!current.angajatId && data.angajatId) {
@@ -165,7 +165,7 @@ export const updateEchipament = async (
             data: {
               angajatId: data.angajatId,
               echipamentId: id,
-              tip: EquipmentChangeType.ASSIGN,
+              tip: Prisma.EquipmentChangeType.ASSIGN,
             },
           });
         }
@@ -178,7 +178,7 @@ export const updateEchipament = async (
             data: {
               angajatId: current.angajatId,
               echipamentId: id,
-              tip: EquipmentChangeType.REPLACE,
+              tip: Prisma.EquipmentChangeType.REPLACE,
             },
           });
         }
