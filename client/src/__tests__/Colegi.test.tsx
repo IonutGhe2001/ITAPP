@@ -1,40 +1,40 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
-import { vi } from "vitest";
-import Colegi from "../features/employees/pages/Colegi/Colegi";
-import ColegRow from "../features/employees/pages/Colegi/ColegRow";
-import ModalCreateEmail from "../features/employees/pages/Colegi/ModalCreateEmail";
+import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import { vi } from 'vitest';
+import Colegi from '../features/employees/pages/Colegi/Colegi';
+import ColegRow from '../features/employees/pages/Colegi/ColegRow';
+import ModalCreateEmail from '../features/employees/pages/Colegi/ModalCreateEmail';
 
-vi.mock("@/features/employees'" () => ({
+vi.mock('@/features/employees', () => ({
   useAngajati: () => ({ data: [], refetch: vi.fn() }),
   useDeleteAngajat: () => ({ mutateAsync: vi.fn() }),
   useUpdateAngajat: () => ({ mutate: vi.fn() }),
   useCreateEmailAccount: () => ({ mutateAsync: vi.fn() }),
 }));
 
-vi.mock("@/features/equipment", () => ({
+vi.mock('@/features/equipment', () => ({
   useUpdateEchipament: () => ({ mutateAsync: vi.fn() }),
 }));
 
-vi.mock("@/features/proceseVerbale", () => ({
+vi.mock('@/features/proceseVerbale', () => ({
   genereazaProcesVerbal: vi.fn(),
 }));
 
-vi.mock("@/services/configService", () => ({
+vi.mock('@/services/configService', () => ({
   getConfig: vi.fn().mockResolvedValue({ pvGenerationMode: 'auto' }),
 }));
 
-vi.mock("@/features/proceseVerbale/pvQueue", () => ({
+vi.mock('@/features/proceseVerbale/pvQueue', () => ({
   queueProcesVerbal: vi.fn(),
   getQueue: () => [],
   removeFromQueue: vi.fn(),
 }));
 
-vi.mock("@/utils/equipmentIcons", () => ({
+vi.mock('@/utils/equipmentIcons', () => ({
   getEquipmentIcon: () => null,
 }));
 
-vi.mock("@/hooks/use-toast/use-toast-hook", () => ({
+vi.mock('@/hooks/use-toast/use-toast-hook', () => ({
   useToast: () => ({ toast: vi.fn() }),
 }));
 
@@ -45,9 +45,7 @@ describe('Colegi', () => {
         <Colegi />
       </MemoryRouter>
     );
-    expect(
-      screen.getByPlaceholderText('Caută după nume sau funcție')
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Caută după nume sau funcție')).toBeInTheDocument();
   });
   
   it('shows mark email button only when status is pending', () => {
@@ -80,9 +78,7 @@ describe('Colegi', () => {
         setCreateEmail={vi.fn()}
       />
     );
-    expect(
-      screen.getByText('Marchează cont e-mail creat')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Marchează cont e-mail creat')).toBeInTheDocument();
 
     const colegCreated = { ...coleg, emailAccountStatus: 'CREATED' as const };
     rerender(
@@ -104,9 +100,7 @@ describe('Colegi', () => {
         setCreateEmail={vi.fn()}
       />
     );
-    expect(
-      screen.queryByText('Marchează cont e-mail creat')
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Marchează cont e-mail creat')).not.toBeInTheDocument();
   });
 
   it('prefills email and requires responsible on mark form', async () => {
@@ -120,13 +114,7 @@ describe('Colegi', () => {
       echipamente: [],
     };
     const onSuccess = vi.fn();
-    render(
-      <ModalCreateEmail
-        coleg={coleg}
-        onClose={vi.fn()}
-        onSuccess={onSuccess}
-      />
-    );
+    render(<ModalCreateEmail coleg={coleg} onClose={vi.fn()} onSuccess={onSuccess} />);
 
     expect(screen.getByDisplayValue('test@example.com')).toBeInTheDocument();
 
