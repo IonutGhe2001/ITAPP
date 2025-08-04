@@ -22,6 +22,18 @@ jest.mock('../src/lib/prisma', () => ({
         }
         return Promise.resolve(echipData.length);
       }),
+      groupBy: jest.fn(() => {
+        const grouped: any[] = [];
+        echipData.forEach((e) => {
+          const existing = grouped.find((g) => g.stare === e.stare);
+          if (existing) {
+            existing._count.stare += 1;
+          } else {
+            grouped.push({ stare: e.stare, _count: { stare: 1 } });
+          }
+        });
+        return Promise.resolve(grouped);
+      }),
     },
     angajat: {
       count: jest.fn().mockResolvedValue(0),
