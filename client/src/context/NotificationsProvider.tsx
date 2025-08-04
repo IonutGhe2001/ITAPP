@@ -2,7 +2,7 @@ import { useState, useEffect, type ReactNode } from 'react';
 import { io, type Socket } from 'socket.io-client';
 import api from '@/services/api';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
-import { NotificationsContext, type Notification } from './NotificationsProvider';
+import { NotificationsContext, type Notification } from './notifications-context';
 import { useAuth } from './useAuth';
 
 export function NotificationsProvider({ children }: { children: ReactNode }) {

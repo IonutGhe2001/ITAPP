@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { logout as logoutRequest } from '@/services/authService';
 import { getToken, setToken as storeToken, removeToken } from '@/utils/storage';
-import { AuthContext } from './AuthProvider';
+import { AuthContext } from './authContext';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setTokenState] = useState<string | null>(getToken());
