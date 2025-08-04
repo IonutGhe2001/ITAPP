@@ -5,3 +5,4 @@ export { default as ModalEditEchipament } from './ModalEditEchipament';
 export { default as ModalPredaEchipament } from './ModalPredaEchipament';
 export { default as EchipamentForm } from './EchipamentForm';
 export { default as EquipmentTypeFilter } from './EquipmentTypeFilter';
+export { EquipmentIcon } from './EquipmentIcon';

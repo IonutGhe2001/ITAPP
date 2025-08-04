@@ -1,6 +1,6 @@
 import { useState, memo, useMemo } from 'react';
 import { PencilIcon, TrashIcon } from 'lucide-react';
-import { getEquipmentIcon } from '@/utils/equipmentIcons';
+import { EquipmentIcon } from '@/features/equipment';
 import { ModalPredaEchipament } from '@/features/equipment';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,7 @@ function EquipmentCard({ echipament, onEdit, onDelete, onRefresh }: EquipmentCar
   };
 
   const icon = useMemo(
-    () => getEquipmentIcon(echipament.tip, 'text-2xl text-primary'),
+    () => <EquipmentIcon type={echipament.tip} className="text-2xl text-primary" />,
     [echipament.tip]
   );
 

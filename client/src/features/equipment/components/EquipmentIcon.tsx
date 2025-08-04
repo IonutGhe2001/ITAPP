@@ -24,7 +24,15 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   imprimanta: PrinterIcon,
 };
 
-export function getEquipmentIcon(type: string, className = 'w-4 h-4 text-primary'): JSX.Element {
+export interface EquipmentIconProps {
+  type: string;
+  className?: string;
+}
+
+export function EquipmentIcon({
+  type,
+  className = 'w-4 h-4 text-primary',
+}: EquipmentIconProps): JSX.Element {
   const Icon = iconMap[type.toLowerCase()];
   if (Icon) {
     return <Icon className={className} />;

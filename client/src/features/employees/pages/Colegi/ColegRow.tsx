@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Pencil, Trash2, MoreHorizontal, AlertCircle } from 'lucide-react';
-import { getEquipmentIcon } from '@/utils/equipmentIcons';
+import { EquipmentIcon } from '@/features/equipment';
 import type { Angajat, Echipament } from '@/features/equipment/types';
 import { useUpdateAngajat } from '@/features/employees';
 
@@ -149,7 +149,9 @@ export default function ColegRow({
                   key={e.id}
                   className="border-border bg-muted flex items-start gap-3 rounded-lg border p-2 text-sm shadow-sm"
                 >
-                  <div className="pt-0.5">{getEquipmentIcon(e.tip)}</div>
+                  <div className="pt-0.5">
+                    <EquipmentIcon type={e.tip} />
+                  </div>
                   <div className="flex-1">
                     <p className="text-foreground font-medium">{e.nume}</p>
                     <p className="text-muted-foreground text-xs">Serie: {e.serie}</p>

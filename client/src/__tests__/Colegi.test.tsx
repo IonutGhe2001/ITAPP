@@ -14,6 +14,7 @@ vi.mock('@/features/employees', () => ({
 
 vi.mock('@/features/equipment', () => ({
   useUpdateEchipament: () => ({ mutateAsync: vi.fn() }),
+  EquipmentIcon: () => null,
 }));
 
 vi.mock('@/features/proceseVerbale', () => ({
@@ -28,10 +29,6 @@ vi.mock('@/features/proceseVerbale/pvQueue', () => ({
   queueProcesVerbal: vi.fn(),
   getQueue: () => [],
   removeFromQueue: vi.fn(),
-}));
-
-vi.mock('@/utils/equipmentIcons', () => ({
-  getEquipmentIcon: () => null,
 }));
 
 vi.mock('@/hooks/use-toast/use-toast-hook', () => ({
