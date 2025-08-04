@@ -18,7 +18,7 @@ const clearRead = vi.fn();
 
 vi.mock('@/context/use-notifications', () => ({
   useNotifications: () => ({
-     notifications: notificationsMock,
+    notifications: notificationsMock,
     markAllRead,
     removeNotification,
     clearRead,

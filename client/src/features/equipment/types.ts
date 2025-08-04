@@ -8,27 +8,26 @@ export interface Angajat {
   cDataId?: string;
   cDataNotes?: string;
   cDataCreated: boolean;
-  emailAccountStatus?: "PENDING" | "CREATED";
+  emailAccountStatus?: 'PENDING' | 'CREATED';
   emailAccountCreatedAt?: string;
   emailAccountResponsible?: string;
   emailAccountLink?: string;
 }
 
 export const EQUIPMENT_STATUS = {
-  IN_STOC: "in_stoc",
-  ALOCAT: "alocat",
-  IN_COMANDA: "in_comanda",
-  MENTENANTA: "mentenanta",
+  IN_STOC: 'in_stoc',
+  ALOCAT: 'alocat',
+  IN_COMANDA: 'in_comanda',
+  MENTENANTA: 'mentenanta',
 } as const;
 
-export type EquipmentStatus =
-  (typeof EQUIPMENT_STATUS)[keyof typeof EQUIPMENT_STATUS];
+export type EquipmentStatus = (typeof EQUIPMENT_STATUS)[keyof typeof EQUIPMENT_STATUS];
 
 export const EQUIPMENT_STATUS_LABELS: Record<EquipmentStatus, string> = {
-  [EQUIPMENT_STATUS.IN_STOC]: "În stoc",
-  [EQUIPMENT_STATUS.ALOCAT]: "Alocate",
-  [EQUIPMENT_STATUS.IN_COMANDA]: "În comandă",
-  [EQUIPMENT_STATUS.MENTENANTA]: "În mentenanță",
+  [EQUIPMENT_STATUS.IN_STOC]: 'În stoc',
+  [EQUIPMENT_STATUS.ALOCAT]: 'Alocate',
+  [EQUIPMENT_STATUS.IN_COMANDA]: 'În comandă',
+  [EQUIPMENT_STATUS.MENTENANTA]: 'În mentenanță',
 };
 
 export interface Echipament {

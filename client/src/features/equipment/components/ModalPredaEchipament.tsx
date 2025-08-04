@@ -1,29 +1,24 @@
-import { useState, memo } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { useState, memo } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { useAngajati } from "@/features/employees";
-import type { ModalPredaEchipamentProps, Angajat } from "@/features/equipment/types";
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { useAngajati } from '@/features/employees';
+import type { ModalPredaEchipamentProps, Angajat } from '@/features/equipment/types';
 
 function ModalPredaEchipament({ echipament, onClose, onSubmit }: ModalPredaEchipamentProps) {
   const { data: angajati = [] } = useAngajati();
-  const [angajatId, setAngajatId] = useState<string>("");
-  
-  const handleSubmit = () => {
-    if (!angajatId) return alert("Selectează un angajat!");
+  const [angajatId, setAngajatId] = useState<string>('');
 
-     onSubmit({ ...echipament, angajatId, stare: "alocat" });
+  const handleSubmit = () => {
+    if (!angajatId) return alert('Selectează un angajat!');
+
+    onSubmit({ ...echipament, angajatId, stare: 'alocat' });
     onClose();
   };
 

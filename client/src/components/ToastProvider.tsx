@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import type { ReactNode } from "react";
-import { ToastProvider as InternalToastProvider } from "@/hooks/use-toast/useToast";
+import type { ReactNode } from 'react';
+import { ToastProvider as InternalToastProvider } from '@/hooks/use-toast/useToast';
 
 interface ToastProviderProps {
   children: ReactNode;

@@ -1,15 +1,10 @@
-import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast/use-toast-hook";
-import { getApiErrorMessage } from "@/utils/apiError";
-import { useCreatePurchaseRequest } from "./purchaseRequestService";
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast/use-toast-hook';
+import { getApiErrorMessage } from '@/utils/apiError';
+import { useCreatePurchaseRequest } from './purchaseRequestService';
 
 interface Props {
   equipmentType: string;
@@ -25,15 +20,15 @@ export default function ModalCreatePurchaseRequest({ equipmentType, onClose }: P
     try {
       await createMutation.mutateAsync({ equipmentType, quantity });
       toast({
-        title: "Cerere creată",
-        description: "Cererea a fost înregistrată.",
+        title: 'Cerere creată',
+        description: 'Cererea a fost înregistrată.',
       });
       onClose();
     } catch (err) {
       toast({
-        title: "Eroare",
+        title: 'Eroare',
         description: getApiErrorMessage(err),
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };

@@ -8,7 +8,7 @@ export {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuRadioGroup,
-} from './DropdownMenuBase'
+} from './DropdownMenuBase';
 
 export {
   DropdownMenuItem,
@@ -17,4 +17,4 @@ export {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-} from './DropdownMenuItems'
+} from './DropdownMenuItems';

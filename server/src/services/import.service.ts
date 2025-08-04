@@ -19,7 +19,12 @@ export const processImportRows = async (rows: ImportRow[]) => {
       chunk.map(async (row, idx) => {
         const index = i + idx;
         try {
-          const { "Nume Echipament": nume, Tip: tip, Serie: serie, "Email Angajat": email } = row;
+          const {
+            "Nume Echipament": nume,
+            Tip: tip,
+            Serie: serie,
+            "Email Angajat": email,
+          } = row;
 
           if (!nume || !tip || !serie) {
             throw new Error("Campuri obligatorii lipsa");
@@ -28,7 +33,8 @@ export const processImportRows = async (rows: ImportRow[]) => {
           const existing = await prisma.echipament.findFirst({
             where: { tip, serie },
           });
-          if (existing) throw new Error(`Serie duplicata pentru tipul ${tip}: ${serie}`);
+          if (existing)
+            throw new Error(`Serie duplicata pentru tipul ${tip}: ${serie}`);
 
           if (email) {
             const hasSameType = await prisma.echipament.findFirst({
@@ -44,7 +50,9 @@ export const processImportRows = async (rows: ImportRow[]) => {
             let angajat = await prisma.angajat.findFirst({ where: { email } });
             if (!angajat) {
               const username = email.split("@")[0];
-              const numeComplet = username.replace(".", " ").replace(/\b\w/g, c => c.toUpperCase());
+              const numeComplet = username
+                .replace(".", " ")
+                .replace(/\b\w/g, (c) => c.toUpperCase());
 
               angajat = await prisma.angajat.create({
                 data: {

@@ -1,16 +1,11 @@
-import { memo } from "react";
-import { useLayoutEffect, useRef, useState } from "react";
-import { FixedSizeList as List } from "react-window";
-import EquipmentCard from "./EquipmentCard";
-import type { EquipmentListProps, Echipament } from "@/features/equipment/types";
+import { memo } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { FixedSizeList as List } from 'react-window';
+import EquipmentCard from './EquipmentCard';
+import type { EquipmentListProps, Echipament } from '@/features/equipment/types';
 
-
-function EquipmentList({
-  echipamente,
-  onEdit,
-  onDelete,
-}: EquipmentListProps) {
-    const containerRef = useRef<HTMLDivElement>(null);
+function EquipmentList({ echipamente, onEdit, onDelete }: EquipmentListProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
 
@@ -25,24 +20,24 @@ function EquipmentList({
 
     const observer = new ResizeObserver(updateSize);
     observer.observe(node);
-   // Wait one frame to ensure the container has dimensions when first displayed
+    // Wait one frame to ensure the container has dimensions when first displayed
     requestAnimationFrame(updateSize);
-    window.addEventListener("resize", updateSize);
+    window.addEventListener('resize', updateSize);
     return () => {
       observer.disconnect();
-      window.removeEventListener("resize", updateSize);
+      window.removeEventListener('resize', updateSize);
     };
   }, []);
 
   if (echipamente.length === 0) {
     return (
-      <div className="text-center text-sm text-gray-500 mt-10">
+      <div className="mt-10 text-center text-sm text-gray-500">
         Nu există echipamente înregistrate.
       </div>
     );
   }
 
- const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
+  const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
     const eq: Echipament = echipamente[index];
     return (
       <div style={style} className="p-2">
@@ -50,7 +45,7 @@ function EquipmentList({
           key={eq.id}
           echipament={eq}
           onEdit={(val: Echipament | string) => {
-            if (typeof val === "object") {
+            if (typeof val === 'object') {
               onEdit?.(val);
             } else {
               onEdit?.(eq);
@@ -58,14 +53,14 @@ function EquipmentList({
           }}
           onDelete={() => onDelete?.(eq.id)}
         />
-     </div>
+      </div>
     );
   };
 
   const ITEM_HEIGHT = 190;
 
   return (
-    <div ref={containerRef} className="max-h-[600px] h-[60vh]">
+    <div ref={containerRef} className="h-[60vh] max-h-[600px]">
       {width > 0 && height > 0 && (
         <List
           height={height}

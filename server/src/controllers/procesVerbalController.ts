@@ -11,10 +11,16 @@ import { prisma } from "../lib/prisma";
 import fs from "fs";
 import path from "path";
 
-
 export const creareProcesVerbal = async (req: Request, res: Response) => {
   try {
-     const { angajatId, observatii, tip, echipamentIds, echipamentePredate, echipamentePrimite } = req.body;
+    const {
+      angajatId,
+      observatii,
+      tip,
+      echipamentIds,
+      echipamentePredate,
+      echipamentePrimite,
+    } = req.body;
     const result = await creeazaProcesVerbalCuEchipamente(
       angajatId,
       observatii,
@@ -28,7 +34,11 @@ export const creareProcesVerbal = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Angajatul nu a fost găsit." });
     }
 
-    const { procesVerbal, echipamentePredate: predate, echipamentePrimite: primite } = result;
+    const {
+      procesVerbal,
+      echipamentePredate: predate,
+      echipamentePrimite: primite,
+    } = result;
 
     const currentUser = await getUserById(Number(req.user!.id));
 
@@ -44,7 +54,11 @@ export const creareProcesVerbal = async (req: Request, res: Response) => {
       digitalSignature: currentUser?.digitalSignature,
     });
     const fileName = `proces-verbal-${procesVerbal.id}.pdf`;
-    const filePath = path.join(__dirname, "../../public/procese-verbale", fileName);
+    const filePath = path.join(
+      __dirname,
+      "../../public/procese-verbale",
+      fileName
+    );
     fs.writeFileSync(filePath, pdfBuffer);
 
     await prisma.procesVerbal.update({
@@ -87,7 +101,11 @@ export const creareProcesVerbalDinSchimbari = async (
       data: { finalized: true },
     });
     const fileName = `proces-verbal-${procesVerbalId}.pdf`;
-    const filePath = path.join(__dirname, "../../public/procese-verbale", fileName);
+    const filePath = path.join(
+      __dirname,
+      "../../public/procese-verbale",
+      fileName
+    );
     fs.writeFileSync(filePath, pdfBuffer);
 
     await prisma.procesVerbal.update({
@@ -103,12 +121,7 @@ export const creareProcesVerbalDinSchimbari = async (
       })
       .send(pdfBuffer);
   } catch (error) {
-    logger.error(
-      "Eroare la creare proces verbal din schimbari:",
-      error
-    );
-    res
-      .status(500)
-      .json({ message: "Eroare la generarea procesului verbal." });
+    logger.error("Eroare la creare proces verbal din schimbari:", error);
+    res.status(500).json({ message: "Eroare la generarea procesului verbal." });
   }
 };

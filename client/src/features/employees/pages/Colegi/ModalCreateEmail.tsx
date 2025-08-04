@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { useCreateEmailAccount } from "@/features/employees";
-import type { Angajat } from "@/features/equipment/types";
-import { useToast } from "@/hooks/use-toast/use-toast-hook";
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { useCreateEmailAccount } from '@/features/employees';
+import type { Angajat } from '@/features/equipment/types';
+import { useToast } from '@/hooks/use-toast/use-toast-hook';
 
 interface ModalCreateEmailProps {
   coleg: Angajat;
@@ -15,9 +15,9 @@ interface ModalCreateEmailProps {
 
 export default function ModalCreateEmail({ coleg, onClose, onSuccess }: ModalCreateEmailProps) {
   const [formData, setFormData] = useState({
-    email: coleg.email || "",
-    responsible: "",
-    link: "",
+    email: coleg.email || '',
+    responsible: '',
+    link: '',
   });
   const [errors, setErrors] = useState<{ responsible?: string }>({});
   const mutation = useCreateEmailAccount();
@@ -31,19 +31,19 @@ export default function ModalCreateEmail({ coleg, onClose, onSuccess }: ModalCre
     e.preventDefault();
     const errs: typeof errors = {};
     if (!formData.responsible) {
-      errs.responsible = "Responsabilul este necesar.";
+      errs.responsible = 'Responsabilul este necesar.';
     }
     setErrors(errs);
     if (Object.keys(errs).length) return;
     try {
       await mutation.mutateAsync({ id: coleg.id, ...formData });
-      toast({ title: "Cont e-mail marcat ca creat" });
+      toast({ title: 'Cont e-mail marcat ca creat' });
       onSuccess();
     } catch {
       toast({
-        title: "Eroare",
-        description: "Nu s-a putut marca contul ca creat",
-        variant: "destructive",
+        title: 'Eroare',
+        description: 'Nu s-a putut marca contul ca creat',
+        variant: 'destructive',
       });
     }
   };

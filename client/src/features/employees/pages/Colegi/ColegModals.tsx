@@ -1,16 +1,16 @@
-import React, { Suspense } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import ModalAsigneazaEchipament from "./ModalAsigneazaEchipament";
-import ModalEditColeg from "./ModalEditColeg";
-import ModalCreateEmail from "./ModalCreateEmail";
-import { useUpdateEchipament } from "@/features/equipment";
-import { genereazaProcesVerbal } from "@/features/proceseVerbale";
-import { queueProcesVerbal } from "@/features/proceseVerbale/pvQueue";
-import { getConfig } from "@/services/configService";
-import type { Angajat } from "@/features/equipment/types";
+import React, { Suspense } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import ModalAsigneazaEchipament from './ModalAsigneazaEchipament';
+import ModalEditColeg from './ModalEditColeg';
+import ModalCreateEmail from './ModalCreateEmail';
+import { useUpdateEchipament } from '@/features/equipment';
+import { genereazaProcesVerbal } from '@/features/proceseVerbale';
+import { queueProcesVerbal } from '@/features/proceseVerbale/pvQueue';
+import { getConfig } from '@/services/configService';
+import type { Angajat } from '@/features/equipment/types';
 
-const ModalAddColeg = React.lazy(() => import("@/pages/Dashboard/modals/ModalAddColeg"));
+const ModalAddColeg = React.lazy(() => import('@/pages/Dashboard/modals/ModalAddColeg'));
 
 interface ReplaceData {
   colegId: string;
@@ -81,25 +81,25 @@ export default function ColegModals({
           onReplace={async (oldId, newId) => {
             await updateMutation.mutateAsync({
               id: oldId,
-              data: { angajatId: null, stare: "in_stoc" },
+              data: { angajatId: null, stare: 'in_stoc' },
             });
             await updateMutation.mutateAsync({
               id: newId,
-              data: { angajatId: replaceData.colegId, stare: "alocat" },
+              data: { angajatId: replaceData.colegId, stare: 'alocat' },
             });
             const { pvGenerationMode } = await getConfig();
-              if (pvGenerationMode === "auto") {
-                const url = await genereazaProcesVerbal(replaceData.colegId, "SCHIMB", {
-                  predate: [oldId],
-                  primite: [newId],
-                });
-                window.open(url, "_blank");
-              } else {
-                queueProcesVerbal(replaceData.colegId, "SCHIMB", {
-                  predate: [oldId],
-                  primite: [newId],
-                });
-              }
+            if (pvGenerationMode === 'auto') {
+              const url = await genereazaProcesVerbal(replaceData.colegId, 'SCHIMB', {
+                predate: [oldId],
+                primite: [newId],
+              });
+              window.open(url, '_blank');
+            } else {
+              queueProcesVerbal(replaceData.colegId, 'SCHIMB', {
+                predate: [oldId],
+                primite: [newId],
+              });
+            }
           }}
           onPendingPV={(change) => onPVChange(replaceData.colegId, change)}
           onClose={() => setReplaceData(null)}
@@ -126,7 +126,7 @@ export default function ColegModals({
             <DialogHeader>
               <DialogTitle>Confirmare ștergere</DialogTitle>
             </DialogHeader>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Ștergerea acestui coleg va elibera echipamentele asignate. Continuă?
             </p>
             <div className="flex justify-end gap-2 pt-4">

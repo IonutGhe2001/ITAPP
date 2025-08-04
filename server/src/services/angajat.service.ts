@@ -26,7 +26,7 @@ export const getAngajati = () => {
             not: null,
           },
         },
-        select: { 
+        select: {
           id: true,
           nume: true,
           tip: true,
@@ -74,7 +74,7 @@ export const updateAngajat = async (
     email?: string;
     telefon?: string;
     departmentConfigId?: string;
-    dataAngajare?: Date 
+    dataAngajare?: Date;
     cDataUsername?: string;
     cDataId?: string;
     cDataNotes?: string;
@@ -111,7 +111,7 @@ export const getAngajatById = (id: string) => {
 };
 
 export const deleteAngajat = (id: string) => {
- return prisma.$transaction(async (tx: any) => {
+  return prisma.$transaction(async (tx: any) => {
     const echipamente = await tx.echipament.findMany({
       where: { angajatId: id },
       select: { id: true },
@@ -128,7 +128,7 @@ export const deleteAngajat = (id: string) => {
           data: echipamente.map((eq: { id: string }) => ({
             angajatId: id,
             echipamentId: eq.id,
-            tip: 'RETURN',
+            tip: "RETURN",
           })),
         });
       }
@@ -136,7 +136,7 @@ export const deleteAngajat = (id: string) => {
 
     await tx.angajat.delete({ where: { id } });
   });
-  };
+};
 
 export const createEmailAccount = (
   id: string,

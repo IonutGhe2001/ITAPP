@@ -1,46 +1,36 @@
-import { useState, memo, useMemo } from "react";
-import { PencilIcon, TrashIcon } from "lucide-react";
-import { getEquipmentIcon } from "@/utils/equipmentIcons";
-import { ModalPredaEchipament } from "@/features/equipment";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import type { EquipmentCardProps } from "@/features/equipment/types";
+import { useState, memo, useMemo } from 'react';
+import { PencilIcon, TrashIcon } from 'lucide-react';
+import { getEquipmentIcon } from '@/utils/equipmentIcons';
+import { ModalPredaEchipament } from '@/features/equipment';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import type { EquipmentCardProps } from '@/features/equipment/types';
 
-function EquipmentCard({
-  echipament,
-  onEdit,
-  onDelete,
-  onRefresh,
-}: EquipmentCardProps) {
+function EquipmentCard({ echipament, onEdit, onDelete, onRefresh }: EquipmentCardProps) {
   const [showModal, setShowModal] = useState(false);
   const [confirmRecupereaza, setConfirmRecupereaza] = useState(false);
 
   const handleConfirmRecupereaza = () => {
-    onEdit?.({ ...echipament, angajatId: null, stare: "in_stoc" });
+    onEdit?.({ ...echipament, angajatId: null, stare: 'in_stoc' });
     setConfirmRecupereaza(false);
     onRefresh?.();
   };
 
-   const icon = useMemo(
-    () => getEquipmentIcon(echipament.tip, "text-2xl text-primary"),
+  const icon = useMemo(
+    () => getEquipmentIcon(echipament.tip, 'text-2xl text-primary'),
     [echipament.tip]
   );
 
   return (
-    <div className="bg-card rounded-2xl shadow-md p-5 flex items-center justify-between transition hover:shadow-lg">
+    <div className="bg-card flex items-center justify-between rounded-2xl p-5 shadow-md transition hover:shadow-lg">
       <div className="flex items-center gap-4">
         <div>{icon}</div>
-        <div className="text-sm space-y-1">
-          <p className="font-semibold text-foreground">{echipament.nume}</p>
-          <p className="text-xs text-muted-foreground">Serie: {echipament.serie}</p>
-          <p className="text-xs text-muted-foreground">Tip: {echipament.tip}</p>
+        <div className="space-y-1 text-sm">
+          <p className="text-foreground font-semibold">{echipament.nume}</p>
+          <p className="text-muted-foreground text-xs">Serie: {echipament.serie}</p>
+          <p className="text-muted-foreground text-xs">Tip: {echipament.tip}</p>
           {echipament.angajat && (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Predat la: {echipament.angajat.numeComplet}
             </p>
           )}
@@ -49,18 +39,18 @@ function EquipmentCard({
 
       <div className="flex flex-col items-end gap-2">
         <span
-          className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${
-            echipament.stare === "in_stoc"
-              ? "bg-green-100 text-green-800"
-              : echipament.stare === "mentenanta"
-              ? "bg-yellow-100 text-yellow-800"
-              : "bg-blue-100 text-blue-800"
+          className={`rounded-full px-2 py-1 text-xs font-medium capitalize ${
+            echipament.stare === 'in_stoc'
+              ? 'bg-green-100 text-green-800'
+              : echipament.stare === 'mentenanta'
+                ? 'bg-yellow-100 text-yellow-800'
+                : 'bg-blue-100 text-blue-800'
           }`}
         >
-          {echipament.stare.replace("_", " ")}
+          {echipament.stare.replace('_', ' ')}
         </span>
 
-        {echipament.stare === "in_stoc" ? (
+        {echipament.stare === 'in_stoc' ? (
           <button
             onClick={() => setShowModal(true)}
             className="text-xs text-blue-600 hover:underline"
@@ -78,9 +68,9 @@ function EquipmentCard({
           </button>
         )}
 
-{echipament.stare === "mentenanta" ? (
+        {echipament.stare === 'mentenanta' ? (
           <button
-            onClick={() => onEdit?.({ ...echipament, stare: "in_stoc" })}
+            onClick={() => onEdit?.({ ...echipament, stare: 'in_stoc' })}
             className="text-xs text-blue-600 hover:underline"
             title="Marchează în stoc"
           >
@@ -88,20 +78,20 @@ function EquipmentCard({
           </button>
         ) : (
           <button
-            onClick={() => onEdit?.({ ...echipament, stare: "mentenanta" })}
+            onClick={() => onEdit?.({ ...echipament, stare: 'mentenanta' })}
             className="text-xs text-yellow-600 hover:underline"
             title="Trimite în mentenanță"
           >
             Mentenanță
           </button>
         )}
-        
+
         <div className="flex gap-2">
           <button onClick={() => onEdit?.({ ...echipament, __editMode: true })} title="Editează">
-  <PencilIcon className="w-4 h-4 text-primary hover:text-primary-dark" />
-</button>
-           <button onClick={() => onDelete?.(echipament.id)}>
-            <TrashIcon className="w-4 h-4 text-primary hover:text-primary-dark" />
+            <PencilIcon className="text-primary hover:text-primary-dark h-4 w-4" />
+          </button>
+          <button onClick={() => onDelete?.(echipament.id)}>
+            <TrashIcon className="text-primary hover:text-primary-dark h-4 w-4" />
           </button>
         </div>
       </div>
@@ -124,8 +114,9 @@ function EquipmentCard({
             <DialogHeader>
               <DialogTitle>Confirmare recuperare</DialogTitle>
             </DialogHeader>
-            <p className="text-sm text-muted-foreground">
-              Sigur dorești să recuperezi acest echipament? Acesta va reveni în stoc și va fi disasociat de angajat.
+            <p className="text-muted-foreground text-sm">
+              Sigur dorești să recuperezi acest echipament? Acesta va reveni în stoc și va fi
+              disasociat de angajat.
             </p>
             <div className="flex justify-end gap-2 pt-4">
               <Button variant="outline" onClick={() => setConfirmRecupereaza(false)}>

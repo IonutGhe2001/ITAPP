@@ -25,7 +25,7 @@
 
     /* ADĂUGAT pentru shadcn/ui */
     "baseUrl": ".",
-     "paths": {
+    "paths": {
       "@/*": ["src/*"],
       "@hooks/*": ["src/hooks/*"],
       "@components/*": ["src/components/*"],

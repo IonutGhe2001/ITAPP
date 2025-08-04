@@ -1,6 +1,6 @@
-import { useRef, forwardRef, useImperativeHandle } from "react";
-import SignatureCanvas from "react-signature-canvas";
-import trimCanvasModule from "trim-canvas";
+import { useRef, forwardRef, useImperativeHandle } from 'react';
+import SignatureCanvas from 'react-signature-canvas';
+import trimCanvasModule from 'trim-canvas';
 
 type TrimCanvas = (canvas: HTMLCanvasElement) => HTMLCanvasElement;
 
@@ -22,9 +22,9 @@ const SignaturePad = forwardRef<SignaturePadHandle>((_props, ref) => {
     },
     getImage: () => {
       if (!padRef.current || padRef.current.isEmpty()) return null;
-         const canvas = padRef.current.getCanvas();
+      const canvas = padRef.current.getCanvas();
       const trimmed = trimCanvas(canvas);
-      return trimmed.toDataURL("image/png");
+      return trimmed.toDataURL('image/png');
     },
   }));
 
@@ -34,7 +34,7 @@ const SignaturePad = forwardRef<SignaturePadHandle>((_props, ref) => {
       penColor="black"
       backgroundColor="white"
       canvasProps={{
-        className: "border border-border rounded-md w-full h-48 bg-background",
+        className: 'border border-border rounded-md w-full h-48 bg-background',
       }}
     />
   );

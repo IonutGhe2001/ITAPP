@@ -1,9 +1,9 @@
-import { createContext } from "react"
+import { createContext } from 'react';
 
 interface SearchContextType {
-  query: string
-  setQuery: (q: string) => void
+  query: string;
+  setQuery: (q: string) => void;
 }
 
-export const SearchContext = createContext<SearchContextType | undefined>(undefined)
-export type { SearchContextType }
+export const SearchContext = createContext<SearchContextType | undefined>(undefined);
+export type { SearchContextType };

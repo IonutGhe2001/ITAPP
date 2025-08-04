@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import api from "./api";
-import type { Echipament, Angajat } from "@/features/equipment/types";
+import { useQuery } from '@tanstack/react-query';
+import api from './api';
+import type { Echipament, Angajat } from '@/features/equipment/types';
 
 export interface GlobalSearchData {
   echipamente: Echipament[];
@@ -13,11 +13,10 @@ export interface GlobalSearchData {
 
 export const useGlobalSearch = (query: string) =>
   useQuery<GlobalSearchData>({
-    queryKey: ["global-search", query],
-    queryFn: async () =>
-      (await api.get("/search", { params: { q: query } })).data,
+    queryKey: ['global-search', query],
+    queryFn: async () => (await api.get('/search', { params: { q: query } })).data,
     enabled: !!query.trim(),
-});
+  });
 
 export interface SuggestionsData {
   echipamente: Echipament[];
@@ -26,8 +25,7 @@ export interface SuggestionsData {
 
 export const useSearchSuggestions = (query: string) =>
   useQuery<SuggestionsData>({
-    queryKey: ["search-suggestions", query],
-    queryFn: async () =>
-      (await api.get("/search/suggestions", { params: { q: query } })).data,
+    queryKey: ['search-suggestions', query],
+    queryFn: async () => (await api.get('/search/suggestions', { params: { q: query } })).data,
     enabled: !!query.trim(),
   });

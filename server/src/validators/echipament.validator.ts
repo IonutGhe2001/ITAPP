@@ -14,7 +14,7 @@ export const createEchipamentSchema = Joi.object({
 export const updateEchipamentSchema = Joi.object({
   nume: Joi.string().optional(),
   tip: Joi.string().optional(),
-   stare: Joi.string()
+  stare: Joi.string()
     .valid("in_stoc", "alocat", "in_comanda", "mentenanta")
     .optional(),
   serie: Joi.string().optional(),

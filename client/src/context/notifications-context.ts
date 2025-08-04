@@ -1,11 +1,11 @@
-import { createContext } from "react";
+import { createContext } from 'react';
 
 export type Notification = {
   id: string;
-  type: "Coleg" | "Echipament" | "SIM";
+  type: 'Coleg' | 'Echipament' | 'SIM';
   message: string;
   timestamp: string | Date;
-  importance: "low" | "medium" | "high";
+  importance: 'low' | 'medium' | 'high';
   read: boolean;
 };
 

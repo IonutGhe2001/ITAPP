@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import clsx from 'clsx';
 
 interface AvatarProps {
   src?: string | null;
@@ -8,10 +8,10 @@ interface AvatarProps {
 
 export default function Avatar({ src, name, className }: AvatarProps) {
   const initials = name
-    .split(" ")
+    .split(' ')
     .filter(Boolean)
     .map((n) => n[0])
-    .join("")
+    .join('')
     .toUpperCase();
 
   if (src) {
@@ -20,7 +20,7 @@ export default function Avatar({ src, name, className }: AvatarProps) {
         src={src}
         alt={name}
         loading="lazy"
-        className={clsx("rounded-full object-cover", className)}
+        className={clsx('rounded-full object-cover', className)}
       />
     );
   }
@@ -28,7 +28,7 @@ export default function Avatar({ src, name, className }: AvatarProps) {
   return (
     <div
       className={clsx(
-        "flex items-center justify-center rounded-full bg-primary text-primary-foreground",
+        'bg-primary text-primary-foreground flex items-center justify-center rounded-full',
         className
       )}
     >

@@ -10,8 +10,12 @@ export interface AuthPayload {
   functie: string;
 }
 
-export const authenticate = (req: Request, res: Response, next: NextFunction) => {
-   let token: string | undefined;
+export const authenticate = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  let token: string | undefined;
   const authHeader = req.headers.authorization;
 
   if (authHeader?.startsWith("Bearer ")) {
@@ -20,12 +24,12 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     token = req.cookies.token;
   }
 
- if (!token) {
+  if (!token) {
     return res.status(401).json({ message: "Token lipsă" });
   }
 
   try {
-   const decoded = jwt.verify(
+    const decoded = jwt.verify(
       token,
       process.env.JWT_SECRET as string
     ) as AuthPayload;
@@ -41,7 +45,9 @@ export const authorizeRoles = (...roles: string[]) => {
     const user = req.user;
 
     if (!user || !roles.includes(user.role)) {
-      return res.status(403).json({ message: "Acces interzis: rol insuficient" });
+      return res
+        .status(403)
+        .json({ message: "Acces interzis: rol insuficient" });
     }
 
     next();

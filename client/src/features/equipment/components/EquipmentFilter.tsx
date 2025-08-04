@@ -1,9 +1,6 @@
-import { memo } from "react";
-import type { EquipmentFilterProps } from "@/features/equipment/types";
-import {
-  EQUIPMENT_STATUS,
-  EQUIPMENT_STATUS_LABELS,
-} from "@/features/equipment/types";
+import { memo } from 'react';
+import type { EquipmentFilterProps } from '@/features/equipment/types';
+import { EQUIPMENT_STATUS, EQUIPMENT_STATUS_LABELS } from '@/features/equipment/types';
 
 function EquipmentFilter({
   search,
@@ -14,18 +11,18 @@ function EquipmentFilter({
   onSortChange,
 }: EquipmentFilterProps) {
   return (
-    <div className="flex flex-col sm:flex-row gap-4 mb-6">
+    <div className="mb-6 flex flex-col gap-4 sm:flex-row">
       <input
         type="text"
         placeholder="Caută după nume sau serie"
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
-        className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/2"
+        className="w-full rounded-lg border border-gray-300 px-4 py-2 sm:w-1/2"
       />
       <select
         value={status}
         onChange={(e) => onStatusChange(e.target.value)}
-        className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/4"
+        className="w-full rounded-lg border border-gray-300 px-4 py-2 sm:w-1/4"
       >
         <option value="">Toate statusurile</option>
         <option value={EQUIPMENT_STATUS.IN_STOC}>
@@ -41,7 +38,7 @@ function EquipmentFilter({
       <select
         value={sort}
         onChange={(e) => onSortChange(e.target.value)}
-        className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/4"
+        className="w-full rounded-lg border border-gray-300 px-4 py-2 sm:w-1/4"
       >
         <option value="asc">Nume A-Z</option>
         <option value="desc">Nume Z-A</option>

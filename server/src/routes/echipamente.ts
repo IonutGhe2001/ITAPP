@@ -1,7 +1,10 @@
 import express from "express";
 import * as controller from "../controllers/echipamenteController";
 import { validateRequest } from "../middlewares/validateRequest";
-import { createEchipamentSchema, updateEchipamentSchema } from "../validators/echipament.validator";
+import {
+  createEchipamentSchema,
+  updateEchipamentSchema,
+} from "../validators/echipament.validator";
 import { authenticate, authorizeRoles } from "../middlewares/authMiddleware";
 
 const router = express.Router();

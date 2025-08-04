@@ -1,6 +1,6 @@
-import { createLogger, format, transports } from 'winston';
+import { createLogger, format, transports } from "winston";
 
-const level = process.env.LOG_LEVEL || 'info';
+const level = process.env.LOG_LEVEL || "info";
 
 export const logger = createLogger({
   level,

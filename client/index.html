@@ -6,30 +6,20 @@
     <link rel="manifest" href="/manifest.webmanifest" />
     <script>
       (function () {
-        const storageKey = "vite-ui-theme";
+        const storageKey = 'vite-ui-theme';
         const stored = localStorage.getItem(storageKey);
-        const system = window.matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light";
+        const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         const theme = stored || system;
-        if (theme === "dark") {
-          document.documentElement.classList.add("dark");
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
         } else {
-          document.documentElement.classList.remove("dark");
+          document.documentElement.classList.remove('dark');
         }
       })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="theme-color"
-      content="#ffffff"
-      media="(prefers-color-scheme: light)"
-    />
-    <meta
-      name="theme-color"
-      content="#000000"
-      media="(prefers-color-scheme: dark)"
-    />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
     <title>IT APP</title>
   </head>
   <body>

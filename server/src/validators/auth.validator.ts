@@ -17,5 +17,5 @@ export const registerSchema = Joi.object({
   nume: Joi.string().required(),
   prenume: Joi.string().required(),
   functie: Joi.string().required(),
-  role: Joi.string().valid("admin", "user", "manager").required()
+  role: Joi.string().valid("admin", "user", "manager").required(),
 });

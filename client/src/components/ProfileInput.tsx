@@ -7,12 +7,12 @@ interface ProfileInputProps {
 export default function ProfileInput({ label, value, onChange }: ProfileInputProps) {
   return (
     <div>
-      <p className="text-sm text-muted-foreground">{label}</p>
+      <p className="text-muted-foreground text-sm">{label}</p>
       <input
         type="text"
-        value={value || ""}
+        value={value || ''}
         onChange={onChange}
-        className="text-base font-medium text-foreground w-full bg-transparent border-b border-border focus:outline-none focus:border-primary"
+        className="text-foreground border-border focus:border-primary w-full border-b bg-transparent text-base font-medium focus:outline-none"
       />
     </div>
   );

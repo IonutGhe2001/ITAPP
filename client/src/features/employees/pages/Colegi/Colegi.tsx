@@ -1,20 +1,17 @@
-import { useState, useLayoutEffect, useRef, useEffect } from "react";
-import {
-  useAngajati,
-  useDeleteAngajat,
-} from "@/features/employees";
-import type { Angajat, Echipament } from "@/features/equipment/types";
-import { useUpdateEchipament } from "@/features/equipment";
-import { genereazaProcesVerbal, type ProcesVerbalTip } from "@/features/proceseVerbale";
-import { queueProcesVerbal, getQueue, removeFromQueue } from "@/features/proceseVerbale/pvQueue";
-import { getConfig } from "@/services/configService";
-import ColegRow from "./ColegRow";
-import ColegModals from "./ColegModals";
-import useColegiFilter from "./useColegiFilter";
-import Container from "@/components/Container";
-import { Button } from "@/components/ui/button";
-import { VariableSizeList as List } from "react-window";
-import { useToast } from "@/hooks/use-toast/use-toast-hook";
+import { useState, useLayoutEffect, useRef, useEffect } from 'react';
+import { useAngajati, useDeleteAngajat } from '@/features/employees';
+import type { Angajat, Echipament } from '@/features/equipment/types';
+import { useUpdateEchipament } from '@/features/equipment';
+import { genereazaProcesVerbal, type ProcesVerbalTip } from '@/features/proceseVerbale';
+import { queueProcesVerbal, getQueue, removeFromQueue } from '@/features/proceseVerbale/pvQueue';
+import { getConfig } from '@/services/configService';
+import ColegRow from './ColegRow';
+import ColegModals from './ColegModals';
+import useColegiFilter from './useColegiFilter';
+import Container from '@/components/Container';
+import { Button } from '@/components/ui/button';
+import { VariableSizeList as List } from 'react-window';
+import { useToast } from '@/hooks/use-toast/use-toast-hook';
 
 export default function Colegi() {
   const { data: colegi = [], refetch } = useAngajati() as {
@@ -23,9 +20,11 @@ export default function Colegi() {
   };
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [selectedAngajatId, setSelectedAngajatId] = useState<string | null>(null);
-  const [replaceData, setReplaceData] = useState<
-    { colegId: string; equipmentId: string; type: string } | null
-  >(null);
+  const [replaceData, setReplaceData] = useState<{
+    colegId: string;
+    equipmentId: string;
+    type: string;
+  } | null>(null);
   const [editColeg, setEditColeg] = useState<Angajat | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Angajat | null>(null);
   const [createEmailFor, setCreateEmailFor] = useState<Angajat | null>(null);
@@ -33,8 +32,10 @@ export default function Colegi() {
   const deleteMutation = useDeleteAngajat();
   const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
-  const [pendingPV, setPendingPV] = useState<Record<string, { predate: string[]; primite: string[] }>>({});
-  
+  const [pendingPV, setPendingPV] = useState<
+    Record<string, { predate: string[]; primite: string[] }>
+  >({});
+
   useEffect(() => {
     const items = getQueue();
     if (items.length === 0) return;
@@ -67,14 +68,14 @@ export default function Colegi() {
     if (!data) return;
     const tip: ProcesVerbalTip =
       data.predate.length > 0 && data.primite.length > 0
-        ? "SCHIMB"
+        ? 'SCHIMB'
         : data.primite.length > 0
-        ? "PREDARE_PRIMIRE"
-        : "RESTITUIRE";
+          ? 'PREDARE_PRIMIRE'
+          : 'RESTITUIRE';
     try {
       const url = await genereazaProcesVerbal(colegId, tip, data);
-      window.open(url, "_blank");
-      toast({ title: "Proces verbal generat" });
+      window.open(url, '_blank');
+      toast({ title: 'Proces verbal generat' });
       setPendingPV((prev) => {
         const updated = { ...prev };
         delete updated[colegId];
@@ -82,7 +83,7 @@ export default function Colegi() {
       });
       removeFromQueue(colegId);
     } catch {
-      toast({ title: "Eroare la generarea procesului verbal", variant: "destructive" });
+      toast({ title: 'Eroare la generarea procesului verbal', variant: 'destructive' });
     }
   };
 
@@ -115,10 +116,10 @@ export default function Colegi() {
     const observer = new ResizeObserver(updateSize);
     observer.observe(node);
     requestAnimationFrame(updateSize);
-    window.addEventListener("resize", updateSize);
+    window.addEventListener('resize', updateSize);
     return () => {
       observer.disconnect();
-      window.removeEventListener("resize", updateSize);
+      window.removeEventListener('resize', updateSize);
     };
   }, []);
 
@@ -147,11 +148,15 @@ export default function Colegi() {
   const handleDelete = async (id: string) => {
     try {
       await deleteMutation.mutateAsync(id);
-      toast({ title: "Coleg șters" });
+      toast({ title: 'Coleg șters' });
       refetch();
       setExpanded(new Set());
     } catch {
-      toast({ title: "Eroare", description: "Nu s-a putut șterge colegul", variant: "destructive" });
+      toast({
+        title: 'Eroare',
+        description: 'Nu s-a putut șterge colegul',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -159,68 +164,66 @@ export default function Colegi() {
     try {
       await updateMutation.mutateAsync({
         id: eqId,
-         data: { angajatId: null, stare: "in_stoc" },
+        data: { angajatId: null, stare: 'in_stoc' },
       });
       const { pvGenerationMode } = await getConfig();
-        if (pvGenerationMode === "auto") {
-          const url = await genereazaProcesVerbal(colegId, "RESTITUIRE", {
-            predate: [eqId],
-          });
-          window.open(url, "_blank");
-        } else {
-          queueProcesVerbal(colegId, "RESTITUIRE", { predate: [eqId] });
-        }
+      if (pvGenerationMode === 'auto') {
+        const url = await genereazaProcesVerbal(colegId, 'RESTITUIRE', {
+          predate: [eqId],
+        });
+        window.open(url, '_blank');
+      } else {
+        queueProcesVerbal(colegId, 'RESTITUIRE', { predate: [eqId] });
+      }
       addPendingPV(colegId, { predate: [eqId] });
-      toast({ title: "Echipament eliberat", description: "Proces verbal în așteptare" });
+      toast({ title: 'Echipament eliberat', description: 'Proces verbal în așteptare' });
       refetch();
     } catch {
       toast({
-        title: "Eroare",
-        description: "Nu s-a putut actualiza echipamentul",
-        variant: "destructive",
+        title: 'Eroare',
+        description: 'Nu s-a putut actualiza echipamentul',
+        variant: 'destructive',
       });
     }
   };
 
-   const handleScrollToPending = () => {
+  const handleScrollToPending = () => {
     const firstId = Object.keys(pendingPV)[0];
     if (!firstId) return;
     const index = filtered.findIndex((c) => c.id === firstId);
     if (index >= 0) {
-      listRef.current?.scrollToItem(index, "start");
+      listRef.current?.scrollToItem(index, 'start');
       setExpanded(new Set([firstId]));
     }
   };
 
   return (
-    <Container className="py-6 space-y-6">
+    <Container className="space-y-6 py-6">
       {(() => {
         const pendingCount = Object.keys(pendingPV).length;
         return (
           <>
             {pendingCount > 0 && (
-              <div className="bg-amber-100 text-amber-900 p-3 rounded-lg flex justify-between items-center">
-                <span>
-                  Există {pendingCount} procese verbale în așteptare
-                </span>
+              <div className="flex items-center justify-between rounded-lg bg-amber-100 p-3 text-amber-900">
+                <span>Există {pendingCount} procese verbale în așteptare</span>
                 <button onClick={handleScrollToPending} className="underline">
                   Vezi detalii
                 </button>
               </div>
             )}
             <div className="sticky top-0 z-10 space-y-4 pb-4">
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row">
                 <input
                   type="text"
                   placeholder="Caută după nume sau funcție"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/2"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 sm:w-1/2"
                 />
                 <select
                   value={functieFilter}
                   onChange={(e) => setFunctieFilter(e.target.value)}
-                  className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/4"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 sm:w-1/4"
                 >
                   <option value="">Toate funcțiile</option>
                   {functii.map((f: string) => (
@@ -231,8 +234,8 @@ export default function Colegi() {
                 </select>
                 <select
                   value={sortOrder}
-                  onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
-                  className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/4"
+                  onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 sm:w-1/4"
                 >
                   <option value="asc">Nume A-Z</option>
                   <option value="desc">Nume Z-A</option>
@@ -275,13 +278,9 @@ export default function Colegi() {
           </List>
         )}
         {width > 0 && height > 0 && filtered.length === 0 && (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center text-sm text-muted-foreground">
-              <p>
-                {search.trim()
-                  ? "Nu s-au găsit colegi."
-                  : "Nu există colegi înregistrați."}
-              </p>
+          <div className="flex h-full items-center justify-center">
+            <div className="text-muted-foreground text-center text-sm">
+              <p>{search.trim() ? 'Nu s-au găsit colegi.' : 'Nu există colegi înregistrați.'}</p>
               {search.trim() && (
                 <Button className="mt-2" onClick={() => setShowAddModal(true)}>
                   Adaugă coleg nou

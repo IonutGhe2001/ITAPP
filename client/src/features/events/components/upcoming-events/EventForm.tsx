@@ -1,16 +1,31 @@
-import { useState, useEffect, useMemo, type FC } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast/use-toast-hook";
-import type { Eveniment, EvenimentData } from "@/features/events";
+import { useState, useEffect, useMemo, type FC } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast/use-toast-hook';
+import type { Eveniment, EvenimentData } from '@/features/events';
 
 const ORA_OPTIONS = [
-  "08:00", "08:30", "09:00", "09:30",
-  "10:00", "10:30", "11:00", "11:30",
-  "12:00", "12:30", "13:00", "13:30",
-  "14:00", "14:30", "15:00", "15:30",
-  "16:00", "16:30", "17:00", "17:30"
+  '08:00',
+  '08:30',
+  '09:00',
+  '09:30',
+  '10:00',
+  '10:30',
+  '11:00',
+  '11:30',
+  '12:00',
+  '12:30',
+  '13:00',
+  '13:30',
+  '14:00',
+  '14:30',
+  '15:00',
+  '15:30',
+  '16:00',
+  '16:30',
+  '17:00',
+  '17:30',
 ];
 
 type Props = {
@@ -21,11 +36,11 @@ type Props = {
 };
 
 const EventForm: FC<Props> = ({ selectedDay, initial, onSave, onCancel }) => {
-  const [titlu, setTitlu] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
+  const [titlu, setTitlu] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
   const [allDay, setAllDay] = useState(false);
-  const [recurrence, setRecurrence] = useState<"none" | "daily" | "weekly" | "monthly">("none");
+  const [recurrence, setRecurrence] = useState<'none' | 'daily' | 'weekly' | 'monthly'>('none');
   const { toast } = useToast();
 
   const validOraOptions = useMemo(() => {
@@ -39,7 +54,7 @@ const EventForm: FC<Props> = ({ selectedDay, initial, onSave, onCancel }) => {
     const currentMinutes = today.getHours() * 60 + today.getMinutes();
 
     return ORA_OPTIONS.filter((opt) => {
-      const [h, m] = opt.split(":").map(Number);
+      const [h, m] = opt.split(':').map(Number);
       return h * 60 + m >= currentMinutes;
     });
   }, [selectedDay]);
@@ -48,20 +63,20 @@ const EventForm: FC<Props> = ({ selectedDay, initial, onSave, onCancel }) => {
     if (initial) {
       setTitlu(initial.titlu);
       if (initial.ora) {
-        const [start, end] = initial.ora.split("-");
+        const [start, end] = initial.ora.split('-');
         setStartTime(start);
         setEndTime(end);
         setAllDay(false);
       } else {
         setAllDay(true);
       }
-      setRecurrence(initial.recurrence ?? "none");
+      setRecurrence(initial.recurrence ?? 'none');
     } else {
-      setTitlu("");
-      setStartTime("");
-      setEndTime("");
+      setTitlu('');
+      setStartTime('');
+      setEndTime('');
       setAllDay(false);
-      setRecurrence("none");
+      setRecurrence('none');
     }
   }, [initial]);
 
@@ -73,23 +88,23 @@ const EventForm: FC<Props> = ({ selectedDay, initial, onSave, onCancel }) => {
     e.preventDefault();
     if (!titlu || (!allDay && (!startTime || !endTime))) {
       toast({
-        title: "Completare necesară",
-        description: "Te rugăm să completezi toate câmpurile.",
-        variant: "destructive",
+        title: 'Completare necesară',
+        description: 'Te rugăm să completezi toate câmpurile.',
+        variant: 'destructive',
       });
       return;
     }
 
     if (!allDay && !isValidInterval(startTime, endTime)) {
       toast({
-        title: "Interval invalid",
-        description: "Ora de început trebuie să fie înaintea celei de sfârșit.",
-        variant: "destructive",
+        title: 'Interval invalid',
+        description: 'Ora de început trebuie să fie înaintea celei de sfârșit.',
+        variant: 'destructive',
       });
       return;
     }
 
-    const ora = allDay ? "" : `${startTime}-${endTime}`;
+    const ora = allDay ? '' : `${startTime}-${endTime}`;
     const data: EvenimentData = {
       titlu,
       ora,
@@ -112,16 +127,16 @@ const EventForm: FC<Props> = ({ selectedDay, initial, onSave, onCancel }) => {
         />
       </div>
 
-      <div className="flex items-center gap-2 cursor-pointer select-none">
+      <div className="flex cursor-pointer select-none items-center gap-2">
         <input
           type="checkbox"
           id="allDay"
           checked={allDay}
           onChange={(e) => setAllDay(e.target.checked)}
-          className="accent-primary w-4 h-4"
+          className="accent-primary h-4 w-4"
         />
         <Label htmlFor="allDay" className="text-sm font-medium">
-          <span className="transition-colors text-muted-foreground hover:text-foreground">
+          <span className="text-muted-foreground hover:text-foreground transition-colors">
             Eveniment toată ziua
           </span>
         </Label>
@@ -137,7 +152,7 @@ const EventForm: FC<Props> = ({ selectedDay, initial, onSave, onCancel }) => {
               type="time"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="w-full rounded border px-3 py-2"
             />
           </div>
           <div className="space-y-1">
@@ -148,7 +163,7 @@ const EventForm: FC<Props> = ({ selectedDay, initial, onSave, onCancel }) => {
               type="time"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="w-full rounded border px-3 py-2"
             />
           </div>
           <datalist id="time-options">
@@ -159,15 +174,13 @@ const EventForm: FC<Props> = ({ selectedDay, initial, onSave, onCancel }) => {
         </div>
       )}
 
-<div>
+      <div>
         <Label htmlFor="recurrence">Recurență</Label>
         <select
           id="recurrence"
           value={recurrence}
-          onChange={(e) =>
-            setRecurrence(e.target.value as "none" | "daily" | "weekly" | "monthly")
-          }
-          className="border rounded px-3 py-2 w-full"
+          onChange={(e) => setRecurrence(e.target.value as 'none' | 'daily' | 'weekly' | 'monthly')}
+          className="w-full rounded border px-3 py-2"
         >
           <option value="none">O singură dată</option>
           <option value="daily">Zilnic</option>
@@ -175,7 +188,7 @@ const EventForm: FC<Props> = ({ selectedDay, initial, onSave, onCancel }) => {
           <option value="monthly">Lunar</option>
         </select>
       </div>
-      
+
       <div className="flex justify-end gap-2 pt-2">
         {initial && (
           <Button type="button" variant="ghost" onClick={onCancel}>

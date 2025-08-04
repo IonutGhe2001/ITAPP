@@ -29,13 +29,16 @@ export const getEquipmentReport = async ({
   }
   // department filtering is not directly supported for equipment; ignore for now
 
-const grouped = await prisma.echipament.groupBy({
+  const grouped = await prisma.echipament.groupBy({
     by: ["stare"],
     _count: { _all: true },
     where,
   });
 
-  return grouped.map((g: { stare: string; _count: { _all: number } }) => ({ type: g.stare, count: g._count._all }));
+  return grouped.map((g: { stare: string; _count: { _all: number } }) => ({
+    type: g.stare,
+    count: g._count._all,
+  }));
 };
 
 export const getOnboardingReport = async ({
@@ -67,7 +70,10 @@ export const getOnboardingReport = async ({
     counts[stat] = (counts[stat] || 0) + 1;
   }
 
-  let result = Object.entries(counts).map(([s, c]) => ({ status: s, count: c }));
+  let result = Object.entries(counts).map(([s, c]) => ({
+    status: s,
+    count: c,
+  }));
   if (status) {
     result = result.filter((r) => r.status === status);
   }

@@ -42,7 +42,7 @@ export const genereazaPDFProcesVerbal = async (data: any): Promise<Buffer> => {
     ...data,
     digitalSignature: signatureBase64,
     headerImg: imgToBase64(headerImagePath),
-    footerImg: imgToBase64(footerImagePath)
+    footerImg: imgToBase64(footerImagePath),
   });
 
   const browser = await puppeteer.launch({ headless: true });
@@ -52,7 +52,7 @@ export const genereazaPDFProcesVerbal = async (data: any): Promise<Buffer> => {
   const pdfBuffer = await page.pdf({
     format: "A4",
     printBackground: true,
-    preferCSSPageSize: true
+    preferCSSPageSize: true,
   });
 
   await browser.close();

@@ -12,7 +12,10 @@ export const getPurchaseRequests = async (_req: Request, res: Response) => {
   res.json(prs);
 };
 
-export const updatePurchaseRequestStatus = async (req: Request, res: Response) => {
+export const updatePurchaseRequestStatus = async (
+  req: Request,
+  res: Response
+) => {
   const { id } = req.params;
   const { status } = req.body;
   const updated = await service.updatePurchaseRequestStatus(id, status);

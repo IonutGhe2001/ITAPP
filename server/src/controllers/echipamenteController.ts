@@ -2,7 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import * as echipamentService from "../services/echipament.service";
 import { emitUpdate } from "../lib/websocket";
 
-export const getEchipamente = async (_: Request, res: Response, next: NextFunction) => {
+export const getEchipamente = async (
+  _: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const echipamente = await echipamentService.getEchipamente();
     res.json(echipamente);
@@ -11,21 +15,29 @@ export const getEchipamente = async (_: Request, res: Response, next: NextFuncti
   }
 };
 
-export const createEchipament = async (req: Request, res: Response, next: NextFunction) => {
+export const createEchipament = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const echipament = await echipamentService.createEchipament(req.body);
     res.status(201).json(echipament);
     emitUpdate({
       type: "Echipament",
       message: `Echipament adăugat: ${echipament.nume}`,
-      importance: 'high',
+      importance: "high",
     });
   } catch (err) {
     next(err);
   }
 };
 
-export const updateEchipament = async (req: Request, res: Response, next: NextFunction) => {
+export const updateEchipament = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const updated = await echipamentService.updateEchipament(id, req.body);
@@ -33,38 +45,50 @@ export const updateEchipament = async (req: Request, res: Response, next: NextFu
     emitUpdate({
       type: "Echipament",
       message: "Echipament actualizat",
-      importance: 'normal',
+      importance: "normal",
     });
   } catch (err) {
     next(err);
   }
 };
 
-export const deleteEchipament = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteEchipament = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     await echipamentService.deleteEchipament(id);
     res.json({ message: "Echipament șters cu succes." });
-     emitUpdate({
+    emitUpdate({
       type: "Echipament",
       message: "Echipament șters",
-      importance: 'high',
+      importance: "high",
     });
   } catch (err) {
     next(err);
   }
-  };
+};
 
-export const getStats = async (_: Request, res: Response, next: NextFunction) => {
+export const getStats = async (
+  _: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const stats = await echipamentService.getStats();
     res.json(stats);
   } catch (err) {
     next(err);
   }
-  };
+};
 
-export const getAvailableStock = async (_: Request, res: Response, next: NextFunction) => {
+export const getAvailableStock = async (
+  _: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const stock = await echipamentService.getAvailableStock();
     res.json(stock);
@@ -73,7 +97,11 @@ export const getAvailableStock = async (_: Request, res: Response, next: NextFun
   }
 };
 
-export const orderEchipament = async (req: Request, res: Response, next: NextFunction) => {
+export const orderEchipament = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { tip } = req.body;
     const item = await echipamentService.orderEchipament(tip);
@@ -81,7 +109,7 @@ export const orderEchipament = async (req: Request, res: Response, next: NextFun
     emitUpdate({
       type: "Echipament",
       message: `Comandă echipament: ${tip}`,
-      importance: 'high',
+      importance: "high",
     });
   } catch (err) {
     next(err);

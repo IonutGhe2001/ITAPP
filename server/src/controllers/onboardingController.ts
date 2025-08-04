@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import * as onboardingService from "../services/onboarding.service";
 
-export const getPackages = (req: Request, res: Response, next: NextFunction) => {
+export const getPackages = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { department } = req.params;
     const packages = onboardingService.getRecommendedPackages(department);
@@ -11,7 +15,11 @@ export const getPackages = (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
-export const createOnboarding = async (req: Request, res: Response, next: NextFunction) => {
+export const createOnboarding = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const record = await onboardingService.createOnboarding(req.body);
     res.status(201).json(record);

@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
-import { useEchipamente } from "@/features/equipment/echipamenteService";
-import { useOnboardingPackages, useSaveOnboarding } from "@/features/onboarding";
-import type { OnboardingTask } from "@/features/onboarding";
+import { useState, useEffect } from 'react';
+import { useEchipamente } from '@/features/equipment/echipamenteService';
+import { useOnboardingPackages, useSaveOnboarding } from '@/features/onboarding';
+import type { OnboardingTask } from '@/features/onboarding';
 
-const departments = ["IT", "Marketing"];
+const departments = ['IT', 'Marketing'];
 
 export default function OnboardingPage() {
   const { data: echipamente } = useEchipamente();
-  const [department, setDepartment] = useState("");
-  const [laptopId, setLaptopId] = useState("");
+  const [department, setDepartment] = useState('');
+  const [laptopId, setLaptopId] = useState('');
   const { data: packages } = useOnboardingPackages(department);
   const [tasks, setTasks] = useState<OnboardingTask[]>([]);
   const saveMutation = useSaveOnboarding();
@@ -20,9 +20,7 @@ export default function OnboardingPage() {
   }, [packages]);
 
   const handleToggle = (index: number) => {
-    setTasks((prev) =>
-      prev.map((t, i) => (i === index ? { ...t, completed: !t.completed } : t))
-    );
+    setTasks((prev) => prev.map((t, i) => (i === index ? { ...t, completed: !t.completed } : t)));
   };
 
   const handleSave = () => {
@@ -30,13 +28,12 @@ export default function OnboardingPage() {
     saveMutation.mutate({ department, laptopId, tasks });
   };
 
-  const laptops =
-    echipamente?.filter((e) => e.tip.toLowerCase() === "laptop") ?? [];
+  const laptops = echipamente?.filter((e) => e.tip.toLowerCase() === 'laptop') ?? [];
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="space-y-4 p-4">
       <div>
-        <label className="block mb-1">Departament</label>
+        <label className="mb-1 block">Departament</label>
         <select
           className="border p-2"
           value={department}
@@ -51,7 +48,7 @@ export default function OnboardingPage() {
         </select>
       </div>
       <div>
-        <label className="block mb-1">Laptop</label>
+        <label className="mb-1 block">Laptop</label>
         <select
           className="border p-2"
           value={laptopId}
@@ -67,7 +64,7 @@ export default function OnboardingPage() {
       </div>
       {tasks.length > 0 && (
         <div>
-          <h3 className="font-semibold mb-2">Checklist instalare</h3>
+          <h3 className="mb-2 font-semibold">Checklist instalare</h3>
           <ul className="space-y-1">
             {tasks.map((task, idx) => (
               <li key={task.name}>
@@ -85,7 +82,7 @@ export default function OnboardingPage() {
         </div>
       )}
       <button
-        className="bg-primary text-white px-4 py-2 rounded"
+        className="bg-primary rounded px-4 py-2 text-white"
         disabled={!department || !laptopId}
         onClick={handleSave}
       >

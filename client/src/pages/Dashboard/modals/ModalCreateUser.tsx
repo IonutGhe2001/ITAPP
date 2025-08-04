@@ -1,24 +1,19 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import api from "@/services/api";
-import { useToast } from "@/hooks/use-toast/use-toast-hook";
+} from '@/components/ui/select';
+import api from '@/services/api';
+import { useToast } from '@/hooks/use-toast/use-toast-hook';
 
 interface ModalCreateUserProps {
   onClose: () => void;
@@ -27,12 +22,12 @@ interface ModalCreateUserProps {
 export default function ModalCreateUser({ onClose }: ModalCreateUserProps) {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    nume: "",
-    prenume: "",
-    functie: "",
-    role: "",
+    email: '',
+    password: '',
+    nume: '',
+    prenume: '',
+    functie: '',
+    role: '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -45,28 +40,28 @@ export default function ModalCreateUser({ onClose }: ModalCreateUserProps) {
 
     if (!email || !password || !nume || !prenume || !functie || !role) {
       toast({
-        title: "Eroare",
-        description: "Toate câmpurile sunt obligatorii",
-        variant: "destructive",
+        title: 'Eroare',
+        description: 'Toate câmpurile sunt obligatorii',
+        variant: 'destructive',
       });
       return;
     }
 
     setLoading(true);
     try {
-      await api.post("/auth/register", formData);
+      await api.post('/auth/register', formData);
       toast({
-        title: "Cont creat",
-        description: "Utilizatorul a fost înregistrat cu succes.",
+        title: 'Cont creat',
+        description: 'Utilizatorul a fost înregistrat cu succes.',
       });
       onClose();
     } catch (err: unknown) {
-      console.error("Eroare la creare cont:", err);
+      console.error('Eroare la creare cont:', err);
       const e = err as { response?: { data?: { error?: string } } };
       toast({
-        title: "Eroare",
-        description: e.response?.data?.error || "Nu s-a putut crea contul.",
-        variant: "destructive",
+        title: 'Eroare',
+        description: e.response?.data?.error || 'Nu s-a putut crea contul.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -121,7 +116,7 @@ export default function ModalCreateUser({ onClose }: ModalCreateUserProps) {
             </Select>
           </div>
           <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "Se creează..." : "Creează cont"}
+            {loading ? 'Se creează...' : 'Creează cont'}
           </Button>
         </div>
       </DialogContent>

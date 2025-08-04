@@ -1,4 +1,4 @@
-import { getAngajat } from "./angajatiService";
+import { getAngajat } from './angajatiService';
 
 export const getInstallChecklist = async (id: string) => {
   const res = await getAngajat(id);

@@ -1,19 +1,14 @@
-import React, { memo, Suspense, useMemo } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { useUpdateEchipament, useEchipamente } from "@/features/equipment";
-import { useAngajati } from "@/features/employees";
-import { useToast } from "@/hooks/use-toast/use-toast-hook";
-import { getApiErrorMessage } from "@/utils/apiError";
-import { useEchipamentForm } from "@/pages/Dashboard/modals/useEchipamentForm";
-import EchipamentForm from "./EchipamentForm";
-const ModalAddColeg = React.lazy(() => import("@/pages/Dashboard/modals/ModalAddColeg"));
-import type { ModalEditEchipamentProps, Angajat, Echipament } from "@/features/equipment/types";
+import React, { memo, Suspense, useMemo } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { useUpdateEchipament, useEchipamente } from '@/features/equipment';
+import { useAngajati } from '@/features/employees';
+import { useToast } from '@/hooks/use-toast/use-toast-hook';
+import { getApiErrorMessage } from '@/utils/apiError';
+import { useEchipamentForm } from '@/pages/Dashboard/modals/useEchipamentForm';
+import EchipamentForm from './EchipamentForm';
+const ModalAddColeg = React.lazy(() => import('@/pages/Dashboard/modals/ModalAddColeg'));
+import type { ModalEditEchipamentProps, Angajat, Echipament } from '@/features/equipment/types';
 
 function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipamentProps) {
   const initialData = useMemo(
@@ -26,8 +21,8 @@ function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipa
         typeof echipament.metadata === 'string'
           ? echipament.metadata
           : echipament.metadata
-          ? JSON.stringify(echipament.metadata)
-          : '',
+            ? JSON.stringify(echipament.metadata)
+            : '',
     }),
     [echipament]
   );
@@ -49,38 +44,36 @@ function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipa
   const { data: echipamente = [] } = useEchipamente();
   const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
-  
 
   const handleSubmit = async () => {
-    if (!validate({
-      nume: "Numele este obligatoriu.",
-      serie: "Seria este obligatorie.",
-      tip: "Tip invalid.",
-    }))
+    if (
+      !validate({
+        nume: 'Numele este obligatoriu.',
+        serie: 'Seria este obligatorie.',
+        tip: 'Tip invalid.',
+      })
+    )
       return;
 
-  const payload = buildPayload();
+    const payload = buildPayload();
 
     const duplicate = echipamente.find(
-      (e) =>
-        e.tip === payload.tip &&
-        e.serie === payload.serie &&
-        e.id !== echipament.id
+      (e) => e.tip === payload.tip && e.serie === payload.serie && e.id !== echipament.id
     );
     if (duplicate) {
-     setErrors((prev) => ({ ...prev, serie: "Un echipament cu aceasta serie exista deja." }));
+      setErrors((prev) => ({ ...prev, serie: 'Un echipament cu aceasta serie exista deja.' }));
       return;
     }
 
     if (payload.angajatId) {
       const eqSameType = echipamente.find(
-        (e) =>
-          e.angajatId === payload.angajatId &&
-          e.tip === payload.tip &&
-          e.id !== echipament.id
+        (e) => e.angajatId === payload.angajatId && e.tip === payload.tip && e.id !== echipament.id
       );
       if (eqSameType) {
-       setErrors((prev) => ({ ...prev, angajatId: "Angajatul are deja un echipament de acest tip." }));
+        setErrors((prev) => ({
+          ...prev,
+          angajatId: 'Angajatul are deja un echipament de acest tip.',
+        }));
         return;
       }
     }
@@ -88,22 +81,22 @@ function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipa
     try {
       const updated = await updateMutation.mutateAsync({ id: echipament.id, data: payload });
       toast({
-        title: "Echipament salvat",
-        description: "Modificările au fost salvate cu succes.",
+        title: 'Echipament salvat',
+        description: 'Modificările au fost salvate cu succes.',
       });
       onUpdated(updated as Echipament);
       onClose();
     } catch (err) {
       toast({
-        title: "Eroare la salvare",
+        title: 'Eroare la salvare',
         description: getApiErrorMessage(err),
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
 
   return (
-     <>
+    <>
       <Dialog open onOpenChange={onClose}>
         <DialogContent>
           <DialogHeader>
@@ -122,9 +115,7 @@ function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipa
         </DialogContent>
       </Dialog>
       <Suspense fallback={null}>
-        {showColegModal && (
-          <ModalAddColeg onClose={() => setShowColegModal(false)} />
-        )}
+        {showColegModal && <ModalAddColeg onClose={() => setShowColegModal(false)} />}
       </Suspense>
     </>
   );

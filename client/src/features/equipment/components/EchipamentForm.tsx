@@ -1,26 +1,26 @@
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
-import type { Dispatch, SetStateAction } from 'react'
-import { useState } from 'react'
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import type { Dispatch, SetStateAction } from 'react';
+import { useState } from 'react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import type { Angajat } from '@/features/equipment/types'
-import type { EchipamentFormData } from '@/pages/Dashboard/modals/useEchipamentForm'
+} from '@/components/ui/select';
+import type { Angajat } from '@/features/equipment/types';
+import type { EchipamentFormData } from '@/pages/Dashboard/modals/useEchipamentForm';
 
 export interface EchipamentFormProps {
- formData: EchipamentFormData
-  setFormData: Dispatch<SetStateAction<EchipamentFormData>>
-  errors: Record<string, string>
-  search: string
-  setSearch: (s: string) => void
-  angajati: Angajat[]
-  onAddColeg: () => void
+  formData: EchipamentFormData;
+  setFormData: Dispatch<SetStateAction<EchipamentFormData>>;
+  errors: Record<string, string>;
+  search: string;
+  setSearch: (s: string) => void;
+  angajati: Angajat[];
+  onAddColeg: () => void;
 }
 
 export default function EchipamentForm({
@@ -32,15 +32,13 @@ export default function EchipamentForm({
   angajati,
   onAddColeg,
 }: EchipamentFormProps) {
-  const [selectOpen, setSelectOpen] = useState(false)
+  const [selectOpen, setSelectOpen] = useState(false);
   const filteredAngajati = angajati.filter((a) =>
     a.numeComplet.toLowerCase().includes(search.toLowerCase())
-  )
+  );
   return (
     <div className="space-y-4">
-      {errors.general && (
-        <p className="text-sm text-red-500">{errors.general}</p>
-      )}
+      {errors.general && <p className="text-sm text-red-500">{errors.general}</p>}
       <div>
         <Label>Nume echipament</Label>
         <Input
@@ -68,7 +66,7 @@ export default function EchipamentForm({
       <div>
         <Label>Detalii (opțional)</Label>
         <textarea
-          className="border border-gray-300 rounded-lg w-full p-2 text-sm"
+          className="w-full rounded-lg border border-gray-300 p-2 text-sm"
           value={formData.metadata}
           onChange={(e) => setFormData({ ...formData, metadata: e.target.value })}
         />
@@ -104,16 +102,16 @@ export default function EchipamentForm({
                 ))}
               </>
             ) : (
-              <div className="p-2 text-center text-sm text-muted-foreground">
+              <div className="text-muted-foreground p-2 text-center text-sm">
                 <p>Nu s-au găsit colegi.</p>
                 <Button
                   size="sm"
                   className="mt-2 w-full"
                   type="button"
                   onClick={(e) => {
-                    e.preventDefault()
-                    setSelectOpen(false)
-                    onAddColeg()
+                    e.preventDefault();
+                    setSelectOpen(false);
+                    onAddColeg();
                   }}
                 >
                   Adaugă coleg nou
@@ -122,11 +120,9 @@ export default function EchipamentForm({
             )}
           </SelectContent>
         </Select>
-        
-        {errors.angajatId && (
-          <p className="text-sm text-red-500 mt-1">{errors.angajatId}</p>
-        )}
+
+        {errors.angajatId && <p className="mt-1 text-sm text-red-500">{errors.angajatId}</p>}
       </div>
     </div>
-  )
+  );
 }

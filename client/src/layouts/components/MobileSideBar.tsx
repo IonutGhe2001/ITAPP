@@ -1,10 +1,10 @@
-import { NavLink } from "react-router-dom";
-import { sidebarRoutes } from "../../routes/sidebarRoutes";
-import { LogOut } from "lucide-react";
-import { useAuth } from "@/context/use-auth";
-import { logout as logoutRequest } from "@/services/authService";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { navItemClass } from "./NavItemClass";
+import { NavLink } from 'react-router-dom';
+import { sidebarRoutes } from '../../routes/sidebarRoutes';
+import { LogOut } from 'lucide-react';
+import { useAuth } from '@/context/use-auth';
+import { logout as logoutRequest } from '@/services/authService';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { navItemClass } from './NavItemClass';
 
 interface MobileSidebarProps {
   open: boolean;
@@ -26,13 +26,11 @@ export default function MobileSidebar({ open, onOpenChange }: MobileSidebarProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className="fixed inset-y-0 left-0 top-0 w-60 max-w-[50vw] translate-x-0 translate-y-0 p-6 bg-background border-r border-border rounded-none shadow-sm focus:outline-none"
-      >
-        <div className="text-2xl font-extrabold text-primary mb-8 tracking-tight pl-1 select-none">
+      <DialogContent className="bg-background border-border fixed inset-y-0 left-0 top-0 w-60 max-w-[50vw] translate-x-0 translate-y-0 rounded-none border-r p-6 shadow-sm focus:outline-none">
+        <div className="text-primary mb-8 select-none pl-1 text-2xl font-extrabold tracking-tight">
           IT <span className="text-foreground">APP</span>
         </div>
-        <nav className="flex flex-col gap-1 mb-auto">
+        <nav className="mb-auto flex flex-col gap-1">
           {sidebarRoutes.map((route) => {
             const Icon = route.icon;
             return (
@@ -42,18 +40,18 @@ export default function MobileSidebar({ open, onOpenChange }: MobileSidebarProps
                 className={({ isActive }) => navItemClass({ active: isActive })}
                 onClick={() => onOpenChange(false)}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className="h-5 w-5" />
                 <span>{route.label}</span>
               </NavLink>
             );
           })}
         </nav>
-        <div className="pt-6 border-t border-border">
+        <div className="border-border border-t pt-6">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-2 rounded-lg text-muted-foreground hover:bg-muted transition text-sm w-full"
+            className="text-muted-foreground hover:bg-muted flex w-full items-center gap-3 rounded-lg px-4 py-2 text-sm transition"
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="h-5 w-5" />
             Logout
           </button>
         </div>

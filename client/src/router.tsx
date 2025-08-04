@@ -1,26 +1,26 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { lazy, Suspense } from "react";
-import type { JSX } from "react";
-import { useAuth } from "@/context/use-auth";
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import type { JSX } from 'react';
+import { useAuth } from '@/context/use-auth';
 
-const LoginPage = lazy(() => import("./pages/Login/Login"));
-const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard"));
-const Echipamente = lazy(() => import("./features/equipment/pages/Echipamente/Echipamente"));
-const Colegi = lazy(() => import("./features/employees/pages/Colegi/Colegi"));
-const EmployeeForm = lazy(() => import("./features/employees/pages/EmployeeForm/EmployeeForm"));
-const AppLayout = lazy(() => import("./layouts/AppLayout"));
-const ProfilePage = lazy(() => import("./pages/Profile/ProfilePage"));
-const SearchPage = lazy(() => import("./pages/Search/Search"));
-const OnboardingPage = lazy(() => import("./pages/Onboarding/OnboardingPage"));
+const LoginPage = lazy(() => import('./pages/Login/Login'));
+const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
+const Echipamente = lazy(() => import('./features/equipment/pages/Echipamente/Echipamente'));
+const Colegi = lazy(() => import('./features/employees/pages/Colegi/Colegi'));
+const EmployeeForm = lazy(() => import('./features/employees/pages/EmployeeForm/EmployeeForm'));
+const AppLayout = lazy(() => import('./layouts/AppLayout'));
+const ProfilePage = lazy(() => import('./pages/Profile/ProfilePage'));
+const SearchPage = lazy(() => import('./pages/Search/Search'));
+const OnboardingPage = lazy(() => import('./pages/Onboarding/OnboardingPage'));
 
 // Componentă pentru rute protejate
 function ProtectedRoute({ children }: { children: JSX.Element }) {
- const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary border-t-transparent"></div>
+      <div className="flex h-screen items-center justify-center">
+        <div className="border-primary h-10 w-10 animate-spin rounded-full border-4 border-t-transparent"></div>
       </div>
     );
   }
@@ -32,8 +32,8 @@ export default function AppRouter() {
     <BrowserRouter>
       <Suspense
         fallback={
-          <div className="flex items-center justify-center h-screen">
-            <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary border-t-transparent"></div>
+          <div className="flex h-screen items-center justify-center">
+            <div className="border-primary h-10 w-10 animate-spin rounded-full border-4 border-t-transparent"></div>
           </div>
         }
       >

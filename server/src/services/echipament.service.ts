@@ -52,8 +52,8 @@ export const createEchipament = (data: {
   const finalStare = data.stare
     ? data.stare
     : data.angajatId
-    ? "alocat"
-    : "in_stoc";
+      ? "alocat"
+      : "in_stoc";
 
   return prisma.$transaction(async (tx: any) => {
     const existing = await tx.echipament.findFirst({
@@ -92,7 +92,7 @@ export const createEchipament = (data: {
         data: {
           angajatId: echipament.angajatId,
           echipamentId: echipament.id,
-          tip: 'ASSIGN',
+          tip: "ASSIGN",
         },
       });
     }
@@ -112,14 +112,13 @@ export const updateEchipament = async (
     metadata?: any;
   }
 ) => {
-
   return prisma.$transaction(async (tx: any) => {
     const current = await tx.echipament.findUnique({ where: { id } });
     if (!current) throw new Error("Echipament inexistent");
 
     await validateEchipamentUpdate(tx, id, current, data);
 
-   const updated = await tx.echipament.update({
+    const updated = await tx.echipament.update({
       where: { id },
       data: {
         ...(data.nume !== undefined && { nume: data.nume }),
@@ -133,22 +132,25 @@ export const updateEchipament = async (
         angajat: true,
       },
     });
-    
+
     if (tx.equipmentChange) {
-      if (data.angajatId !== undefined && data.angajatId !== current.angajatId) {
+      if (
+        data.angajatId !== undefined &&
+        data.angajatId !== current.angajatId
+      ) {
         if (current.angajatId && data.angajatId) {
           await tx.equipmentChange.create({
             data: {
               angajatId: current.angajatId,
               echipamentId: id,
-              tip: 'RETURN',
+              tip: "RETURN",
             },
           });
           await tx.equipmentChange.create({
             data: {
               angajatId: data.angajatId,
               echipamentId: id,
-              tip: 'ASSIGN',
+              tip: "ASSIGN",
             },
           });
         } else if (current.angajatId && !data.angajatId) {
@@ -156,7 +158,7 @@ export const updateEchipament = async (
             data: {
               angajatId: current.angajatId,
               echipamentId: id,
-              tip: 'RETURN',
+              tip: "RETURN",
             },
           });
         } else if (!current.angajatId && data.angajatId) {
@@ -164,7 +166,7 @@ export const updateEchipament = async (
             data: {
               angajatId: data.angajatId,
               echipamentId: id,
-              tip: 'ASSIGN',
+              tip: "ASSIGN",
             },
           });
         }
@@ -177,7 +179,7 @@ export const updateEchipament = async (
             data: {
               angajatId: current.angajatId,
               echipamentId: id,
-              tip: 'REPLACE',
+              tip: "REPLACE",
             },
           });
         }
@@ -193,13 +195,12 @@ export const deleteEchipament = (id: string) => {
 };
 
 export const getStats = async () => {
- const [echipamente, inStocCount, alocatCount, angajati] =
-    await Promise.all([
-      prisma.echipament.count(),
-      prisma.echipament.count({ where: { stare: "in_stoc" } }),
-      prisma.echipament.count({ where: { stare: "alocat" } }),
-      prisma.angajat.count(),
-    ]);
+  const [echipamente, inStocCount, alocatCount, angajati] = await Promise.all([
+    prisma.echipament.count(),
+    prisma.echipament.count({ where: { stare: "in_stoc" } }),
+    prisma.echipament.count({ where: { stare: "alocat" } }),
+    prisma.angajat.count(),
+  ]);
 
   return {
     echipamente,

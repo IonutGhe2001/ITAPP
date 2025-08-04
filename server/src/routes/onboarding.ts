@@ -9,6 +9,10 @@ const router = express.Router();
 router.use(authenticate);
 
 router.get("/packages/:department", controller.getPackages);
-router.post("/", validateRequest(createOnboardingSchema), controller.createOnboarding);
+router.post(
+  "/",
+  validateRequest(createOnboardingSchema),
+  controller.createOnboarding
+);
 
 export default router;

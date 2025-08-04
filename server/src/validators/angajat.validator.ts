@@ -24,7 +24,7 @@ export const updateAngajatSchema = Joi.object({
   cDataId: Joi.string().allow(null, ""),
   cDataNotes: Joi.string().allow(null, ""),
   cDataCreated: Joi.boolean(),
-  });
+});
 
 export const createEmailAccountSchema = Joi.object({
   email: Joi.string().email().required(),

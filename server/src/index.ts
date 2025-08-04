@@ -27,9 +27,6 @@ import reportsRoutes from "./routes/reports";
 import purchaseRequestRoutes from "./routes/purchaseRequests";
 import onboardingRoutes from "./routes/onboarding";
 
-
-
-
 dotenv.config();
 
 const app = express();
@@ -41,7 +38,7 @@ const server = http.createServer(app);
 const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
   .split(",")
   .filter(Boolean);
-  initWebSocket(server, allowedOrigins);
+initWebSocket(server, allowedOrigins);
 app.use(
   cors({
     origin: allowedOrigins,
@@ -77,7 +74,7 @@ app.use(
   })
 );
 app.use("/api/auth/login", loginLimiter);
- app.use(logRequest);
+app.use(logRequest);
 
 // Routes
 app.use("/api/auth", authRoutes);

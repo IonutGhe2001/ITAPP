@@ -1,4 +1,4 @@
-declare module '@prisma/client' {
+declare module "@prisma/client" {
   export class PrismaClient {
     [key: string]: any;
     constructor(options?: any);
@@ -8,8 +8,8 @@ declare module '@prisma/client' {
   export namespace Prisma {}
 
   export enum ProcesVerbalTip {
-    PREDARE_PRIMIRE = 'PREDARE_PRIMIRE',
-    RESTITUIRE = 'RESTITUIRE',
-    SCHIMB = 'SCHIMB',
+    PREDARE_PRIMIRE = "PREDARE_PRIMIRE",
+    RESTITUIRE = "RESTITUIRE",
+    SCHIMB = "SCHIMB",
   }
 }

@@ -1,6 +1,6 @@
-import { DayPicker } from "react-day-picker";
-import "react-day-picker/dist/style.css";
-import { ro } from "date-fns/locale";
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
+import { ro } from 'date-fns/locale';
 
 type EventCalendarProps = {
   selected: Date | undefined;
@@ -23,15 +23,10 @@ export default function EventCalendar({
   };
 
   const modifiersClassNames = {
-    hasEvent:
-      "rounded-full bg-chart-1 text-white font-semibold hover:bg-chart-1/90",
+    hasEvent: 'rounded-full bg-chart-1 text-white font-semibold hover:bg-chart-1/90',
   };
 
-  const handleDayClick = (
-    date?: Date,
-    _modifiers?: unknown,
-    e?: React.MouseEvent
-  ) => {
+  const handleDayClick = (date?: Date, _modifiers?: unknown, e?: React.MouseEvent) => {
     if (!date) return;
     if (e?.detail === 2) {
       onDoubleClick?.(date);
@@ -41,7 +36,7 @@ export default function EventCalendar({
   };
 
   return (
-    <div className="w-full min-w-[250px] sm:min-w-[350px] rounded-xl border border-border bg-card shadow-sm p-4 sm:p-6">
+    <div className="border-border bg-card w-full min-w-[250px] rounded-xl border p-4 shadow-sm sm:min-w-[350px] sm:p-6">
       <DayPicker
         mode="single"
         selected={selected}

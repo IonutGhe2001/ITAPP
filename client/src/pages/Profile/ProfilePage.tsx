@@ -1,14 +1,13 @@
-import React, { useState } from "react";
-import { Pencil, X } from "lucide-react";
-import { updateCurrentUser } from "@/services/authService";
-import { useUser } from "@/store/use-user";
-import type { User } from "@/types/user";
-import { useToast } from "@/hooks/use-toast/use-toast-hook";
-import Container from "@/components/Container";
-import Avatar from "@/components/Avatar";
-import ProfileInput from "@/components/ProfileInput";
-import SignatureEditor from "@/components/SignatureEditor";
-
+import React, { useState } from 'react';
+import { Pencil, X } from 'lucide-react';
+import { updateCurrentUser } from '@/services/authService';
+import { useUser } from '@/store/use-user';
+import type { User } from '@/types/user';
+import { useToast } from '@/hooks/use-toast/use-toast-hook';
+import Container from '@/components/Container';
+import Avatar from '@/components/Avatar';
+import ProfileInput from '@/components/ProfileInput';
+import SignatureEditor from '@/components/SignatureEditor';
 
 export default function ProfilePage() {
   const { user, setUser } = useUser();
@@ -36,11 +35,11 @@ export default function ProfilePage() {
     }
   };
 
- const handleChange = (field: keyof User) => (e: React.ChangeEvent<HTMLInputElement>) => {
-  if (user) {
-    setUser({ ...user, [field]: e.target.value });
-  }
-};
+  const handleChange = (field: keyof User) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (user) {
+      setUser({ ...user, [field]: e.target.value });
+    }
+  };
 
   const handleSave = async () => {
     if (!user) return;
@@ -51,12 +50,12 @@ export default function ProfilePage() {
       setOriginal(updated);
       setIsEditing(false);
       toast({
-  title: "Profil actualizat",
-  description: "Modificările au fost salvate cu succes.",
-});
+        title: 'Profil actualizat',
+        description: 'Modificările au fost salvate cu succes.',
+      });
     } catch (_err) {
-      console.error("Eroare la salvare:", _err);
-      alert("A apărut o eroare la salvarea profilului.");
+      console.error('Eroare la salvare:', _err);
+      alert('A apărut o eroare la salvarea profilului.');
     } finally {
       setIsSaving(false);
     }
@@ -69,20 +68,20 @@ export default function ProfilePage() {
 
   return (
     <Container className="py-10">
-      <h1 className="text-3xl font-bold text-foreground mb-8">Profilul meu</h1>
+      <h1 className="text-foreground mb-8 text-3xl font-bold">Profilul meu</h1>
 
-      <div className="bg-card shadow-md rounded-2xl p-6 flex flex-col items-center gap-6">
+      <div className="bg-card flex flex-col items-center gap-6 rounded-2xl p-6 shadow-md">
         <div className="relative">
-           <Avatar
+          <Avatar
             src={user?.profilePicture ?? undefined}
-            name={`${user?.nume ?? ""} ${user?.prenume ?? ""}`}
-            className="w-32 h-32 border-4 border-primary shadow"
+            name={`${user?.nume ?? ''} ${user?.prenume ?? ''}`}
+            className="border-primary h-32 w-32 border-4 shadow"
           />
           {isEditing && (
             <>
               <label
                 htmlFor="profile-picture"
-                className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2 rounded-full cursor-pointer shadow"
+                className="bg-primary text-primary-foreground absolute bottom-0 right-0 cursor-pointer rounded-full p-2 shadow"
               >
                 <Pencil size={16} />
                 <input
@@ -97,7 +96,7 @@ export default function ProfilePage() {
                 <button
                   type="button"
                   onClick={handleRemoveImage}
-                  className="absolute top-0 right-0 bg-destructive text-destructive-foreground p-1 rounded-full shadow"
+                  className="bg-destructive text-destructive-foreground absolute right-0 top-0 rounded-full p-1 shadow"
                 >
                   <X size={14} />
                 </button>
@@ -106,7 +105,7 @@ export default function ProfilePage() {
           )}
         </div>
 
-<SignatureEditor
+        <SignatureEditor
           signature={user?.digitalSignature ?? null}
           isEditing={isEditing}
           onChange={(sig) => {
@@ -115,38 +114,53 @@ export default function ProfilePage() {
             }
           }}
         />
-        
+
         <div className="w-full space-y-4">
           {isEditing ? (
             <>
-              <ProfileInput label="Nume" value={user?.nume} onChange={handleChange("nume")} />
-              <ProfileInput label="Prenume" value={user?.prenume} onChange={handleChange("prenume")} />
-              <ProfileInput label="Funcție" value={user?.functie} onChange={handleChange("functie")} />
-              <ProfileInput label="Telefon" value={user?.telefon || ""} onChange={handleChange("telefon")} />
+              <ProfileInput label="Nume" value={user?.nume} onChange={handleChange('nume')} />
+              <ProfileInput
+                label="Prenume"
+                value={user?.prenume}
+                onChange={handleChange('prenume')}
+              />
+              <ProfileInput
+                label="Funcție"
+                value={user?.functie}
+                onChange={handleChange('functie')}
+              />
+              <ProfileInput
+                label="Telefon"
+                value={user?.telefon || ''}
+                onChange={handleChange('telefon')}
+              />
             </>
           ) : (
             <>
-              <ProfileField label="Nume complet" value={`${user?.nume ?? ""} ${user?.prenume ?? ""}`} />
+              <ProfileField
+                label="Nume complet"
+                value={`${user?.nume ?? ''} ${user?.prenume ?? ''}`}
+              />
               <ProfileField label="Email" value={user?.email} />
               <ProfileField label="Funcție" value={user?.functie} />
-              <ProfileField label="Telefon" value={user?.telefon || "-"} />
+              <ProfileField label="Telefon" value={user?.telefon || '-'} />
             </>
           )}
         </div>
 
-        <div className="flex gap-4 mt-6">
+        <div className="mt-6 flex gap-4">
           {isEditing ? (
             <>
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                 className="px-6 py-2 bg-primary text-primary-foreground rounded-xl hover:bg-primary/80 transition"
+                className="bg-primary text-primary-foreground hover:bg-primary/80 rounded-xl px-6 py-2 transition"
               >
-                {isSaving ? "Se salvează..." : "Salvează"}
+                {isSaving ? 'Se salvează...' : 'Salvează'}
               </button>
               <button
                 onClick={handleCancel}
-                className="px-6 py-2 bg-muted text-foreground rounded-xl hover:bg-muted/70 transition"
+                className="bg-muted text-foreground hover:bg-muted/70 rounded-xl px-6 py-2 transition"
               >
                 Anulează
               </button>
@@ -154,7 +168,7 @@ export default function ProfilePage() {
           ) : (
             <button
               onClick={() => setIsEditing(true)}
-              className="px-6 py-2 bg-primary text-primary-foreground rounded-xl hover:bg-primary/80 transition"
+              className="bg-primary text-primary-foreground hover:bg-primary/80 rounded-xl px-6 py-2 transition"
             >
               Editează
             </button>
@@ -168,8 +182,8 @@ export default function ProfilePage() {
 function ProfileField({ label, value }: { label: string; value?: string }) {
   return (
     <div>
-      <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="text-base font-medium text-foreground">{value}</p>
+      <p className="text-muted-foreground text-sm">{label}</p>
+      <p className="text-foreground text-base font-medium">{value}</p>
     </div>
   );
 }

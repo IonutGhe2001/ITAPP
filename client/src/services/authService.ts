@@ -1,33 +1,34 @@
-import api from "./api";
+import api from './api';
 
 export const login = async (email: string, password: string) => {
-  await api.post("/auth/login", { email, password });
+  await api.post('/auth/login', { email, password });
 };
 
 export const getCurrentUser = async () => {
   try {
-   const res = await api.get("/auth/me");
+    const res = await api.get('/auth/me');
     return res.data;
   } catch (error) {
-    console.error("Eroare la /me:", error);
+    console.error('Eroare la /me:', error);
     return null;
   }
 };
 
-export const updateCurrentUser = async (data: Partial<{
-  nume: string;
-  prenume: string;
-  functie: string;
-  telefon?: string;
-  profilePicture?: string | null;
-  digitalSignature?: string | null;
-}>) => {
-
-   const res = await api.patch("/auth/me", data);
+export const updateCurrentUser = async (
+  data: Partial<{
+    nume: string;
+    prenume: string;
+    functie: string;
+    telefon?: string;
+    profilePicture?: string | null;
+    digitalSignature?: string | null;
+  }>
+) => {
+  const res = await api.patch('/auth/me', data);
 
   return res.data;
 };
 
 export const logout = async () => {
-  await api.post("/auth/logout");
+  await api.post('/auth/logout');
 };

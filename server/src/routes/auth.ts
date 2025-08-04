@@ -1,5 +1,11 @@
 import express from "express";
-import { login, getMe, register, updateMe, logout } from "../controllers/authController";
+import {
+  login,
+  getMe,
+  register,
+  updateMe,
+  logout,
+} from "../controllers/authController";
 import { validateRequest } from "../middlewares/validateRequest";
 import { loginSchema, registerSchema } from "../validators/auth.validator";
 import { authenticate, authorizeRoles } from "../middlewares/authMiddleware";

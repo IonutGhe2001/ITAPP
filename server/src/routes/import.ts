@@ -21,6 +21,11 @@ const upload = multer({
   },
 });
 
-router.post("/echipamente", authenticate, upload.single("file"), uploadImportFile);
+router.post(
+  "/echipamente",
+  authenticate,
+  upload.single("file"),
+  uploadImportFile
+);
 
 export default router;

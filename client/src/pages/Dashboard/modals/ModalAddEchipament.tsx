@@ -1,28 +1,22 @@
-"use client";
+'use client';
 
-import React, { Suspense, useMemo } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import type { Angajat } from "@/features/equipment/types";
-const ModalAddColeg = React.lazy(() => import("./ModalAddColeg"));
-import { useCreateEchipament, useEchipamente } from "@/features/equipment";
-import { useAngajati } from "@/features/employees";
-import { useToast } from "@/hooks/use-toast/use-toast-hook";
-import { useEchipamentForm } from "./useEchipamentForm";
-import EchipamentForm from "@/features/equipment/components/EchipamentForm";
-
+import React, { Suspense, useMemo } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import type { Angajat } from '@/features/equipment/types';
+const ModalAddColeg = React.lazy(() => import('./ModalAddColeg'));
+import { useCreateEchipament, useEchipamente } from '@/features/equipment';
+import { useAngajati } from '@/features/employees';
+import { useToast } from '@/hooks/use-toast/use-toast-hook';
+import { useEchipamentForm } from './useEchipamentForm';
+import EchipamentForm from '@/features/equipment/components/EchipamentForm';
 
 export default function ModalAddEchipament({
   onClose,
-  defaultName = "",
+  defaultName = '',
 }: {
-  onClose: () => void
-  defaultName?: string
+  onClose: () => void;
+  defaultName?: string;
 }) {
   const initialData = useMemo(() => ({ nume: defaultName }), [defaultName]);
 
@@ -37,7 +31,7 @@ export default function ModalAddEchipament({
     setShowColegModal,
     validate,
     buildPayload,
-   } = useEchipamentForm(initialData);
+  } = useEchipamentForm(initialData);
 
   const { data: angajati = [] } = useAngajati();
   const { data: echipamente = [] } = useEchipamente();
@@ -45,20 +39,20 @@ export default function ModalAddEchipament({
   const { toast } = useToast();
 
   const handleSubmit = async () => {
-    if (!validate({
-      nume: "Numele echipamentului este obligatoriu.",
-      serie: "Seria este obligatorie.",
-      tip: "Tipul este obligatoriu.",
-    }))
+    if (
+      !validate({
+        nume: 'Numele echipamentului este obligatoriu.',
+        serie: 'Seria este obligatorie.',
+        tip: 'Tipul este obligatoriu.',
+      })
+    )
       return;
 
     const payload = buildPayload();
 
-    const duplicate = echipamente.find(
-      (e) => e.tip === payload.tip && e.serie === payload.serie
-    );
+    const duplicate = echipamente.find((e) => e.tip === payload.tip && e.serie === payload.serie);
     if (duplicate) {
-      setErrors((prev) => ({ ...prev, serie: "Un echipament cu aceasta serie exista deja." }));
+      setErrors((prev) => ({ ...prev, serie: 'Un echipament cu aceasta serie exista deja.' }));
       return;
     }
 
@@ -67,7 +61,10 @@ export default function ModalAddEchipament({
         (e) => e.angajatId === payload.angajatId && e.tip === payload.tip
       );
       if (eqSameType) {
-        setErrors((prev) => ({ ...prev, angajatId: "Angajatul are deja un echipament de acest tip." }));
+        setErrors((prev) => ({
+          ...prev,
+          angajatId: 'Angajatul are deja un echipament de acest tip.',
+        }));
         return;
       }
     }
@@ -75,21 +72,21 @@ export default function ModalAddEchipament({
     try {
       await createMutation.mutateAsync(payload);
       toast({
-        title: "Echipament adăugat",
-        description: "Echipamentul a fost salvat cu succes.",
+        title: 'Echipament adăugat',
+        description: 'Echipamentul a fost salvat cu succes.',
       });
       onClose();
     } catch {
       toast({
-        title: "Eroare",
-        description: "Eroare la adăugare echipament.",
-        variant: "destructive",
+        title: 'Eroare',
+        description: 'Eroare la adăugare echipament.',
+        variant: 'destructive',
       });
     }
   };
 
   return (
-   <>
+    <>
       <Dialog open onOpenChange={onClose}>
         <DialogContent>
           <DialogHeader>
@@ -109,10 +106,8 @@ export default function ModalAddEchipament({
         </DialogContent>
       </Dialog>
       <Suspense fallback={null}>
-        {showColegModal && (
-          <ModalAddColeg onClose={() => setShowColegModal(false)} />
-        )}
-    </Suspense>
+        {showColegModal && <ModalAddColeg onClose={() => setShowColegModal(false)} />}
+      </Suspense>
     </>
   );
 }

@@ -1,75 +1,67 @@
-import React, { useState, Suspense } from "react";
-import type { Echipament } from "@/features/equipment/types";
-import {
-  useEchipamente,
-  useDeleteEchipament,
-  useUpdateEchipament,
-} from "@/features/equipment";
-import { useToast } from "@/hooks/use-toast/use-toast-hook";
-import { getApiErrorMessage } from "@/utils/apiError";
+import React, { useState, Suspense } from 'react';
+import type { Echipament } from '@/features/equipment/types';
+import { useEchipamente, useDeleteEchipament, useUpdateEchipament } from '@/features/equipment';
+import { useToast } from '@/hooks/use-toast/use-toast-hook';
+import { getApiErrorMessage } from '@/utils/apiError';
 import {
   EquipmentFilter,
   EquipmentList,
   EquipmentTypeFilter,
   ModalEditEchipament,
   ImportEchipamente,
-} from "@/features/equipment";
-import Container from "@/components/Container";
-import { Button } from "@/components/ui/button";
-const ModalAddEchipament = React.lazy(() =>
-  import("@/pages/Dashboard/modals/ModalAddEchipament")
-);
+} from '@/features/equipment';
+import Container from '@/components/Container';
+import { Button } from '@/components/ui/button';
+const ModalAddEchipament = React.lazy(() => import('@/pages/Dashboard/modals/ModalAddEchipament'));
 
 export default function Echipamente() {
- const {
+  const {
     data: echipamente = [],
     refetch,
-  isLoading,
+    isLoading,
   } = useEchipamente() as {
-    data: Echipament[] | undefined
-    refetch: () => void
-    isLoading: boolean
-  }
+    data: Echipament[] | undefined;
+    refetch: () => void;
+    isLoading: boolean;
+  };
 
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("");
-const [type, setType] = useState("");
-  const [sort, setSort] = useState("asc");
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('');
+  const [type, setType] = useState('');
+  const [sort, setSort] = useState('asc');
 
-const [selected, setSelected] = useState<(Echipament & { __editMode?: boolean }) | null>(null);
-const [showAddModal, setShowAddModal] = useState(false);
+  const [selected, setSelected] = useState<(Echipament & { __editMode?: boolean }) | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const deleteMutation = useDeleteEchipament();
   const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
 
-   if (isLoading && echipamente.length === 0) {
+  if (isLoading && echipamente.length === 0) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary border-t-transparent"></div>
+      <div className="flex h-screen items-center justify-center">
+        <div className="border-primary h-10 w-10 animate-spin rounded-full border-4 border-t-transparent"></div>
       </div>
-    )
+    );
   }
 
-    const types = Array.from(new Set(echipamente.map((e) => e.tip))).sort();
+  const types = Array.from(new Set(echipamente.map((e) => e.tip))).sort();
 
   const filtered = echipamente
     .filter((e: Echipament) => {
       if (status && e.stare !== status) return false;
       if (type && e.tip !== type) return false;
 
-    const q = search.trim().toLowerCase();
+      const q = search.trim().toLowerCase();
       if (q) {
         if (!e.nume.toLowerCase().includes(q) && !e.serie?.toLowerCase().includes(q)) {
           return false;
         }
       }
-    return true;
+      return true;
     })
     .sort((a: Echipament, b: Echipament) =>
-      sort === "asc"
-        ? a.nume.localeCompare(b.nume)
-        : b.nume.localeCompare(a.nume)
+      sort === 'asc' ? a.nume.localeCompare(b.nume) : b.nume.localeCompare(a.nume)
     );
 
   const handleDelete = async (id: string) => {
@@ -77,32 +69,32 @@ const [showAddModal, setShowAddModal] = useState(false);
   };
 
   const handleEdit = async (data: Echipament & { __editMode?: boolean }) => {
-    const isQuickUpdate = "angajatId" in data && data.__editMode !== true;
+    const isQuickUpdate = 'angajatId' in data && data.__editMode !== true;
 
     if (isQuickUpdate) {
       const payload = {
-        nume: data.nume?.trim() || "",
-        tip: data.tip?.trim() || "",
-        serie: data.serie?.trim() || "",
-        angajatId: data.angajatId === null ? null : data.angajatId ?? null,
+        nume: data.nume?.trim() || '',
+        tip: data.tip?.trim() || '',
+        serie: data.serie?.trim() || '',
+        angajatId: data.angajatId === null ? null : (data.angajatId ?? null),
         stare: data.stare ?? undefined,
       };
 
       Object.keys(payload).forEach((key) => {
-        if (payload[key as keyof typeof payload] === "") {
+        if (payload[key as keyof typeof payload] === '') {
           delete payload[key as keyof typeof payload];
         }
       });
 
       try {
         const res = await updateMutation.mutateAsync({ id: data.id, data: payload });
-        if (!res || !res.id) throw new Error("Obiectul returnat nu este valid");
+        if (!res || !res.id) throw new Error('Obiectul returnat nu este valid');
       } catch (err) {
-        console.error("❌ Eroare la update rapid:", err);
+        console.error('❌ Eroare la update rapid:', err);
         toast({
-          title: "Eroare la actualizare",
+          title: 'Eroare la actualizare',
           description: getApiErrorMessage(err),
-          variant: "destructive",
+          variant: 'destructive',
         });
       }
     } else {
@@ -112,9 +104,8 @@ const [showAddModal, setShowAddModal] = useState(false);
 
   return (
     <Container className="py-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-4">
-          
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="space-y-4 lg:col-span-2">
           <EquipmentFilter
             search={search}
             status={status}
@@ -123,27 +114,16 @@ const [showAddModal, setShowAddModal] = useState(false);
             onStatusChange={(value: string) => setStatus(value)}
             onSortChange={(value: string) => setSort(value)}
           />
-          <EquipmentTypeFilter
-            types={types}
-            selected={type}
-            onChange={setType}
-          />
+          <EquipmentTypeFilter types={types} selected={type} onChange={setType} />
           {filtered.length === 0 && search.trim() ? (
-            <div className="text-center text-sm text-muted-foreground py-10">
+            <div className="text-muted-foreground py-10 text-center text-sm">
               <p>Nu s-au găsit echipamente.</p>
-              <Button
-                className="mt-2"
-                onClick={() => setShowAddModal(true)}
-              >
+              <Button className="mt-2" onClick={() => setShowAddModal(true)}>
                 Adaugă echipament nou
               </Button>
             </div>
           ) : (
-            <EquipmentList
-              echipamente={filtered}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
+            <EquipmentList echipamente={filtered} onEdit={handleEdit} onDelete={handleDelete} />
           )}
         </div>
         <div>
@@ -153,17 +133,14 @@ const [showAddModal, setShowAddModal] = useState(false);
 
       {selected && (
         <ModalEditEchipament
-            echipament={selected}
-            onClose={() => setSelected(null)}
-            onUpdated={() => setSelected(null)}
-          />
+          echipament={selected}
+          onClose={() => setSelected(null)}
+          onUpdated={() => setSelected(null)}
+        />
       )}
       <Suspense fallback={null}>
         {showAddModal && (
-          <ModalAddEchipament
-            onClose={() => setShowAddModal(false)}
-            defaultName={search.trim()}
-          />
+          <ModalAddEchipament onClose={() => setShowAddModal(false)} defaultName={search.trim()} />
         )}
       </Suspense>
     </Container>

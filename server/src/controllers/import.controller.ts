@@ -15,14 +15,16 @@ export const uploadImportFile = async (req: Request, res: Response) => {
       defval: "",
     });
 
-const rows: ImportRow[] = rawRows.map((row: Record<string, unknown>) => ({
-  "Nume Echipament": String(row["Nume Echipament"] ?? ""),
-  Tip: String(row["Tip"] ?? ""),
-  Serie: String(row["Serie"] ?? ""),
-  "Email Angajat": row["Email Angajat"] ? String(row["Email Angajat"]) : undefined,
-}));
+    const rows: ImportRow[] = rawRows.map((row: Record<string, unknown>) => ({
+      "Nume Echipament": String(row["Nume Echipament"] ?? ""),
+      Tip: String(row["Tip"] ?? ""),
+      Serie: String(row["Serie"] ?? ""),
+      "Email Angajat": row["Email Angajat"]
+        ? String(row["Email Angajat"])
+        : undefined,
+    }));
 
-const { results, errors } = await processImportRows(rows);
+    const { results, errors } = await processImportRows(rows);
 
     res.json({ importate: results.length, erori: errors });
   } catch (err) {

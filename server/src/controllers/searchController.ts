@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import * as searchService from "../services/search.service";
 
-export const search = async (req: Request, res: Response, next: NextFunction) => {
+export const search = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const q = (req.query.q as string) || "";
     const results = await searchService.globalSearch(q);
@@ -9,7 +13,7 @@ export const search = async (req: Request, res: Response, next: NextFunction) =>
   } catch (err) {
     next(err);
   }
-  };
+};
 
 export const suggestions = async (
   req: Request,

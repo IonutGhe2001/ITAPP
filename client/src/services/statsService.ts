@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import { EQUIPMENT_STATUS } from "@/features/equipment/types";
-import api from "./api";
+import { useQuery } from '@tanstack/react-query';
+import { EQUIPMENT_STATUS } from '@/features/equipment/types';
+import api from './api';
 
 export interface OverviewStats {
   echipamente: number;
@@ -11,6 +11,6 @@ export interface OverviewStats {
 
 export const useOverviewStats = () =>
   useQuery<OverviewStats>({
-    queryKey: ["overview-stats"],
-    queryFn: async () => (await api.get("/echipamente/stats")).data,
+    queryKey: ['overview-stats'],
+    queryFn: async () => (await api.get('/echipamente/stats')).data,
   });

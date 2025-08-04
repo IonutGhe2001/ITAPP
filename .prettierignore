@@ -1,0 +1,13 @@
+# Ignoră dependențele
+node_modules/
+# Ignoră fișierele de build
+build/
+dist/
+# Ignoră Prisma-generated client
+prisma/generated/
+# Ignoră folderele cu template-uri/tests dacă nu vrei să le formatezi
+server/templates/
+server/tests/
+# Ignoră fișiere de log, cache sau temporare
+*.log
+.cache/

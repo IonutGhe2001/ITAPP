@@ -10,7 +10,11 @@ export const list = async (_: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export const create = async (req: Request, res: Response, next: NextFunction) => {
+export const create = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const config = await service.createConfig(req.body);
     res.status(201).json(config);
@@ -19,7 +23,11 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-export const update = async (req: Request, res: Response, next: NextFunction) => {
+export const update = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const config = await service.updateConfig(id, req.body);

@@ -1,9 +1,6 @@
 export default {
-  darkMode: ["class"],
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  darkMode: ['class'],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
@@ -46,11 +43,11 @@ export default {
           foreground: '#212121',
         },
         chart: {
-          '1': '#E53935',
-          '2': '#FF7043',
-          '3': '#FDD835',
-          '4': '#66BB6A',
-          '5': '#29B6F6',
+          1: '#E53935',
+          2: '#FF7043',
+          3: '#FDD835',
+          4: '#66BB6A',
+          5: '#29B6F6',
         },
       },
       borderRadius: {
@@ -60,5 +57,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require('tailwindcss-animate')],
 };

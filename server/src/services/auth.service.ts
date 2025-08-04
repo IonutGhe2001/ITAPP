@@ -2,7 +2,10 @@ import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
 import { prisma } from "../lib/prisma";
 
-export const authenticateUser = async (email: string, password: string): Promise<string | null> => {
+export const authenticateUser = async (
+  email: string,
+  password: string
+): Promise<string | null> => {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return null;
 
@@ -23,7 +26,8 @@ export const authenticateUser = async (email: string, password: string): Promise
     throw new Error("JWT_SECRET nu este definit în .env");
   }
 
-  const expiresIn = (process.env.JWT_EXPIRES_IN || "1d") as SignOptions["expiresIn"];
+  const expiresIn = (process.env.JWT_EXPIRES_IN ||
+    "1d") as SignOptions["expiresIn"];
 
   const options: SignOptions = {
     expiresIn,
@@ -73,10 +77,7 @@ export interface UserUpdateData {
   digitalSignature?: string | null;
 }
 
-export const updateUser = (
-  id: number,
-  data: Partial<UserUpdateData>
-) => {
+export const updateUser = (id: number, data: Partial<UserUpdateData>) => {
   return prisma.user.update({
     where: { id },
     data,

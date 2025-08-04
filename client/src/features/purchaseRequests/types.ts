@@ -1,4 +1,4 @@
-export type PurchaseRequestStatus = "PENDING" | "ORDERED" | "DELIVERED";
+export type PurchaseRequestStatus = 'PENDING' | 'ORDERED' | 'DELIVERED';
 
 export interface PurchaseRequest {
   id: string;

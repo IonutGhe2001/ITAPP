@@ -1,9 +1,9 @@
-import { useState, useEffect, type ReactNode } from "react";
-import { io, type Socket } from "socket.io-client";
-import api from "@/services/api";
-import { useToast } from "@/hooks/use-toast/use-toast-hook";
-import { NotificationsContext, type Notification } from "./notifications-context";
-import { useAuth } from "./use-auth";
+import { useState, useEffect, type ReactNode } from 'react';
+import { io, type Socket } from 'socket.io-client';
+import api from '@/services/api';
+import { useToast } from '@/hooks/use-toast/use-toast-hook';
+import { NotificationsContext, type Notification } from './notifications-context';
+import { useAuth } from './use-auth';
 
 export function NotificationsProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -17,7 +17,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     const fetchNotifications = async () => {
       try {
         const res = await api.get<Omit<Notification, 'read'>[]>(
-          "/updates?limit=10&importance=high"
+          '/updates?limit=10&importance=high'
         );
         setNotifications(res.data.map((n) => ({ ...n, read: true })));
       } catch {
@@ -27,25 +27,23 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
 
     fetchNotifications();
 
-    const baseUrl =
-      import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL;
-    const url = baseUrl.replace(/\/api$/, "");
+    const baseUrl = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL;
+    const url = baseUrl.replace(/\/api$/, '');
     socket = io(url, {
       withCredentials: true,
       reconnectionAttempts: 5,
     });
 
-    socket.on("notification", (update: Omit<Notification, 'read'>) => {
+    socket.on('notification', (update: Omit<Notification, 'read'>) => {
       const notification = { ...update, read: false };
       toast({ title: update.type, description: update.message });
       setNotifications((prev) => [notification, ...prev]);
     });
 
-
     return () => {
       socket?.disconnect();
     };
-   // toast comes from a hook and is recreated on each render
+    // toast comes from a hook and is recreated on each render
     // but we only want to set up the socket when authenticated
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);

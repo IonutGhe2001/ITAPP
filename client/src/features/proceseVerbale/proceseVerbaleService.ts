@@ -4,12 +4,10 @@ import api from '@/services/api';
 
 export async function genereazaProcesVerbal(
   angajatId: string,
-   tip: ProcesVerbalTip,
+  tip: ProcesVerbalTip,
   opts?: { predate?: string[]; primite?: string[]; fromChanges?: boolean }
 ): Promise<string> {
-  const url = opts?.fromChanges
-    ? '/procese-verbale/from-changes'
-    : '/procese-verbale';
+  const url = opts?.fromChanges ? '/procese-verbale/from-changes' : '/procese-verbale';
 
   const body = opts?.fromChanges
     ? { angajatId }

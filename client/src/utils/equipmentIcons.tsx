@@ -1,4 +1,4 @@
-import type { JSX } from "react";
+import type { JSX } from 'react';
 import {
   LaptopIcon,
   SmartphoneIcon,
@@ -9,7 +9,7 @@ import {
   PrinterIcon,
   ServerIcon,
   WrenchIcon,
-} from "lucide-react";
+} from 'lucide-react';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   laptop: LaptopIcon,
@@ -24,10 +24,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   imprimanta: PrinterIcon,
 };
 
-export function getEquipmentIcon(
-  type: string,
-  className = "w-4 h-4 text-primary"
-): JSX.Element {
+export function getEquipmentIcon(type: string, className = 'w-4 h-4 text-primary'): JSX.Element {
   const Icon = iconMap[type.toLowerCase()];
   if (Icon) {
     return <Icon className={className} />;

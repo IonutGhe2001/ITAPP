@@ -1,11 +1,7 @@
-import { useEffect, useState, type ReactNode } from "react";
-import { logout as logoutRequest } from "@/services/authService";
-import {
-  getToken,
-  setToken as storeToken,
-  removeToken,
-} from "@/utils/storage";
-import { AuthContext } from "./auth-context";
+import { useEffect, useState, type ReactNode } from 'react';
+import { logout as logoutRequest } from '@/services/authService';
+import { getToken, setToken as storeToken, removeToken } from '@/utils/storage';
+import { AuthContext } from './auth-context';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setTokenState] = useState<string | null>(getToken());
@@ -29,9 +25,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-     const stored = getToken();
-    fetch(import.meta.env.VITE_API_URL + "/auth/me", {
-      credentials: "include",
+    const stored = getToken();
+    fetch(import.meta.env.VITE_API_URL + '/auth/me', {
+      credentials: 'include',
       headers: stored ? { Authorization: `Bearer ${stored}` } : undefined,
     })
       .then((res) => {

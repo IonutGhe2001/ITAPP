@@ -69,7 +69,12 @@ export const onboardingReport = async (
       endDate: req.query.endDate as string,
       status: req.query.status as string,
     });
-    await exportData(res, data, "onboarding-report", req.query.format as string);
+    await exportData(
+      res,
+      data,
+      "onboarding-report",
+      req.query.format as string
+    );
   } catch (err) {
     next(err);
   }

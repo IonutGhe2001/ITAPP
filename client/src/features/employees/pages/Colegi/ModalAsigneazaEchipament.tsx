@@ -1,14 +1,11 @@
-import { useState } from "react";
-import { useEchipamente, useUpdateEchipament } from "@/features/equipment";
-import type { Echipament } from "@/features/equipment/types";
-import {
-  genereazaProcesVerbal,
-  type ProcesVerbalTip,
-} from "@/features/proceseVerbale";
-import { queueProcesVerbal } from "@/features/proceseVerbale/pvQueue";
-import { getConfig } from "@/services/configService";
-import { useToast } from "@/hooks/use-toast/use-toast-hook";
-import { getApiErrorMessage } from "@/utils/apiError";
+import { useState } from 'react';
+import { useEchipamente, useUpdateEchipament } from '@/features/equipment';
+import type { Echipament } from '@/features/equipment/types';
+import { genereazaProcesVerbal, type ProcesVerbalTip } from '@/features/proceseVerbale';
+import { queueProcesVerbal } from '@/features/proceseVerbale/pvQueue';
+import { getConfig } from '@/services/configService';
+import { useToast } from '@/hooks/use-toast/use-toast-hook';
+import { getApiErrorMessage } from '@/utils/apiError';
 
 export default function ModalAsigneazaEchipament({
   angajatId,
@@ -30,100 +27,96 @@ export default function ModalAsigneazaEchipament({
   const { data: echipamente = [] } = useEchipamente();
   const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
-  const [selectedId, setSelectedId] = useState("");
+  const [selectedId, setSelectedId] = useState('');
 
   const handleAssign = async () => {
     if (!selectedId) return;
 
-     const tip: ProcesVerbalTip =
-      onReplace && oldEchipamentId ? "SCHIMB" : "PREDARE_PRIMIRE";
+    const tip: ProcesVerbalTip = onReplace && oldEchipamentId ? 'SCHIMB' : 'PREDARE_PRIMIRE';
 
     try {
       if (onReplace && oldEchipamentId) {
         await onReplace(oldEchipamentId, selectedId);
         onPendingPV?.({ predate: [oldEchipamentId], primite: [selectedId] });
         toast({
-          title: "Echipament schimbat",
-          description: "Proces verbal în așteptare",
+          title: 'Echipament schimbat',
+          description: 'Proces verbal în așteptare',
         });
       } else {
         await updateMutation.mutateAsync({
           id: selectedId,
-          data: { angajatId, stare: "alocat" },
+          data: { angajatId, stare: 'alocat' },
         });
         onPendingPV?.({ primite: [selectedId] });
         toast({
-          title: "Echipament asignat",
-          description: "Proces verbal în așteptare",
+          title: 'Echipament asignat',
+          description: 'Proces verbal în așteptare',
         });
       }
 
       const { pvGenerationMode } = await getConfig();
-      if (pvGenerationMode === "auto") {
+      if (pvGenerationMode === 'auto') {
         const url = await genereazaProcesVerbal(
           angajatId,
           tip,
-          tip === "SCHIMB" && oldEchipamentId
+          tip === 'SCHIMB' && oldEchipamentId
             ? { predate: [oldEchipamentId], primite: [selectedId] }
             : { primite: [selectedId] }
         );
-        window.open(url, "_blank");
-        toast({ title: "Proces verbal generat" });
+        window.open(url, '_blank');
+        toast({ title: 'Proces verbal generat' });
       } else {
         queueProcesVerbal(
           angajatId,
           tip,
-          tip === "SCHIMB" && oldEchipamentId
+          tip === 'SCHIMB' && oldEchipamentId
             ? { predate: [oldEchipamentId], primite: [selectedId] }
             : { primite: [selectedId] }
         );
-        toast({ title: "Proces verbal în așteptare" });
+        toast({ title: 'Proces verbal în așteptare' });
       }
 
       onClose();
       onSuccess?.();
     } catch (err) {
       toast({
-        title: "Eroare la asignare",
+        title: 'Eroare la asignare',
         description: getApiErrorMessage(err),
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-card rounded-2xl shadow-xl p-6 w-full max-w-md relative space-y-4">
-        <h2 className="text-lg font-semibold text-primary">Asignează echipament</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="bg-card relative w-full max-w-md space-y-4 rounded-2xl p-6 shadow-xl">
+        <h2 className="text-primary text-lg font-semibold">Asignează echipament</h2>
 
         <select
           value={selectedId}
           onChange={(e) => setSelectedId(e.target.value)}
-          className="w-full border border-border rounded-lg px-4 py-2 bg-background text-foreground"
+          className="border-border bg-background text-foreground w-full rounded-lg border px-4 py-2"
         >
           <option value="">Selectează echipament în stoc</option>
-           {echipamente
-            .filter(
-              (e: Echipament) =>
-                e.stare === "in_stoc" && (!filterTip || e.tip === filterTip)
-            )
+          {echipamente
+            .filter((e: Echipament) => e.stare === 'in_stoc' && (!filterTip || e.tip === filterTip))
             .map((e: Echipament) => (
-            <option key={e.id} value={e.id}>
-              {e.nume} – Serie: {e.serie}
-            </option>
-          ))}
+              <option key={e.id} value={e.id}>
+                {e.nume} – Serie: {e.serie}
+              </option>
+            ))}
         </select>
 
         <div className="flex justify-end gap-2 pt-2">
           <button
             onClick={onClose}
-            className="bg-muted text-muted-foreground px-4 py-2 rounded-lg hover:bg-muted/90"
+            className="bg-muted text-muted-foreground hover:bg-muted/90 rounded-lg px-4 py-2"
           >
             Anulează
           </button>
           <button
             onClick={handleAssign}
-            className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary-dark"
+            className="bg-primary text-primary-foreground hover:bg-primary-dark rounded-lg px-4 py-2"
             disabled={!selectedId}
           >
             Asignează

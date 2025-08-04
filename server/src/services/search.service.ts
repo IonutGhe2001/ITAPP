@@ -31,8 +31,12 @@ export const globalSearch = async (
   query: string
 ): Promise<GlobalSearchResult> => {
   const q = query.trim();
- if (!q) {
-    return { echipamente: [], angajati: [], suggestions: { echipamente: [], angajati: [] } };
+  if (!q) {
+    return {
+      echipamente: [],
+      angajati: [],
+      suggestions: { echipamente: [], angajati: [] },
+    };
   }
 
   const echipamente = await prisma.echipament.findMany({
@@ -69,7 +73,7 @@ export const globalSearch = async (
     },
   });
 
-   if (!echipamente.length && !angajati.length) {
+  if (!echipamente.length && !angajati.length) {
     const suggestions = await computeSuggestions(q);
     return { echipamente, angajati, suggestions };
   }
@@ -112,7 +116,7 @@ const computeSuggestions = async (
 
   const employees = (await prisma.angajat.findMany({
     take: SEARCH_SAMPLE_SIZE,
-     select: {
+    select: {
       id: true,
       numeComplet: true,
       functie: true,
@@ -126,10 +130,10 @@ const computeSuggestions = async (
       item: a,
       score: Math.min(
         levenshtein(a.numeComplet.toLowerCase(), q),
-        levenshtein((a.functie || '').toLowerCase(), q),
-        levenshtein((a.email || '').toLowerCase(), q),
-        levenshtein((a.cDataUsername || '').toLowerCase(), q),
-        levenshtein((a.cDataId || '').toLowerCase(), q)
+        levenshtein((a.functie || "").toLowerCase(), q),
+        levenshtein((a.email || "").toLowerCase(), q),
+        levenshtein((a.cDataUsername || "").toLowerCase(), q),
+        levenshtein((a.cDataId || "").toLowerCase(), q)
       ),
     }))
     .sort((a, b) => a.score - b.score)

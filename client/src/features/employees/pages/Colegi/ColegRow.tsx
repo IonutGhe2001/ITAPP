@@ -1,16 +1,16 @@
-import React, { useLayoutEffect, useRef } from "react";
-import Avatar from "@/components/Avatar";
+import React, { useLayoutEffect, useRef } from 'react';
+import Avatar from '@/components/Avatar';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { Pencil, Trash2, MoreHorizontal, AlertCircle } from "lucide-react";
-import { getEquipmentIcon } from "@/utils/equipmentIcons";
-import type { Angajat, Echipament } from "@/features/equipment/types";
-import { useUpdateAngajat } from "@/features/employees";
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import { Pencil, Trash2, MoreHorizontal, AlertCircle } from 'lucide-react';
+import { getEquipmentIcon } from '@/utils/equipmentIcons';
+import type { Angajat, Echipament } from '@/features/equipment/types';
+import { useUpdateAngajat } from '@/features/employees';
 
 interface ReplaceData {
   colegId: string;
@@ -64,68 +64,60 @@ export default function ColegRow({
 
   return (
     <div style={style} className="py-2">
-      <div ref={rowRef} className="relative bg-card rounded-xl shadow-md p-4 flex flex-col gap-4">
+      <div ref={rowRef} className="bg-card relative flex flex-col gap-4 rounded-xl p-4 shadow-md">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="absolute top-2 right-2 p-1 rounded hover:bg-muted">
-              <MoreHorizontal className="w-4 h-4" />
+            <button className="hover:bg-muted absolute right-2 top-2 rounded p-1">
+              <MoreHorizontal className="h-4 w-4" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => setEditColeg(coleg)}>
-              <Pencil className="w-4 h-4" />
+              <Pencil className="h-4 w-4" />
               <span>Editează</span>
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>
-                coleg.echipamente.length > 0
-                  ? setConfirmDelete(coleg)
-                  : handleDelete(coleg.id)
+                coleg.echipamente.length > 0 ? setConfirmDelete(coleg) : handleDelete(coleg.id)
               }
               className="text-destructive"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="h-4 w-4" />
               <span>Șterge</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <div className="flex items-center gap-4">
-          <Avatar name={coleg.numeComplet} className="w-16 h-16" />
+          <Avatar name={coleg.numeComplet} className="h-16 w-16" />
           <div className="flex-1">
-            <p className="font-semibold text-foreground">{coleg.numeComplet}</p>
-            <p className="text-sm text-muted-foreground">{coleg.functie}</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-foreground font-semibold">{coleg.numeComplet}</p>
+            <p className="text-muted-foreground text-sm">{coleg.functie}</p>
+            <p className="text-muted-foreground text-sm">
               {coleg.email}
-              {coleg.emailAccountStatus === "PENDING" && " (pendinte)"}
+              {coleg.emailAccountStatus === 'PENDING' && ' (pendinte)'}
             </p>
-            {coleg.emailAccountStatus === "CREATED" && coleg.emailAccountLink && (
+            {coleg.emailAccountStatus === 'CREATED' && coleg.emailAccountLink && (
               <a
                 href={coleg.emailAccountLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-primary underline"
+                className="text-primary text-xs underline"
               >
                 Deschide e-mail
               </a>
             )}
-            <p className="text-sm text-muted-foreground">{coleg.telefon}</p>
+            <p className="text-muted-foreground text-sm">{coleg.telefon}</p>
             {coleg.cDataUsername && (
-              <p className="text-sm text-muted-foreground">
-                c-data user: {coleg.cDataUsername}
-              </p>
+              <p className="text-muted-foreground text-sm">c-data user: {coleg.cDataUsername}</p>
             )}
             {coleg.cDataId && (
-              <p className="text-sm text-muted-foreground">
-                c-data ID: {coleg.cDataId}
-              </p>
+              <p className="text-muted-foreground text-sm">c-data ID: {coleg.cDataId}</p>
             )}
             {coleg.cDataNotes && (
-              <p className="text-sm text-muted-foreground break-all">
-                {coleg.cDataNotes}
-              </p>
+              <p className="text-muted-foreground break-all text-sm">{coleg.cDataNotes}</p>
             )}
-            <p className="text-sm text-muted-foreground">
-              Cont c-data: {coleg.cDataCreated ? "Creat" : "Necreat"}
+            <p className="text-muted-foreground text-sm">
+              Cont c-data: {coleg.cDataCreated ? 'Creat' : 'Necreat'}
               {!coleg.cDataCreated && (
                 <button
                   onClick={() =>
@@ -134,7 +126,7 @@ export default function ColegRow({
                       data: { cDataCreated: true },
                     })
                   }
-                  className="ml-2 text-primary hover:underline text-xs"
+                  className="text-primary ml-2 text-xs hover:underline"
                 >
                   Marchează creat
                 </button>
@@ -148,22 +140,22 @@ export default function ColegRow({
           </div>
         </div>
         {expanded && (
-          <ul className="space-y-2 mt-2">
+          <ul className="mt-2 space-y-2">
             {coleg.echipamente.length === 0 ? (
               <li className="text-muted-foreground italic">Nu are echipamente alocate.</li>
             ) : (
               coleg.echipamente.map((e) => (
                 <li
                   key={e.id}
-                  className="flex items-start gap-3 text-sm border border-border rounded-lg p-2 shadow-sm bg-muted"
+                  className="border-border bg-muted flex items-start gap-3 rounded-lg border p-2 text-sm shadow-sm"
                 >
                   <div className="pt-0.5">{getEquipmentIcon(e.tip)}</div>
                   <div className="flex-1">
-                    <p className="font-medium text-foreground">{e.nume}</p>
-                    <p className="text-xs text-muted-foreground">Serie: {e.serie}</p>
+                    <p className="text-foreground font-medium">{e.nume}</p>
+                    <p className="text-muted-foreground text-xs">Serie: {e.serie}</p>
                   </div>
                   <div className="flex flex-col items-end gap-1">
-                    <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full self-center capitalize">
+                    <span className="bg-primary/10 text-primary self-center rounded-full px-2 py-0.5 text-xs capitalize">
                       {e.tip}
                     </span>
                     <div className="flex gap-1">
@@ -177,7 +169,7 @@ export default function ColegRow({
                         onClick={() =>
                           setReplaceData({ colegId: coleg.id, equipmentId: e.id, type: e.tip })
                         }
-                        className="text-[10px] text-primary hover:underline"
+                        className="text-primary text-[10px] hover:underline"
                       >
                         Schimbă
                       </button>
@@ -188,33 +180,33 @@ export default function ColegRow({
             )}
           </ul>
         )}
-        <div className="flex justify-between items-center gap-4 text-sm mt-auto">
+        <div className="mt-auto flex items-center justify-between gap-4 text-sm">
           <button
             onClick={() => toggleExpand(coleg.id, index)}
-            className="text-sm text-primary hover:underline self-start"
+            className="text-primary self-start text-sm hover:underline"
           >
-            {expanded ? "Ascunde echipamente" : "Vezi echipamente"}
+            {expanded ? 'Ascunde echipamente' : 'Vezi echipamente'}
           </button>
           <div className="flex gap-4">
             {pendingPV && (pendingPV.predate.length > 0 || pendingPV.primite.length > 0) && (
               <button
                 onClick={() => onGeneratePV(coleg.id)}
-                className="text-sm text-primary hover:underline"
+                className="text-primary text-sm hover:underline"
               >
                 Generează PV
               </button>
             )}
-            {coleg.emailAccountStatus === "PENDING" && (
+            {coleg.emailAccountStatus === 'PENDING' && (
               <button
                 onClick={() => setCreateEmail(coleg)}
-                className="text-sm text-primary hover:underline"
+                className="text-primary text-sm hover:underline"
               >
-                 Marchează cont e-mail creat
+                Marchează cont e-mail creat
               </button>
             )}
             <button
               onClick={() => setSelectedAngajatId(coleg.id)}
-              className="text-sm text-primary hover:underline"
+              className="text-primary text-sm hover:underline"
             >
               Asignează echipament
             </button>

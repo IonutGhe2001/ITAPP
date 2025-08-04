@@ -1,5 +1,5 @@
-import { memo } from "react";
-import { Button } from "@/components/ui/button";
+import { memo } from 'react';
+import { Button } from '@/components/ui/button';
 
 interface EquipmentTypeFilterProps {
   types: string[];
@@ -11,10 +11,10 @@ function EquipmentTypeFilter({ types, selected, onChange }: EquipmentTypeFilterP
   if (!types.length) return null;
 
   return (
-    <div className="flex flex-wrap gap-2 mb-4">
+    <div className="mb-4 flex flex-wrap gap-2">
       <Button
-        variant={selected === "" ? "default" : "outline"}
-        onClick={() => onChange("")}
+        variant={selected === '' ? 'default' : 'outline'}
+        onClick={() => onChange('')}
         className="text-sm capitalize"
       >
         Toate
@@ -22,7 +22,7 @@ function EquipmentTypeFilter({ types, selected, onChange }: EquipmentTypeFilterP
       {types.map((t) => (
         <Button
           key={t}
-          variant={selected === t ? "default" : "outline"}
+          variant={selected === t ? 'default' : 'outline'}
           onClick={() => onChange(t)}
           className="text-sm capitalize"
         >

@@ -1,6 +1,5 @@
 import { prisma } from "../lib/prisma";
 
-
 export const getEvenimenteByUser = (userId: number) => {
   return prisma.eveniment.findMany({ where: { userId } });
 };
@@ -12,7 +11,7 @@ export const createEveniment = (data: {
   userId: number;
   recurrence?: string;
 }) => {
-   return prisma.eveniment.create({
+  return prisma.eveniment.create({
     data: {
       ...data,
       recurrence: data.recurrence ?? "none",

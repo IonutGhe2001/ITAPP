@@ -17,11 +17,12 @@ export const creeazaProcesVerbalCuEchipamente = async (
 
   if (!angajat) return null;
 
-  const idsToConnect = (echipamentIds
-    ? angajat.echipamente.filter((eq: { id: string }) =>
-        echipamentIds.includes(eq.id)
-      )
-    : angajat.echipamente
+  const idsToConnect = (
+    echipamentIds
+      ? angajat.echipamente.filter((eq: { id: string }) =>
+          echipamentIds.includes(eq.id)
+        )
+      : angajat.echipamente
   ).map((eq: { id: string }) => ({ id: eq.id }));
 
   const procesVerbal = await prisma.procesVerbal.create({
@@ -30,7 +31,7 @@ export const creeazaProcesVerbalCuEchipamente = async (
       observatii: observatii || null,
       tip,
       echipamente: {
-      connect: idsToConnect,
+        connect: idsToConnect,
       },
     },
     include: {
@@ -53,7 +54,7 @@ export const creeazaProcesVerbalCuEchipamente = async (
         })
       : [];
 
-      const involvedIds = [
+  const involvedIds = [
     ...idsToConnect.map((i: { id: string }) => i.id),
     ...(echipamentePredateIds ?? []),
     ...(echipamentePrimiteIds ?? []),
@@ -73,9 +74,7 @@ export const creeazaProcesVerbalCuEchipamente = async (
   return { procesVerbal, echipamentePredate, echipamentePrimite };
 };
 
-export const creeazaProcesVerbalDinSchimbari = async (
-  angajatId: string
-) => {
+export const creeazaProcesVerbalDinSchimbari = async (angajatId: string) => {
   // @ts-ignore - equipmentChange may not be typed in generated Prisma client yet
   const schimbari = await prisma.equipmentChange.findMany({
     where: { angajatId, finalized: false },

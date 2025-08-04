@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
-import { Pencil, X } from "lucide-react";
-import SignaturePad, { type SignaturePadHandle } from "@/components/SignaturePad";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { useRef, useState } from 'react';
+import { Pencil, X } from 'lucide-react';
+import SignaturePad, { type SignaturePadHandle } from '@/components/SignaturePad';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface SignatureEditorProps {
   signature?: string | null;
@@ -30,10 +30,10 @@ export default function SignatureEditor({ signature, isEditing, onChange }: Sign
         <img
           src={signature}
           alt="Semnătură"
-          className="w-32 max-h-32 object-contain border border-border"
+          className="border-border max-h-32 w-32 border object-contain"
         />
       ) : (
-        <div className="w-32 h-32 flex items-center justify-center border border-dashed text-muted-foreground">
+        <div className="text-muted-foreground flex h-32 w-32 items-center justify-center border border-dashed">
           Fără semnătură
         </div>
       )}
@@ -42,7 +42,7 @@ export default function SignatureEditor({ signature, isEditing, onChange }: Sign
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2 rounded-full cursor-pointer shadow"
+            className="bg-primary text-primary-foreground absolute bottom-0 right-0 cursor-pointer rounded-full p-2 shadow"
           >
             <Pencil size={16} />
           </button>
@@ -50,7 +50,7 @@ export default function SignatureEditor({ signature, isEditing, onChange }: Sign
             <button
               type="button"
               onClick={remove}
-              className="absolute top-0 right-0 bg-destructive text-destructive-foreground p-1 rounded-full shadow"
+              className="bg-destructive text-destructive-foreground absolute right-0 top-0 rounded-full p-1 shadow"
             >
               <X size={14} />
             </button>
@@ -60,7 +60,7 @@ export default function SignatureEditor({ signature, isEditing, onChange }: Sign
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <SignaturePad ref={padRef} />
-          <div className="flex justify-end gap-2 mt-4">
+          <div className="mt-4 flex justify-end gap-2">
             <Button type="button" variant="ghost" onClick={() => padRef.current?.clear()}>
               Curăță
             </Button>

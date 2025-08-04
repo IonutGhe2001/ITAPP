@@ -1,7 +1,10 @@
 import express from "express";
 import * as controller from "../controllers/evenimenteController";
 import { validateRequest } from "../middlewares/validateRequest";
-import { createEvenimentSchema, updateEvenimentSchema } from "../validators/eveniment.validator";
+import {
+  createEvenimentSchema,
+  updateEvenimentSchema,
+} from "../validators/eveniment.validator";
 import { authenticate, authorizeRoles } from "../middlewares/authMiddleware";
 
 const router = express.Router();
@@ -22,6 +25,5 @@ router.patch(
   controller.updateEveniment
 );
 router.delete("/:id", authorizeRoles("admin"), controller.deleteEveniment);
-
 
 export default router;

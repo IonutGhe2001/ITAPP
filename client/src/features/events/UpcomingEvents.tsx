@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import {
   fetchEvenimente,
   createEveniment,
@@ -8,38 +8,32 @@ import {
   updateEveniment,
   type Eveniment,
   type EvenimentData,
-} from "@/features/events";
+} from '@/features/events';
 
-
-import EventCalendar from "./components/upcoming-events/EventCalendar";
-import EventList from "./components/upcoming-events/EventList";
-import EventForm from "./components/upcoming-events/EventForm";
-import DashboardSectionCard from "@layouts/components/DashboardSectionCard";
-import { CalendarCheckIcon } from "lucide-react";
+import EventCalendar from './components/upcoming-events/EventCalendar';
+import EventList from './components/upcoming-events/EventList';
+import EventForm from './components/upcoming-events/EventForm';
+import DashboardSectionCard from '@layouts/components/DashboardSectionCard';
+import { CalendarCheckIcon } from 'lucide-react';
 
 export default function UpcomingEvents() {
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(new Date());
   const [evenimente, setEvenimente] = useState<Eveniment[]>([]);
   const [editing, setEditing] = useState<Eveniment | null>(null);
-  
 
   useEffect(() => {
-    fetchEvenimente()
-      .then(setEvenimente)
-      .catch(console.error);
+    fetchEvenimente().then(setEvenimente).catch(console.error);
   }, []);
 
   const handleCreate = async (data: EvenimentData) => {
-     const nou = await createEveniment(data);
+    const nou = await createEveniment(data);
     setEvenimente((prev) => [...prev, nou]);
   };
 
   const handleUpdate = async (id: number | null, data: EvenimentData) => {
     if (id === null) return;
     const updated = await updateEveniment(id, data);
-    setEvenimente((prev) =>
-      prev.map((e) => (e.id === id ? updated : e))
-    );
+    setEvenimente((prev) => prev.map((e) => (e.id === id ? updated : e)));
     setEditing(null);
   };
 
@@ -54,7 +48,7 @@ export default function UpcomingEvents() {
 
   return (
     <DashboardSectionCard title="Evenimente" icon={<CalendarCheckIcon />} className="p-0">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
+      <div className="grid grid-cols-1 gap-6 p-6 lg:grid-cols-3">
         <div className="lg:col-span-1">
           <EventCalendar
             selected={selectedDay}
@@ -62,12 +56,8 @@ export default function UpcomingEvents() {
             highlightDates={evenimente.map((e) => new Date(e.data))}
           />
         </div>
-        <div className="lg:col-span-2 space-y-6">
-          <EventList
-            events={eventsInDay}
-            onEdit={setEditing}
-            onDelete={handleDelete}
-          />
+        <div className="space-y-6 lg:col-span-2">
+          <EventList events={eventsInDay} onEdit={setEditing} onDelete={handleDelete} />
           <EventForm
             selectedDay={selectedDay || new Date()}
             initial={editing}
