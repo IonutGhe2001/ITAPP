@@ -4,6 +4,7 @@ import { LogOut } from "lucide-react";
 import { useAuth } from "@/context/use-auth";
 import { logout as logoutRequest } from "@/services/authService";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { navItemClass } from "./NavItemClass";
 
 interface MobileSidebarProps {
   open: boolean;
@@ -23,11 +24,6 @@ export default function MobileSidebar({ open, onOpenChange }: MobileSidebarProps
     onOpenChange(false);
   };
 
-  const navItemClass = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition ${
-      isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"
-    }`;
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -43,7 +39,7 @@ export default function MobileSidebar({ open, onOpenChange }: MobileSidebarProps
               <NavLink
                 key={route.path}
                 to={route.path}
-                className={navItemClass}
+                className={({ isActive }) => navItemClass({ active: isActive })}
                 onClick={() => onOpenChange(false)}
               >
                 <Icon className="w-5 h-5" />
