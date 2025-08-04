@@ -6,3 +6,5 @@ export { default as ModalPredaEchipament } from './ModalPredaEchipament';
 export { default as EchipamentForm } from './EchipamentForm';
 export { default as EquipmentTypeFilter } from './EquipmentTypeFilter';
 export { EquipmentIcon } from './EquipmentIcon';
+export { default as StatusBadge } from './StatusBadge';
+export { default as EquipmentActions } from './EquipmentActions';

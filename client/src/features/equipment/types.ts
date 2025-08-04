@@ -1,4 +1,5 @@
 import { EQUIPMENT_STATUS, type EquipmentStatus } from '@shared/equipmentStatus';
+import type { ReactNode } from 'react';
 export { EQUIPMENT_STATUS } from '@shared/equipmentStatus';
 export type { EquipmentStatus } from '@shared/equipmentStatus';
 
@@ -98,4 +99,29 @@ export interface ModalPredaEchipamentProps {
   echipament: Echipament;
   onClose: () => void;
   onSubmit: (data: Echipament) => void;
+}
+
+export interface StatusBadgeProps {
+  status: EquipmentStatus;
+}
+
+export interface EquipmentActionsProps {
+  echipament: Echipament;
+  onEdit?: (echipament: Echipament & { __editMode?: boolean }) => void;
+  onDelete?: (id: string) => void;
+  onAllocate: () => void;
+  onRecupereaza: () => void;
+}
+
+export interface EquipmentCardModalsProps {
+  echipament: Echipament;
+  onEdit?: (echipament: Echipament & { __editMode?: boolean }) => void;
+  onRefresh?: () => void;
+}
+
+export interface EquipmentCardModalsResult {
+  openAllocation: () => void;
+  openRecupereaza: () => void;
+  allocationModal: ReactNode;
+  recupereazaModal: ReactNode;
 }
