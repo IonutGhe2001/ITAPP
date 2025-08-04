@@ -29,6 +29,8 @@ export interface AngajatUpdateInput {
 
 export const getAngajat = (id: string) => api.get(`/angajati/${id}`);
 
+export const getAngajati = () => api.get('/angajati');
+
 export const useAngajati = () =>
   useQuery({
     queryKey: ['angajati'],
