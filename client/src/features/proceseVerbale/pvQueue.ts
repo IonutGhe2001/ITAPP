@@ -10,11 +10,23 @@ export interface PvQueueItem {
 }
 
 function readQueue(): PvQueueItem[] {
-  return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]');
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(QUEUE_KEY);
+    return raw ? (JSON.parse(raw) as PvQueueItem[]) : [];
+  } catch (error) {
+    console.error('Failed to read pv queue from localStorage', error);
+    return [];
+  }
 }
 
 function writeQueue(items: PvQueueItem[]) {
-  localStorage.setItem(QUEUE_KEY, JSON.stringify(items));
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(QUEUE_KEY, JSON.stringify(items));
+  } catch (error) {
+    console.error('Failed to write pv queue to localStorage', error);
+  }
 }
 
 export function queueProcesVerbal(
@@ -32,7 +44,12 @@ export function getQueue(): PvQueueItem[] {
 }
 
 export function clearQueue() {
-  localStorage.removeItem(QUEUE_KEY);
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.removeItem(QUEUE_KEY);
+  } catch (error) {
+    console.error('Failed to clear pv queue from localStorage', error);
+  }
 }
 
 export function removeFromQueue(angajatId: string) {

@@ -6,8 +6,14 @@
     <link rel="manifest" href="/manifest.webmanifest" />
     <script>
       (function () {
+        if (typeof window === 'undefined') return;
         const storageKey = 'vite-ui-theme';
-        const stored = localStorage.getItem(storageKey);
+        let stored = null;
+        try {
+          stored = window.localStorage.getItem(storageKey);
+        } catch (err) {
+          console.error('Failed to read theme from localStorage', err);
+        }
         const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         const theme = stored || system;
         if (theme === 'dark') {

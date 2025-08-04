@@ -2,7 +2,8 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 import './index.css';
-import App from './App.tsx';
+import AppRouter from './router';
+import ErrorBoundary from '@components/ErrorBoundary';
 import { ThemeProvider } from '@components/ui/theme-provider';
 import { ToastProvider } from '@components/ToastProvider';
 import { Toaster } from '@components/ui/toaster';
@@ -20,7 +21,9 @@ createRoot(document.getElementById('root')!).render(
         <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
           <ToastProvider>
             <NotificationsProvider>
-              <App />
+              <ErrorBoundary>
+                <AppRouter />
+              </ErrorBoundary>
               <Toaster />
             </NotificationsProvider>
           </ToastProvider>
