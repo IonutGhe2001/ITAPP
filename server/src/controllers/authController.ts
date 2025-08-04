@@ -7,6 +7,7 @@ import {
   UserUpdateData,
 } from "../services/auth.service";
 import { logger } from "@lib/logger";
+import { env } from "../config";
 
 export const login = async (req: Request, res: Response) => {
   try {
@@ -19,7 +20,7 @@ export const login = async (req: Request, res: Response) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: env.NODE_ENV === "production",
       sameSite: "strict",
     });
 

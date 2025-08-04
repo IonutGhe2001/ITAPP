@@ -1,5 +1,6 @@
 import { prisma } from "../lib/prisma";
 import { ProcesVerbalTip } from "@prisma/client";
+import type { Prisma, PrismaClient } from "@prisma/client";
 import { genereazaPDFProcesVerbal } from "../utils/pdfGenerator";
 
 export const creeazaProcesVerbalCuEchipamente = async (
@@ -75,21 +76,25 @@ export const creeazaProcesVerbalCuEchipamente = async (
 };
 
 export const creeazaProcesVerbalDinSchimbari = async (angajatId: string) => {
-  // @ts-ignore - equipmentChange may not be typed in generated Prisma client yet
-  const schimbari = await prisma.equipmentChange.findMany({
-    where: { angajatId, finalized: false },
-    // @ts-ignore
+  interface SchimbareExt extends Prisma.EquipmentChange {
+    type?: string;
+    finalized?: boolean;
+  }
+
+  const schimbari = (await prisma.equipmentChange.findMany({
+    where: {
+      angajatId,
+      finalized: false,
+    } as unknown as Prisma.EquipmentChangeWhereInput,
     include: { echipament: true },
-  });
+  })) as SchimbareExt[];
 
   if (!schimbari.length) return null;
 
   // Split changes by type (assuming PREDAT for returned, PRIMIT for received)
-  // @ts-ignore
   const echipamentePredateIds = schimbari
-    // @ts-ignore
     .filter((s) => s.type === "PREDAT")
-    .map((s: any) => s.echipamentId);
+    .map((s) => s.echipamentId);
 
   // @ts-ignore
   const echipamentePrimiteIds = schimbari
@@ -130,7 +135,7 @@ export const creeazaProcesVerbalDinSchimbari = async (angajatId: string) => {
 
   return {
     pdfBuffer,
-    schimbariIds: schimbari.map((s: any) => s.id),
+    schimbariIds: schimbari.map((s) => s.id),
     procesVerbalId: procesVerbal.id,
   };
 };

@@ -1,4 +1,6 @@
 import { prisma } from "../lib/prisma";
+import { env } from "../config";
+import type { Prisma, PrismaClient } from "@prisma/client";
 
 export type ImportRow = {
   "Nume Echipament": string;
@@ -8,10 +10,10 @@ export type ImportRow = {
 };
 
 export const processImportRows = async (rows: ImportRow[]) => {
-  const results: any[] = [];
+  const results: Prisma.Echipament[] = [];
   const errors: { index: number; error: string }[] = [];
 
-  const limit = parseInt(process.env.IMPORT_CONCURRENCY_LIMIT || "10", 10); // procesează 10 rânduri simultan
+  const limit = env.IMPORT_CONCURRENCY_LIMIT; // procesează 10 rânduri simultan
   for (let i = 0; i < rows.length; i += limit) {
     const chunk = rows.slice(i, i + limit);
 
@@ -76,8 +78,12 @@ export const processImportRows = async (rows: ImportRow[]) => {
           });
 
           results.push(echipament);
-        } catch (error: any) {
-          errors.push({ index, error: error.message || "Eroare necunoscută" });
+        } catch (error: unknown) {
+          errors.push({
+            index,
+            error:
+              error instanceof Error ? error.message : "Eroare necunoscută",
+          });
         }
       })
     );

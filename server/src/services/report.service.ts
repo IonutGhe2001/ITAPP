@@ -1,4 +1,5 @@
 import { prisma } from "@lib/prisma";
+import type { Prisma, PrismaClient } from "@prisma/client";
 
 interface ReportQuery {
   department?: string;
@@ -13,18 +14,18 @@ export const getEquipmentReport = async ({
   endDate,
   status,
 }: ReportQuery) => {
-  const where: any = {};
+  const where: Prisma.EchipamentWhereInput = {};
   if (status) {
     // equipment status is stored in the `stare` field
     where.stare = status;
   }
   if (startDate || endDate) {
-    where.createdAt = {};
+    where.createdAt = {} as Prisma.DateTimeFilter;
     if (startDate) {
-      where.createdAt.gte = new Date(startDate);
+      (where.createdAt as Prisma.DateTimeFilter).gte = new Date(startDate);
     }
     if (endDate) {
-      where.createdAt.lte = new Date(endDate);
+      (where.createdAt as Prisma.DateTimeFilter).lte = new Date(endDate);
     }
   }
   // department filtering is not directly supported for equipment; ignore for now
@@ -35,10 +36,7 @@ export const getEquipmentReport = async ({
     where,
   });
 
-  return grouped.map((g: { stare: string; _count: { _all: number } }) => ({
-    type: g.stare,
-    count: g._count._all,
-  }));
+  return grouped.map((g) => ({ type: g.stare, count: g._count._all }));
 };
 
 export const getOnboardingReport = async ({
@@ -47,24 +45,24 @@ export const getOnboardingReport = async ({
   endDate,
   status,
 }: ReportQuery) => {
-  const where: any = {};
+  const where: Prisma.OnboardingWhereInput = {};
   if (department) {
     where.department = department;
   }
   if (startDate || endDate) {
-    where.createdAt = {};
+    where.createdAt = {} as Prisma.DateTimeFilter;
     if (startDate) {
-      where.createdAt.gte = new Date(startDate);
+      (where.createdAt as Prisma.DateTimeFilter).gte = new Date(startDate);
     }
     if (endDate) {
-      where.createdAt.lte = new Date(endDate);
+      (where.createdAt as Prisma.DateTimeFilter).lte = new Date(endDate);
     }
   }
 
   const onboardings = await prisma.onboarding.findMany({ where });
   const counts: Record<string, number> = {};
   for (const ob of onboardings) {
-    const tasks = (ob.tasks as any[]) || [];
+    const tasks = (ob.tasks as { completed: boolean }[]) || [];
     const completed = tasks.length > 0 && tasks.every((t) => t.completed);
     const stat = completed ? "completed" : "in_progress";
     counts[stat] = (counts[stat] || 0) + 1;

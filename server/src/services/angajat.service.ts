@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma";
+import type { Prisma, PrismaClient } from "@prisma/client";
 
 export const getAngajati = () => {
   return prisma.angajat.findMany({
@@ -81,7 +82,7 @@ export const updateAngajat = async (
     cDataCreated?: boolean;
   }
 ) => {
-  const updateData: any = { ...data };
+  const updateData: Prisma.AngajatUpdateInput = { ...data };
   if (data.departmentConfigId) {
     const config = await prisma.departmentConfig.findUnique({
       where: { id: data.departmentConfigId },
@@ -111,7 +112,7 @@ export const getAngajatById = (id: string) => {
 };
 
 export const deleteAngajat = (id: string) => {
-  return prisma.$transaction(async (tx: any) => {
+  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const echipamente = await tx.echipament.findMany({
       where: { angajatId: id },
       select: { id: true },

@@ -1,11 +1,12 @@
 import { prisma } from "../lib/prisma";
 // Proces verbal generation is handled separately; avoid importing related services here
 import { EQUIPMENT_STATUS } from "@shared/equipmentStatus";
+import type { Prisma, PrismaClient } from "@prisma/client";
 
 const validateEchipamentUpdate = async (
-  tx: any,
+  tx: Prisma.TransactionClient,
   id: string,
-  current: any,
+  current: Prisma.Echipament,
   data: { tip?: string; serie?: string; angajatId?: string | null }
 ) => {
   const newTip = data.tip ?? current.tip;
@@ -16,9 +17,9 @@ const validateEchipamentUpdate = async (
       where: { tip: newTip, serie: newSerie, NOT: { id } },
     });
     if (duplicate) {
-      const error: any = new Error(
+      const error = new Error(
         "Există deja un echipament cu această serie pentru acest tip."
-      );
+      ) as Error & { status?: number };
       error.status = 409;
       throw error;
     }
@@ -29,9 +30,9 @@ const validateEchipamentUpdate = async (
       where: { angajatId: data.angajatId, tip: newTip, NOT: { id } },
     });
     if (eqSameType) {
-      const error: any = new Error(
+      const error = new Error(
         "Angajatul are deja un echipament de acest tip."
-      );
+      ) as Error & { status?: number };
       error.status = 409;
       throw error;
     }
@@ -48,7 +49,7 @@ export const createEchipament = (data: {
   stare?: string;
   serie: string;
   angajatId?: string | null;
-  metadata?: any;
+  metadata?: Prisma.JsonValue;
 }) => {
   const finalStare = data.stare
     ? data.stare
@@ -56,14 +57,14 @@ export const createEchipament = (data: {
       ? "alocat"
       : "in_stoc";
 
-  return prisma.$transaction(async (tx: any) => {
+  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const existing = await tx.echipament.findFirst({
       where: { tip: data.tip, serie: data.serie },
     });
     if (existing) {
-      const error: any = new Error(
+      const error = new Error(
         "Există deja un echipament cu această serie pentru acest tip."
-      );
+      ) as Error & { status?: number };
       error.status = 409;
       throw error;
     }
@@ -73,9 +74,9 @@ export const createEchipament = (data: {
         where: { angajatId: data.angajatId, tip: data.tip },
       });
       if (eqSameType) {
-        const error: any = new Error(
+        const error = new Error(
           "Angajatul are deja un echipament de acest tip."
-        );
+        ) as Error & { status?: number };
         error.status = 409;
         throw error;
       }
@@ -110,10 +111,10 @@ export const updateEchipament = async (
     serie?: string;
     stare?: string;
     angajatId?: string | null;
-    metadata?: any;
+    metadata?: Prisma.JsonValue;
   }
 ) => {
-  return prisma.$transaction(async (tx: any) => {
+  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const current = await tx.echipament.findUnique({ where: { id } });
     if (!current) throw new Error("Echipament inexistent");
 
@@ -227,7 +228,7 @@ export const getStats = async () => {
 
 export const getAvailableStock = async () => {
   const types = ["Laptop", "Telefon", "SIM"];
-  const stock: Record<string, any[]> = {};
+  const stock: Record<string, Prisma.Echipament[]> = {};
   for (const t of types) {
     stock[t] = await prisma.echipament.findMany({
       where: { tip: t, stare: "in_stoc" },

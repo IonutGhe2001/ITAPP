@@ -3,7 +3,6 @@ import http from "http";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import dotenv from "dotenv";
 import path from "path";
 import compression from "compression";
 import cookieParser from "cookie-parser";
@@ -11,6 +10,7 @@ import { logger } from "@lib/logger";
 import { errorHandler } from "./middlewares/errorHandler";
 import { logRequest } from "./utils/logger";
 import { initWebSocket } from "./lib/websocket";
+import { env } from "./config";
 
 import authRoutes from "./routes/auth";
 import echipamenteRoutes from "./routes/echipamente";
@@ -27,7 +27,6 @@ import reportsRoutes from "./routes/reports";
 import purchaseRequestRoutes from "./routes/purchaseRequests";
 import onboardingRoutes from "./routes/onboarding";
 
-dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
@@ -35,9 +34,7 @@ const server = http.createServer(app);
 // Global Middlewares
 // When using credentials the origin cannot be "*". Default to the frontend
 // development URL if no environment variable is provided.
-const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
-  .split(",")
-  .filter(Boolean);
+const allowedOrigins = env.CORS_ORIGIN.split(",").filter(Boolean);
 initWebSocket(server, allowedOrigins);
 app.use(
   cors({
@@ -95,5 +92,5 @@ app.use("/api/onboarding", onboardingRoutes);
 // Error handler middleware (final)
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = env.PORT;
 server.listen(PORT, () => logger.info(`Server running on port ${PORT}`));
