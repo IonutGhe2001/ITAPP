@@ -3,10 +3,7 @@ import { prisma } from "../lib/prisma";
 import { EQUIPMENT_STATUS } from "@shared/equipmentStatus";
 import type { PrismaClient } from "@prisma/client";
 
-type TransactionClient = Pick<
-  PrismaClient,
-  "echipament" | "equipmentChange"
->;
+type TransactionClient = Pick<PrismaClient, "echipament" | "equipmentChange">;
 
 type Echipament = NonNullable<
   Awaited<ReturnType<typeof prisma.echipament.findUnique>>
@@ -68,7 +65,7 @@ export const createEchipament = (data: {
       ? "alocat"
       : "in_stoc";
 
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: TransactionClient) => {
     const existing = await tx.echipament.findFirst({
       where: { tip: data.tip, serie: data.serie },
     });
@@ -125,7 +122,7 @@ export const updateEchipament = async (
     metadata?: JsonValue;
   }
 ) => {
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: TransactionClient) => {
     const current = await tx.echipament.findUnique({ where: { id } });
     if (!current) throw new Error("Echipament inexistent");
 

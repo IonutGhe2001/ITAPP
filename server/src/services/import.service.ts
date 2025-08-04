@@ -1,6 +1,5 @@
 import { prisma } from "../lib/prisma";
 import { env } from "../config";
-import type { Prisma, PrismaClient } from "@prisma/client";
 
 export type ImportRow = {
   "Nume Echipament": string;
@@ -10,7 +9,7 @@ export type ImportRow = {
 };
 
 export const processImportRows = async (rows: ImportRow[]) => {
-  const results: Prisma.Echipament[] = [];
+  const results: unknown[] = [];
   const errors: { index: number; error: string }[] = [];
 
   const limit = env.IMPORT_CONCURRENCY_LIMIT; // procesează 10 rânduri simultan

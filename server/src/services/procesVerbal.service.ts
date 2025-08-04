@@ -1,6 +1,5 @@
 import { prisma } from "../lib/prisma";
 import { ProcesVerbalTip } from "@prisma/client";
-import type { Prisma, PrismaClient } from "@prisma/client";
 import { genereazaPDFProcesVerbal } from "../utils/pdfGenerator";
 
 export const creeazaProcesVerbalCuEchipamente = async (
@@ -76,16 +75,21 @@ export const creeazaProcesVerbalCuEchipamente = async (
 };
 
 export const creeazaProcesVerbalDinSchimbari = async (angajatId: string) => {
-  interface SchimbareExt extends Prisma.EquipmentChange {
+  interface SchimbareExt {
+    id: string;
+    echipamentId: string;
+    angajatId: string;
+    tip: string;
     type?: string;
     finalized?: boolean;
+    echipament?: unknown;
   }
 
   const schimbari = (await prisma.equipmentChange.findMany({
     where: {
       angajatId,
       finalized: false,
-    } as unknown as Prisma.EquipmentChangeWhereInput,
+    },
     include: { echipament: true },
   })) as SchimbareExt[];
 

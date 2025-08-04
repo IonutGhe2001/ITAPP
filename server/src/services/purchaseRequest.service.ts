@@ -1,6 +1,6 @@
 import { prisma } from "../lib/prisma";
 import { EQUIPMENT_STATUS } from "@shared/equipmentStatus";
-import type { Prisma, PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 type PurchaseRequestStatus = "PENDING" | "ORDERED" | "DELIVERED";
 
 export const createPurchaseRequest = (data: {
@@ -18,7 +18,7 @@ export const updatePurchaseRequestStatus = (
   id: string,
   status: PurchaseRequestStatus
 ) => {
-  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+  return prisma.$transaction(async (tx: PrismaClient) => {
     const request = await tx.purchaseRequest.findUnique({ where: { id } });
     if (!request) throw new Error("Cerere inexistentă");
 

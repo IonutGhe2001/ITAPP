@@ -1,5 +1,3 @@
-import { Angajat, Echipament } from "@prisma/client";
-
 export interface EquipmentSuggestion {
   id: string;
   nume: string;
@@ -20,9 +18,17 @@ export interface SuggestionsResult {
   angajati: EmployeeSuggestion[];
 }
 
-export type EquipmentSearchResult = Echipament & {
-  angajat: Angajat | null;
-};
+export interface EquipmentSearchResult {
+  id: string;
+  nume: string;
+  tip: string;
+  serie: string;
+  stare: string;
+  angajatId: string | null;
+  metadata: unknown;
+  createdAt: Date;
+  angajat: EmployeeSearchResult | null;
+}
 
 export interface EmployeeSearchResult {
   id: string;

@@ -1,5 +1,4 @@
 import { prisma } from "@lib/prisma";
-import type { Prisma, PrismaClient } from "@prisma/client";
 
 interface ReportQuery {
   department?: string;
@@ -14,18 +13,18 @@ export const getEquipmentReport = async ({
   endDate,
   status,
 }: ReportQuery) => {
-  const where: Prisma.EchipamentWhereInput = {};
+  const where: { stare?: string; createdAt?: { gte?: Date; lte?: Date } } = {};
   if (status) {
     // equipment status is stored in the `stare` field
     where.stare = status;
   }
   if (startDate || endDate) {
-    where.createdAt = {} as Prisma.DateTimeFilter;
+    where.createdAt = {};
     if (startDate) {
-      (where.createdAt as Prisma.DateTimeFilter).gte = new Date(startDate);
+      where.createdAt.gte = new Date(startDate);
     }
     if (endDate) {
-      (where.createdAt as Prisma.DateTimeFilter).lte = new Date(endDate);
+      where.createdAt.lte = new Date(endDate);
     }
   }
   // department filtering is not directly supported for equipment; ignore for now
@@ -36,7 +35,10 @@ export const getEquipmentReport = async ({
     where,
   });
 
-  return grouped.map((g) => ({ type: g.stare, count: g._count._all }));
+  return grouped.map((g: { stare: string; _count: { _all: number } }) => ({
+    type: g.stare,
+    count: g._count._all,
+  }));
 };
 
 export const getOnboardingReport = async ({
@@ -45,17 +47,18 @@ export const getOnboardingReport = async ({
   endDate,
   status,
 }: ReportQuery) => {
-  const where: Prisma.OnboardingWhereInput = {};
+  const where: { department?: string; createdAt?: { gte?: Date; lte?: Date } } =
+    {};
   if (department) {
     where.department = department;
   }
   if (startDate || endDate) {
-    where.createdAt = {} as Prisma.DateTimeFilter;
+    where.createdAt = {};
     if (startDate) {
-      (where.createdAt as Prisma.DateTimeFilter).gte = new Date(startDate);
+      where.createdAt.gte = new Date(startDate);
     }
     if (endDate) {
-      (where.createdAt as Prisma.DateTimeFilter).lte = new Date(endDate);
+      where.createdAt.lte = new Date(endDate);
     }
   }
 
