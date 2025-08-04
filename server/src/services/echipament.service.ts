@@ -213,10 +213,11 @@ export const getStats = async () => {
     {} as Record<string, number>
   );
 
-  grouped.forEach(({ stare, _count }) => {
-    counts[stare] = _count.stare;
-  });
-
+  grouped.forEach(
+    ({ stare, _count }: { stare: string; _count: { stare: number } }) => {
+      counts[stare] = _count.stare;
+    }
+  );
   return {
     echipamente,
     ...counts,
