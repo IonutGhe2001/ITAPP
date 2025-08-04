@@ -1,14 +1,16 @@
-const { describe, it, expect, beforeEach, afterEach } = require('@jest/globals');
+import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
+
 const puppeteer = { launch: jest.fn() };
 jest.mock('puppeteer', () => ({ __esModule: true, default: puppeteer }));
+
 const { genereazaPDFProcesVerbal } = require('../src/utils/pdfGenerator');
 
-let setContentHtml = null;
+let setContentHtml: string | null = null;
 
 beforeEach(() => {
   puppeteer.launch.mockResolvedValue({
     newPage: jest.fn().mockResolvedValue({
-      setContent: jest.fn((html) => {
+      setContent: jest.fn((html: string) => {
         setContentHtml = html;
         return Promise.resolve();
       }),

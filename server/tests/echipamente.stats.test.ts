@@ -70,5 +70,7 @@ describe('GET /echipamente/stats', () => {
     expect(res.status).toBe(200);
     expect(res.body.in_stoc).toBe(2);
     expect(res.body.alocat).toBe(1);
+    expect(res.body.in_comanda).toBe(0);
+    expect(res.body.mentenanta).toBe(0);
   });
 });

@@ -3,6 +3,8 @@ import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import { beforeAll, afterEach, describe, it, expect, jest } from '@jest/globals';
+import proceseVerbaleRoutes from '../src/routes/proceseVerbale';
+import * as procesService from '../src/services/procesVerbal.service';
 
 jest.mock('@prisma/client', () => {
   return {
@@ -18,8 +20,6 @@ jest.mock('@prisma/client', () => {
 jest.mock('../src/services/procesVerbal.service', () => ({
   creeazaProcesVerbalCuEchipamente: jest.fn(),
 }));
-const procesService = require('../src/services/procesVerbal.service');
-const proceseVerbaleRoutes = require('../src/routes/proceseVerbale').default;
 
 const app = express();
 app.use(express.json());

@@ -196,17 +196,30 @@ export const deleteEchipament = (id: string) => {
 };
 
 export const getStats = async () => {
-  const [echipamente, inStocCount, alocatCount, angajati] = await Promise.all([
+  const [echipamente, grouped, angajati] = await Promise.all([
     prisma.echipament.count(),
-    prisma.echipament.count({ where: { stare: EQUIPMENT_STATUS.IN_STOC } }),
-    prisma.echipament.count({ where: { stare: EQUIPMENT_STATUS.ALOCAT } }),
+    prisma.echipament.groupBy({
+      by: ["stare"],
+      _count: { stare: true },
+    }),
     prisma.angajat.count(),
   ]);
 
+  const counts: Record<string, number> = Object.values(EQUIPMENT_STATUS).reduce(
+    (acc, status) => {
+      acc[status] = 0;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+
+  grouped.forEach(({ stare, _count }) => {
+    counts[stare] = _count.stare;
+  });
+
   return {
     echipamente,
-    [EQUIPMENT_STATUS.IN_STOC]: inStocCount,
-    [EQUIPMENT_STATUS.ALOCAT]: alocatCount,
+    ...counts,
     angajati,
   };
 };

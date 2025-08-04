@@ -3,6 +3,7 @@ import handlebars from "handlebars";
 import fs from "fs";
 import path from "path";
 import { Buffer } from "buffer";
+import { PdfGenerationInput } from "../types/pdf";
 
 const templatePath = path.join(__dirname, "../../templates/procesVerbal.hbs");
 const partialsDir = path.join(__dirname, "../../templates/partials");
@@ -23,7 +24,9 @@ const imgToBase64 = (imgPath: string): string => {
   return `data:image/png;base64,${image.toString("base64")}`;
 };
 
-export const genereazaPDFProcesVerbal = async (data: any): Promise<Buffer> => {
+export const genereazaPDFProcesVerbal = async (
+  data: PdfGenerationInput
+): Promise<Buffer> => {
   const templateHtml = fs.readFileSync(templatePath, "utf-8");
   handlebars.registerHelper("eq", (a, b) => a === b);
   registerPartials();

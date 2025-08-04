@@ -1,7 +1,11 @@
 import { AuthPayload } from "../../middlewares/authMiddleware";
 
-declare module "express-serve-static-core" {
-  interface Request {
-    user?: AuthPayload;
+declare global {
+  namespace Express {
+    interface Request {
+      user?: AuthPayload;
+    }
   }
 }
+
+export {};

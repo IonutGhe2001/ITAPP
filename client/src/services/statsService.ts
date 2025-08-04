@@ -16,13 +16,18 @@ export const useOverviewStats = () =>
     queryFn: async () => {
       const data = (await api.get("/echipamente/stats")).data;
 
+      const statusCounts = Object.values(EQUIPMENT_STATUS).reduce(
+        (acc, status) => {
+          acc[status] = data[status] ?? 0;
+          return acc;
+        },
+        {} as Record<EquipmentStatus, number>
+      );
+
       return {
         echipamente: data.echipamente,
         angajati: data.angajati,
-        [EQUIPMENT_STATUS.IN_STOC]: data[EQUIPMENT_STATUS.IN_STOC] ?? 0,
-        [EQUIPMENT_STATUS.ALOCAT]: data[EQUIPMENT_STATUS.ALOCAT] ?? 0,
-        [EQUIPMENT_STATUS.IN_COMANDA]: data[EQUIPMENT_STATUS.IN_COMANDA] ?? 0,
-        [EQUIPMENT_STATUS.MENTENANTA]: data[EQUIPMENT_STATUS.MENTENANTA] ?? 0,
+        ...statusCounts,
       };
     },
   });

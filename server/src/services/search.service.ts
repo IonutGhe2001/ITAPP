@@ -1,31 +1,13 @@
 import { prisma } from "../lib/prisma";
 import { levenshtein } from "../utils/levenshtein";
-
-export interface EquipmentSuggestion {
-  id: string;
-  nume: string;
-  serie: string;
-}
-
-export interface EmployeeSuggestion {
-  id: string;
-  numeComplet: string;
-  functie: string;
-  email: string | null;
-  cDataUsername: string | null;
-  cDataId: string | null;
-}
-
-interface SuggestionsResult {
-  echipamente: EquipmentSuggestion[];
-  angajati: EmployeeSuggestion[];
-}
-
-interface GlobalSearchResult {
-  echipamente: any[];
-  angajati: any[];
-  suggestions?: SuggestionsResult;
-}
+import {
+  EquipmentSuggestion,
+  EmployeeSuggestion,
+  SuggestionsResult,
+  GlobalSearchResult,
+  EquipmentSearchResult,
+  EmployeeSearchResult,
+} from "../types/search";
 
 export const globalSearch = async (
   query: string
@@ -39,7 +21,7 @@ export const globalSearch = async (
     };
   }
 
-  const echipamente = await prisma.echipament.findMany({
+  const echipamente = (await prisma.echipament.findMany({
     where: {
       OR: [
         { nume: { contains: q, mode: "insensitive" } },
@@ -47,9 +29,9 @@ export const globalSearch = async (
       ],
     },
     include: { angajat: true },
-  });
+  })) as EquipmentSearchResult[];
 
-  const angajati = await prisma.angajat.findMany({
+  const angajati = (await prisma.angajat.findMany({
     where: {
       OR: [
         { numeComplet: { contains: q, mode: "insensitive" } },
@@ -71,7 +53,7 @@ export const globalSearch = async (
       cDataNotes: true,
       cDataCreated: true,
     },
-  });
+  })) as EmployeeSearchResult[];
 
   if (!echipamente.length && !angajati.length) {
     const suggestions = await computeSuggestions(q);
