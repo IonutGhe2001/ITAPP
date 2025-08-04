@@ -1,12 +1,23 @@
 import { prisma } from "../lib/prisma";
 // Proces verbal generation is handled separately; avoid importing related services here
 import { EQUIPMENT_STATUS } from "@shared/equipmentStatus";
-import type { Prisma, PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
+
+type TransactionClient = Pick<
+  PrismaClient,
+  "echipament" | "equipmentChange"
+>;
+
+type Echipament = NonNullable<
+  Awaited<ReturnType<typeof prisma.echipament.findUnique>>
+>;
+
+type JsonValue = unknown;
 
 const validateEchipamentUpdate = async (
-  tx: Prisma.TransactionClient,
+  tx: TransactionClient,
   id: string,
-  current: Prisma.Echipament,
+  current: Echipament,
   data: { tip?: string; serie?: string; angajatId?: string | null }
 ) => {
   const newTip = data.tip ?? current.tip;
@@ -49,7 +60,7 @@ export const createEchipament = (data: {
   stare?: string;
   serie: string;
   angajatId?: string | null;
-  metadata?: Prisma.JsonValue;
+  metadata?: JsonValue;
 }) => {
   const finalStare = data.stare
     ? data.stare
@@ -57,7 +68,7 @@ export const createEchipament = (data: {
       ? "alocat"
       : "in_stoc";
 
-  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+  return prisma.$transaction(async (tx) => {
     const existing = await tx.echipament.findFirst({
       where: { tip: data.tip, serie: data.serie },
     });
@@ -111,10 +122,10 @@ export const updateEchipament = async (
     serie?: string;
     stare?: string;
     angajatId?: string | null;
-    metadata?: Prisma.JsonValue;
+    metadata?: JsonValue;
   }
 ) => {
-  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+  return prisma.$transaction(async (tx) => {
     const current = await tx.echipament.findUnique({ where: { id } });
     if (!current) throw new Error("Echipament inexistent");
 
@@ -228,7 +239,7 @@ export const getStats = async () => {
 
 export const getAvailableStock = async () => {
   const types = ["Laptop", "Telefon", "SIM"];
-  const stock: Record<string, Prisma.Echipament[]> = {};
+  const stock: Record<string, Echipament[]> = {};
   for (const t of types) {
     stock[t] = await prisma.echipament.findMany({
       where: { tip: t, stare: "in_stoc" },
