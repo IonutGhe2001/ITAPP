@@ -59,6 +59,7 @@ export default defineConfig(({ mode }) => {
         '@components': resolve(__dirname, 'src/components'),
         '@layouts': resolve(__dirname, 'src/layouts'),
         '@services': resolve(__dirname, 'src/services'),
+        '@shared': resolve(__dirname, '../shared'),
       },
     },
     test: {

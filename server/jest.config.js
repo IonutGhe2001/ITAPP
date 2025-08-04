@@ -10,6 +10,7 @@ module.exports = {
     "^@services/(.*)$": "<rootDir>/src/services/$1",
     "^@middlewares/(.*)$": "<rootDir>/src/middlewares/$1",
     "^@validators/(.*)$": "<rootDir>/src/validators/$1",
+    "^@shared/(.*)$": "<rootDir>/../shared/$1",
   },
   globals: {
     "ts-jest": {

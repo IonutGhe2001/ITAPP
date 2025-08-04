@@ -13,7 +13,8 @@
       "@lib/*": ["lib/*"],
       "@services/*": ["services/*"],
       "@middlewares/*": ["middlewares/*"],
-      "@validators/*": ["validators/*"]
+      "@validators/*": ["validators/*"],
+      "@shared/*": ["../shared/*"]
     }
   },
   "include": ["src", "prisma"]

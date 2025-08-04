@@ -1,12 +1,6 @@
 import { prisma } from "../lib/prisma";
 // Proces verbal generation is handled separately; avoid importing related services here
-
-const EQUIPMENT_STATUS = {
-  IN_STOC: "in_stoc",
-  ALOCAT: "alocat",
-  IN_COMANDA: "in_comanda",
-  MENTENANTA: "mentenanta",
-} as const;
+import { EQUIPMENT_STATUS } from "@shared/equipmentStatus";
 
 const validateEchipamentUpdate = async (
   tx: any,
@@ -202,10 +196,10 @@ export const deleteEchipament = (id: string) => {
 };
 
 export const getStats = async () => {
-   const [echipamente, inStocCount, alocatCount, angajati] = await Promise.all([
+  const [echipamente, inStocCount, alocatCount, angajati] = await Promise.all([
     prisma.echipament.count(),
     prisma.echipament.count({ where: { stare: EQUIPMENT_STATUS.IN_STOC } }),
-      prisma.echipament.count({ where: { stare: EQUIPMENT_STATUS.ALOCAT } }),
+    prisma.echipament.count({ where: { stare: EQUIPMENT_STATUS.ALOCAT } }),
     prisma.angajat.count(),
   ]);
 

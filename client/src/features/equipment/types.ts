@@ -1,3 +1,7 @@
+import { EQUIPMENT_STATUS, type EquipmentStatus } from '@shared/equipmentStatus';
+export { EQUIPMENT_STATUS } from '@shared/equipmentStatus';
+export type { EquipmentStatus } from '@shared/equipmentStatus';
+
 export interface Angajat {
   id: string;
   numeComplet: string;
@@ -13,15 +17,6 @@ export interface Angajat {
   emailAccountResponsible?: string;
   emailAccountLink?: string;
 }
-
-export const EQUIPMENT_STATUS = {
-  IN_STOC: 'in_stoc',
-  ALOCAT: 'alocat',
-  IN_COMANDA: 'in_comanda',
-  MENTENANTA: 'mentenanta',
-} as const;
-
-export type EquipmentStatus = (typeof EQUIPMENT_STATUS)[keyof typeof EQUIPMENT_STATUS];
 
 export const EQUIPMENT_STATUS_LABELS: Record<EquipmentStatus, string> = {
   [EQUIPMENT_STATUS.IN_STOC]: 'În stoc',
