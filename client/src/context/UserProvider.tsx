@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { getCurrentUser } from '@/services/authService';
 import { getUser, setUser as setUserStorage } from '@/utils/storage';
 import type { User } from '@/types/user';
-import { UserContext } from './user-context';
+import { UserContext } from './UserProvider';
 
-export const UserProvider = ({ children }: { children: React.ReactNode }) => {
+export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(getUser());
 
   const [loading, setLoading] = useState(true);

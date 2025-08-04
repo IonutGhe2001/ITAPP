@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useNotifications } from '@/context/use-notifications';
+import { useNotifications } from '@/context/useNotifications';
 
 const updateIcons = {
   Echipament: <MonitorIcon className="h-4 w-4" />,

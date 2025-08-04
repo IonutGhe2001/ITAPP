@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import type { JSX } from 'react';
-import { useAuth } from '@/context/use-auth';
+import { useAuth } from '@/context/useAuth';
 
 const LoginPage = lazy(() => import('./pages/Login/Login'));
 const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));

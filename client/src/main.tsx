@@ -7,8 +7,8 @@ import { ThemeProvider } from '@components/ui/theme-provider';
 import { ToastProvider } from '@components/ToastProvider';
 import { Toaster } from '@components/ui/toaster';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from '@/context/AuthContext';
-import { NotificationsProvider } from '@/context/NotificationsContext';
+import { AuthProvider } from '@/context/AuthProvider';
+import { NotificationsProvider } from '@/context/NotificationsProvider';
 
 const queryClient = new QueryClient();
 registerSW();

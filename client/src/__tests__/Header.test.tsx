@@ -3,11 +3,11 @@ import { MemoryRouter } from 'react-router-dom';
 import Header from '../layouts/components/Header';
 import { vi } from 'vitest';
 
-vi.mock('@/context/use-search', () => ({
+vi.mock('@/context/useSearch', () => ({
   useSearch: () => ({ query: '', setQuery: vi.fn() }),
 }));
 
-vi.mock('@/store/use-user', () => ({
+vi.mock('@/context/useUser', () => ({
   useUser: () => ({ user: { nume: 'John', prenume: 'Doe', functie: 'Admin' }, loading: false }),
 }));
 
@@ -16,7 +16,7 @@ const markAllRead = vi.fn();
 const removeNotification = vi.fn();
 const clearRead = vi.fn();
 
-vi.mock('@/context/use-notifications', () => ({
+vi.mock('@/context/useNotifications', () => ({
   useNotifications: () => ({
     notifications: notificationsMock,
     markAllRead,
@@ -25,7 +25,7 @@ vi.mock('@/context/use-notifications', () => ({
   }),
 }));
 
-vi.mock('@/context/use-auth', () => ({
+vi.mock('@/context/useAuth', () => ({
   useAuth: () => ({ isAuthenticated: true }),
 }));
 

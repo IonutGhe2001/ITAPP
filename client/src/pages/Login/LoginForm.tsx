@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
 import api from '../../services/api';
-import { useAuth } from '@/context/use-auth';
+import { useAuth } from '@/context/useAuth';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');

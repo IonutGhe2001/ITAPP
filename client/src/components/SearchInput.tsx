@@ -1,7 +1,7 @@
 import { Search } from 'lucide-react';
 import { useState, useMemo, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSearch } from '@/context/use-search';
+import { useSearch } from '@/context/useSearch';
 import { useSearchSuggestions } from '@/services/searchService';
 import { cn } from '@/lib/utils';
 

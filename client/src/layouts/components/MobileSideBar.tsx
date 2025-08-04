@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { sidebarRoutes } from '../../routes/sidebarRoutes';
 import { LogOut } from 'lucide-react';
-import { useAuth } from '@/context/use-auth';
+import { useAuth } from '@/context/useAuth';
 import { logout as logoutRequest } from '@/services/authService';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { navItemClass } from './NavItemClass';

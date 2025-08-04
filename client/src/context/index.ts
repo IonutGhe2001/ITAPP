@@ -1,8 +1,8 @@
-export { AuthProvider } from './AuthContext';
-export { useAuth } from './use-auth';
-export { SearchProvider } from './SearchContext';
-export { useSearch } from './use-search';
-export { UserProvider } from '../store/UserContext';
-export { useUser } from '../store/use-user';
-export { NotificationsProvider } from './NotificationsContext';
-export { useNotifications } from './use-notifications';
+export { AuthProvider } from './AuthProvider';
+export { useAuth } from './useAuth';
+export { SearchProvider } from './SearchProvider';
+export { useSearch } from './useSearch';
+export { UserProvider } from './UserProvider';
+export { useUser } from './useUser';
+export { NotificationsProvider } from './NotificationsProvider';
+export { useNotifications } from './useNotifications';

@@ -2,8 +2,8 @@ import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Container from '../components/Container';
 import { Outlet } from 'react-router-dom';
-import { UserProvider } from '@/store/UserContext';
-import { SearchProvider } from '@/context/SearchContext';
+import { UserProvider } from '@/context/UserProvider';
+import { SearchProvider } from '@/context/SearchProvider';
 
 export default function AppLayout() {
   return (

@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@components/ui/button';
 import ThemeToggle from '@components/ThemeToggle';
 import Avatar from '@/components/Avatar';
-import { useUser } from '@/store/use-user';
+import { useUser } from '@/context/useUser';
 import { removeToken } from '@/utils/storage';
 import pageTitles from '@/constants/pageTitles';
 import MobileSidebar from '@layouts/components/MobileSideBar';

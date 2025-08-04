@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Pencil, X } from 'lucide-react';
 import { updateCurrentUser } from '@/services/authService';
-import { useUser } from '@/store/use-user';
+import { useUser } from '@/context/useUser';
 import type { User } from '@/types/user';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 import Container from '@/components/Container';
