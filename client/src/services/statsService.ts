@@ -19,8 +19,10 @@ export const useOverviewStats = () =>
       return {
         echipamente: data.echipamente,
         angajati: data.angajati,
-        [EQUIPMENT_STATUS.IN_STOC]: data[EQUIPMENT_STATUS.IN_STOC],
-        [EQUIPMENT_STATUS.ALOCAT]: data[EQUIPMENT_STATUS.ALOCAT],
+        [EQUIPMENT_STATUS.IN_STOC]: data[EQUIPMENT_STATUS.IN_STOC] ?? 0,
+        [EQUIPMENT_STATUS.ALOCAT]: data[EQUIPMENT_STATUS.ALOCAT] ?? 0,
+        [EQUIPMENT_STATUS.IN_COMANDA]: data[EQUIPMENT_STATUS.IN_COMANDA] ?? 0,
+        [EQUIPMENT_STATUS.MENTENANTA]: data[EQUIPMENT_STATUS.MENTENANTA] ?? 0,
       };
     },
   });
