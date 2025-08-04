@@ -14,7 +14,7 @@
       "@services/*": ["services/*"],
       "@middlewares/*": ["middlewares/*"],
       "@validators/*": ["validators/*"],
-      "@shared/*": ["../shared/*"]
+      "@shared/*": ["../../shared/*"]
     }
   },
   "include": ["src", "prisma"]
