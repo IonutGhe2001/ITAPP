@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@/constants/queryKeys';
 import api from '@/services/api';
 
 export interface AngajatInput {
@@ -33,7 +34,7 @@ export const getAngajati = () => api.get('/angajati');
 
 export const useAngajati = () =>
   useQuery({
-    queryKey: ['angajati'],
+    queryKey: QUERY_KEYS.EMPLOYEES,
     queryFn: async () => (await api.get('/angajati')).data,
   });
 
@@ -42,7 +43,7 @@ export const useCreateAngajat = () => {
   return useMutation({
     mutationFn: (data: AngajatInput) => api.post('/angajati', data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['angajati'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
     },
   });
 };
@@ -53,7 +54,7 @@ export const useUpdateAngajat = () => {
     mutationFn: ({ id, data }: { id: string; data: AngajatUpdateInput }) =>
       api.put(`/angajati/${id}`, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['angajati'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
     },
   });
 };
@@ -63,7 +64,7 @@ export const useDeleteAngajat = () => {
   return useMutation({
     mutationFn: (id: string) => api.delete(`/angajati/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['angajati'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
     },
   });
 };
@@ -83,7 +84,7 @@ export const useCreateEmailAccount = () => {
       link?: string;
     }) => api.post(`/angajati/${id}/email-account`, { email, responsible, link }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['angajati'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
     },
   });
 };

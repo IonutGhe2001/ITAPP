@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@/constants/queryKeys';
 import {
   EQUIPMENT_STATUS,
   type EquipmentStatus,
@@ -12,7 +13,7 @@ export type OverviewStats = {
 
 export const useOverviewStats = () =>
   useQuery<OverviewStats>({
-    queryKey: ['overview-stats'],
+    queryKey: QUERY_KEYS.OVERVIEW_STATS,
     queryFn: async () => {
       const data = (await api.get("/echipamente/stats")).data;
 
