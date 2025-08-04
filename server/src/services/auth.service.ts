@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
 import { prisma } from "../lib/prisma";
-import type { Prisma, PrismaClient } from "@prisma/client";
+import { User } from "@prisma/client";
 import { env } from "../config";
 
 export const authenticateUser = async (
@@ -38,7 +38,7 @@ export const registerUser = async (input: {
   prenume: string;
   functie: string;
   role: string;
-}): Promise<Prisma.User> => {
+}): Promise<User> => {
   const { email, password, nume, prenume, functie, role } = input;
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
