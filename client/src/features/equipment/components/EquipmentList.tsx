@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import EquipmentCard from './EquipmentCard';
@@ -29,6 +29,29 @@ function EquipmentList({ echipamente, onEdit, onDelete }: EquipmentListProps) {
     };
   }, []);
 
+  const Row = useCallback(
+    ({ index, style }: { index: number; style: React.CSSProperties }) => {
+      const eq: Echipament = echipamente[index];
+      return (
+        <div style={style} className="p-2">
+          <EquipmentCard
+            key={eq.id}
+            echipament={eq}
+            onEdit={(val: Echipament | string) => {
+              if (typeof val === 'object') {
+                onEdit?.(val);
+              } else {
+                onEdit?.(eq);
+              }
+            }}
+            onDelete={() => onDelete?.(eq.id)}
+          />
+        </div>
+      );
+    },
+    [echipamente, onEdit, onDelete]
+  );
+
   if (echipamente.length === 0) {
     return (
       <div className="mt-10 text-center text-sm text-gray-500">
@@ -36,26 +59,6 @@ function EquipmentList({ echipamente, onEdit, onDelete }: EquipmentListProps) {
       </div>
     );
   }
-
-  const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
-    const eq: Echipament = echipamente[index];
-    return (
-      <div style={style} className="p-2">
-        <EquipmentCard
-          key={eq.id}
-          echipament={eq}
-          onEdit={(val: Echipament | string) => {
-            if (typeof val === 'object') {
-              onEdit?.(val);
-            } else {
-              onEdit?.(eq);
-            }
-          }}
-          onDelete={() => onDelete?.(eq.id)}
-        />
-      </div>
-    );
-  };
 
   const ITEM_HEIGHT = 190;
 

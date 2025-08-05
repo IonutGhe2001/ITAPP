@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { Pencil, X } from 'lucide-react';
 import { updateCurrentUser } from '@/services/authService';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,8 @@ import { useToast } from '@/hooks/use-toast/use-toast-hook';
 import Container from '@/components/Container';
 import Avatar from '@/components/Avatar';
 import ProfileInput from '@/components/ProfileInput';
-import SignatureEditor from '@/components/SignatureEditor';
+
+const SignatureEditor = React.lazy(() => import('@/components/SignatureEditor'));
 
 export default function ProfilePage() {
   const { user, setUser } = useUser();
@@ -107,20 +108,32 @@ export default function ProfilePage() {
           )}
         </div>
 
-        <SignatureEditor
-          signature={user?.digitalSignature ?? null}
-          isEditing={isEditing}
-          onChange={(sig) => {
-            if (user) {
-              setUser({ ...user, digitalSignature: sig });
-            }
-          }}
-        />
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center">
+              <div className="border-primary h-10 w-10 animate-spin rounded-full border-4 border-t-transparent"></div>
+            </div>
+          }
+        >
+          <SignatureEditor
+            signature={user?.digitalSignature ?? null}
+            isEditing={isEditing}
+            onChange={(sig) => {
+              if (user) {
+                setUser({ ...user, digitalSignature: sig });
+              }
+            }}
+          />
+        </Suspense>
 
         <div className="w-full space-y-4">
           {isEditing ? (
             <>
-              <ProfileInput label={t('profile.labels.lastName')} value={user?.nume} onChange={handleChange('nume')} />
+              <ProfileInput
+                label={t('profile.labels.lastName')}
+                value={user?.nume}
+                onChange={handleChange('nume')}
+              />
               <ProfileInput
                 label={t('profile.labels.firstName')}
                 value={user?.prenume}

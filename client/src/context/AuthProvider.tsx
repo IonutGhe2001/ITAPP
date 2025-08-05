@@ -25,10 +25,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    const controller = new AbortController();
     const stored = getToken();
     fetch(import.meta.env.VITE_API_URL + '/auth/me', {
       credentials: 'include',
       headers: stored ? { Authorization: `Bearer ${stored}` } : undefined,
+      signal: controller.signal,
     })
       .then((res) => {
         if (res.ok) {
@@ -42,12 +44,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setLoggedInViaCookie(false);
         }
       })
-      .catch(() => {
-        removeToken();
-        setTokenState(null);
-        setLoggedInViaCookie(false);
+      .catch((err) => {
+        if (err.name !== 'AbortError') {
+          removeToken();
+          setTokenState(null);
+          setLoggedInViaCookie(false);
+        }
       })
       .finally(() => setLoading(false));
+
+      return () => {
+      controller.abort();
+    };
   }, []);
 
   return (

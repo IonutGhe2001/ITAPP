@@ -14,7 +14,7 @@ export interface GlobalSearchData {
 
 export const useGlobalSearch = (query: string) =>
   useQuery<GlobalSearchData>({
-    queryKey: [...QUERY_KEYS.GLOBAL_SEARCH, query],
+    queryKey: [...QUERY_KEYS.GLOBAL_SEARCH, { q: query }],
     queryFn: () => http.get<GlobalSearchData>('/search', { params: { q: query } }),
     enabled: !!query.trim(),
   });

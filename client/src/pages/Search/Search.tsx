@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Container from '@/components/Container';
 import { useGlobalSearch } from '@/services/searchService';
@@ -6,13 +5,7 @@ import { useGlobalSearch } from '@/services/searchService';
 export default function SearchResults() {
   const [params] = useSearchParams();
   const q = params.get('q') || '';
-  const { data, refetch } = useGlobalSearch(q);
-
-  useEffect(() => {
-    if (q) {
-      refetch();
-    }
-  }, [q, refetch]);
+  const { data } = useGlobalSearch(q);
 
   const noResults = !data?.echipamente?.length && !data?.angajati?.length;
 
