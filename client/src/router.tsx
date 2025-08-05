@@ -7,7 +7,9 @@ import { ROUTES } from '@/constants/routes';
 const LoginPage = lazy(() => import('./pages/Login/Login'));
 const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
 const Echipamente = lazy(() => import('./features/equipment/pages/Echipamente/Echipamente'));
-const EquipmentDetail = lazy(() => import('./features/equipment/pages/EquipmentDetail/EquipmentDetail'));
+const EquipmentDetail = lazy(
+  () => import('./features/equipment/pages/EquipmentDetail/EquipmentDetail')
+);
 const Colegi = lazy(() => import('./features/employees/pages/Colegi/Colegi'));
 const EmployeeForm = lazy(() => import('./features/employees/pages/EmployeeForm/EmployeeForm'));
 const AppLayout = lazy(() => import('./layouts/AppLayout'));
@@ -32,7 +34,7 @@ function ProtectedRoute({ children }: { children: JSX.Element }) {
 
 export default function AppRouter() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Suspense
         fallback={
           <div className="flex h-screen items-center justify-center">
@@ -53,7 +55,7 @@ export default function AppRouter() {
             <Route index element={<Dashboard />} />
             <Route path={ROUTES.EQUIPMENT.slice(1)} element={<Echipamente />} />
             <Route path={ROUTES.EQUIPMENT_DETAIL.slice(1)} element={<EquipmentDetail />} />
-            <Route path={ROUTES.COLEGI.slice(1)} element={<Colegi />} />
+            <Route path={ROUTES.COLEGI} element={<Colegi />} />
             <Route path={ROUTES.EMPLOYEE_FORM.slice(1)} element={<EmployeeForm />} />
             <Route path={ROUTES.PROFILE.slice(1)} element={<ProfilePage />} />
             <Route path={ROUTES.SEARCH.slice(1)} element={<SearchPage />} />
