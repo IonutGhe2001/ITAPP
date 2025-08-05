@@ -5,6 +5,7 @@ import { useSearch } from '@/context/useSearch';
 import { useSearchSuggestions } from '@/services/searchService';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/constants/routes';
+import { levenshtein } from '@/utils/levenshtein';
 
 interface SearchInputProps {
   className?: string;
@@ -17,13 +18,40 @@ export default function SearchInput({ className, onSelect }: SearchInputProps) {
   const { data: suggestionData } = useSearchSuggestions(query);
   const [activeIndex, setActiveIndex] = useState(-1);
 
-  const suggestions = useMemo(
-    () => [
-      ...(suggestionData?.echipamente.map((e) => e.nume) || []),
-      ...(suggestionData?.angajati.map((a) => a.numeComplet) || []),
-    ],
-    [suggestionData]
-  );
+  const suggestions = useMemo(() => {
+    if (!suggestionData) return [];
+    const q = query.toLowerCase();
+
+    const equipment = suggestionData.echipamente.map((e) => {
+      const candidates = [e.nume, e.serie].filter(Boolean) as string[];
+      let best = { value: candidates[0], score: Infinity };
+      candidates.forEach((c) => {
+        const s = levenshtein(c.toLowerCase(), q);
+        if (s < best.score) best = { value: c, score: s };
+      });
+      return best;
+    });
+
+    const employees = suggestionData.angajati.map((a) => {
+      const candidates = [
+        a.numeComplet,
+        a.functie,
+        a.email,
+        a.cDataUsername,
+        a.cDataId,
+      ].filter(Boolean) as string[];
+      let best = { value: candidates[0], score: Infinity };
+      candidates.forEach((c) => {
+        const s = levenshtein(c.toLowerCase(), q);
+        if (s < best.score) best = { value: c, score: s };
+      });
+      return best;
+    });
+
+    return [...equipment, ...employees]
+      .sort((a, b) => a.score - b.score)
+      .map((r) => r.value);
+  }, [suggestionData, query]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
