@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/constants/queryKeys';
-import api from '@/services/api';
+import http from '@/services/http';
+import type { Angajat } from '@/features/equipment/types';
 
 export interface AngajatInput {
   numeComplet: string;
@@ -28,20 +29,20 @@ export interface AngajatUpdateInput {
   cDataCreated?: boolean;
 }
 
-export const getAngajat = (id: string) => api.get(`/angajati/${id}`);
+export const getAngajat = (id: string) => http.get<Angajat>(`/angajati/${id}`);
 
-export const getAngajati = () => api.get('/angajati');
+export const getAngajati = () => http.get<Angajat[]>(`/angajati`);
 
 export const useAngajati = () =>
-  useQuery({
+  useQuery<Angajat[]>({
     queryKey: QUERY_KEYS.EMPLOYEES,
-    queryFn: async () => (await api.get('/angajati')).data,
+    queryFn: () => http.get<Angajat[]>('/angajati'),
   });
 
 export const useCreateAngajat = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: AngajatInput) => api.post('/angajati', data),
+    mutationFn: (data: AngajatInput) => http.post<Angajat>('/angajati', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
     },
@@ -52,7 +53,7 @@ export const useUpdateAngajat = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: AngajatUpdateInput }) =>
-      api.put(`/angajati/${id}`, data),
+      http.put<Angajat>(`/angajati/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
     },
@@ -62,7 +63,7 @@ export const useUpdateAngajat = () => {
 export const useDeleteAngajat = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => api.delete(`/angajati/${id}`),
+    mutationFn: (id: string) => http.delete<void>(`/angajati/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
     },
@@ -82,7 +83,12 @@ export const useCreateEmailAccount = () => {
       email: string;
       responsible: string;
       link?: string;
-    }) => api.post(`/angajati/${id}/email-account`, { email, responsible, link }),
+    }) =>
+      http.post<void>(`/angajati/${id}/email-account`, {
+        email,
+        responsible,
+        link,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
     },

@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/select';
 import { Expand, X } from 'lucide-react';
 import { getAngajati } from '@/features/employees';
-import api from '@/services/api';
+import http from '@/services/http'
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 
 interface ModalProcesVerbalProps {
@@ -30,7 +30,7 @@ export default function ModalProcesVerbal({ onClose }: ModalProcesVerbalProps) {
 
   useEffect(() => {
     getAngajati()
-      .then((res) => setAngajati(res.data))
+      .then(setAngajati)
       .catch((err) => console.error('Eroare la încărcare angajați', err));
   }, []);
 
@@ -38,14 +38,14 @@ export default function ModalProcesVerbal({ onClose }: ModalProcesVerbalProps) {
     if (!selectedId) return;
     setLoading(true);
     try {
-      const res = await api.post(
+      const blob = await http.post<Blob>(
         '/procese-verbale',
         { angajatId: selectedId },
         {
           responseType: 'blob',
         }
       );
-      const file = new Blob([res.data], { type: 'application/pdf' });
+      const file = new Blob([blob], { type: 'application/pdf' });
       const url = URL.createObjectURL(file);
       setPdfUrl(url);
       toast({ title: 'Proces verbal generat', description: 'PDF-ul a fost creat cu succes.' });

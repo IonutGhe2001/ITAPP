@@ -1,4 +1,4 @@
-import api from '@/services/api';
+import http from '@/services/http';
 
 // Tipuri de bază
 export type EvenimentData = {
@@ -14,20 +14,23 @@ export type Eveniment = EvenimentData & {
 
 // 🔍 Obține toate evenimentele
 export const fetchEvenimente = (): Promise<Eveniment[]> => {
-  return api.get('/evenimente').then((res) => res.data);
+  return http.get<Eveniment[]>('/evenimente');
 };
 
 // ➕ Creează un nou eveniment
 export const createEveniment = (data: EvenimentData): Promise<Eveniment> => {
-  return api.post('/evenimente', data).then((res) => res.data);
+  return http.post<Eveniment>('/evenimente', data);
 };
 
 // 📝 Actualizează un eveniment existent
-export const updateEveniment = (id: number, data: EvenimentData): Promise<Eveniment> => {
-  return api.patch(`/evenimente/${id}`, data).then((res) => res.data);
+export const updateEveniment = (
+  id: number,
+  data: EvenimentData
+): Promise<Eveniment> => {
+  return http.patch<Eveniment>(`/evenimente/${id}`, data);
 };
 
 // ❌ Șterge un eveniment
 export const deleteEveniment = (id: number): Promise<void> => {
-  return api.delete(`/evenimente/${id}`).then((res) => res.data);
+  return http.delete<void>(`/evenimente/${id}`);
 };

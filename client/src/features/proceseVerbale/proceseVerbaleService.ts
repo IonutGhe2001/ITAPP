@@ -1,6 +1,6 @@
 export type ProcesVerbalTip = 'PREDARE_PRIMIRE' | 'RESTITUIRE' | 'SCHIMB';
 
-import api from '@/services/api';
+import http from '@/services/http';
 
 export async function genereazaProcesVerbal(
   angajatId: string,
@@ -18,7 +18,7 @@ export async function genereazaProcesVerbal(
         echipamentePrimite: opts?.primite,
       };
 
-  const res = await api.post(url, body, { responseType: 'blob' });
-  const file = new Blob([res.data], { type: 'application/pdf' });
+  const blob = await http.post<Blob>(url, body, { responseType: 'blob' });
+  const file = new Blob([blob], { type: 'application/pdf' });
   return URL.createObjectURL(file);
 }

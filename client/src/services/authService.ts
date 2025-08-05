@@ -1,13 +1,12 @@
-import api from './api';
+import http from './http';
+import type { User } from '@/types/user';
 
-export const login = async (email: string, password: string) => {
-  await api.post('/auth/login', { email, password });
-};
+export const login = (email: string, password: string) =>
+  http.post<void>('/auth/login', { email, password });
 
 export const getCurrentUser = async () => {
   try {
-    const res = await api.get('/auth/me');
-    return res.data;
+    return await http.get<User>('/auth/me');
   } catch (error) {
     console.error('Eroare la /me:', error);
     return null;
@@ -24,11 +23,7 @@ export const updateCurrentUser = async (
     digitalSignature?: string | null;
   }>
 ) => {
-  const res = await api.patch('/auth/me', data);
-
-  return res.data;
+  return await http.patch<User>('/auth/me', data);
 };
 
-export const logout = async () => {
-  await api.post('/auth/logout');
-};
+export const logout = () => http.post<void>('/auth/logout');

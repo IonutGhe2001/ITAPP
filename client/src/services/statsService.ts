@@ -4,7 +4,7 @@ import {
   EQUIPMENT_STATUS,
   type EquipmentStatus,
 } from "@/features/equipment/types";
-import api from './api';
+import http from './http';
 
 export type OverviewStats = {
   echipamente: number;
@@ -15,7 +15,7 @@ export const useOverviewStats = () =>
   useQuery<OverviewStats>({
     queryKey: QUERY_KEYS.OVERVIEW_STATS,
     queryFn: async () => {
-      const data = (await api.get("/echipamente/stats")).data;
+      const data = await http.get<Record<string, number>>("/echipamente/stats");
 
       const statusCounts = Object.values(EQUIPMENT_STATUS).reduce(
         (acc, status) => {
