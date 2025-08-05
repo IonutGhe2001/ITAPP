@@ -1,5 +1,14 @@
 import { Request, Response, NextFunction } from "express";
-import * as echipamentService from "../services/echipament.service";
+import {
+  getEchipamente as getEchipamenteService,
+  getEchipament as getEchipamentService,
+  createEchipament as createEchipamentService,
+  updateEchipament as updateEchipamentService,
+  deleteEchipament as deleteEchipamentService,
+  getStats as getStatsService,
+  getAvailableStock as getAvailableStockService,
+  orderEchipament as orderEchipamentService,
+} from "../services/echipament.service";
 import { emitUpdate } from "../lib/websocket";
 
 export const getEchipamente = async (
@@ -8,7 +17,7 @@ export const getEchipamente = async (
   next: NextFunction
 ) => {
   try {
-    const echipamente = await echipamentService.getEchipamente();
+    const echipamente = await getEchipamenteService();
     res.json(echipamente);
   } catch (err) {
     next(err);
@@ -22,7 +31,7 @@ export const getEchipament = async (
 ) => {
   try {
     const { id } = req.params;
-    const echipament = await echipamentService.getEchipament(id);
+    const echipament = await getEchipamentService(id);
     if (!echipament) {
       res.status(404).json({ message: 'Echipament negăsit' });
       return;
@@ -39,7 +48,7 @@ export const createEchipament = async (
   next: NextFunction
 ) => {
   try {
-    const echipament = await echipamentService.createEchipament(req.body);
+    const echipament = await createEchipamentService(req.body);
     res.status(201).json(echipament);
     emitUpdate({
       type: "Echipament",
@@ -58,7 +67,7 @@ export const updateEchipament = async (
 ) => {
   try {
     const { id } = req.params;
-    const updated = await echipamentService.updateEchipament(id, req.body);
+    const updated = await updateEchipamentService(id, req.body);
     res.json(updated);
     emitUpdate({
       type: "Echipament",
@@ -77,7 +86,7 @@ export const deleteEchipament = async (
 ) => {
   try {
     const { id } = req.params;
-    await echipamentService.deleteEchipament(id);
+    await deleteEchipamentService(id);
     res.json({ message: "Echipament șters cu succes." });
     emitUpdate({
       type: "Echipament",
@@ -95,7 +104,7 @@ export const getStats = async (
   next: NextFunction
 ) => {
   try {
-    const stats = await echipamentService.getStats();
+    const stats = await getStatsService();
     res.json(stats);
   } catch (err) {
     next(err);
@@ -108,7 +117,7 @@ export const getAvailableStock = async (
   next: NextFunction
 ) => {
   try {
-    const stock = await echipamentService.getAvailableStock();
+    const stock = await getAvailableStockService();
     res.json(stock);
   } catch (err) {
     next(err);
@@ -122,7 +131,7 @@ export const orderEchipament = async (
 ) => {
   try {
     const { tip } = req.body;
-    const item = await echipamentService.orderEchipament(tip);
+    const item = await orderEchipamentService(tip);
     res.status(201).json(item);
     emitUpdate({
       type: "Echipament",
