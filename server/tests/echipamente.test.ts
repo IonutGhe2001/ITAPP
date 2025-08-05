@@ -4,6 +4,7 @@ import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import { beforeAll, afterEach, describe, it, expect, jest } from '@jest/globals';
 jest.mock('../src/services/echipament.service', () => ({
+  getEchipament: jest.fn(),
   getEchipamente: jest.fn(),
   createEchipament: jest.fn(),
   updateEchipament: jest.fn(),
