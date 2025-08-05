@@ -6,12 +6,7 @@ import { getEchipamenteCache, setEchipamenteCache } from '@/utils/storage';
 import type { Echipament, EchipamentInput, EchipamentUpdateInput } from './types';
 
 export const useEchipamente = () => {
-  const query = useQuery<
-    Echipament[],
-    Error,
-    Echipament[],
-    typeof QUERY_KEYS.EQUIPMENT
-  >({
+  const query = useQuery<Echipament[], Error, Echipament[], typeof QUERY_KEYS.EQUIPMENT>({
     queryKey: QUERY_KEYS.EQUIPMENT,
     queryFn: () => http.get<Echipament[]>('/echipamente'),
     initialData: getEchipamenteCache() ?? [],
@@ -27,10 +22,15 @@ export const useEchipamente = () => {
 };
 
 export const useEchipament = (id: string) => {
+  const queryClient = useQueryClient();
   return useQuery<Echipament, Error>({
     queryKey: [...QUERY_KEYS.EQUIPMENT, id],
     queryFn: () => http.get<Echipament>(`/echipamente/${id}`),
     enabled: !!id,
+    initialData: () => {
+      const list = queryClient.getQueryData<Echipament[]>(QUERY_KEYS.EQUIPMENT);
+      return list?.find((e) => e.id === id);
+    },
   });
 };
 

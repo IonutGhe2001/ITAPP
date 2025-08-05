@@ -7,6 +7,7 @@ import { BrowserRouter } from 'react-router-dom';
 // Mock nested equipment exports used by EquipmentCard
 vi.mock('@/features/equipment', () => ({
   EquipmentIcon: () => <span data-testid="icon" />,
+  EQUIPMENT_STATUS_LABELS: { in_stoc: 'În stoc', alocat: 'Alocat' },
 }));
 
 // Simplify react-window behavior
@@ -67,8 +68,6 @@ describe('EquipmentList', () => {
         <EquipmentList echipamente={[]} onEdit={vi.fn()} onDelete={vi.fn()} />
       </BrowserRouter>
     );
-    expect(
-      screen.getByText('Nu există echipamente înregistrate.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Nu există echipamente înregistrate.')).toBeInTheDocument();
   });
 });

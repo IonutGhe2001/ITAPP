@@ -14,9 +14,14 @@ import { VariableSizeList as List } from 'react-window';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 
 export default function Colegi() {
-  const { data: colegi = [], refetch } = useAngajati() as {
+  const {
+    data: colegi = [],
+    refetch,
+    isLoading,
+  } = useAngajati() as {
     data: (Angajat & { echipamente: Echipament[] })[] | undefined;
     refetch: () => void;
+    isLoading: boolean;
   };
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [selectedAngajatId, setSelectedAngajatId] = useState<string | null>(null);
@@ -49,6 +54,14 @@ export default function Colegi() {
     setPendingPV(grouped);
   }, []);
 
+  if (isLoading && colegi.length === 0) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="border-primary h-10 w-10 animate-spin rounded-full border-4 border-t-transparent"></div>
+      </div>
+    );
+  }
+  
   const addPendingPV = (colegId: string, change: { predate?: string[]; primite?: string[] }) => {
     setPendingPV((prev) => {
       const current = prev[colegId] || { predate: [], primite: [] };
