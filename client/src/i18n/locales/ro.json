@@ -32,5 +32,24 @@
       "cancel": "Anulează",
       "edit": "Editează"
     }
+    },
+  "employeeForm": {
+    "heading": "Adaugă Angajat",
+    "labels": {
+      "lastName": "Nume",
+      "firstName": "Prenume",
+      "department": "Departament",
+      "hireDate": "Data angajării"
+    },
+    "errors": {
+      "required": "Numele și departamentul sunt obligatorii",
+      "save": "Eroare la salvarea angajatului"
+    },
+    "success": {
+      "save": "Angajat salvat cu succes"
+    },
+    "buttons": {
+      "save": "Salvează"
+    }
   }
 }

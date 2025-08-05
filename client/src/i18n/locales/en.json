@@ -32,5 +32,24 @@
       "cancel": "Cancel",
       "edit": "Edit"
     }
+    },
+  "employeeForm": {
+    "heading": "Add Employee",
+    "labels": {
+      "lastName": "Last name",
+      "firstName": "First name",
+      "department": "Department",
+      "hireDate": "Hire date"
+    },
+    "errors": {
+      "required": "Last name and department are required",
+      "save": "Error saving employee"
+    },
+    "success": {
+      "save": "Employee saved successfully"
+    },
+    "buttons": {
+      "save": "Save"
+    }
   }
 }

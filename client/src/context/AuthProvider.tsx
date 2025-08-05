@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { logout as logoutRequest } from '@/services/authService';
+import { logout as logoutRequest, getCurrentUser } from '@/services/authService';
 import { getToken, setToken as storeToken, removeToken } from '@/utils/storage';
 import { AuthContext } from './authContext';
 
@@ -25,37 +25,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const controller = new AbortController();
-    const stored = getToken();
-    fetch(import.meta.env.VITE_API_URL + '/auth/me', {
-      credentials: 'include',
-      headers: stored ? { Authorization: `Bearer ${stored}` } : undefined,
-      signal: controller.signal,
-    })
-      .then((res) => {
-        if (res.ok) {
+    const checkAuth = async () => {
+      const stored = getToken();
+      try {
+        const user = await getCurrentUser();
+        if (user) {
           if (!stored) {
             // session valid via cookie
             setLoggedInViaCookie(true);
           }
+          setTokenState(stored);
         } else {
           removeToken();
           setTokenState(null);
           setLoggedInViaCookie(false);
         }
-      })
-      .catch((err) => {
-        if (err.name !== 'AbortError') {
-          removeToken();
-          setTokenState(null);
-          setLoggedInViaCookie(false);
-        }
-      })
-      .finally(() => setLoading(false));
-
-      return () => {
-      controller.abort();
+      } catch {
+        removeToken();
+        setTokenState(null);
+        setLoggedInViaCookie(false);
+      } finally {
+        setLoading(false);
+      };
     };
+
+    checkAuth();
   }, []);
 
   return (

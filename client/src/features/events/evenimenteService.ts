@@ -1,3 +1,5 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@/constants/queryKeys';
 import http from '@/services/http';
 
 // Tipuri de bază
@@ -33,4 +35,43 @@ export const updateEveniment = (
 // ❌ Șterge un eveniment
 export const deleteEveniment = (id: number): Promise<void> => {
   return http.delete<void>(`/evenimente/${id}`);
+};
+
+// React Query hooks
+
+export const useEvenimente = () =>
+  useQuery<Eveniment[]>({
+    queryKey: QUERY_KEYS.EVENTS,
+    queryFn: fetchEvenimente,
+  });
+
+export const useCreateEveniment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: EvenimentData) => createEveniment(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EVENTS });
+    },
+  });
+};
+
+export const useUpdateEveniment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: EvenimentData }) =>
+      updateEveniment(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EVENTS });
+    },
+  });
+};
+
+export const useDeleteEveniment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => deleteEveniment(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EVENTS });
+    },
+  });
 };
