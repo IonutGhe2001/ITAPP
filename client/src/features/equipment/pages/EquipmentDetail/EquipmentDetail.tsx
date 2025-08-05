@@ -6,6 +6,29 @@ import { Card } from '@/components/ui/card';
 import { useEchipament, EQUIPMENT_STATUS_LABELS } from '@/features/equipment';
 import { ROUTES } from '@/constants/routes';
 
+function flattenMetadata(metadata: Record<string, unknown>, prefix = ''): [string, string][] {
+  return Object.entries(metadata).flatMap(([key, value]) => {
+    const prefixedKey = prefix ? `${prefix}.${key}` : key;
+
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      return flattenMetadata(value as Record<string, unknown>, prefixedKey);
+    }
+
+    if (Array.isArray(value)) {
+      return [
+        [
+          prefixedKey,
+          value
+            .map((item) => (item && typeof item === 'object' ? JSON.stringify(item) : String(item)))
+            .join(', '),
+        ],
+      ];
+    }
+
+    return [[prefixedKey, String(value)]];
+  });
+}
+
 export default function EquipmentDetail() {
   const { id } = useParams();
   const { data, isLoading } = useEchipament(id || '');
@@ -22,11 +45,11 @@ export default function EquipmentDetail() {
     return (
       <Container className="py-6">
         <div className="flex items-center gap-2 text-xl font-semibold">
-        <Link to={ROUTES.EQUIPMENT}>
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-        <h1>INFO: {id}</h1>
-      </div>
+          <Link to={ROUTES.EQUIPMENT}>
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+          <h1>INFO: {id}</h1>
+        </div>
         <p className="text-muted-foreground text-sm">Echipament negăsit.</p>
       </Container>
     );
@@ -48,10 +71,10 @@ export default function EquipmentDetail() {
           <h2 className="mb-2 font-medium">Metadata</h2>
           <Card className="p-4">
             <div className="grid grid-cols-2 gap-2 text-sm">
-              {Object.entries(data.metadata).map(([key, value]) => (
+              {flattenMetadata(data.metadata as Record<string, unknown>).map(([key, value]) => (
                 <Fragment key={key}>
                   <span className="font-medium">{key}</span>
-                  <span className="text-muted-foreground">{String(value)}</span>
+                  <span className="text-muted-foreground">{value}</span>
                 </Fragment>
               ))}
             </div>
