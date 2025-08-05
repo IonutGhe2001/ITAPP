@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/select';
 import { Expand, X } from 'lucide-react';
 import { getAngajati } from '@/features/employees';
-import http from '@/services/http'
+import http from '@/services/http';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 
 interface ModalProcesVerbalProps {
@@ -31,7 +31,7 @@ export default function ModalProcesVerbal({ onClose }: ModalProcesVerbalProps) {
   useEffect(() => {
     getAngajati()
       .then(setAngajati)
-      .catch((err) => console.error('Eroare la încărcare angajați', err));
+      .catch((err: unknown) => console.error('Eroare la încărcare angajați', err));
   }, []);
 
   const genereazaProces = async () => {
@@ -49,7 +49,7 @@ export default function ModalProcesVerbal({ onClose }: ModalProcesVerbalProps) {
       const url = URL.createObjectURL(file);
       setPdfUrl(url);
       toast({ title: 'Proces verbal generat', description: 'PDF-ul a fost creat cu succes.' });
-    } catch (_err) {
+    } catch (_err: unknown) {
       console.error('Eroare la generare proces verbal', _err);
       toast({
         title: 'Eroare',
