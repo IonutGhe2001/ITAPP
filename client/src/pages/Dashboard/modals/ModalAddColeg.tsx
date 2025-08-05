@@ -20,9 +20,6 @@ export default function ModalAddColeg({
     functie: '',
     email: '',
     telefon: '',
-    cDataUsername: '',
-    cDataId: '',
-    cDataNotes: '',
     cDataCreated: false,
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -60,15 +57,7 @@ export default function ModalAddColeg({
         </DialogHeader>
         <div className="space-y-4">
           {(
-            [
-              'numeComplet',
-              'functie',
-              'email',
-              'telefon',
-              'cDataUsername',
-              'cDataId',
-              'cDataNotes',
-            ] as const
+            ['numeComplet', 'functie', 'email', 'telefon'] as const
           ).map((field) => (
             <div key={field}>
               <Label htmlFor={field}>
@@ -79,9 +68,6 @@ export default function ModalAddColeg({
                       functie: 'Funcție',
                       email: 'Email',
                       telefon: 'Telefon',
-                      cDataUsername: 'c-data username',
-                      cDataId: 'c-data ID',
-                      cDataNotes: 'Note/Link c-data',
                     } as Record<string, string>
                   )[field]
                 }

@@ -3,7 +3,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import ModalAsigneazaEchipament from './ModalAsigneazaEchipament';
 import ModalEditColeg from './ModalEditColeg';
-import ModalCreateEmail from './ModalCreateEmail';
 import { useUpdateEchipament } from '@/features/equipment';
 import { genereazaProcesVerbal } from '@/features/proceseVerbale';
 import { queueProcesVerbal } from '@/features/proceseVerbale/pvQueue';
@@ -34,8 +33,6 @@ interface ColegModalsProps {
   setExpanded: React.Dispatch<React.SetStateAction<Set<string>>>;
   handleDelete: (id: string) => void;
   onPVChange: (colegId: string, change: { predate?: string[]; primite?: string[] }) => void;
-  createEmailFor: Angajat | null;
-  setCreateEmailFor: (c: Angajat | null) => void;
 }
 
 export default function ColegModals({
@@ -54,8 +51,6 @@ export default function ColegModals({
   setExpanded,
   handleDelete,
   onPVChange,
-  createEmailFor,
-  setCreateEmailFor,
 }: ColegModalsProps) {
   const updateMutation = useUpdateEchipament();
 
@@ -150,17 +145,6 @@ export default function ColegModals({
           <ModalAddColeg onClose={() => setShowAddModal(false)} defaultName={search.trim()} />
         )}
       </Suspense>
-      {createEmailFor && (
-        <ModalCreateEmail
-          coleg={createEmailFor}
-          onClose={() => setCreateEmailFor(null)}
-          onSuccess={() => {
-            refetch();
-            setExpanded(new Set());
-            setCreateEmailFor(null);
-          }}
-        />
-      )}
     </>
   );
 }

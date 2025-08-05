@@ -33,7 +33,6 @@ interface ColegRowProps {
   setSize: (index: number, size: number) => void;
   pendingPV?: { predate: string[]; primite: string[] };
   onGeneratePV: (colegId: string) => void;
-  setCreateEmail: (c: Angajat) => void;
 }
 
 export default function ColegRow({
@@ -51,7 +50,6 @@ export default function ColegRow({
   setSize,
   pendingPV,
   onGeneratePV,
-  setCreateEmail,
 }: ColegRowProps) {
   const rowRef = useRef<HTMLDivElement>(null);
   const updateAngajat = useUpdateAngajat();
@@ -196,14 +194,6 @@ export default function ColegRow({
                 className="text-primary text-sm hover:underline"
               >
                 Generează PV
-              </button>
-            )}
-            {coleg.emailAccountStatus === 'PENDING' && (
-              <button
-                onClick={() => setCreateEmail(coleg)}
-                className="text-primary text-sm hover:underline"
-              >
-                Marchează cont e-mail creat
               </button>
             )}
             <button
