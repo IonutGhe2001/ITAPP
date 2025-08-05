@@ -8,7 +8,7 @@
     "passwordPlaceholder": "Parolă",
     "passwordRequired": "Introduceți parola",
     "togglePassword": "Afișează/ascunde parola",
-    "errorInvalid": "Email sau parolă incorectă",
+    "errorInvalid": "Date de autentificare invalide",
     "submit": "Autentificare",
     "loading": "Se autentifică..."
   },

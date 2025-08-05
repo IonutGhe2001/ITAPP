@@ -44,5 +44,16 @@ describe('Auth Routes', () => {
       .send({ email: 'wrong@example.com', password: 'bad' });
 
     expect(res.status).toBe(401);
+    expect(res.body).toEqual({ message: 'Date de autentificare invalide' });
+  });
+
+  it('login validation failure returns generic message', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'invalid', password: 'pass' });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toEqual({ message: 'Date de autentificare invalide' });
+    expect(authService.authenticateUser).not.toHaveBeenCalled();
   });
 });

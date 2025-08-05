@@ -8,14 +8,24 @@ import {
 } from "../services/auth.service";
 import { logger } from "@lib/logger";
 import { env } from "../config";
+import { loginSchema } from "../validators/auth.validator";
 
 export const login = async (req: Request, res: Response) => {
   try {
+    const { error } = loginSchema.validate(req.body);
+    if (error) {
+      return res
+        .status(401)
+        .json({ message: "Date de autentificare invalide" });
+    }
+    
     const { email, password } = req.body;
     const token = await authenticateUser(email, password);
 
     if (!token) {
-      return res.status(401).json({ message: "Email sau parolă incorecte" });
+      return res
+        .status(401)
+        .json({ message: "Date de autentificare invalide" });
     }
 
     res.cookie("token", token, {

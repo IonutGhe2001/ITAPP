@@ -8,7 +8,7 @@
     "passwordPlaceholder": "Password",
     "passwordRequired": "Enter your password",
     "togglePassword": "Toggle password visibility",
-    "errorInvalid": "Incorrect email or password",
+    "errorInvalid": "Invalid credentials",
     "submit": "Sign In",
     "loading": "Signing in..."
   },

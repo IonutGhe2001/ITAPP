@@ -7,12 +7,12 @@ import {
   logout,
 } from "../controllers/authController";
 import { validateRequest } from "../middlewares/validateRequest";
-import { loginSchema, registerSchema } from "../validators/auth.validator";
+import { registerSchema } from "../validators/auth.validator";
 import { authenticate, authorizeRoles } from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
-router.post("/login", validateRequest(loginSchema), login);
+router.post("/login", login);
 router.get("/me", authenticate, getMe);
 router.patch("/me", authenticate, updateMe);
 router.post("/logout", authenticate, logout);
