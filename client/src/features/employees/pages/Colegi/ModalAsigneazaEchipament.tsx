@@ -28,6 +28,7 @@ export default function ModalAsigneazaEchipament({
   const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
   const [selectedId, setSelectedId] = useState('');
+  const filterTipNormalized = filterTip?.trim().toLowerCase();
 
   const handleAssign = async () => {
     if (!selectedId) return;
@@ -99,7 +100,11 @@ export default function ModalAsigneazaEchipament({
         >
           <option value="">Selectează echipament în stoc</option>
           {echipamente
-            .filter((e: Echipament) => e.stare === 'in_stoc' && (!filterTip || e.tip === filterTip))
+           .filter(
+              (e: Echipament) =>
+                e.stare === 'in_stoc' &&
+                (!filterTipNormalized || e.tip.trim().toLowerCase() === filterTipNormalized)
+            )
             .map((e: Echipament) => (
               <option key={e.id} value={e.id}>
                 {e.nume} – Serie: {e.serie}

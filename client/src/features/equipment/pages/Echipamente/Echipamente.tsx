@@ -45,12 +45,14 @@ export default function Echipamente() {
     );
   }
 
-  const types = Array.from(new Set(echipamente.map((e) => e.tip))).sort();
+  const types = Array.from(
+    new Set(echipamente.map((e) => e.tip.trim().toLowerCase()))
+  ).sort();
 
   const filtered = echipamente
     .filter((e: Echipament) => {
       if (status && e.stare !== status) return false;
-      if (type && e.tip !== type) return false;
+      if (type && e.tip.trim().toLowerCase() !== type) return false;
 
       const q = search.trim().toLowerCase();
       if (q) {
