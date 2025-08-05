@@ -51,9 +51,12 @@ export const getEchipamente = () => {
   return prisma.echipament.findMany({ include: { angajat: true } });
 };
 
-export const getEchipament = (id: string) => {
-  return prisma.echipament.findUnique({ where: { id }, include: { angajat: true } });
-};
+// Fetch a single equipment entry along with its assigned employee
+export const getEchipament = (id: string) =>
+  prisma.echipament.findUnique({
+    where: { id },
+    include: { angajat: true },
+  });
 
 export const createEchipament = (data: {
   nume: string;
