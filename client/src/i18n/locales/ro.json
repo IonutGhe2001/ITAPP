@@ -1,0 +1,36 @@
+{
+  "login": {
+    "email": "E-Mail",
+    "emailPlaceholder": "exemplu@firma.com",
+    "emailRequired": "Introdu adresa de email",
+    "emailInvalid": "Adresa de email nu este validă",
+    "password": "Parolă",
+    "passwordPlaceholder": "Parolă",
+    "passwordRequired": "Introduceți parola",
+    "togglePassword": "Afișează/ascunde parola",
+    "errorInvalid": "Email sau parolă incorectă",
+    "submit": "Autentificare",
+    "loading": "Se autentifică..."
+  },
+  "profile": {
+    "heading": "Profilul meu",
+    "saveSuccessTitle": "Profil actualizat",
+    "saveSuccessDesc": "Modificările au fost salvate cu succes.",
+    "saveError": "Eroare la salvare:",
+    "saveErrorMessage": "A apărut o eroare la salvarea profilului.",
+    "labels": {
+      "lastName": "Nume",
+      "firstName": "Prenume",
+      "position": "Funcție",
+      "phone": "Telefon",
+      "fullName": "Nume complet",
+      "email": "Email"
+    },
+    "buttons": {
+      "save": "Salvează",
+      "saving": "Se salvează...",
+      "cancel": "Anulează",
+      "edit": "Editează"
+    }
+  }
+}

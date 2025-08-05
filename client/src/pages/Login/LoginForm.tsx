@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import { useAuth } from '@/context/useAuth';
 import { ROUTES } from '@/constants/routes';
@@ -16,6 +17,7 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const auth = useAuth();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,15 +28,15 @@ export default function LoginForm() {
 
     let hasError = false;
     if (!email) {
-      setEmailError('Introdu adresa de email');
+      setEmailError(t('login.emailRequired'));
       hasError = true;
     } else if (!/^\S+@\S+\.\S+$/.test(email)) {
-      setEmailError('Adresa de email nu este validă');
+      setEmailError(t('login.emailInvalid'));
       hasError = true;
     }
 
     if (!parola) {
-      setPasswordError('Introduceți parola');
+      setPasswordError(t('login.passwordRequired'));
       hasError = true;
     }
 
@@ -53,7 +55,7 @@ export default function LoginForm() {
       }
       navigate(ROUTES.DASHBOARD);
     } catch {
-      setError('Email sau parolă incorectă');
+      setError(t('login.errorInvalid'));
     } finally {
       setLoading(false);
     }
@@ -72,7 +74,7 @@ export default function LoginForm() {
 
       <div className="space-y-1">
         <label htmlFor="email" className="text-sm font-medium">
-          E-Mail
+          {t('login.email')}
         </label>
         <input
           id="email"
@@ -82,7 +84,7 @@ export default function LoginForm() {
             setEmail(e.target.value);
             if (emailError) setEmailError('');
           }}
-          placeholder="exemplu@firma.com"
+          placeholder={t('login.emailPlaceholder')}
           autoComplete="email"
           className={`w-full rounded border px-4 py-2 focus:outline-none focus:ring ${emailError ? 'border-red-500' : 'border-gray-300'}`}
         />
@@ -91,7 +93,7 @@ export default function LoginForm() {
 
       <div className="relative space-y-1">
         <label htmlFor="parola" className="text-sm font-medium">
-          Parolă
+          {t('login.password')}
         </label>
         <div className="relative">
           <input
@@ -102,7 +104,7 @@ export default function LoginForm() {
               setParola(e.target.value);
               if (passwordError) setPasswordError('');
             }}
-            placeholder="Parolă"
+            placeholder={t('login.passwordPlaceholder')}
             autoComplete="current-password"
             inputMode="text"
             className={`w-full rounded border px-4 py-2 focus:outline-none focus:ring ${passwordError ? 'border-red-500' : 'border-gray-300'} pr-12`}
@@ -112,7 +114,7 @@ export default function LoginForm() {
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="text-gray-500 hover:text-gray-700"
-              aria-label="Toggle parola vizibilă"
+              aria-label={t('login.togglePassword')}
             >
               {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
@@ -126,7 +128,7 @@ export default function LoginForm() {
         className="w-full rounded-full bg-red-600 py-2 text-white hover:bg-red-700 disabled:opacity-60"
         disabled={loading}
       >
-        {loading ? 'Se autentifică...' : 'Sign In'}
+        {loading ? t('login.loading') : t('login.submit')}
       </button>
     </motion.form>
   );

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Pencil, X } from 'lucide-react';
 import { updateCurrentUser } from '@/services/authService';
+import { useTranslation } from 'react-i18next';
 import { useUser } from '@/context/useUser';
 import type { User } from '@/types/user';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
@@ -15,6 +16,7 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [original, setOriginal] = useState<User | null>(user ?? null);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -50,12 +52,12 @@ export default function ProfilePage() {
       setOriginal(updated);
       setIsEditing(false);
       toast({
-        title: 'Profil actualizat',
-        description: 'Modificările au fost salvate cu succes.',
+        title: t('profile.saveSuccessTitle'),
+        description: t('profile.saveSuccessDesc'),
       });
     } catch (_err) {
-      console.error('Eroare la salvare:', _err);
-      alert('A apărut o eroare la salvarea profilului.');
+      console.error(t('profile.saveError'), _err);
+      alert(t('profile.saveErrorMessage'));
     } finally {
       setIsSaving(false);
     }
@@ -68,7 +70,7 @@ export default function ProfilePage() {
 
   return (
     <Container className="py-10">
-      <h1 className="text-foreground mb-8 text-3xl font-bold">Profilul meu</h1>
+      <h1 className="text-foreground mb-8 text-3xl font-bold">{t('profile.heading')}</h1>
 
       <div className="bg-card flex flex-col items-center gap-6 rounded-2xl p-6 shadow-md">
         <div className="relative">
@@ -118,19 +120,19 @@ export default function ProfilePage() {
         <div className="w-full space-y-4">
           {isEditing ? (
             <>
-              <ProfileInput label="Nume" value={user?.nume} onChange={handleChange('nume')} />
+              <ProfileInput label={t('profile.labels.lastName')} value={user?.nume} onChange={handleChange('nume')} />
               <ProfileInput
-                label="Prenume"
+                label={t('profile.labels.firstName')}
                 value={user?.prenume}
                 onChange={handleChange('prenume')}
               />
               <ProfileInput
-                label="Funcție"
+                label={t('profile.labels.position')}
                 value={user?.functie}
                 onChange={handleChange('functie')}
               />
               <ProfileInput
-                label="Telefon"
+                label={t('profile.labels.phone')}
                 value={user?.telefon || ''}
                 onChange={handleChange('telefon')}
               />
@@ -138,12 +140,12 @@ export default function ProfilePage() {
           ) : (
             <>
               <ProfileField
-                label="Nume complet"
+                label={t('profile.labels.fullName')}
                 value={`${user?.nume ?? ''} ${user?.prenume ?? ''}`}
               />
-              <ProfileField label="Email" value={user?.email} />
-              <ProfileField label="Funcție" value={user?.functie} />
-              <ProfileField label="Telefon" value={user?.telefon || '-'} />
+              <ProfileField label={t('profile.labels.email')} value={user?.email} />
+              <ProfileField label={t('profile.labels.position')} value={user?.functie} />
+              <ProfileField label={t('profile.labels.phone')} value={user?.telefon || '-'} />
             </>
           )}
         </div>
@@ -156,13 +158,13 @@ export default function ProfilePage() {
                 disabled={isSaving}
                 className="bg-primary text-primary-foreground hover:bg-primary/80 rounded-xl px-6 py-2 transition"
               >
-                {isSaving ? 'Se salvează...' : 'Salvează'}
+                {isSaving ? t('profile.buttons.saving') : t('profile.buttons.save')}
               </button>
               <button
                 onClick={handleCancel}
                 className="bg-muted text-foreground hover:bg-muted/70 rounded-xl px-6 py-2 transition"
               >
-                Anulează
+                {t('profile.buttons.cancel')}
               </button>
             </>
           ) : (
@@ -170,7 +172,7 @@ export default function ProfilePage() {
               onClick={() => setIsEditing(true)}
               className="bg-primary text-primary-foreground hover:bg-primary/80 rounded-xl px-6 py-2 transition"
             >
-              Editează
+              {t('profile.buttons.edit')}
             </button>
           )}
         </div>

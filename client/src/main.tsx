@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 import './index.css';
+import './i18n/config';
 import AppRouter from './router';
 import ErrorBoundary from '@components/ErrorBoundary';
 import { ThemeProvider } from '@components/ui/theme-provider';

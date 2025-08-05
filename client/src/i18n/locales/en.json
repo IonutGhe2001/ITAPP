@@ -1,0 +1,36 @@
+{
+  "login": {
+    "email": "E-Mail",
+    "emailPlaceholder": "example@company.com",
+    "emailRequired": "Enter your email address",
+    "emailInvalid": "Email address is not valid",
+    "password": "Password",
+    "passwordPlaceholder": "Password",
+    "passwordRequired": "Enter your password",
+    "togglePassword": "Toggle password visibility",
+    "errorInvalid": "Incorrect email or password",
+    "submit": "Sign In",
+    "loading": "Signing in..."
+  },
+  "profile": {
+    "heading": "My Profile",
+    "saveSuccessTitle": "Profile updated",
+    "saveSuccessDesc": "Changes have been saved successfully.",
+    "saveError": "Save error:",
+    "saveErrorMessage": "An error occurred while saving the profile.",
+    "labels": {
+      "lastName": "Last name",
+      "firstName": "First name",
+      "position": "Position",
+      "phone": "Phone",
+      "fullName": "Full name",
+      "email": "Email"
+    },
+    "buttons": {
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "edit": "Edit"
+    }
+  }
+}
