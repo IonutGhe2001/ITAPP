@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import Header from '../layouts/components/Header';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ROUTES } from '@/constants/routes';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 vi.mock('@/context/useSearch', () => ({
   useSearch: () => ({ query: '', setQuery: vi.fn() }),
@@ -34,16 +35,23 @@ vi.mock('@/services/searchService', () => ({
   useSearchSuggestions: () => ({ data: { echipamente: [], angajati: [] } }),
 }));
 
+vi.mock('@/features/equipment', () => ({
+  useEchipament: (id: string) => ({ data: id ? { nume: 'Laptop Pro' } : undefined }),
+}));
+
 describe('Header', () => {
   beforeEach(() => {
     notificationsMock.length = 0;
   });
 
   it('renders page title based on route', () => {
+    const queryClient = new QueryClient();
     render(
-      <MemoryRouter initialEntries={[ROUTES.COLEGI]}>
-        <Header />
-      </MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={[ROUTES.COLEGI]}>
+          <Header />
+        </MemoryRouter>
+      </QueryClientProvider>
     );
     expect(screen.getByText('Colegi')).toBeInTheDocument();
   });
@@ -57,11 +65,26 @@ describe('Header', () => {
       importance: 'high',
       read: false,
     });
+    const queryClient = new QueryClient();
     const { container } = render(
-      <MemoryRouter>
-        <Header />
-      </MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <Header />
+        </MemoryRouter>
+      </QueryClientProvider>
     );
     expect(container.querySelector('.bg-destructive')).toBeInTheDocument();
+  });
+  
+  it('renders equipment name on detail page', () => {
+    const queryClient = new QueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={[`/echipamente/1`]}>
+          <Header />
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+    expect(screen.getByText('INFO: Laptop Pro')).toBeInTheDocument();
   });
 });

@@ -44,12 +44,10 @@ export default function EquipmentDetail() {
   if (!data) {
     return (
       <Container className="py-6">
-        <div className="flex items-center gap-2 text-xl font-semibold">
-          <Link to={ROUTES.EQUIPMENT}>
+        <Link to={ROUTES.EQUIPMENT} className="flex items-center gap-2 text-xl font-semibold">
             <ArrowLeft className="h-5 w-5" />
+            <span>Înapoi</span>
           </Link>
-          <h1>INFO: {id}</h1>
-        </div>
         <p className="text-muted-foreground text-sm">Echipament negăsit.</p>
       </Container>
     );
@@ -57,9 +55,14 @@ export default function EquipmentDetail() {
 
   return (
     <Container className="space-y-4 py-6">
-      <div>
-        <h1 className="text-2xl font-semibold">{data.nume}</h1>
-        <p className="text-muted-foreground text-sm">Serie: {data.serie}</p>
+      <div className="flex items-center gap-2">
+        <Link to={ROUTES.EQUIPMENT}>
+          <ArrowLeft className="h-5 w-5" />
+        </Link>
+        <div>
+          <h1 className="text-2xl font-semibold">{data.nume}</h1>
+          <p className="text-muted-foreground text-sm">Serie: {data.serie}</p>
+        </div>
       </div>
       <div className="space-y-1 text-sm">
         <p>Tip: {data.tip}</p>

@@ -18,11 +18,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@components/ui/dropdown-menu';
+import { useEchipament } from '@/features/equipment';
 
 export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
-  const title = pageTitles[location.pathname] || 'Pagina';
+  const equipmentDetailMatch = location.pathname.match(/^\/echipamente\/([^/]+)/);
+  const equipmentId = equipmentDetailMatch ? equipmentDetailMatch[1] : null;
+  const { data: equipment } = useEchipament(equipmentId || '');
+  const title = equipmentId
+    ? `INFO: ${equipment?.nume ?? equipmentId}`
+    : pageTitles[location.pathname] || 'Pagina';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
