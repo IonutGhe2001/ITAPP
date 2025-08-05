@@ -7,7 +7,7 @@ export const setDispatchRef = (dispatch: React.Dispatch<Action>) => {
   dispatchRef = dispatch;
 };
 
-export const addToRemoveQueue = (toastId: string) => {
+const addToRemoveQueue = (toastId: string) => {
   if (toastTimeouts.has(toastId)) return;
 
   const timeout = setTimeout(() => {

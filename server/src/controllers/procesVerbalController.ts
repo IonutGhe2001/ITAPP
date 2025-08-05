@@ -11,6 +11,26 @@ import { prisma } from "../lib/prisma";
 import fs from "fs";
 import path from "path";
 
+const saveProcesVerbalPDF = async (
+  procesVerbalId: number,
+  pdfBuffer: Buffer,
+) => {
+  const fileName = `proces-verbal-${procesVerbalId}.pdf`;
+  const filePath = path.join(
+    __dirname,
+    "../../public/procese-verbale",
+    fileName,
+  );
+  fs.writeFileSync(filePath, pdfBuffer);
+
+  await prisma.procesVerbal.update({
+    where: { id: procesVerbalId },
+    data: { documentPath: `/procese-verbale/${fileName}` },
+  });
+
+  return fileName;
+};
+
 export const creareProcesVerbal = async (req: Request, res: Response) => {
   try {
     const {
@@ -53,18 +73,7 @@ export const creareProcesVerbal = async (req: Request, res: Response) => {
       firma: "Creative & Innovative Management SRL",
       digitalSignature: currentUser?.digitalSignature,
     });
-    const fileName = `proces-verbal-${procesVerbal.id}.pdf`;
-    const filePath = path.join(
-      __dirname,
-      "../../public/procese-verbale",
-      fileName
-    );
-    fs.writeFileSync(filePath, pdfBuffer);
-
-    await prisma.procesVerbal.update({
-      where: { id: procesVerbal.id },
-      data: { documentPath: `/procese-verbale/${fileName}` },
-    });
+    const fileName = await saveProcesVerbalPDF(procesVerbal.id, pdfBuffer);
 
     res
       .set({
@@ -100,18 +109,7 @@ export const creareProcesVerbalDinSchimbari = async (
       where: { id: { in: schimbariIds } },
       data: { finalized: true },
     });
-    const fileName = `proces-verbal-${procesVerbalId}.pdf`;
-    const filePath = path.join(
-      __dirname,
-      "../../public/procese-verbale",
-      fileName
-    );
-    fs.writeFileSync(filePath, pdfBuffer);
-
-    await prisma.procesVerbal.update({
-      where: { id: procesVerbalId },
-      data: { documentPath: `/procese-verbale/${fileName}` },
-    });
+    const fileName = await saveProcesVerbalPDF(procesVerbalId, pdfBuffer);
 
     res
       .set({
