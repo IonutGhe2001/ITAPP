@@ -1,12 +1,20 @@
 import { useMemo, useState } from 'react';
 import type { Angajat, Echipament } from '@/features/equipment/types';
 
-export default function useColegiFilter(colegi: (Angajat & { echipamente: Echipament[] })[]) {
+export default function useColegiFilter(
+  colegi: (Angajat & { echipamente: Echipament[] })[],
+) {
   const [search, setSearch] = useState('');
   const [functieFilter, setFunctieFilter] = useState('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  const functii = useMemo(() => Array.from(new Set(colegi.map((c) => c.functie))).sort(), [colegi]);
+  const functii = useMemo(
+    () =>
+      Array.from(new Set(colegi.map((c) => c.functie || '')))
+        .filter(Boolean)
+        .sort(),
+    [colegi],
+  );
 
   const filtered = useMemo(() => {
     return colegi
@@ -14,15 +22,19 @@ export default function useColegiFilter(colegi: (Angajat & { echipamente: Echipa
         if (functieFilter && c.functie !== functieFilter) return false;
         const q = search.trim().toLowerCase();
         if (q) {
-          return c.numeComplet.toLowerCase().includes(q) || c.functie.toLowerCase().includes(q);
+          const nume = (c.numeComplet || '').toLowerCase();
+          const functie = (c.functie || '').toLowerCase();
+          return nume.includes(q) || functie.includes(q);
         }
         return true;
       })
-      .sort((a, b) =>
-        sortOrder === 'asc'
-          ? a.numeComplet.localeCompare(b.numeComplet)
-          : b.numeComplet.localeCompare(a.numeComplet)
-      );
+      .sort((a, b) => {
+        const aName = a.numeComplet || '';
+        const bName = b.numeComplet || '';
+        return sortOrder === 'asc'
+          ? aName.localeCompare(bName)
+          : bName.localeCompare(aName);
+      });
   }, [colegi, functieFilter, search, sortOrder]);
 
   return {
