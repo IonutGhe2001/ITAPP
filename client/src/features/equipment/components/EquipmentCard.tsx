@@ -1,6 +1,5 @@
 import { memo, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { EquipmentIcon } from '@/features/equipment';
 import { ROUTES } from '@/constants/routes';
 import {
   DropdownMenu,
@@ -9,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
-import { EquipmentIcon, EQUIPMENT_STATUS_LABELS } from '@/features/equipment';
+import { EquipmentIcon, EQUIPMENT_STATUS_LABELS, type EquipmentCardProps } from '@/features/equipment';
 
 function EquipmentCard({ echipament, onEdit, onDelete }: EquipmentCardProps) {
   const icon = useMemo(
