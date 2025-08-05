@@ -7,6 +7,7 @@ import Avatar from '@/components/Avatar';
 import { useUser } from '@/context/useUser';
 import { removeToken } from '@/utils/storage';
 import pageTitles from '@/constants/pageTitles';
+import { ROUTES } from '@/constants/routes';
 import MobileSidebar from '@layouts/components/MobileSideBar';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import SearchInput from '@/components/SearchInput';
@@ -29,11 +30,11 @@ export default function Header() {
 
   const handleLogout = () => {
     removeToken();
-    navigate('/login');
+    navigate(ROUTES.LOGIN);
   };
 
   const handleProfile = () => {
-    navigate('/profil');
+    navigate(ROUTES.PROFILE);
   };
 
   return (

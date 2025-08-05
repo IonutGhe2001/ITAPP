@@ -1,10 +1,12 @@
+import { ROUTES } from './routes';
+
 const pageTitles: Record<string, string> = {
-  '/': 'Dashboard',
-  '/echipamente': 'Echipamente',
-  '/colegi': 'Colegi',
-  '/profil': 'Profil',
-  '/search': 'Căutare',
-  '/onboarding': 'Onboarding',
+  [ROUTES.DASHBOARD]: 'Dashboard',
+  [ROUTES.EQUIPMENT]: 'Echipamente',
+  [ROUTES.COLEGI]: 'Colegi',
+  [ROUTES.PROFILE]: 'Profil',
+  [ROUTES.SEARCH]: 'Căutare',
+  [ROUTES.ONBOARDING]: 'Onboarding',
 };
 
 export default pageTitles;

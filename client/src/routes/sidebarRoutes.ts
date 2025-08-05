@@ -1,4 +1,5 @@
 import { Home, Laptop, Users, UserCircle, ClipboardList } from 'lucide-react';
+import { ROUTES } from '@/constants/routes';
 
 export interface SidebarRoute {
   path: string;
@@ -7,9 +8,9 @@ export interface SidebarRoute {
 }
 
 export const sidebarRoutes: SidebarRoute[] = [
-  { path: '/', label: 'Dashboard', icon: Home },
-  { path: '/echipamente', label: 'Echipamente', icon: Laptop },
-  { path: '/onboarding', label: 'Onboarding', icon: ClipboardList },
-  { path: '/colegi', label: 'Colegi', icon: Users },
-  { path: '/profil', label: 'Profil', icon: UserCircle },
+  { path: ROUTES.DASHBOARD, label: 'Dashboard', icon: Home },
+  { path: ROUTES.EQUIPMENT, label: 'Echipamente', icon: Laptop },
+  { path: ROUTES.ONBOARDING, label: 'Onboarding', icon: ClipboardList },
+  { path: ROUTES.COLEGI, label: 'Colegi', icon: Users },
+  { path: ROUTES.PROFILE, label: 'Profil', icon: UserCircle },
 ];

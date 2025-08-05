@@ -16,6 +16,7 @@ import { useTheme } from '@components/ui/theme-provider-utils';
 import { useNavigate } from 'react-router-dom';
 import { useOverviewStats } from '@/services/statsService';
 import { EQUIPMENT_STATUS, EQUIPMENT_STATUS_LABELS } from '@/features/equipment/types';
+import { ROUTES } from '@/constants/routes';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, ChartDataLabels);
 
@@ -38,8 +39,8 @@ export default function OverviewCards() {
     (_event, elements) => {
       if (!elements.length) return;
       const index = elements[0].index;
-      if (index === 0) navigate('/colegi');
-      else navigate('/echipamente');
+      if (index === 0) navigate(ROUTES.COLEGI);
+      else navigate(ROUTES.EQUIPMENT);
     },
     [navigate]
   );

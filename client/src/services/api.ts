@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getToken } from '@/utils/storage';
+import { ROUTES } from '@/constants/routes';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -25,7 +26,7 @@ api.interceptors.response.use(
     const isLoginRequest = requestUrl.includes('/auth/login') || requestUrl.includes('/auth');
 
     if (status === 401 && !isLoginRequest) {
-      window.location.href = '/login';
+      window.location.href = ROUTES.LOGIN;
     }
 
     // 429 — prea multe cereri → tratăm în componentă, nu delogăm

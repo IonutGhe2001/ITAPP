@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import type { JSX } from 'react';
 import { useAuth } from '@/context/useAuth';
+import { ROUTES } from '@/constants/routes';
 
 const LoginPage = lazy(() => import('./pages/Login/Login'));
 const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
@@ -24,7 +25,7 @@ function ProtectedRoute({ children }: { children: JSX.Element }) {
       </div>
     );
   }
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  return isAuthenticated ? children : <Navigate to={ROUTES.LOGIN} />;
 }
 
 export default function AppRouter() {
@@ -38,9 +39,9 @@ export default function AppRouter() {
         }
       >
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          <Route path={ROUTES.LOGIN} element={<LoginPage />} />
           <Route
-            path="/"
+            path={ROUTES.DASHBOARD}
             element={
               <ProtectedRoute>
                 <AppLayout />
@@ -48,12 +49,15 @@ export default function AppRouter() {
             }
           >
             <Route index element={<Dashboard />} />
-            <Route path="echipamente" element={<Echipamente />} />
-            <Route path="colegi" element={<Colegi />} />
-            <Route path="employee-form" element={<EmployeeForm />} />
-            <Route path="profil" element={<ProfilePage />} />
-            <Route path="search" element={<SearchPage />} />
-            <Route path="onboarding" element={<OnboardingPage />} />
+            <Route path={ROUTES.EQUIPMENT.slice(1)} element={<Echipamente />} />
+            <Route path={ROUTES.COLEGI.slice(1)} element={<Colegi />} />
+            <Route
+              path={ROUTES.EMPLOYEE_FORM.slice(1)}
+              element={<EmployeeForm />}
+            />
+            <Route path={ROUTES.PROFILE.slice(1)} element={<ProfilePage />} />
+            <Route path={ROUTES.SEARCH.slice(1)} element={<SearchPage />} />
+            <Route path={ROUTES.ONBOARDING.slice(1)} element={<OnboardingPage />} />
           </Route>
         </Routes>
       </Suspense>

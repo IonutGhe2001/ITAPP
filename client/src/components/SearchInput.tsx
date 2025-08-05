@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSearch } from '@/context/useSearch';
 import { useSearchSuggestions } from '@/services/searchService';
 import { cn } from '@/lib/utils';
+import { ROUTES } from '@/constants/routes';
 
 interface SearchInputProps {
   className?: string;
@@ -27,14 +28,14 @@ export default function SearchInput({ className, onSelect }: SearchInputProps) {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      navigate(`/search?q=${encodeURIComponent(query)}`);
+      navigate(`${ROUTES.SEARCH}?q=${encodeURIComponent(query)}`);
       onSelect?.();
     }
   };
 
   const handleNavigate = (val: string) => {
     setQuery(val);
-    navigate(`/search?q=${encodeURIComponent(val)}`);
+    navigate(`${ROUTES.SEARCH}?q=${encodeURIComponent(val)}`);
     onSelect?.();
   };
 

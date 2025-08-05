@@ -1,0 +1,12 @@
+export const ROUTES = {
+  DASHBOARD: '/',
+  LOGIN: '/login',
+  EQUIPMENT: '/echipamente',
+  ONBOARDING: '/onboarding',
+  COLEGI: '/colegi',
+  EMPLOYEE_FORM: '/employee-form',
+  PROFILE: '/profil',
+  SEARCH: '/search',
+} as const;
+
+export type RoutePath = (typeof ROUTES)[keyof typeof ROUTES];

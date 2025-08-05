@@ -3,12 +3,13 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { MonitorIcon, UsersIcon, UserCircle } from 'lucide-react';
+import { ROUTES } from '@/constants/routes';
 
 const shortcuts = [
   {
     id: 1,
     label: 'Echipamente',
-    route: '/echipamente',
+    route: ROUTES.EQUIPMENT,
     icon: <MonitorIcon className="h-5 w-5 stroke-[1.5]" />,
     color: 'bg-chart-2/10 text-chart-2',
     keybinding: '1',
@@ -16,7 +17,7 @@ const shortcuts = [
   {
     id: 2,
     label: 'Colegi',
-    route: '/colegi',
+    route: ROUTES.COLEGI,
     icon: <UsersIcon className="h-5 w-5 stroke-[1.5]" />,
     color: 'bg-chart-1/10 text-chart-1',
     keybinding: '2',
@@ -24,7 +25,7 @@ const shortcuts = [
   {
     id: 3,
     label: 'Profil',
-    route: '/profil',
+    route: ROUTES.PROFILE,
     icon: <UserCircle className="h-5 w-5 stroke-[1.5]" />,
     color: 'bg-primary/10 text-primary',
     keybinding: '3',

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
 import api from '../../services/api';
 import { useAuth } from '@/context/useAuth';
+import { ROUTES } from '@/constants/routes';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -50,7 +51,7 @@ export default function LoginForm() {
       if (token) {
         auth.login(token);
       }
-      navigate('/');
+      navigate(ROUTES.DASHBOARD);
     } catch {
       setError('Email sau parolă incorectă');
     } finally {

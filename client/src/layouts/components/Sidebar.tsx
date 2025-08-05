@@ -4,6 +4,7 @@ import { LogOut } from 'lucide-react';
 import { useAuth } from '@/context/useAuth';
 import { logout as logoutRequest } from '@/services/authService';
 import { navItemClass } from './NavItemClass';
+import { ROUTES } from '@/constants/routes';
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ export default function Sidebar() {
       // ignore network errors
     }
     auth.logout();
-    navigate('/login');
+    navigate(ROUTES.LOGIN);
   };
 
   return (

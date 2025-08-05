@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Header from '../layouts/components/Header';
 import { vi } from 'vitest';
+import { ROUTES } from '@/constants/routes';
 
 vi.mock('@/context/useSearch', () => ({
   useSearch: () => ({ query: '', setQuery: vi.fn() }),
@@ -40,7 +41,7 @@ describe('Header', () => {
 
   it('renders page title based on route', () => {
     render(
-      <MemoryRouter initialEntries={['/colegi']}>
+      <MemoryRouter initialEntries={[ROUTES.COLEGI]}>
         <Header />
       </MemoryRouter>
     );
