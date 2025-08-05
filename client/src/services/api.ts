@@ -2,8 +2,19 @@ import axios from 'axios';
 import { getToken } from '@/utils/storage';
 import { ROUTES } from '@/constants/routes';
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
+if (!apiUrl) {
+  if (import.meta.env.DEV) {
+    // Allow running without explicit API URL in development
+    console.warn('VITE_API_URL is not defined. Falling back to "/api"');
+  } else {
+    throw new Error('VITE_API_URL is not defined');
+  }
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: apiUrl || '/api',
   withCredentials: true,
 });
 
