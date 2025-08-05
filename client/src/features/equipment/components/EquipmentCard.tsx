@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
-import { EquipmentIcon, EQUIPMENT_STATUS_LABELS, type EquipmentCardProps } from '@/features/equipment';
+import { EquipmentIcon, StatusBadge, type EquipmentCardProps } from '@/features/equipment';
 
 function EquipmentCard({ echipament, onEdit, onDelete }: EquipmentCardProps) {
   const icon = useMemo(
@@ -43,16 +43,15 @@ function EquipmentCard({ echipament, onEdit, onDelete }: EquipmentCardProps) {
         <div className="space-y-1 text-sm">
           <p className="text-foreground font-semibold">{echipament.nume}</p>
           <p className="text-muted-foreground text-xs">Serie: {echipament.serie}</p>
-          <p className="text-muted-foreground text-xs">
-            Stare: {EQUIPMENT_STATUS_LABELS[echipament.stare] ?? echipament.stare}
-          </p>
-        {echipament.angajat && (
+          {echipament.angajat && (
             <p className="text-muted-foreground text-xs">
               Predat la: {echipament.angajat.numeComplet}
             </p>
           )}
         </div>
-
+        <div className="ml-auto">
+          <StatusBadge status={echipament.stare} />
+        </div>
       </Link>
       </div>
   );

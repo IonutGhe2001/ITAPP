@@ -7,7 +7,7 @@ import { BrowserRouter } from 'react-router-dom';
 // Mock nested equipment exports used by EquipmentCard
 vi.mock('@/features/equipment', () => ({
   EquipmentIcon: () => <span data-testid="icon" />,
-  EQUIPMENT_STATUS_LABELS: { in_stoc: 'În stoc', alocat: 'Alocat' },
+  StatusBadge: ({ status }: { status: string }) => <span>{status}</span>,
 }));
 
 // Simplify react-window behavior
