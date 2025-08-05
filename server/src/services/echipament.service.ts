@@ -51,6 +51,10 @@ export const getEchipamente = () => {
   return prisma.echipament.findMany({ include: { angajat: true } });
 };
 
+export const getEchipament = (id: string) => {
+  return prisma.echipament.findUnique({ where: { id }, include: { angajat: true } });
+};
+
 export const createEchipament = (data: {
   nume: string;
   tip: string;

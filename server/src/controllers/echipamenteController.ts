@@ -15,6 +15,24 @@ export const getEchipamente = async (
   }
 };
 
+export const getEchipament = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const echipament = await echipamentService.getEchipament(id);
+    if (!echipament) {
+      res.status(404).json({ message: 'Echipament negăsit' });
+      return;
+    }
+    res.json(echipament);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const createEchipament = async (
   req: Request,
   res: Response,

@@ -15,6 +15,7 @@ router.get("/", controller.getEchipamente);
 router.get("/stats", controller.getStats);
 router.get("/stock", controller.getAvailableStock);
 router.post("/order", authorizeRoles("admin"), controller.orderEchipament);
+router.get("/:id", controller.getEchipament);
 router.post(
   "/",
   authorizeRoles("admin"),

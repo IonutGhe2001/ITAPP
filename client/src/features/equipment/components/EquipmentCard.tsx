@@ -1,61 +1,33 @@
 import { memo, useMemo } from 'react';
-import {
-  EquipmentIcon,
-  StatusBadge,
-  EquipmentActions,
-  useEquipmentCardModals,
-} from '@/features/equipment';
+import { Link } from 'react-router-dom';
+import { EquipmentIcon } from '@/features/equipment';
+import { ROUTES } from '@/constants/routes';
 import type { EquipmentCardProps } from '@/features/equipment/types';
 
-function EquipmentCard({ echipament, onEdit, onDelete, onRefresh }: EquipmentCardProps) {
-  const { openAllocation, openRecupereaza, allocationModal, recupereazaModal } =
-    useEquipmentCardModals({ echipament, onEdit, onRefresh });
+function EquipmentCard({ echipament }: EquipmentCardProps) {
 
   const icon = useMemo(
     () => <EquipmentIcon type={echipament.tip} className="text-primary text-2xl" />,
     [echipament.tip]
   );
-  const sim = (echipament.metadata as any)?.sim as
-    | { operator?: string; serie?: string; expirationDate?: string }
-    | undefined;
 
   return (
-    <div className="bg-card flex items-center justify-between rounded-2xl p-5 shadow-md transition hover:shadow-lg">
-      <div className="flex items-center gap-4">
-        <div>{icon}</div>
-        <div className="space-y-1 text-sm">
-          <p className="text-foreground font-semibold">{echipament.nume}</p>
-          <p className="text-muted-foreground text-xs">Serie: {echipament.serie}</p>
-          <p className="text-muted-foreground text-xs">Tip: {echipament.tip}</p>
-          {sim && (
-            <>
-              <p className="text-muted-foreground text-xs">SIM Operator: {sim.operator}</p>
-              <p className="text-muted-foreground text-xs">SIM Serie: {sim.serie}</p>
-              <p className="text-muted-foreground text-xs">SIM Expiră: {sim.expirationDate}</p>
-            </>
-          )}
-          {echipament.angajat && (
-            <p className="text-muted-foreground text-xs">
-              Predat la: {echipament.angajat.numeComplet}
-            </p>
-          )}
-        </div>
+    <Link
+      to={ROUTES.EQUIPMENT_DETAIL.replace(':id', echipament.id)}
+      className="bg-card flex items-center gap-4 rounded-2xl p-5 shadow-md transition hover:shadow-lg"
+    >
+      <div>{icon}</div>
+      <div className="space-y-1 text-sm">
+        <p className="text-foreground font-semibold">{echipament.nume}</p>
+        <p className="text-muted-foreground text-xs">Serie: {echipament.serie}</p>
+        {echipament.angajat && (
+          <p className="text-muted-foreground text-xs">
+            Predat la: {echipament.angajat.numeComplet}
+          </p>
+        )}
       </div>
 
-      <div className="flex flex-col items-end gap-2">
-        <StatusBadge status={echipament.stare} />
-        <EquipmentActions
-          echipament={echipament}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          onAllocate={openAllocation}
-          onRecupereaza={openRecupereaza}
-        />
-      </div>
-
-      {allocationModal}
-      {recupereazaModal}
-    </div>
+      </Link>
   );
 }
 

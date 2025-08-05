@@ -2,27 +2,20 @@ import { render, screen } from '@testing-library/react';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import EquipmentList from '@/features/equipment/components/EquipmentList';
 import type { Echipament } from '@/features/equipment/types';
+import { BrowserRouter } from 'react-router-dom';
 
 // Mock nested equipment exports used by EquipmentCard
 vi.mock('@/features/equipment', () => ({
-  EquipmentIcon: () => <span data-testid="icon" />, 
-  StatusBadge: () => <span data-testid="status" />, 
-  EquipmentActions: () => <div data-testid="actions" />, 
-  useEquipmentCardModals: () => ({
-    openAllocation: vi.fn(),
-    openRecupereaza: vi.fn(),
-    allocationModal: null,
-    recupereazaModal: null,
-  }),
+  EquipmentIcon: () => <span data-testid="icon" />,
 }));
 
 // Simplify react-window behavior
 vi.mock('react-window', () => ({
   FixedSizeList: ({ itemCount, children }: any) => (
     <div>
-      {Array.from({ length: itemCount }).map((_, index) =>
-        children({ index, style: {} })
-      )}
+      {Array.from({ length: itemCount }).map((_, index) => (
+        <div key={index}>{children({ index, style: {} })}</div>
+      ))}
     </div>
   ),
 }));
@@ -53,16 +46,27 @@ describe('EquipmentList', () => {
         tip: 'laptop',
         serie: '123',
         stare: 'in_stoc',
+        angajat: { id: 'a1', numeComplet: 'Ion Popescu' },
       },
     ];
     render(
-      <EquipmentList echipamente={echipamente} onEdit={vi.fn()} onDelete={vi.fn()} />
+      <BrowserRouter>
+        <EquipmentList echipamente={echipamente} onEdit={vi.fn()} onDelete={vi.fn()} />
+      </BrowserRouter>
     );
     expect(screen.getByText('Laptop')).toBeInTheDocument();
+    expect(screen.getByText('Serie: 123')).toBeInTheDocument();
+    expect(screen.getByText('Predat la: Ion Popescu')).toBeInTheDocument();
+    const link = screen.getByRole('link');
+    expect(link).toHaveAttribute('href', '/echipamente/1');
   });
 
   it('shows empty message when no data', () => {
-    render(<EquipmentList echipamente={[]} onEdit={vi.fn()} onDelete={vi.fn()} />);
+    render(
+      <BrowserRouter>
+        <EquipmentList echipamente={[]} onEdit={vi.fn()} onDelete={vi.fn()} />
+      </BrowserRouter>
+    );
     expect(
       screen.getByText('Nu există echipamente înregistrate.')
     ).toBeInTheDocument();

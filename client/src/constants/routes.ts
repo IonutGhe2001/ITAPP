@@ -2,6 +2,7 @@ export const ROUTES = {
   DASHBOARD: '/',
   LOGIN: '/login',
   EQUIPMENT: '/echipamente',
+  EQUIPMENT_DETAIL: '/echipamente/:id',
   ONBOARDING: '/onboarding',
   COLEGI: '/colegi',
   EMPLOYEE_FORM: '/employee-form',

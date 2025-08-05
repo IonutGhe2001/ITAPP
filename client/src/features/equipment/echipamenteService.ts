@@ -26,6 +26,14 @@ export const useEchipamente = () => {
   return query;
 };
 
+export const useEchipament = (id: string) => {
+  return useQuery<Echipament, Error>({
+    queryKey: [...QUERY_KEYS.EQUIPMENT, id],
+    queryFn: () => http.get<Echipament>(`/echipamente/${id}`),
+    enabled: !!id,
+  });
+};
+
 export const useCreateEchipament = () => {
   const queryClient = useQueryClient();
   return useMutation({
