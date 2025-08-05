@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import Colegi from '../features/employees/pages/Colegi/Colegi';
 import ColegRow from '../features/employees/pages/Colegi/ColegRow';
 import ModalCreateEmail from '../features/employees/pages/Colegi/ModalCreateEmail';

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Header from '../layouts/components/Header';
-import { vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ROUTES } from '@/constants/routes';
 
 vi.mock('@/context/useSearch', () => ({

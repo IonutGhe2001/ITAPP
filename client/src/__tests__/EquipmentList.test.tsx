@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
-import { vi } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import EquipmentList from '@/features/equipment/components/EquipmentList';
+import type { Echipament } from '@/features/equipment/types';
 
 // Mock nested equipment exports used by EquipmentCard
 vi.mock('@/features/equipment', () => ({
@@ -45,8 +46,14 @@ describe('EquipmentList', () => {
   });
 
   it('renders equipment items', () => {
-    const echipamente = [
-      { id: '1', nume: 'Laptop', tip: 'laptop', serie: '123', stare: 'in_stoc' },
+    const echipamente: Echipament[] = [
+      {
+        id: '1',
+        nume: 'Laptop',
+        tip: 'laptop',
+        serie: '123',
+        stare: 'in_stoc',
+      },
     ];
     render(
       <EquipmentList echipamente={echipamente} onEdit={vi.fn()} onDelete={vi.fn()} />
