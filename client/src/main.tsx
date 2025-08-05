@@ -5,11 +5,9 @@ import './index.css';
 import AppRouter from './router';
 import ErrorBoundary from '@components/ErrorBoundary';
 import { ThemeProvider } from '@components/ui/theme-provider';
-import { ToastProvider } from '@components/ToastProvider';
 import { Toaster } from '@components/ui/toaster';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from '@/context/AuthProvider';
-import { NotificationsProvider } from '@/context/NotificationsProvider';
+import { Providers } from '@/context/Providers';
 
 const queryClient = new QueryClient();
 registerSW();
@@ -17,18 +15,14 @@ registerSW();
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
+      <Providers>
         <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-          <ToastProvider>
-            <NotificationsProvider>
-              <ErrorBoundary>
-                <AppRouter />
-              </ErrorBoundary>
-              <Toaster />
-            </NotificationsProvider>
-          </ToastProvider>
+          <ErrorBoundary>
+            <AppRouter />
+          </ErrorBoundary>
+          <Toaster />
         </ThemeProvider>
-      </AuthProvider>
+      </Providers>
     </QueryClientProvider>
   </StrictMode>
 );

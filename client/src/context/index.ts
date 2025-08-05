@@ -6,3 +6,4 @@ export { UserProvider } from './UserProvider';
 export { useUser } from './useUser';
 export { NotificationsProvider } from './NotificationsProvider';
 export { useNotifications } from './useNotifications';
+export { Providers } from './Providers';

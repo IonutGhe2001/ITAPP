@@ -1,4 +1,4 @@
-import { useState, memo } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   Select,
@@ -14,6 +14,11 @@ import type { ModalPredaEchipamentProps, Angajat } from '@/features/equipment/ty
 function ModalPredaEchipament({ echipament, onClose, onSubmit }: ModalPredaEchipamentProps) {
   const { data: angajati = [] } = useAngajati();
   const [angajatId, setAngajatId] = useState<string>('');
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    triggerRef.current?.focus();
+  }, []);
 
   const handleSubmit = () => {
     if (!angajatId) return alert('Selectează un angajat!');
@@ -30,7 +35,7 @@ function ModalPredaEchipament({ echipament, onClose, onSubmit }: ModalPredaEchip
         </DialogHeader>
         <div className="space-y-4">
           <Select value={angajatId} onValueChange={(val) => setAngajatId(val)}>
-            <SelectTrigger>
+            <SelectTrigger ref={triggerRef} aria-label="Selectează angajatul">
               <SelectValue placeholder="Selectează angajatul" />
             </SelectTrigger>
             <SelectContent>

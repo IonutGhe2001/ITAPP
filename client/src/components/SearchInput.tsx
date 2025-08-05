@@ -45,6 +45,14 @@ export default function SearchInput({ className, onSelect }: SearchInputProps) {
       <input
         type="text"
         placeholder="Caută..."
+        role="combobox"
+        aria-autocomplete="list"
+        aria-label="Caută"
+        aria-expanded={suggestions.length > 0}
+        aria-controls="search-suggestions"
+        aria-activedescendant={
+          activeIndex >= 0 ? `search-suggestion-${activeIndex}` : undefined
+        }
         className="bg-muted text-foreground border-border focus:ring-primary w-full rounded-md border py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2"
         value={query}
         onChange={(e) => {
@@ -68,11 +76,19 @@ export default function SearchInput({ className, onSelect }: SearchInputProps) {
         }}
       />
       {suggestions.length > 0 && (
-        <ul className="bg-background border-border absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-y-auto rounded-md border shadow">
+        <ul
+          id="search-suggestions"
+          role="listbox"
+          className="bg-background border-border absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-y-auto rounded-md border shadow"
+        >
           {suggestions.map((s, idx) => (
             <li
               key={idx}
               className={cn('cursor-pointer px-3 py-1 text-sm', idx === activeIndex && 'bg-muted')}
+              id={`search-suggestion-${idx}`}
+              role="option"
+              aria-selected={idx === activeIndex}
+              tabIndex={-1}
               onMouseDown={(e) => {
                 e.preventDefault();
                 handleNavigate(s);
