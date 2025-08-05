@@ -63,6 +63,32 @@ export default function EchipamentForm({
         />
         {errors.tip && <p className="text-sm text-red-500">{errors.tip}</p>}
       </div>
+      {formData.tip.toLowerCase() === 'telefon' && (
+        <>
+          <div>
+            <Label>Operator SIM</Label>
+            <Input
+              value={formData.simOperator}
+              onChange={(e) => setFormData({ ...formData, simOperator: e.target.value })}
+            />
+          </div>
+          <div>
+            <Label>Seria SIM</Label>
+            <Input
+              value={formData.simSerie}
+              onChange={(e) => setFormData({ ...formData, simSerie: e.target.value })}
+            />
+          </div>
+          <div>
+            <Label>Data expirare SIM</Label>
+            <Input
+              type="date"
+              value={formData.simExpirare}
+              onChange={(e) => setFormData({ ...formData, simExpirare: e.target.value })}
+            />
+          </div>
+        </>
+      )}
       <div>
         <Label>Detalii (opțional)</Label>
         <textarea

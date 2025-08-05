@@ -15,6 +15,9 @@ function EquipmentCard({ echipament, onEdit, onDelete, onRefresh }: EquipmentCar
     () => <EquipmentIcon type={echipament.tip} className="text-primary text-2xl" />,
     [echipament.tip]
   );
+  const sim = (echipament.metadata as any)?.sim as
+    | { operator?: string; serie?: string; expirationDate?: string }
+    | undefined;
 
   return (
     <div className="bg-card flex items-center justify-between rounded-2xl p-5 shadow-md transition hover:shadow-lg">
@@ -24,6 +27,13 @@ function EquipmentCard({ echipament, onEdit, onDelete, onRefresh }: EquipmentCar
           <p className="text-foreground font-semibold">{echipament.nume}</p>
           <p className="text-muted-foreground text-xs">Serie: {echipament.serie}</p>
           <p className="text-muted-foreground text-xs">Tip: {echipament.tip}</p>
+          {sim && (
+            <>
+              <p className="text-muted-foreground text-xs">SIM Operator: {sim.operator}</p>
+              <p className="text-muted-foreground text-xs">SIM Serie: {sim.serie}</p>
+              <p className="text-muted-foreground text-xs">SIM Expiră: {sim.expirationDate}</p>
+            </>
+          )}
           {echipament.angajat && (
             <p className="text-muted-foreground text-xs">
               Predat la: {echipament.angajat.numeComplet}

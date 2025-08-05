@@ -6,6 +6,9 @@ export interface EchipamentFormData {
   tip: string;
   angajatId: string;
   metadata: string;
+  simOperator: string;
+  simSerie: string;
+  simExpirare: string;
 }
 
 export function useEchipamentForm(initial?: Partial<EchipamentFormData>) {
@@ -15,7 +18,9 @@ export function useEchipamentForm(initial?: Partial<EchipamentFormData>) {
     tip: '',
     angajatId: 'none',
     metadata: '',
-    ...initial,
+    simOperator: '',
+    simSerie: '',
+    simExpirare: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [search, setSearch] = useState('');
@@ -23,12 +28,40 @@ export function useEchipamentForm(initial?: Partial<EchipamentFormData>) {
 
   useEffect(() => {
     if (initial) {
+      let metadataStr = '';
+      let simOperator = '';
+      let simSerie = '';
+      let simExpirare = '';
+      if (initial.metadata) {
+        let metaObj: any = {};
+        if (typeof initial.metadata === 'string') {
+          try {
+            metaObj = JSON.parse(initial.metadata);
+          } catch {
+            metadataStr = initial.metadata;
+          }
+        } else if (typeof initial.metadata === 'object') {
+          metaObj = initial.metadata as any;
+        }
+        if (metaObj && metaObj.sim) {
+          simOperator = metaObj.sim.operator ?? '';
+          simSerie = metaObj.sim.serie ?? '';
+          simExpirare = metaObj.sim.expirationDate ?? '';
+          delete metaObj.sim;
+        }
+        if (!metadataStr && metaObj && Object.keys(metaObj).length > 0) {
+          metadataStr = JSON.stringify(metaObj);
+        }
+      }
       setFormData({
         nume: initial.nume ?? '',
         serie: initial.serie ?? '',
         tip: initial.tip ?? '',
         angajatId: initial.angajatId ?? 'none',
-        metadata: initial.metadata ?? '',
+        metadata: metadataStr,
+        simOperator,
+        simSerie,
+        simExpirare,
       });
     }
   }, [initial]);
@@ -43,13 +76,26 @@ export function useEchipamentForm(initial?: Partial<EchipamentFormData>) {
   };
 
   const buildPayload = () => {
-    let metadata: unknown = undefined;
+    let metadata: any = {};
     if (formData.metadata.trim()) {
       try {
         metadata = JSON.parse(formData.metadata);
       } catch {
-        metadata = formData.metadata;
+        metadata.extra = formData.metadata;
       }
+    }
+    if (
+      formData.tip.trim().toLowerCase() === 'telefon' &&
+      (formData.simOperator || formData.simSerie || formData.simExpirare)
+    ) {
+      metadata.sim = {
+        operator: formData.simOperator.trim(),
+        serie: formData.simSerie.trim(),
+        expirationDate: formData.simExpirare.trim(),
+      };
+    }
+    if (Object.keys(metadata).length === 0) {
+      metadata = undefined;
     }
     return {
       nume: formData.nume.trim(),
