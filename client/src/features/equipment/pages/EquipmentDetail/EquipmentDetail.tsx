@@ -25,7 +25,7 @@ export default function EquipmentDetail() {
         <Link to={ROUTES.EQUIPMENT}>
           <ArrowLeft className="h-5 w-5" />
         </Link>
-        <h1>INFO: {data.nume}</h1>
+        <h1>INFO: {id}</h1>
       </div>
         <p className="text-muted-foreground text-sm">Echipament negăsit.</p>
       </Container>
