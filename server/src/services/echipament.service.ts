@@ -52,11 +52,46 @@ export const getEchipamente = () => {
 };
 
 // Fetch a single equipment entry along with its assigned employee
-export const getEchipament = (id: string) =>
-  prisma.echipament.findUnique({
+export const getEchipament = async (id: string) => {
+  const echipament = await prisma.echipament.findUnique({
     where: { id },
     include: { angajat: true, documents: true, images: true },
   });
+
+  if (!echipament) return echipament;
+
+  const now = new Date();
+  const meta: {
+    warrantyDaysLeft?: number;
+    warrantyExpired?: boolean;
+    ageYears?: number;
+    defectDays?: number;
+  } = {};
+
+  if (echipament.garantie) {
+    const garantieDate = new Date(echipament.garantie);
+    meta.warrantyDaysLeft = Math.ceil(
+      (garantieDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    meta.warrantyExpired = meta.warrantyDaysLeft < 0;
+  }
+
+  if (echipament.dataAchizitie) {
+    const achizitieDate = new Date(echipament.dataAchizitie);
+    meta.ageYears = Math.floor(
+      (now.getTime() - achizitieDate.getTime()) / (1000 * 60 * 60 * 24 * 365)
+    );
+  }
+
+  if (echipament.stare === EQUIPMENT_STATUS.MENTENANTA) {
+    const defectDate = echipament.createdAt;
+    meta.defectDays = Math.floor(
+      (now.getTime() - defectDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+  }
+
+  return { ...echipament, meta };
+};
 
 export const createEchipament = (data: {
   nume: string;

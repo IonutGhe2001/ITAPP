@@ -1,10 +1,11 @@
-import { Fragment, useRef, useState } from 'react';
+import { Fragment, useRef, useState, type JSX } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, Clock } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import Container from '@/components/Container';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   useEchipament,
   EQUIPMENT_STATUS_LABELS,
@@ -19,6 +20,9 @@ import http from '@/services/http';
 import { QRCodeCanvas } from 'qrcode.react';
 import type { Echipament } from '@/features/equipment';
 const apiBase = (import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '');
+const AGE_WARNING_YEARS = 3;
+const WARRANTY_SOON_DAYS = 30;
+const DEFECT_WARNING_DAYS = 30;
 
 type EquipmentChange = {
   id: string;
@@ -178,10 +182,46 @@ export default function EquipmentDetail() {
     { key: 'Garanție', value: dedicated.garantie },
   ].filter((e) => e.value);
 
+  const meta = data.meta || {};
+  const alerts: JSX.Element[] = [];
+
+  if (meta.ageYears !== undefined && meta.ageYears >= AGE_WARNING_YEARS) {
+    alerts.push(
+      <Badge variant="destructive" className="flex items-center gap-1" key="age">
+        <Clock className="h-3 w-3" /> Vechime {meta.ageYears} ani
+      </Badge>
+    );
+  }
+
+  if (meta.warrantyDaysLeft !== undefined) {
+    if (meta.warrantyDaysLeft <= 0) {
+      alerts.push(
+        <Badge variant="destructive" className="flex items-center gap-1" key="warranty">
+          <AlertTriangle className="h-3 w-3" /> Garanție expirată
+        </Badge>
+      );
+    } else if (meta.warrantyDaysLeft <= WARRANTY_SOON_DAYS) {
+      alerts.push(
+        <Badge variant="secondary" className="flex items-center gap-1" key="warranty-soon">
+          <Clock className="h-3 w-3" /> Garanția expiră în {meta.warrantyDaysLeft} zile
+        </Badge>
+      );
+    }
+  }
+
+  if (meta.defectDays !== undefined && data.stare === 'mentenanta') {
+    const variant = meta.defectDays > DEFECT_WARNING_DAYS ? 'destructive' : 'secondary';
+    alerts.push(
+      <Badge variant={variant} className="flex items-center gap-1" key="defect">
+        <AlertTriangle className="h-3 w-3" /> Defect de {meta.defectDays} zile
+      </Badge>
+    );
+  }
+
   return (
     <>
       <Container className="space-y-4 py-6">
-<div className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <Link to={ROUTES.EQUIPMENT}>
             <ArrowLeft className="h-5 w-5" />
           </Link>
@@ -190,12 +230,13 @@ export default function EquipmentDetail() {
             <p className="text-muted-foreground text-sm">Serie: {data.serie}</p>
           </div>
         </div>
-      <div className="space-y-1 text-sm">
+        <div className="space-y-1 text-sm">
           <p>Tip: {data.tip}</p>
           <p>Stare: {EQUIPMENT_STATUS_LABELS[data.stare] ?? data.stare}</p>
           {data.angajat && <p>Predat la: {data.angajat.numeComplet}</p>}
         </div>
-      <div className="flex flex-wrap gap-2 pt-2">
+      {alerts.length > 0 && <div className="flex flex-wrap gap-2 pt-2">{alerts}</div>}
+        <div className="flex flex-wrap gap-2 pt-2">
           <Button onClick={() => setShowEdit(true)}>Editează</Button>
           <Button variant="outline" onClick={() => setShowReassign(true)}>
             Reasignare
@@ -207,7 +248,7 @@ export default function EquipmentDetail() {
             <Link to={ROUTES.EMPLOYEE_FORM}>Generare fișă</Link>
           </Button>
         </div>
-      {data.images && data.images.length > 0 ? (
+        {data.images && data.images.length > 0 ? (
           <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
             {data.images.map((img) => (
               <img
@@ -218,7 +259,7 @@ export default function EquipmentDetail() {
               />
             ))}
           </div>
-          ) : (
+        ) : (
           <p className="text-muted-foreground text-sm">Nu există imagini disponibile.</p>
         )}
         {dedicatedEntries.length > 0 && (
@@ -287,7 +328,7 @@ export default function EquipmentDetail() {
             </div>
           </Card>
         </div>
-      {history.length > 0 && (
+       {history.length > 0 && (
           <div>
             <h2 className="mb-2 font-medium">Istoric</h2>
             <Card className="p-4">

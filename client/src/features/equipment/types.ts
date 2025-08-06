@@ -51,6 +51,12 @@ export interface Echipament {
   metadata?: Record<string, unknown>;
   documents?: EquipmentDocument[];
   images?: EquipmentImage[];
+  meta?: {
+    warrantyDaysLeft?: number;
+    warrantyExpired?: boolean;
+    ageYears?: number;
+    defectDays?: number;
+  };
 }
 
 export interface EchipamentInput {
