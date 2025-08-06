@@ -82,11 +82,12 @@ export default function EquipmentDetail() {
       http.get<EquipmentChange[]>(
         `/equipment-changes/history/${id}?skip=${pageParam}&take=${PAGE_SIZE}`
       ),
+      initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length < PAGE_SIZE ? undefined : allPages.length * PAGE_SIZE,
     enabled: !!id,
   });
-  const history = historyPages?.pages.flat() ?? [];
+  const history: EquipmentChange[] = historyPages?.pages.flat() ?? [];
 
   const qrRef = useRef<HTMLDivElement>(null);
   const handleReassignSubmit = async (eq: Echipament) => {
