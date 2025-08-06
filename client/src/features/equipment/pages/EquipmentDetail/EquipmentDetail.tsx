@@ -71,9 +71,7 @@ export default function EquipmentDetail() {
   });
 
   const qrRef = useRef<HTMLDivElement>(null);
-
-  const handleDownload = () => {
-    const handleReassignSubmit = async (eq: Echipament) => {
+  const handleReassignSubmit = async (eq: Echipament) => {
     await updateMutation.mutateAsync({
       id: eq.id,
       data: { angajatId: eq.angajatId, stare: eq.stare },
@@ -88,7 +86,7 @@ export default function EquipmentDetail() {
     setConfirmDefect(false);
     refetch();
   };
-
+  const handleDownload = () => {
     const canvas = qrRef.current?.querySelector('canvas');
     if (!canvas) return;
     const url = canvas.toDataURL('image/png');
@@ -123,7 +121,7 @@ export default function EquipmentDetail() {
     return (
       <Container className="py-6">
         <Link to={ROUTES.EQUIPMENT} className="flex items-center gap-2 text-xl font-semibold">
-            <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-5 w-5" />
           <span>Înapoi</span>
         </Link>
         <p className="text-muted-foreground text-sm">Echipament negăsit.</p>
@@ -183,133 +181,133 @@ export default function EquipmentDetail() {
   return (
     <>
       <Container className="space-y-4 py-6">
-      <div className="flex items-center gap-2">
-        <Link to={ROUTES.EQUIPMENT}>
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-        <div>
-          <h1 className="text-2xl font-semibold">{data.nume}</h1>
-          <p className="text-muted-foreground text-sm">Serie: {data.serie}</p>
+<div className="flex items-center gap-2">
+          <Link to={ROUTES.EQUIPMENT}>
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+          <div>
+            <h1 className="text-2xl font-semibold">{data.nume}</h1>
+            <p className="text-muted-foreground text-sm">Serie: {data.serie}</p>
+          </div>
         </div>
-      </div>
       <div className="space-y-1 text-sm">
-        <p>Tip: {data.tip}</p>
-        <p>Stare: {EQUIPMENT_STATUS_LABELS[data.stare] ?? data.stare}</p>
-        {data.angajat && <p>Predat la: {data.angajat.numeComplet}</p>}
-      </div>
+          <p>Tip: {data.tip}</p>
+          <p>Stare: {EQUIPMENT_STATUS_LABELS[data.stare] ?? data.stare}</p>
+          {data.angajat && <p>Predat la: {data.angajat.numeComplet}</p>}
+        </div>
       <div className="flex flex-wrap gap-2 pt-2">
-        <Button onClick={() => setShowEdit(true)}>Editează</Button>
-        <Button variant="outline" onClick={() => setShowReassign(true)}>
-          Reasignare
-        </Button>
-        <Button variant="destructive" onClick={() => setConfirmDefect(true)}>
-          Marcare defect
-        </Button>
-        <Button asChild variant="secondary">
-          <Link to={ROUTES.EMPLOYEE_FORM}>Generare fișă</Link>
-        </Button>
-      </div>
+          <Button onClick={() => setShowEdit(true)}>Editează</Button>
+          <Button variant="outline" onClick={() => setShowReassign(true)}>
+            Reasignare
+          </Button>
+          <Button variant="destructive" onClick={() => setConfirmDefect(true)}>
+            Marcare defect
+          </Button>
+          <Button asChild variant="secondary">
+            <Link to={ROUTES.EMPLOYEE_FORM}>Generare fișă</Link>
+          </Button>
+        </div>
       {data.images && data.images.length > 0 ? (
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
-          {data.images.map((img) => (
-            <img
-              key={img.id}
-              src={`${apiBase}${img.url}`}
-              alt={data.nume}
-              className="h-40 w-full rounded object-cover"
-            />
-          ))}
-        </div>
-      ) : (
-        <p className="text-muted-foreground text-sm">Nu există imagini disponibile.</p>
-      )}
-      {dedicatedEntries.length > 0 && (
+          <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+            {data.images.map((img) => (
+              <img
+                key={img.id}
+                src={`${apiBase}${img.url}`}
+                alt={data.nume}
+                className="h-40 w-full rounded object-cover"
+              />
+            ))}
+          </div>
+          ) : (
+          <p className="text-muted-foreground text-sm">Nu există imagini disponibile.</p>
+        )}
+        {dedicatedEntries.length > 0 && (
+          <div>
+            <h2 className="mb-2 font-medium">Detalii</h2>
+            <Card className="p-4">
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                {dedicatedEntries.map(({ key, value }) => (
+                  <Fragment key={key}>
+                    <span className="font-medium">{key}</span>
+                    <span className="text-muted-foreground">{String(value)}</span>
+                  </Fragment>
+                ))}
+              </div>
+            </Card>
+          </div>
+        )}
+        {Object.keys(remainingMetadata).length > 0 && (
+          <div>
+            <h2 className="mb-2 font-medium">Metadata</h2>
+            <Card className="p-4">
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                {flattenMetadata(remainingMetadata).map(([key, value]) => (
+                  <Fragment key={key}>
+                    <span className="font-medium">{key}</span>
+                    <span className="text-muted-foreground">{value}</span>
+                  </Fragment>
+                ))}
+              </div>
+            </Card>
+          </div>
+        )}
+        {data.documents && data.documents.length > 0 && (
+          <div>
+            <h2 className="mb-2 font-medium">Documente</h2>
+            <Card className="p-4">
+              <ul className="space-y-2 text-sm">
+                {data.documents.map((doc) => (
+                  <li key={doc.id} className="flex justify-between">
+                    <span>{doc.name}</span>
+                    <a
+                      href={`${apiBase}${doc.path}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary underline"
+                    >
+                      Vezi
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          </div>
+        )}
         <div>
-          <h2 className="mb-2 font-medium">Detalii</h2>
-          <Card className="p-4">
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              {dedicatedEntries.map(({ key, value }) => (
-                <Fragment key={key}>
-                  <span className="font-medium">{key}</span>
-                  <span className="text-muted-foreground">{String(value)}</span>
-                </Fragment>
-              ))}
+          <h2 className="mb-2 font-medium">Cod QR</h2>
+          <Card className="flex flex-col items-center gap-4 p-4">
+            <div ref={qrRef}>
+              <QRCodeCanvas value={window.location.href} size={128} />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleDownload}>Descarcă</Button>
+              <Button variant="outline" onClick={handlePrint}>
+                Printează
+              </Button>
             </div>
           </Card>
         </div>
-      )}
-      {Object.keys(remainingMetadata).length > 0 && (
-        <div>
-          <h2 className="mb-2 font-medium">Metadata</h2>
-          <Card className="p-4">
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              {flattenMetadata(remainingMetadata).map(([key, value]) => (
-                <Fragment key={key}>
-                  <span className="font-medium">{key}</span>
-                  <span className="text-muted-foreground">{value}</span>
-                </Fragment>
-              ))}
-            </div>
-          </Card>
-        </div>
-      )}
-      {data.documents && data.documents.length > 0 && (
-        <div>
-          <h2 className="mb-2 font-medium">Documente</h2>
-          <Card className="p-4">
-            <ul className="space-y-2 text-sm">
-              {data.documents.map((doc) => (
-                <li key={doc.id} className="flex justify-between">
-                  <span>{doc.name}</span>
-                  <a
-                    href={`${apiBase}${doc.path}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary underline"
-                  >
-                    Vezi
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </Card>
-        </div>
-      )}
-      <div>
-        <h2 className="mb-2 font-medium">Cod QR</h2>
-        <Card className="flex flex-col items-center gap-4 p-4">
-          <div ref={qrRef}>
-            <QRCodeCanvas value={window.location.href} size={128} />
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={handleDownload}>Descarcă</Button>
-            <Button variant="outline" onClick={handlePrint}>
-              Printează
-            </Button>
-          </div>
-        </Card>
-      </div>
       {history.length > 0 && (
-        <div>
-          <h2 className="mb-2 font-medium">Istoric</h2>
-          <Card className="p-4">
-            <ul className="space-y-2 text-sm">
-              {history.map((item) => (
-                <li key={item.id} className="flex justify-between">
-                  <span>
-                    {EQUIPMENT_CHANGE_LABELS[item.tip]}
-                    {item.angajat?.numeComplet && ` - ${item.angajat.numeComplet}`}
-                  </span>
-                  <span className="text-muted-foreground">
-                    {new Date(item.createdAt).toLocaleString('ro-RO')}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </Card>
-        </div>
-      )}
-    </Container>
+          <div>
+            <h2 className="mb-2 font-medium">Istoric</h2>
+            <Card className="p-4">
+              <ul className="space-y-2 text-sm">
+                {history.map((item) => (
+                  <li key={item.id} className="flex justify-between">
+                    <span>
+                      {EQUIPMENT_CHANGE_LABELS[item.tip]}
+                      {item.angajat?.numeComplet && ` - ${item.angajat.numeComplet}`}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {new Date(item.createdAt).toLocaleString('ro-RO')}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          </div>
+        )}
+      </Container>
       {showEdit && (
         <ModalEditEchipament
           echipament={data}
