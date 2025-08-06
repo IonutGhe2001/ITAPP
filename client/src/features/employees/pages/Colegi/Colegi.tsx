@@ -54,14 +54,6 @@ export default function Colegi() {
     setPendingPV(grouped);
   }, []);
 
-  if (isLoading && colegi.length === 0) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="border-primary h-10 w-10 animate-spin rounded-full border-4 border-t-transparent"></div>
-      </div>
-    );
-  }
-  
   const addPendingPV = (colegId: string, change: { predate?: string[]; primite?: string[] }) => {
     setPendingPV((prev) => {
       const current = prev[colegId] || { predate: [], primite: [] };
@@ -199,6 +191,14 @@ export default function Colegi() {
     }
   };
 
+  if (isLoading && colegi.length === 0) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="border-primary h-10 w-10 animate-spin rounded-full border-4 border-t-transparent"></div>
+      </div>
+    );
+  }
+  
   const handleScrollToPending = () => {
     const firstId = Object.keys(pendingPV)[0];
     if (!firstId) return;
