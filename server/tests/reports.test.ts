@@ -39,9 +39,11 @@ afterEach(() => {
 
 describe('Reports Routes', () => {
   it('returns equipment report json', async () => {
-    (reportService.getEquipmentReport as jest.Mock).mockResolvedValue([
-      { type: 'allocated', count: 1 },
-    ]);
+    (
+      reportService.getEquipmentReport as jest.MockedFunction<
+        (...args: any[]) => Promise<any>
+      >
+    ).mockResolvedValue([{ type: 'allocated', count: 1 }]);
     const res = await request(app)
       .get('/api/reports/equipment')
       .set('Authorization', `Bearer ${token}`);
@@ -50,9 +52,11 @@ describe('Reports Routes', () => {
   });
 
   it('returns equipment report csv', async () => {
-    (reportService.getEquipmentReport as jest.Mock).mockResolvedValue([
-      { type: 'allocated', count: 1 },
-    ]);
+    (
+      reportService.getEquipmentReport as jest.MockedFunction<
+        (...args: any[]) => Promise<any>
+      >
+    ).mockResolvedValue([{ type: 'allocated', count: 1 }]);
     const res = await request(app)
       .get('/api/reports/equipment?format=csv')
       .set('Authorization', `Bearer ${token}`);
@@ -61,9 +65,11 @@ describe('Reports Routes', () => {
   });
 
   it('returns onboarding report json', async () => {
-    (reportService.getOnboardingReport as jest.Mock).mockResolvedValue([
-      { status: 'in_progress', count: 1 },
-    ]);
+    (
+      reportService.getOnboardingReport as jest.MockedFunction<
+        (...args: any[]) => Promise<any>
+      >
+    ).mockResolvedValue([{ status: 'in_progress', count: 1 }]);
     const res = await request(app)
       .get('/api/reports/onboarding')
       .set('Authorization', `Bearer ${token}`);

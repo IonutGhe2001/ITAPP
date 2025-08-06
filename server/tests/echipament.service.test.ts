@@ -4,9 +4,9 @@ import { creeazaProcesVerbalCuEchipamente } from '../src/services/procesVerbal.s
 
 const tx = {
   echipament: {
-    findUnique: jest.fn(),
-    findFirst: jest.fn(),
-    update: jest.fn(),
+    findUnique: jest.fn<(...args: any[]) => Promise<any>>(),
+    findFirst: jest.fn<(...args: any[]) => Promise<any>>(),
+    update: jest.fn<(...args: any[]) => Promise<any>>(),
   },
 };
 

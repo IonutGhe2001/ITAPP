@@ -36,7 +36,9 @@ jest.mock('../src/lib/prisma', () => ({
       }),
     },
     angajat: {
-      count: jest.fn().mockResolvedValue(0),
+      count: jest
+        .fn<(...args: any[]) => Promise<number>>()
+        .mockResolvedValue(0),
     },
   },
 }));
