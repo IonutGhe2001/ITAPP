@@ -55,7 +55,7 @@ export const getEchipamente = () => {
 export const getEchipament = (id: string) =>
   prisma.echipament.findUnique({
     where: { id },
-    include: { angajat: true },
+    include: { angajat: true, documents: true },
   });
 
 export const createEchipament = (data: {

@@ -8,6 +8,7 @@ import { useEchipament, EQUIPMENT_STATUS_LABELS } from '@/features/equipment';
 import { ROUTES } from '@/constants/routes';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import http from '@/services/http';
+const apiBase = (import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '');
 
 type EquipmentChange = {
   id: string;
@@ -172,6 +173,28 @@ export default function EquipmentDetail() {
                 </Fragment>
               ))}
             </div>
+          </Card>
+        </div>
+      )}
+      {data.documents && data.documents.length > 0 && (
+        <div>
+          <h2 className="mb-2 font-medium">Documente</h2>
+          <Card className="p-4">
+            <ul className="space-y-2 text-sm">
+              {data.documents.map((doc) => (
+                <li key={doc.id} className="flex justify-between">
+                  <span>{doc.name}</span>
+                  <a
+                    href={`${apiBase}${doc.path}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary underline"
+                  >
+                    Vezi
+                  </a>
+                </li>
+              ))}
+            </ul>
           </Card>
         </div>
       )}

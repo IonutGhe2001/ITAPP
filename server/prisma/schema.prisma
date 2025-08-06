@@ -80,6 +80,7 @@ model Echipament {
   createdAt  DateTime  @default(now())
   proceseVerbale ProcesVerbal[] @relation("EchipamenteProcesVerbal")
   changes      EquipmentChange[]
+  documents    EquipmentDocument[]
 
   @@unique([tip, serie])
 }
@@ -127,6 +128,15 @@ enum EquipmentChangeType {
   RETURN
   REPLACE
   }
+
+model EquipmentDocument {
+  id           String    @id @default(uuid())
+  echipamentId String
+  echipament   Echipament @relation(fields: [echipamentId], references: [id])
+  name         String
+  path         String
+  createdAt    DateTime  @default(now())
+}
 
 model PurchaseRequest {
   id            String               @id @default(uuid())

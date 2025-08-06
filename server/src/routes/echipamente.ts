@@ -1,5 +1,8 @@
 import express from "express";
 import * as controller from "../controllers/echipamenteController";
+import * as docController from "../controllers/equipmentDocumentController";
+import multer from "multer";
+import path from "path";
 import { validateRequest } from "../middlewares/validateRequest";
 import {
   createEchipamentSchema,
@@ -11,11 +14,23 @@ const router = express.Router();
 
 router.use(authenticate);
 
+const upload = multer({
+  dest: path.join(__dirname, "../../public/equipment-documents"),
+});
+
 router.get("/", controller.getEchipamente);
 router.get("/stats", controller.getStats);
 router.get("/stock", controller.getAvailableStock);
 router.post("/order", authorizeRoles("admin"), controller.orderEchipament);
+router.get("/documents/:docId", docController.downloadDocument);
 router.get("/:id", controller.getEchipament);
+router.get("/:id/documents", docController.listDocuments);
+router.post(
+  "/:id/documents",
+  authorizeRoles("admin"),
+  upload.single("file"),
+  docController.uploadDocument,
+);
 router.post(
   "/",
   authorizeRoles("admin"),

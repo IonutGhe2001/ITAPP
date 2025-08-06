@@ -70,6 +70,13 @@ app.use(
     etag: false,
   })
 );
+app.use(
+  "/equipment-documents",
+  express.static(path.join(__dirname, "../public/equipment-documents"), {
+    maxAge: "1y",
+    etag: false,
+  })
+);
 app.use("/api/auth/login", loginLimiter);
 app.use(logRequest);
 

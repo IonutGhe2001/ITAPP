@@ -49,6 +49,7 @@ export interface Echipament {
   dataAchizitie?: string;
   garantie?: string;
   metadata?: Record<string, unknown>;
+  documents?: EquipmentDocument[];
 }
 
 export interface EchipamentInput {
@@ -83,6 +84,13 @@ export interface EchipamentUpdateInput {
   dataAchizitie?: string;
   garantie?: string;
   metadata?: unknown;
+}
+
+export interface EquipmentDocument {
+  id: string;
+  name: string;
+  path: string;
+  createdAt: string;
 }
 
 export interface EquipmentCardProps {
