@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -69,10 +69,10 @@ describe('AuthProvider', () => {
   });
 
   it('throws if useAuth is used outside provider', () => {
-    function Broken() {
-      useAuth();
-      return null;
-    }
-    expect(() => render(<Broken />)).toThrow('useAuth must be used within AuthProvider');
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect(() => renderHook(() => useAuth())).toThrow(
+      'useAuth must be used within AuthProvider',
+    );
+    consoleError.mockRestore();
   });
 });
