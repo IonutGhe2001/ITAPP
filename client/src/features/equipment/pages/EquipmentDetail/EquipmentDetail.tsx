@@ -1,13 +1,15 @@
-import { Fragment } from 'react';
+import { Fragment, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import Container from '@/components/Container';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { useEchipament, EQUIPMENT_STATUS_LABELS } from '@/features/equipment';
 import { ROUTES } from '@/constants/routes';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import http from '@/services/http';
+import { QRCodeCanvas } from 'qrcode.react';
 const apiBase = (import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '');
 
 type EquipmentChange = {
@@ -55,6 +57,31 @@ export default function EquipmentDetail() {
     enabled: !!id,
   });
 
+  const qrRef = useRef<HTMLCanvasElement>(null);
+
+  const handleDownload = () => {
+    const canvas = qrRef.current;
+    if (!canvas) return;
+    const url = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `equipment-${id}-qr.png`;
+    link.click();
+  };
+
+  const handlePrint = () => {
+    const canvas = qrRef.current;
+    if (!canvas) return;
+    const url = canvas.toDataURL('image/png');
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    printWindow.document.write(`<img src="${url}" style="width:100%" />`);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  };
+
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -68,8 +95,8 @@ export default function EquipmentDetail() {
       <Container className="py-6">
         <Link to={ROUTES.EQUIPMENT} className="flex items-center gap-2 text-xl font-semibold">
             <ArrowLeft className="h-5 w-5" />
-            <span>Înapoi</span>
-          </Link>
+          <span>Înapoi</span>
+        </Link>
         <p className="text-muted-foreground text-sm">Echipament negăsit.</p>
       </Container>
     );
@@ -79,25 +106,19 @@ export default function EquipmentDetail() {
   const dedicated = {
     cpu: data.cpu ?? (rawMetadata.cpu as string),
     ram: data.ram ?? (rawMetadata.ram as string),
-    stocare:
-      data.stocare ??
-      ((rawMetadata.stocare as string) ?? (rawMetadata.storage as string)),
+    stocare: data.stocare ?? (rawMetadata.stocare as string) ?? (rawMetadata.storage as string),
     os: data.os ?? (rawMetadata.os as string),
     versiuneFirmware:
       data.versiuneFirmware ??
-      ((rawMetadata.versiuneFirmware as string) ||
-        (rawMetadata.firmwareVersion as string)),
+      ((rawMetadata.versiuneFirmware as string) || (rawMetadata.firmwareVersion as string)),
     numarInventar:
       data.numarInventar ??
-      ((rawMetadata.numarInventar as string) ||
-        (rawMetadata.inventoryNumber as string)),
+      ((rawMetadata.numarInventar as string) || (rawMetadata.inventoryNumber as string)),
     dataAchizitie:
       data.dataAchizitie ??
-      ((rawMetadata.dataAchizitie as string) ||
-        (rawMetadata.purchaseDate as string)),
+      ((rawMetadata.dataAchizitie as string) || (rawMetadata.purchaseDate as string)),
     garantie:
-      data.garantie ??
-      ((rawMetadata.garantie as string) || (rawMetadata.warranty as string)),
+      data.garantie ?? ((rawMetadata.garantie as string) || (rawMetadata.warranty as string)),
   };
 
   const remainingMetadata = { ...rawMetadata } as Record<string, unknown>;
@@ -212,6 +233,18 @@ export default function EquipmentDetail() {
           </Card>
         </div>
       )}
+      <div>
+        <h2 className="mb-2 font-medium">Cod QR</h2>
+        <Card className="flex flex-col items-center gap-4 p-4">
+          <QRCodeCanvas ref={qrRef} value={window.location.href} size={128} />
+          <div className="flex gap-2">
+            <Button onClick={handleDownload}>Descarcă</Button>
+            <Button variant="outline" onClick={handlePrint}>
+              Printează
+            </Button>
+          </div>
+        </Card>
+      </div>
       {history.length > 0 && (
         <div>
           <h2 className="mb-2 font-medium">Istoric</h2>
