@@ -31,11 +31,15 @@ const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => {
-  const hasDescription = React.Children.toArray(children).some(function check(child): boolean {
+  const hasDescription = React.Children.toArray(children).some(function check(
+    child: React.ReactNode
+  ): boolean {
     if (!React.isValidElement(child)) return false;
     if (child.type === DialogDescription) return true;
-    if (child.props?.children) {
-      return React.Children.toArray(child.props.children).some(check);
+    const childProps = child.props as { children?: React.ReactNode };
+
+    if (childProps.children) {
+      return React.Children.toArray(childProps.children).some(check);
     }
     return false;
   });
