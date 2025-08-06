@@ -61,27 +61,6 @@ describe('Echipamente Routes', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({ nume: 'Lap', tip: 'Laptop', serie: 'S1' });
 
-      it('sets defectAt when changing status to mentenanta', async () => {
-    tx.echipament.findUnique.mockResolvedValue({
-      id: 'e1',
-      tip: 'T',
-      serie: 'S',
-      angajatId: null,
-      stare: 'in_stoc',
-    });
-    const now = new Date();
-    tx.echipament.update.mockResolvedValue({ id: 'e1', stare: 'mentenanta', defectAt: now });
-
-    const res = await updateEchipament('e1', { stare: 'mentenanta' });
-
-    expect(tx.echipament.update).toHaveBeenCalledWith({
-      where: { id: 'e1' },
-      data: expect.objectContaining({ stare: 'mentenanta', defectAt: expect.any(Date) }),
-      include: { angajat: true },
-    });
-    expect(res).toEqual({ id: 'e1', stare: 'mentenanta', defectAt: now });
-  });
-
     expect(res.status).toBe(201);
     expect(res.body).toEqual({ id: '1', nume: 'Lap' });
     expect(echipService.createEchipament).toHaveBeenCalled();
