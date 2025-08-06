@@ -8,51 +8,51 @@ datasource db {
 }
 
 model User {
-  id             Int      @id @default(autoincrement())
-  email          String   @unique
-  password       String
-  nume           String   
-  prenume        String    
-  functie        String    
-  role           String  
-  telefon        String?
-  profilePicture String?
+  id               Int      @id @default(autoincrement())
+  email            String   @unique
+  password         String
+  nume             String
+  prenume          String
+  functie          String
+  role             String
+  telefon          String?
+  profilePicture   String?
   digitalSignature String?
-  createdAt      DateTime @default(now())
+  createdAt        DateTime @default(now())
 }
 
 model DepartmentConfig {
-  id                 String   @id @default(uuid())
-  name               String
-  defaultLicenses    String[] @default([])
-  defaultRequirements String[] @default([])
-  angajati           Angajat[]
+  id                  String    @id @default(uuid())
+  name                String
+  defaultLicenses     String[]  @default([])
+  defaultRequirements String[]  @default([])
+  angajati            Angajat[]
 }
 
 model Angajat {
-  id          String       @id @default(uuid())
-  numeComplet String
-  functie     String
-  email       String?
-  telefon     String?
-  dataAngajare DateTime @default(now())
-  cDataUsername String?
-  cDataId      String?
-  cDataNotes   String?
-  cDataCreated Boolean     @default(false)
-  emailAccountStatus     EmailAccountStatus @default(PENDING)
-  emailAccountCreatedAt  DateTime?
+  id                      String             @id @default(uuid())
+  numeComplet             String
+  functie                 String
+  email                   String?
+  telefon                 String?
+  dataAngajare            DateTime           @default(now())
+  cDataUsername           String?
+  cDataId                 String?
+  cDataNotes              String?
+  cDataCreated            Boolean            @default(false)
+  emailAccountStatus      EmailAccountStatus @default(PENDING)
+  emailAccountCreatedAt   DateTime?
   emailAccountResponsible String?
-  emailAccountLink       String?
-  echipamente Echipament[]
-  createdAt   DateTime     @default(now())
-  proceseVerbale ProcesVerbal[]
-  equipmentChanges EquipmentChange[]
-  departmentConfigId String?
-  departmentConfig   DepartmentConfig? @relation(fields: [departmentConfigId], references: [id])
-  checklist          String[] @default([])
-  licenses           String[] @default([])
-  onboarding   Onboarding[]
+  emailAccountLink        String?
+  echipamente             Echipament[]
+  createdAt               DateTime           @default(now())
+  proceseVerbale          ProcesVerbal[]
+  equipmentChanges        EquipmentChange[]
+  departmentConfigId      String?
+  departmentConfig        DepartmentConfig?  @relation(fields: [departmentConfigId], references: [id])
+  checklist               String[]           @default([])
+  licenses                String[]           @default([])
+  onboarding              Onboarding[]
 }
 
 enum EmailAccountStatus {
@@ -61,11 +61,11 @@ enum EmailAccountStatus {
 }
 
 model Echipament {
-  id         String    @id @default(uuid())
-  nume       String
-  tip        String
-  serie      String
-  stare      String
+  id               String              @id @default(uuid())
+  nume             String
+  tip              String
+  serie            String
+  stare            String
   cpu              String?
   ram              String?
   stocare          String?
@@ -74,33 +74,34 @@ model Echipament {
   numarInventar    String?
   dataAchizitie    DateTime?
   garantie         DateTime?
-  metadata         Json?   
-  angajatId  String?
-  angajat    Angajat?  @relation(fields: [angajatId], references: [id])
-  createdAt  DateTime  @default(now())
-  proceseVerbale ProcesVerbal[] @relation("EchipamenteProcesVerbal")
-  changes      EquipmentChange[]
-  documents    EquipmentDocument[]
-  images       EquipmentImage[]
+  metadata         Json?
+  defectAt         DateTime?
+  angajatId        String?
+  angajat          Angajat?            @relation(fields: [angajatId], references: [id])
+  createdAt        DateTime            @default(now())
+  proceseVerbale   ProcesVerbal[]      @relation("EchipamenteProcesVerbal")
+  changes          EquipmentChange[]
+  documents        EquipmentDocument[]
+  images           EquipmentImage[]
 
   @@unique([tip, serie])
 }
 
 model Eveniment {
-  id        Int      @id @default(autoincrement())
-  titlu     String
-  data      DateTime
-  ora       String
-  userId    Int  
-  recurrence String   @default("none")    
+  id         Int      @id @default(autoincrement())
+  titlu      String
+  data       DateTime
+  ora        String
+  userId     Int
+  recurrence String   @default("none") 
 }
 
 model ProcesVerbal {
-  id           String        @id @default(uuid())
+  id           String          @id @default(uuid())
   angajatId    String
-  angajat      Angajat       @relation(fields: [angajatId], references: [id])
-  echipamente  Echipament[]  @relation("EchipamenteProcesVerbal")
-  dataGenerare DateTime      @default(now())
+  angajat      Angajat         @relation(fields: [angajatId], references: [id])
+  echipamente  Echipament[]    @relation("EchipamenteProcesVerbal")
+  dataGenerare DateTime        @default(now())
   observatii   String?
   tip          ProcesVerbalTip @default(PREDARE_PRIMIRE)
   documentPath String?
@@ -113,46 +114,46 @@ enum ProcesVerbalTip {
 }
 
 model EquipmentChange {
-  id           String               @id @default(uuid())
+  id           String              @id @default(uuid())
   angajatId    String
   echipamentId String
   tip          EquipmentChangeType
-  includedInPV Boolean              @default(false)
-  createdAt    DateTime             @default(now())
+  includedInPV Boolean             @default(false)
+  createdAt    DateTime            @default(now())
 
-  angajat      Angajat              @relation(fields: [angajatId], references: [id])
-  echipament   Echipament           @relation(fields: [echipamentId], references: [id])
+  angajat    Angajat    @relation(fields: [angajatId], references: [id])
+  echipament Echipament @relation(fields: [echipamentId], references: [id])
 }
 
 enum EquipmentChangeType {
   ASSIGN
   RETURN
   REPLACE
-  }
+}
 
 model EquipmentDocument {
-  id           String    @id @default(uuid())
+  id           String     @id @default(uuid())
   echipamentId String
   echipament   Echipament @relation(fields: [echipamentId], references: [id])
   name         String
   path         String
-  createdAt    DateTime  @default(now())
+  createdAt    DateTime   @default(now())
 }
 
 model EquipmentImage {
-  id           String    @id @default(uuid())
+  id           String     @id @default(uuid())
   echipamentId String
   echipament   Echipament @relation(fields: [echipamentId], references: [id])
   url          String
-  createdAt    DateTime  @default(now())
+  createdAt    DateTime   @default(now())
 }
 
 model PurchaseRequest {
-  id            String               @id @default(uuid())
+  id            String                @id @default(uuid())
   equipmentType String
   quantity      Int
   status        PurchaseRequestStatus @default(PENDING)
-  createdAt     DateTime             @default(now())
+  createdAt     DateTime              @default(now())
 }
 
 enum PurchaseRequestStatus {

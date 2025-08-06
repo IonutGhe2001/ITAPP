@@ -48,6 +48,7 @@ export interface Echipament {
   numarInventar?: string;
   dataAchizitie?: string;
   garantie?: string;
+  defectAt?: string;
   metadata?: Record<string, unknown>;
   documents?: EquipmentDocument[];
   images?: EquipmentImage[];

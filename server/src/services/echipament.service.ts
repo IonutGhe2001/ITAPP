@@ -83,8 +83,11 @@ export const getEchipament = async (id: string) => {
     );
   }
 
-  if (echipament.stare === EQUIPMENT_STATUS.MENTENANTA) {
-    const defectDate = echipament.createdAt;
+  if (
+    echipament.stare === EQUIPMENT_STATUS.MENTENANTA &&
+    echipament.defectAt
+  ) {
+    const defectDate = new Date(echipament.defectAt);
     meta.defectDays = Math.floor(
       (now.getTime() - defectDate.getTime()) / (1000 * 60 * 60 * 24)
     );
@@ -186,30 +189,46 @@ export const updateEchipament = async (
 
     await validateEchipamentUpdate(tx, id, current, data);
 
+    const updateData: Record<string, any> = {
+      ...(data.nume !== undefined && { nume: data.nume }),
+      ...(data.tip !== undefined && { tip: data.tip }),
+      ...(data.serie !== undefined && { serie: data.serie }),
+      ...(data.angajatId !== undefined && { angajatId: data.angajatId }),
+      ...(data.metadata !== undefined && { metadata: data.metadata }),
+      ...(data.cpu !== undefined && { cpu: data.cpu }),
+      ...(data.ram !== undefined && { ram: data.ram }),
+      ...(data.stocare !== undefined && { stocare: data.stocare }),
+      ...(data.os !== undefined && { os: data.os }),
+      ...(data.versiuneFirmware !== undefined && {
+        versiuneFirmware: data.versiuneFirmware,
+      }),
+      ...(data.numarInventar !== undefined && {
+        numarInventar: data.numarInventar,
+      }),
+      ...(data.dataAchizitie !== undefined && {
+        dataAchizitie: data.dataAchizitie,
+      }),
+      ...(data.garantie !== undefined && { garantie: data.garantie }),
+    };
+
+    if (data.stare !== undefined) {
+      updateData.stare = data.stare;
+      if (
+        data.stare === EQUIPMENT_STATUS.MENTENANTA &&
+        current.stare !== EQUIPMENT_STATUS.MENTENANTA
+      ) {
+        updateData.defectAt = new Date();
+      } else if (
+        current.stare === EQUIPMENT_STATUS.MENTENANTA &&
+        data.stare !== EQUIPMENT_STATUS.MENTENANTA
+      ) {
+        updateData.defectAt = null;
+      }
+    }
+
     const updated = await tx.echipament.update({
       where: { id },
-      data: {
-        ...(data.nume !== undefined && { nume: data.nume }),
-        ...(data.tip !== undefined && { tip: data.tip }),
-        ...(data.serie !== undefined && { serie: data.serie }),
-        ...(data.stare !== undefined && { stare: data.stare }),
-        ...(data.angajatId !== undefined && { angajatId: data.angajatId }),
-        ...(data.metadata !== undefined && { metadata: data.metadata }),
-        ...(data.cpu !== undefined && { cpu: data.cpu }),
-        ...(data.ram !== undefined && { ram: data.ram }),
-        ...(data.stocare !== undefined && { stocare: data.stocare }),
-        ...(data.os !== undefined && { os: data.os }),
-        ...(data.versiuneFirmware !== undefined && {
-          versiuneFirmware: data.versiuneFirmware,
-        }),
-        ...(data.numarInventar !== undefined && {
-          numarInventar: data.numarInventar,
-        }),
-        ...(data.dataAchizitie !== undefined && {
-          dataAchizitie: data.dataAchizitie,
-        }),
-        ...(data.garantie !== undefined && { garantie: data.garantie }),
-      },
+      data: updateData,
       include: {
         angajat: true,
       },
