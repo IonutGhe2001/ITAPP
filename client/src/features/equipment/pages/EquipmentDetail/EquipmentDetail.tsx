@@ -57,10 +57,10 @@ export default function EquipmentDetail() {
     enabled: !!id,
   });
 
-  const qrRef = useRef<HTMLCanvasElement>(null);
+  const qrRef = useRef<HTMLDivElement>(null);
 
   const handleDownload = () => {
-    const canvas = qrRef.current;
+    const canvas = qrRef.current?.querySelector('canvas');
     if (!canvas) return;
     const url = canvas.toDataURL('image/png');
     const link = document.createElement('a');
@@ -70,7 +70,7 @@ export default function EquipmentDetail() {
   };
 
   const handlePrint = () => {
-    const canvas = qrRef.current;
+    const canvas = qrRef.current?.querySelector('canvas');
     if (!canvas) return;
     const url = canvas.toDataURL('image/png');
     const printWindow = window.open('', '_blank');
@@ -236,7 +236,9 @@ export default function EquipmentDetail() {
       <div>
         <h2 className="mb-2 font-medium">Cod QR</h2>
         <Card className="flex flex-col items-center gap-4 p-4">
-          <QRCodeCanvas ref={qrRef} value={window.location.href} size={128} />
+          <div ref={qrRef}>
+            <QRCodeCanvas value={window.location.href} size={128} />
+          </div>
           <div className="flex gap-2">
             <Button onClick={handleDownload}>Descarcă</Button>
             <Button variant="outline" onClick={handlePrint}>
