@@ -1,10 +1,26 @@
 import { Fragment } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import Container from '@/components/Container';
 import { Card } from '@/components/ui/card';
 import { useEchipament, EQUIPMENT_STATUS_LABELS } from '@/features/equipment';
 import { ROUTES } from '@/constants/routes';
+import { QUERY_KEYS } from '@/constants/queryKeys';
+import http from '@/services/http';
+
+type EquipmentChange = {
+  id: string;
+  tip: 'ASSIGN' | 'RETURN' | 'REPLACE';
+  createdAt: string;
+  angajat?: { numeComplet: string };
+};
+
+const EQUIPMENT_CHANGE_LABELS: Record<EquipmentChange['tip'], string> = {
+  ASSIGN: 'Predare',
+  RETURN: 'Returnare',
+  REPLACE: 'Înlocuire',
+};
 
 function flattenMetadata(metadata: Record<string, unknown>, prefix = ''): [string, string][] {
   return Object.entries(metadata).flatMap(([key, value]) => {
@@ -32,6 +48,11 @@ function flattenMetadata(metadata: Record<string, unknown>, prefix = ''): [strin
 export default function EquipmentDetail() {
   const { id } = useParams();
   const { data, isLoading } = useEchipament(id || '');
+  const { data: history = [] } = useQuery<EquipmentChange[]>({
+    queryKey: [...QUERY_KEYS.EQUIPMENT, id || '', 'history'],
+    queryFn: () => http.get<EquipmentChange[]>(`/equipment-changes/history/${id}`),
+    enabled: !!id,
+  });
 
   if (isLoading) {
     return (
@@ -151,6 +172,26 @@ export default function EquipmentDetail() {
                 </Fragment>
               ))}
             </div>
+          </Card>
+        </div>
+      )}
+      {history.length > 0 && (
+        <div>
+          <h2 className="mb-2 font-medium">Istoric</h2>
+          <Card className="p-4">
+            <ul className="space-y-2 text-sm">
+              {history.map((item) => (
+                <li key={item.id} className="flex justify-between">
+                  <span>
+                    {EQUIPMENT_CHANGE_LABELS[item.tip]}
+                    {item.angajat?.numeComplet && ` - ${item.angajat.numeComplet}`}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {new Date(item.createdAt).toLocaleString('ro-RO')}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </Card>
         </div>
       )}

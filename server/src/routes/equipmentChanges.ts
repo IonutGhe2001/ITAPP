@@ -5,7 +5,7 @@ import { authenticate } from "../middlewares/authMiddleware";
 const router = express.Router();
 
 router.use(authenticate);
-
+router.get("/history/:echipamentId", controller.getEquipmentHistory);
 router.get("/:angajatId", controller.getEquipmentChanges);
 
 export default router;

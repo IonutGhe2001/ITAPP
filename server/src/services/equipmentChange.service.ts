@@ -6,3 +6,11 @@ export const getUnsyncedChanges = (angajatId: string) => {
     orderBy: { createdAt: "asc" },
   });
 };
+
+export const getEquipmentHistory = (echipamentId: string) => {
+  return prisma.equipmentChange.findMany({
+    where: { echipamentId },
+    include: { angajat: true },
+    orderBy: { createdAt: "desc" },
+  });
+};
