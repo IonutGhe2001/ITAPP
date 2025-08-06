@@ -10,6 +10,10 @@ export const getEquipmentChanges = async (req: Request, res: Response) => {
 };
 
 export const getEquipmentHistory = async (req: Request, res: Response) => {
-  const history = await getEquipmentHistoryService(req.params.echipamentId);
+  const { skip, take } = req.query;
+  const history = await getEquipmentHistoryService(req.params.echipamentId, {
+    skip: skip ? Number(skip) : undefined,
+    take: take ? Number(take) : undefined,
+  });
   res.json(history);
 };

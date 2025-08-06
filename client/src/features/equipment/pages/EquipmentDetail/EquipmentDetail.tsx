@@ -1,7 +1,7 @@
 import { Fragment, useRef, useState, type JSX } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, AlertTriangle, Clock } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import Container from '@/components/Container';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -70,11 +70,23 @@ export default function EquipmentDetail() {
   const [imageError, setImageError] = useState<string | null>(null);
   const [docError, setDocError] = useState<string | null>(null);
 
-  const { data: history = [] } = useQuery<EquipmentChange[]>({
+  const PAGE_SIZE = 20;
+  const {
+    data: historyPages,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery<EquipmentChange[]>({
     queryKey: [...QUERY_KEYS.EQUIPMENT, id || '', 'history'],
-    queryFn: () => http.get<EquipmentChange[]>(`/equipment-changes/history/${id}`),
+    queryFn: ({ pageParam = 0 }) =>
+      http.get<EquipmentChange[]>(
+        `/equipment-changes/history/${id}?skip=${pageParam}&take=${PAGE_SIZE}`
+      ),
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length < PAGE_SIZE ? undefined : allPages.length * PAGE_SIZE,
     enabled: !!id,
   });
+  const history = historyPages?.pages.flat() ?? [];
 
   const qrRef = useRef<HTMLDivElement>(null);
   const handleReassignSubmit = async (eq: Echipament) => {
@@ -395,6 +407,16 @@ export default function EquipmentDetail() {
                   </li>
                 ))}
               </ul>
+              {hasNextPage && (
+                <Button
+                  variant="outline"
+                  className="mt-2 w-full"
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                >
+                  {isFetchingNextPage ? 'Se încarcă...' : 'Încarcă mai mult'}
+                </Button>
+              )}
             </Card>
           </div>
         )}

@@ -7,10 +7,16 @@ export const getUnsyncedChanges = (angajatId: string) => {
   });
 };
 
-export const getEquipmentHistory = (echipamentId: string) => {
+export const getEquipmentHistory = (
+  echipamentId: string,
+  options?: { skip?: number; take?: number }
+) => {
+  const { skip, take } = options || {};
   return prisma.equipmentChange.findMany({
     where: { echipamentId },
     include: { angajat: true },
     orderBy: { createdAt: "desc" },
+    skip,
+    take,
   });
 };
