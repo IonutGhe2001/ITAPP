@@ -4,6 +4,13 @@ ITAPP is a full‑stack application for managing IT equipment, employees and rel
 It consists of a React front end and an Express/Prisma back end that share a small set of
 TypeScript utilities.
 
+## File Uploads
+
+The API supports uploading attachments for equipment with the following restrictions:
+
+- **Documents:** only PDF files up to 5 MB.
+- **Images:** only PNG or JPEG files up to 5 MB.
+
 ## Architecture
 
 - **client/** – React + TypeScript + Vite front end.

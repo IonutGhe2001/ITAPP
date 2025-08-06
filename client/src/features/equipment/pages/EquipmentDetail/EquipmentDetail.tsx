@@ -67,6 +67,8 @@ export default function EquipmentDetail() {
   const [showEdit, setShowEdit] = useState(false);
   const [showReassign, setShowReassign] = useState(false);
   const [confirmDefect, setConfirmDefect] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [docError, setDocError] = useState<string | null>(null);
 
   const { data: history = [] } = useQuery<EquipmentChange[]>({
     queryKey: [...QUERY_KEYS.EQUIPMENT, id || '', 'history'],
@@ -111,6 +113,42 @@ export default function EquipmentDetail() {
     printWindow.focus();
     printWindow.print();
     printWindow.close();
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!id) return;
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      await http.post(`/echipamente/${id}/images`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setImageError(null);
+      refetch();
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message?: string } } };
+      setImageError(axiosErr.response?.data?.message || 'Eroare la încărcare');
+    }
+  };
+
+  const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!id) return;
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      await http.post(`/echipamente/${id}/documents`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setDocError(null);
+      refetch();
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message?: string } } };
+      setDocError(axiosErr.response?.data?.message || 'Eroare la încărcare');
+    }
   };
 
   if (isLoading) {
@@ -235,7 +273,7 @@ export default function EquipmentDetail() {
           <p>Stare: {EQUIPMENT_STATUS_LABELS[data.stare] ?? data.stare}</p>
           {data.angajat && <p>Predat la: {data.angajat.numeComplet}</p>}
         </div>
-      {alerts.length > 0 && <div className="flex flex-wrap gap-2 pt-2">{alerts}</div>}
+        {alerts.length > 0 && <div className="flex flex-wrap gap-2 pt-2">{alerts}</div>}
         <div className="flex flex-wrap gap-2 pt-2">
           <Button onClick={() => setShowEdit(true)}>Editează</Button>
           <Button variant="outline" onClick={() => setShowReassign(true)}>
@@ -262,6 +300,10 @@ export default function EquipmentDetail() {
         ) : (
           <p className="text-muted-foreground text-sm">Nu există imagini disponibile.</p>
         )}
+        <div className="mt-2">
+          <input type="file" accept="image/png,image/jpeg" onChange={handleImageUpload} />
+          {imageError && <p className="text-sm text-red-500">{imageError}</p>}
+        </div>
         {dedicatedEntries.length > 0 && (
           <div>
             <h2 className="mb-2 font-medium">Detalii</h2>
@@ -292,9 +334,9 @@ export default function EquipmentDetail() {
             </Card>
           </div>
         )}
-        {data.documents && data.documents.length > 0 && (
-          <div>
-            <h2 className="mb-2 font-medium">Documente</h2>
+        <div>
+          <h2 className="mb-2 font-medium">Documente</h2>
+          {data.documents && data.documents.length > 0 ? (
             <Card className="p-4">
               <ul className="space-y-2 text-sm">
                 {data.documents.map((doc) => (
@@ -312,8 +354,16 @@ export default function EquipmentDetail() {
                 ))}
               </ul>
             </Card>
+            ) : (
+            <Card className="p-4">
+              <p className="text-muted-foreground text-sm">Nu există documente disponibile.</p>
+            </Card>
+          )}
+          <div className="mt-2">
+            <input type="file" accept="application/pdf" onChange={handleDocumentUpload} />
+            {docError && <p className="text-sm text-red-500">{docError}</p>}
           </div>
-        )}
+        </div>
         <div>
           <h2 className="mb-2 font-medium">Cod QR</h2>
           <Card className="flex flex-col items-center gap-4 p-4">
@@ -328,7 +378,7 @@ export default function EquipmentDetail() {
             </div>
           </Card>
         </div>
-       {history.length > 0 && (
+        {history.length > 0 && (
           <div>
             <h2 className="mb-2 font-medium">Istoric</h2>
             <Card className="p-4">

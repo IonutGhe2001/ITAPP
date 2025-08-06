@@ -10,7 +10,7 @@ import {
 export const listDocuments = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   try {
     const { id } = req.params;
@@ -24,19 +24,27 @@ export const listDocuments = async (
 export const uploadDocument = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   try {
     const { id } = req.params;
+    const uploadErr = (req as any).multerError as Error | undefined;
+    if (uploadErr) {
+      res.status(400).json({ message: uploadErr.message });
+      return;
+    }
+    const validationErr = (req as any).fileValidationError as
+      | string
+      | undefined;
     const file = req.file;
-    if (!file) {
-      res.status(400).json({ message: "Fișier lipsă" });
+    if (!file || validationErr) {
+      res.status(400).json({ message: validationErr || "Fișier lipsă" });
       return;
     }
     const doc = await addEquipmentDocument(
       id,
       file.originalname,
-      `/equipment-documents/${file.filename}`,
+      `/equipment-documents/${file.filename}`
     );
     res.status(201).json(doc);
   } catch (err) {
@@ -47,7 +55,7 @@ export const uploadDocument = async (
 export const downloadDocument = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   try {
     const { docId } = req.params as { docId: string };
@@ -56,11 +64,7 @@ export const downloadDocument = async (
       res.status(404).json({ message: "Document negăsit" });
       return;
     }
-    const filePath = path.join(
-      __dirname,
-      "../../public",
-      doc.path,
-    );
+    const filePath = path.join(__dirname, "../../public", doc.path);
     if (!fs.existsSync(filePath)) {
       res.status(404).json({ message: "Fișier negăsit" });
       return;
