@@ -6,6 +6,7 @@ import Container from '@/components/Container';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   useEchipament,
   EQUIPMENT_STATUS_LABELS,
@@ -317,110 +318,131 @@ export default function EquipmentDetail() {
           <input type="file" accept="image/png,image/jpeg" onChange={handleImageUpload} />
           {imageError && <p className="text-sm text-red-500">{imageError}</p>}
         </div>
-        {dedicatedEntries.length > 0 && (
-          <div>
-            <h2 className="mb-2 font-medium">Detalii</h2>
-            <Card className="p-4">
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                {dedicatedEntries.map(({ key, value }) => (
-                  <Fragment key={key}>
-                    <span className="font-medium">{key}</span>
-                    <span className="text-muted-foreground">{String(value)}</span>
-                  </Fragment>
-                ))}
+        <Tabs defaultValue="detalii" className="space-y-4">
+          <TabsList className="flex flex-wrap gap-2">
+            {dedicatedEntries.length > 0 && <TabsTrigger value="detalii">Detalii</TabsTrigger>}
+            {Object.keys(remainingMetadata).length > 0 && (
+              <TabsTrigger value="metadata">Metadata</TabsTrigger>
+            )}
+            <TabsTrigger value="documente">Documente</TabsTrigger>
+            <TabsTrigger value="codqr">Cod QR</TabsTrigger>
+            {history.length > 0 && <TabsTrigger value="istoric">Istoric</TabsTrigger>}
+          </TabsList>
+          {dedicatedEntries.length > 0 && (
+            <TabsContent value="detalii">
+              <div>
+                <h2 className="mb-2 font-medium">Detalii</h2>
+                <Card className="p-4">
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    {dedicatedEntries.map(({ key, value }) => (
+                      <Fragment key={key}>
+                        <span className="font-medium">{key}</span>
+                        <span className="text-muted-foreground">{String(value)}</span>
+                      </Fragment>
+                    ))}
+                  </div>
+                </Card>
               </div>
-            </Card>
-          </div>
-        )}
-        {Object.keys(remainingMetadata).length > 0 && (
-          <div>
-            <h2 className="mb-2 font-medium">Metadata</h2>
-            <Card className="p-4">
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                {flattenMetadata(remainingMetadata).map(([key, value]) => (
-                  <Fragment key={key}>
-                    <span className="font-medium">{key}</span>
-                    <span className="text-muted-foreground">{value}</span>
-                  </Fragment>
-                ))}
-              </div>
-            </Card>
-          </div>
-        )}
-        <div>
-          <h2 className="mb-2 font-medium">Documente</h2>
-          {data.documents && data.documents.length > 0 ? (
-            <Card className="p-4">
-              <ul className="space-y-2 text-sm">
-                {data.documents.map((doc) => (
-                  <li key={doc.id} className="flex justify-between">
-                    <span>{doc.name}</span>
-                    <a
-                      href={`${apiBase}${doc.path}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary underline"
-                    >
-                      Vezi
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-            ) : (
-            <Card className="p-4">
-              <p className="text-muted-foreground text-sm">Nu există documente disponibile.</p>
-            </Card>
+            </TabsContent>
           )}
-          <div className="mt-2">
-            <input type="file" accept="application/pdf" onChange={handleDocumentUpload} />
-            {docError && <p className="text-sm text-red-500">{docError}</p>}
-          </div>
-        </div>
-        <div>
-          <h2 className="mb-2 font-medium">Cod QR</h2>
-          <Card className="flex flex-col items-center gap-4 p-4">
-            <div ref={qrRef}>
-              <QRCodeCanvas value={window.location.href} size={128} />
-            </div>
-            <div className="flex gap-2">
-              <Button onClick={handleDownload}>Descarcă</Button>
-              <Button variant="outline" onClick={handlePrint}>
-                Printează
-              </Button>
-            </div>
-          </Card>
-        </div>
-        {history.length > 0 && (
-          <div>
-            <h2 className="mb-2 font-medium">Istoric</h2>
-            <Card className="p-4">
-              <ul className="space-y-2 text-sm">
-                {history.map((item) => (
-                  <li key={item.id} className="flex justify-between">
-                    <span>
-                      {EQUIPMENT_CHANGE_LABELS[item.tip]}
-                      {item.angajat?.numeComplet && ` - ${item.angajat.numeComplet}`}
-                    </span>
-                    <span className="text-muted-foreground">
-                      {new Date(item.createdAt).toLocaleString('ro-RO')}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              {hasNextPage && (
-                <Button
-                  variant="outline"
-                  className="mt-2 w-full"
-                  onClick={() => fetchNextPage()}
-                  disabled={isFetchingNextPage}
-                >
-                  {isFetchingNextPage ? 'Se încarcă...' : 'Încarcă mai mult'}
-                </Button>
+          {Object.keys(remainingMetadata).length > 0 && (
+            <TabsContent value="metadata">
+              <div>
+                <h2 className="mb-2 font-medium">Metadata</h2>
+                <Card className="p-4">
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    {flattenMetadata(remainingMetadata).map(([key, value]) => (
+                      <Fragment key={key}>
+                        <span className="font-medium">{key}</span>
+                        <span className="text-muted-foreground">{value}</span>
+                      </Fragment>
+                    ))}
+                  </div>
+                </Card>
+              </div>
+            </TabsContent>
+          )}
+          <TabsContent value="documente">
+            <div>
+              <h2 className="mb-2 font-medium">Documente</h2>
+              {data.documents && data.documents.length > 0 ? (
+                <Card className="p-4">
+                  <ul className="space-y-2 text-sm">
+                    {data.documents.map((doc) => (
+                      <li key={doc.id} className="flex justify-between">
+                        <span>{doc.name}</span>
+                        <a
+                          href={`${apiBase}${doc.path}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary underline"
+                        >
+                          Vezi
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              ) : (
+                <Card className="p-4">
+                  <p className="text-muted-foreground text-sm">Nu există documente disponibile.</p>
+                </Card>
               )}
-            </Card>
-          </div>
-        )}
+              <div className="mt-2">
+                <input type="file" accept="application/pdf" onChange={handleDocumentUpload} />
+                {docError && <p className="text-sm text-red-500">{docError}</p>}
+              </div>
+            </div>
+            </TabsContent>
+          <TabsContent value="codqr">
+            <div>
+              <h2 className="mb-2 font-medium">Cod QR</h2>
+              <Card className="flex flex-col items-center gap-4 p-4">
+                <div ref={qrRef}>
+                  <QRCodeCanvas value={window.location.href} size={128} />
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={handleDownload}>Descarcă</Button>
+                  <Button variant="outline" onClick={handlePrint}>
+                    Printează
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          </TabsContent>
+          {history.length > 0 && (
+            <TabsContent value="istoric">
+              <div>
+                <h2 className="mb-2 font-medium">Istoric</h2>
+                <Card className="p-4">
+                  <ul className="space-y-2 text-sm">
+                    {history.map((item) => (
+                      <li key={item.id} className="flex justify-between">
+                        <span>
+                          {EQUIPMENT_CHANGE_LABELS[item.tip]}
+                          {item.angajat?.numeComplet && ` - ${item.angajat.numeComplet}`}
+                        </span>
+                        <span className="text-muted-foreground">
+                          {new Date(item.createdAt).toLocaleString('ro-RO')}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  {hasNextPage && (
+                    <Button
+                      variant="outline"
+                      className="mt-2 w-full"
+                      onClick={() => fetchNextPage()}
+                      disabled={isFetchingNextPage}
+                    >
+                      {isFetchingNextPage ? 'Se încarcă...' : 'Încarcă mai mult'}
+                    </Button>
+                  )}
+                </Card>
+              </div>
+            </TabsContent>
+          )}
+        </Tabs>
       </Container>
       {showEdit && (
         <ModalEditEchipament
