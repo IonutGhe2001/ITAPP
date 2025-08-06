@@ -1,15 +1,23 @@
-import { Fragment, useRef } from 'react';
+import { Fragment, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import Container from '@/components/Container';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useEchipament, EQUIPMENT_STATUS_LABELS } from '@/features/equipment';
+import {
+  useEchipament,
+  EQUIPMENT_STATUS_LABELS,
+  useUpdateEchipament,
+  ModalEditEchipament,
+  ModalPredaEchipament,
+} from '@/features/equipment';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ROUTES } from '@/constants/routes';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import http from '@/services/http';
 import { QRCodeCanvas } from 'qrcode.react';
+import type { Echipament } from '@/features/equipment';
 const apiBase = (import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '');
 
 type EquipmentChange = {
@@ -50,7 +58,12 @@ function flattenMetadata(metadata: Record<string, unknown>, prefix = ''): [strin
 
 export default function EquipmentDetail() {
   const { id } = useParams();
-  const { data, isLoading } = useEchipament(id || '');
+  const { data, isLoading, refetch } = useEchipament(id || '');
+  const updateMutation = useUpdateEchipament();
+  const [showEdit, setShowEdit] = useState(false);
+  const [showReassign, setShowReassign] = useState(false);
+  const [confirmDefect, setConfirmDefect] = useState(false);
+
   const { data: history = [] } = useQuery<EquipmentChange[]>({
     queryKey: [...QUERY_KEYS.EQUIPMENT, id || '', 'history'],
     queryFn: () => http.get<EquipmentChange[]>(`/equipment-changes/history/${id}`),
@@ -60,6 +73,22 @@ export default function EquipmentDetail() {
   const qrRef = useRef<HTMLDivElement>(null);
 
   const handleDownload = () => {
+    const handleReassignSubmit = async (eq: Echipament) => {
+    await updateMutation.mutateAsync({
+      id: eq.id,
+      data: { angajatId: eq.angajatId, stare: eq.stare },
+    });
+    setShowReassign(false);
+    refetch();
+  };
+
+  const handleMarkDefect = async () => {
+    if (!id) return;
+    await updateMutation.mutateAsync({ id, data: { stare: 'mentenanta' } });
+    setConfirmDefect(false);
+    refetch();
+  };
+
     const canvas = qrRef.current?.querySelector('canvas');
     if (!canvas) return;
     const url = canvas.toDataURL('image/png');
@@ -152,7 +181,8 @@ export default function EquipmentDetail() {
   ].filter((e) => e.value);
 
   return (
-    <Container className="space-y-4 py-6">
+    <>
+      <Container className="space-y-4 py-6">
       <div className="flex items-center gap-2">
         <Link to={ROUTES.EQUIPMENT}>
           <ArrowLeft className="h-5 w-5" />
@@ -166,6 +196,18 @@ export default function EquipmentDetail() {
         <p>Tip: {data.tip}</p>
         <p>Stare: {EQUIPMENT_STATUS_LABELS[data.stare] ?? data.stare}</p>
         {data.angajat && <p>Predat la: {data.angajat.numeComplet}</p>}
+      </div>
+      <div className="flex flex-wrap gap-2 pt-2">
+        <Button onClick={() => setShowEdit(true)}>Editează</Button>
+        <Button variant="outline" onClick={() => setShowReassign(true)}>
+          Reasignare
+        </Button>
+        <Button variant="destructive" onClick={() => setConfirmDefect(true)}>
+          Marcare defect
+        </Button>
+        <Button asChild variant="secondary">
+          <Link to={ROUTES.EMPLOYEE_FORM}>Generare fișă</Link>
+        </Button>
       </div>
       {data.images && data.images.length > 0 ? (
         <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
@@ -268,5 +310,43 @@ export default function EquipmentDetail() {
         </div>
       )}
     </Container>
+      {showEdit && (
+        <ModalEditEchipament
+          echipament={data}
+          onClose={() => setShowEdit(false)}
+          onUpdated={() => {
+            setShowEdit(false);
+            refetch();
+          }}
+        />
+      )}
+      {showReassign && (
+        <ModalPredaEchipament
+          echipament={data}
+          onClose={() => setShowReassign(false)}
+          onSubmit={(eq) => handleReassignSubmit(eq as Echipament)}
+        />
+      )}
+      {confirmDefect && (
+        <Dialog open onOpenChange={setConfirmDefect}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirmare defect</DialogTitle>
+            </DialogHeader>
+            <p className="text-muted-foreground text-sm">
+              Sigur dorești să marchezi acest echipament ca defect?
+            </p>
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="outline" onClick={() => setConfirmDefect(false)}>
+                Anulează
+              </Button>
+              <Button variant="destructive" onClick={handleMarkDefect}>
+                Confirmă
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 }
