@@ -53,6 +53,61 @@ export default function EquipmentDetail() {
     );
   }
 
+  const rawMetadata = (data.metadata as Record<string, unknown>) || {};
+  const dedicated = {
+    cpu: data.cpu ?? (rawMetadata.cpu as string),
+    ram: data.ram ?? (rawMetadata.ram as string),
+    stocare:
+      data.stocare ??
+      ((rawMetadata.stocare as string) ?? (rawMetadata.storage as string)),
+    os: data.os ?? (rawMetadata.os as string),
+    versiuneFirmware:
+      data.versiuneFirmware ??
+      ((rawMetadata.versiuneFirmware as string) ||
+        (rawMetadata.firmwareVersion as string)),
+    numarInventar:
+      data.numarInventar ??
+      ((rawMetadata.numarInventar as string) ||
+        (rawMetadata.inventoryNumber as string)),
+    dataAchizitie:
+      data.dataAchizitie ??
+      ((rawMetadata.dataAchizitie as string) ||
+        (rawMetadata.purchaseDate as string)),
+    garantie:
+      data.garantie ??
+      ((rawMetadata.garantie as string) || (rawMetadata.warranty as string)),
+  };
+
+  const remainingMetadata = { ...rawMetadata } as Record<string, unknown>;
+  [
+    'cpu',
+    'ram',
+    'stocare',
+    'storage',
+    'os',
+    'versiuneFirmware',
+    'firmwareVersion',
+    'numarInventar',
+    'inventoryNumber',
+    'dataAchizitie',
+    'purchaseDate',
+    'garantie',
+    'warranty',
+  ].forEach((key) => {
+    delete (remainingMetadata as Record<string, unknown>)[key];
+  });
+
+  const dedicatedEntries = [
+    { key: 'CPU', value: dedicated.cpu },
+    { key: 'RAM', value: dedicated.ram },
+    { key: 'Stocare', value: dedicated.stocare },
+    { key: 'OS', value: dedicated.os },
+    { key: 'Versiune firmware', value: dedicated.versiuneFirmware },
+    { key: 'Număr inventar', value: dedicated.numarInventar },
+    { key: 'Dată achiziție', value: dedicated.dataAchizitie },
+    { key: 'Garanție', value: dedicated.garantie },
+  ].filter((e) => e.value);
+
   return (
     <Container className="space-y-4 py-6">
       <div className="flex items-center gap-2">
@@ -69,12 +124,27 @@ export default function EquipmentDetail() {
         <p>Stare: {EQUIPMENT_STATUS_LABELS[data.stare] ?? data.stare}</p>
         {data.angajat && <p>Predat la: {data.angajat.numeComplet}</p>}
       </div>
-      {data.metadata && (
+      {dedicatedEntries.length > 0 && (
+        <div>
+          <h2 className="mb-2 font-medium">Detalii</h2>
+          <Card className="p-4">
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              {dedicatedEntries.map(({ key, value }) => (
+                <Fragment key={key}>
+                  <span className="font-medium">{key}</span>
+                  <span className="text-muted-foreground">{String(value)}</span>
+                </Fragment>
+              ))}
+            </div>
+          </Card>
+        </div>
+      )}
+      {Object.keys(remainingMetadata).length > 0 && (
         <div>
           <h2 className="mb-2 font-medium">Metadata</h2>
           <Card className="p-4">
             <div className="grid grid-cols-2 gap-2 text-sm">
-              {flattenMetadata(data.metadata as Record<string, unknown>).map(([key, value]) => (
+              {flattenMetadata(remainingMetadata).map(([key, value]) => (
                 <Fragment key={key}>
                   <span className="font-medium">{key}</span>
                   <span className="text-muted-foreground">{value}</span>

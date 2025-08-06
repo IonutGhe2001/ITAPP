@@ -59,4 +59,34 @@ describe('updateEchipament', () => {
     expect(mockedProcesVerbal).not.toHaveBeenCalled();
     expect(res).toEqual({ id: 'e1', angajatId: 'a2' });
   });
+
+  it('updates technical details', async () => {
+    tx.echipament.findUnique.mockResolvedValue({
+      id: 'e1',
+      tip: 'T',
+      serie: 'S',
+      angajatId: null,
+    });
+    tx.echipament.update.mockResolvedValue({ id: 'e1', cpu: 'i7', ram: '16GB' });
+
+    const details = {
+      cpu: 'i7',
+      ram: '16GB',
+      stocare: '512GB',
+      os: 'Windows',
+      versiuneFirmware: '1.0',
+      numarInventar: 'INV-1',
+      dataAchizitie: new Date('2024-01-01'),
+      garantie: new Date('2025-01-01'),
+    } as const;
+
+    const res = await updateEchipament('e1', details);
+
+    expect(tx.echipament.update).toHaveBeenCalledWith({
+      where: { id: 'e1' },
+      data: expect.objectContaining(details),
+      include: { angajat: true },
+    });
+    expect(res).toEqual({ id: 'e1', cpu: 'i7', ram: '16GB' });
+  });
 });

@@ -64,6 +64,14 @@ export const createEchipament = (data: {
   stare?: string;
   serie: string;
   angajatId?: string | null;
+  cpu?: string;
+  ram?: string;
+  stocare?: string;
+  os?: string;
+  versiuneFirmware?: string;
+  numarInventar?: string;
+  dataAchizitie?: Date | string;
+  garantie?: Date | string;
   metadata?: JsonValue;
 }) => {
   const finalStare = data.stare
@@ -127,6 +135,14 @@ export const updateEchipament = async (
     stare?: string;
     angajatId?: string | null;
     metadata?: JsonValue;
+    cpu?: string;
+    ram?: string;
+    stocare?: string;
+    os?: string;
+    versiuneFirmware?: string;
+    numarInventar?: string;
+    dataAchizitie?: Date | string;
+    garantie?: Date | string;
   }
 ) => {
   return prisma.$transaction(async (tx: TransactionClient) => {
@@ -144,6 +160,20 @@ export const updateEchipament = async (
         ...(data.stare !== undefined && { stare: data.stare }),
         ...(data.angajatId !== undefined && { angajatId: data.angajatId }),
         ...(data.metadata !== undefined && { metadata: data.metadata }),
+        ...(data.cpu !== undefined && { cpu: data.cpu }),
+        ...(data.ram !== undefined && { ram: data.ram }),
+        ...(data.stocare !== undefined && { stocare: data.stocare }),
+        ...(data.os !== undefined && { os: data.os }),
+        ...(data.versiuneFirmware !== undefined && {
+          versiuneFirmware: data.versiuneFirmware,
+        }),
+        ...(data.numarInventar !== undefined && {
+          numarInventar: data.numarInventar,
+        }),
+        ...(data.dataAchizitie !== undefined && {
+          dataAchizitie: data.dataAchizitie,
+        }),
+        ...(data.garantie !== undefined && { garantie: data.garantie }),
       },
       include: {
         angajat: true,

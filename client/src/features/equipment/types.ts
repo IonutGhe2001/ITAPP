@@ -40,6 +40,14 @@ export interface Echipament {
     numeComplet: string;
     id: string;
   };
+  cpu?: string;
+  ram?: string;
+  stocare?: string;
+  os?: string;
+  versiuneFirmware?: string;
+  numarInventar?: string;
+  dataAchizitie?: string;
+  garantie?: string;
   metadata?: Record<string, unknown>;
 }
 
@@ -49,6 +57,14 @@ export interface EchipamentInput {
   serie: string;
   angajatId: string | null;
   stare?: EquipmentStatus;
+  cpu?: string;
+  ram?: string;
+  stocare?: string;
+  os?: string;
+  versiuneFirmware?: string;
+  numarInventar?: string;
+  dataAchizitie?: string;
+  garantie?: string;
   metadata?: unknown;
 }
 
@@ -58,6 +74,14 @@ export interface EchipamentUpdateInput {
   serie?: string;
   angajatId?: string | null;
   stare?: EquipmentStatus;
+  cpu?: string;
+  ram?: string;
+  stocare?: string;
+  os?: string;
+  versiuneFirmware?: string;
+  numarInventar?: string;
+  dataAchizitie?: string;
+  garantie?: string;
   metadata?: unknown;
 }
 
