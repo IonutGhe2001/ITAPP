@@ -81,6 +81,7 @@ model Echipament {
   proceseVerbale ProcesVerbal[] @relation("EchipamenteProcesVerbal")
   changes      EquipmentChange[]
   documents    EquipmentDocument[]
+  images       EquipmentImage[]
 
   @@unique([tip, serie])
 }
@@ -135,6 +136,14 @@ model EquipmentDocument {
   echipament   Echipament @relation(fields: [echipamentId], references: [id])
   name         String
   path         String
+  createdAt    DateTime  @default(now())
+}
+
+model EquipmentImage {
+  id           String    @id @default(uuid())
+  echipamentId String
+  echipament   Echipament @relation(fields: [echipamentId], references: [id])
+  url          String
   createdAt    DateTime  @default(now())
 }
 

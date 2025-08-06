@@ -1,6 +1,7 @@
 import express from "express";
 import * as controller from "../controllers/echipamenteController";
 import * as docController from "../controllers/equipmentDocumentController";
+import * as imageController from "../controllers/equipmentImageController";
 import multer from "multer";
 import path from "path";
 import { validateRequest } from "../middlewares/validateRequest";
@@ -14,8 +15,11 @@ const router = express.Router();
 
 router.use(authenticate);
 
-const upload = multer({
+const uploadDoc = multer({
   dest: path.join(__dirname, "../../public/equipment-documents"),
+});
+const uploadImage = multer({
+  dest: path.join(__dirname, "../../public/equipment-images"),
 });
 
 router.get("/", controller.getEchipamente);
@@ -28,8 +32,15 @@ router.get("/:id/documents", docController.listDocuments);
 router.post(
   "/:id/documents",
   authorizeRoles("admin"),
-  upload.single("file"),
+  uploadDoc.single("file"),
   docController.uploadDocument,
+);
+router.get("/:id/images", imageController.listImages);
+router.post(
+  "/:id/images",
+  authorizeRoles("admin"),
+  uploadImage.single("file"),
+  imageController.uploadImage,
 );
 router.post(
   "/",

@@ -146,6 +146,20 @@ export default function EquipmentDetail() {
         <p>Stare: {EQUIPMENT_STATUS_LABELS[data.stare] ?? data.stare}</p>
         {data.angajat && <p>Predat la: {data.angajat.numeComplet}</p>}
       </div>
+      {data.images && data.images.length > 0 ? (
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+          {data.images.map((img) => (
+            <img
+              key={img.id}
+              src={`${apiBase}${img.url}`}
+              alt={data.nume}
+              className="h-40 w-full rounded object-cover"
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="text-muted-foreground text-sm">Nu există imagini disponibile.</p>
+      )}
       {dedicatedEntries.length > 0 && (
         <div>
           <h2 className="mb-2 font-medium">Detalii</h2>

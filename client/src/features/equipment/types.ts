@@ -50,6 +50,7 @@ export interface Echipament {
   garantie?: string;
   metadata?: Record<string, unknown>;
   documents?: EquipmentDocument[];
+  images?: EquipmentImage[];
 }
 
 export interface EchipamentInput {
@@ -90,6 +91,12 @@ export interface EquipmentDocument {
   id: string;
   name: string;
   path: string;
+  createdAt: string;
+}
+
+export interface EquipmentImage {
+  id: string;
+  url: string;
   createdAt: string;
 }
 
