@@ -45,9 +45,13 @@ const uploadImage = multer({
 });
 
 const handleUpload =
-  (upload: multer.Multer["single"]) =>
-  (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    upload(req, res, (err) => {
+  (upload: ReturnType<multer.Multer["single"]>) =>
+  (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    upload(req, res, (err: unknown) => {
       if (err) {
         (req as any).multerError = err;
       }
