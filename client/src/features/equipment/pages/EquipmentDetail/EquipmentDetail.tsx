@@ -71,6 +71,7 @@ export default function EquipmentDetail() {
   const [confirmDefect, setConfirmDefect] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
   const [docError, setDocError] = useState<string | null>(null);
+  const [selectedDoc, setSelectedDoc] = useState<{ name: string; path: string } | null>(null);
 
   const PAGE_SIZE = 20;
   const {
@@ -392,14 +393,13 @@ export default function EquipmentDetail() {
                     {data.documents.map((doc) => (
                       <li key={doc.id} className="flex justify-between">
                         <span>{doc.name}</span>
-                        <a
-                          href={`${apiBase}${doc.path}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary underline"
+                        <Button
+                          variant="link"
+                          className="p-0 h-auto font-normal"
+                          onClick={() => setSelectedDoc({ name: doc.name, path: doc.path })}
                         >
                           Vezi
-                        </a>
+                        </Button>
                       </li>
                     ))}
                   </ul>
@@ -481,6 +481,29 @@ export default function EquipmentDetail() {
           onClose={() => setShowReassign(false)}
           onSubmit={(eq) => handleReassignSubmit(eq as Echipament)}
         />
+      )}
+      {selectedDoc && (
+        <Dialog open onOpenChange={(open) => !open && setSelectedDoc(null)}>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>{selectedDoc.name}</DialogTitle>
+            </DialogHeader>
+            <iframe
+              src={`${apiBase}${selectedDoc.path}`}
+              className="h-[80vh] w-full"
+            />
+            <div className="flex justify-end pt-2">
+              <a
+                href={`${apiBase}${selectedDoc.path}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline text-sm"
+              >
+                Descarcă / deschide în tab nou
+              </a>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
       {confirmDefect && (
         <Dialog open onOpenChange={setConfirmDefect}>
