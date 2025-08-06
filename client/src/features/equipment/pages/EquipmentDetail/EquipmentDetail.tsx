@@ -20,6 +20,7 @@ import { QUERY_KEYS } from '@/constants/queryKeys';
 import http from '@/services/http';
 import { QRCodeCanvas } from 'qrcode.react';
 import type { Echipament } from '@/features/equipment';
+import { toast } from 'react-toastify';
 const apiBase = (import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '');
 const AGE_WARNING_YEARS = 3;
 const WARRANTY_SOON_DAYS = 30;
@@ -92,19 +93,33 @@ export default function EquipmentDetail() {
 
   const qrRef = useRef<HTMLDivElement>(null);
   const handleReassignSubmit = async (eq: Echipament) => {
-    await updateMutation.mutateAsync({
-      id: eq.id,
-      data: { angajatId: eq.angajatId, stare: eq.stare },
-    });
-    setShowReassign(false);
-    refetch();
+    try {
+      await updateMutation.mutateAsync({
+        id: eq.id,
+        data: { angajatId: eq.angajatId, stare: eq.stare },
+      });
+      setShowReassign(false);
+      refetch();
+      toast.success('Echipament reasignat cu succes');
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message?: string } } };
+      toast.error(axiosErr.response?.data?.message || 'Eroare la reasignare');
+    }
   };
 
   const handleMarkDefect = async () => {
     if (!id) return;
-    await updateMutation.mutateAsync({ id, data: { stare: 'mentenanta' } });
-    setConfirmDefect(false);
-    refetch();
+    try {
+      await updateMutation.mutateAsync({ id, data: { stare: 'mentenanta' } });
+      setConfirmDefect(false);
+      refetch();
+      toast.success('Echipament marcat ca defect');
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message?: string } } };
+      toast.error(
+        axiosErr.response?.data?.message || 'Eroare la marcarea defectului'
+      );
+    }
   };
   const handleDownload = () => {
     const canvas = qrRef.current?.querySelector('canvas');
@@ -141,9 +156,12 @@ export default function EquipmentDetail() {
       });
       setImageError(null);
       refetch();
+      toast.success('Imagine încărcată cu succes');
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string } } };
-      setImageError(axiosErr.response?.data?.message || 'Eroare la încărcare');
+      const message = axiosErr.response?.data?.message || 'Eroare la încărcare';
+      setImageError(message);
+      toast.error(message);
     }
   };
 
@@ -159,9 +177,12 @@ export default function EquipmentDetail() {
       });
       setDocError(null);
       refetch();
+      toast.success('Document încărcat cu succes');
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string } } };
-      setDocError(axiosErr.response?.data?.message || 'Eroare la încărcare');
+      const message = axiosErr.response?.data?.message || 'Eroare la încărcare';
+      setDocError(message);
+      toast.error(message);
     }
   };
 
