@@ -1,22 +1,9 @@
-import { useRef, useState, type JSX } from 'react';
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import {
-  ArrowLeft,
-  AlertTriangle,
-  Clock,
-  Trash2,
-  Upload,
-  Download,
-  Replace,
-  ImageUp,
-  FileUp,
-  type LucideIcon,
-} from 'lucide-react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { ArrowLeft } from 'lucide-react';
 import Container from '@/components/Container';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Alert } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   useEchipament,
@@ -27,41 +14,13 @@ import {
 } from '@/features/equipment';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ROUTES } from '@/constants/routes';
-import { QUERY_KEYS } from '@/constants/queryKeys';
-import http from '@/services/http';
-import { QRCodeCanvas } from 'qrcode.react';
 import type { Echipament } from '@/features/equipment';
 import { toast } from 'react-toastify';
-import UploadButton from '@/components/UploadButton';
-const apiBase = (import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '');
-const AGE_WARNING_YEARS = 3;
-const WARRANTY_SOON_DAYS = 30;
-const DEFECT_WARNING_DAYS = 30;
-
-type EquipmentChange = {
-  id: string;
-  tip: 'ASSIGN' | 'RETURN' | 'REPLACE';
-  createdAt: string;
-  angajat?: { numeComplet: string };
-};
-
-const EQUIPMENT_CHANGE_LABELS: Record<EquipmentChange['tip'], string> = {
-  ASSIGN: 'Predare',
-  RETURN: 'Returnare',
-  REPLACE: 'Înlocuire',
-};
-
-const EQUIPMENT_CHANGE_ICONS: Record<EquipmentChange['tip'], LucideIcon> = {
-  ASSIGN: Upload,
-  RETURN: Download,
-  REPLACE: Replace,
-};
-
-const EQUIPMENT_CHANGE_COLORS: Record<EquipmentChange['tip'], string> = {
-  ASSIGN: 'text-green-500',
-  RETURN: 'text-blue-500',
-  REPLACE: 'text-orange-500',
-};
+import EquipmentAlerts from './EquipmentAlerts';
+import ImageGallery from './ImageGallery';
+import DocumentSection from './DocumentSection';
+import QRCodeSection from './QRCodeSection';
+import HistoryList from './HistoryList';
 
 function flattenMetadata(metadata: Record<string, unknown>, prefix = ''): [string, string][] {
   return Object.entries(metadata).flatMap(([key, value]) => {
@@ -93,32 +52,7 @@ export default function EquipmentDetail() {
   const [showEdit, setShowEdit] = useState(false);
   const [showReassign, setShowReassign] = useState(false);
   const [confirmDefect, setConfirmDefect] = useState(false);
-  const [imageError, setImageError] = useState<string | null>(null);
-  const [docError, setDocError] = useState<string | null>(null);
-  const [selectedDoc, setSelectedDoc] = useState<{ name: string; path: string } | null>(null);
-  const [deleteImageId, setDeleteImageId] = useState<string | null>(null);
-  const [deleteDocId, setDeleteDocId] = useState<string | null>(null);
 
-  const PAGE_SIZE = 20;
-  const {
-    data: historyPages,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery<EquipmentChange[]>({
-    queryKey: [...QUERY_KEYS.EQUIPMENT, id || '', 'history'],
-    queryFn: ({ pageParam = 0 }) =>
-      http.get<EquipmentChange[]>(
-        `/equipment-changes/history/${id}?skip=${pageParam}&take=${PAGE_SIZE}`
-      ),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.length < PAGE_SIZE ? undefined : allPages.length * PAGE_SIZE,
-    enabled: !!id,
-  });
-  const history: EquipmentChange[] = historyPages?.pages.flat() ?? [];
-
-  const qrRef = useRef<HTMLDivElement>(null);
   const handleReassignSubmit = async (eq: Echipament) => {
     try {
       await updateMutation.mutateAsync({
@@ -144,96 +78,6 @@ export default function EquipmentDetail() {
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string } } };
       toast.error(axiosErr.response?.data?.message || 'Eroare la marcarea defectului');
-    }
-  };
-  const handleDownload = () => {
-    const canvas = qrRef.current?.querySelector('canvas');
-    if (!canvas) return;
-    const url = canvas.toDataURL('image/png');
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `equipment-${id}-qr.png`;
-    link.click();
-  };
-
-  const handlePrint = () => {
-    const canvas = qrRef.current?.querySelector('canvas');
-    if (!canvas) return;
-    const url = canvas.toDataURL('image/png');
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-    printWindow.document.write(`<img src="${url}" style="width:100%" />`);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!id) return;
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const formData = new FormData();
-    formData.append('file', file);
-    try {
-      await http.post(`/echipamente/${id}/images`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      setImageError(null);
-      refetch();
-      toast.success('Imagine încărcată cu succes');
-    } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: { message?: string } } };
-      const message = axiosErr.response?.data?.message || 'Eroare la încărcare';
-      setImageError(message);
-      toast.error(message);
-    }
-  };
-
-  const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!id) return;
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const formData = new FormData();
-    formData.append('file', file);
-    try {
-      await http.post(`/echipamente/${id}/documents`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      setDocError(null);
-      refetch();
-      toast.success('Document încărcat cu succes');
-    } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: { message?: string } } };
-      const message = axiosErr.response?.data?.message || 'Eroare la încărcare';
-      setDocError(message);
-      toast.error(message);
-    }
-  };
-
-  const handleDeleteImage = async () => {
-    if (!id || !deleteImageId) return;
-    try {
-      await http.delete(`/echipamente/${id}/images/${deleteImageId}`);
-      setDeleteImageId(null);
-      refetch();
-      toast.success('Imagine ștearsă cu succes');
-    } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: { message?: string } } };
-      toast.error(axiosErr.response?.data?.message || 'Eroare la ștergere');
-    }
-  };
-
-  const handleDeleteDocument = async () => {
-    if (!id || !deleteDocId) return;
-    try {
-      await http.delete(`/echipamente/${id}/documents/${deleteDocId}`);
-      setDeleteDocId(null);
-      refetch();
-      toast.success('Document șters cu succes');
-    } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: { message?: string } } };
-      toast.error(axiosErr.response?.data?.message || 'Eroare la ștergere');
     }
   };
 
@@ -307,52 +151,6 @@ export default function EquipmentDetail() {
   ].filter((e) => e.value);
 
   const meta = data.meta || {};
-  const alerts: JSX.Element[] = [];
-
-  if (meta.ageYears !== undefined && meta.ageYears >= AGE_WARNING_YEARS) {
-    alerts.push(
-      <Alert variant="warning" icon={<Clock className="h-4 w-4" aria-hidden="true" />} key="age">
-        Vechime {meta.ageYears} ani
-      </Alert>
-    );
-  }
-
-  if (meta.warrantyDaysLeft !== undefined) {
-    if (meta.warrantyDaysLeft <= 0) {
-      alerts.push(
-        <Alert
-          variant="destructive"
-          icon={<AlertTriangle className="h-4 w-4" aria-hidden="true" />}
-          key="warranty"
-        >
-          Garanție expirată
-        </Alert>
-      );
-    } else if (meta.warrantyDaysLeft <= WARRANTY_SOON_DAYS) {
-      alerts.push(
-        <Alert
-          variant="warning"
-          icon={<Clock className="h-4 w-4" aria-hidden="true" />}
-          key="warranty-soon"
-        >
-          Garanția expiră în {meta.warrantyDaysLeft} zile
-        </Alert>
-      );
-    }
-  }
-
-  if (meta.defectDays !== undefined && data.stare === 'mentenanta') {
-    const variant = meta.defectDays > DEFECT_WARNING_DAYS ? 'destructive' : 'warning';
-    alerts.push(
-      <Alert
-        variant={variant}
-        icon={<AlertTriangle className="h-4 w-4" aria-hidden="true" />}
-        key="defect"
-      >
-        Defect de {meta.defectDays} zile
-      </Alert>
-    );
-  }
 
   return (
     <>
@@ -371,7 +169,7 @@ export default function EquipmentDetail() {
           <p>Stare: {EQUIPMENT_STATUS_LABELS[data.stare] ?? data.stare}</p>
           {data.angajat && <p>Predat la: {data.angajat.numeComplet}</p>}
         </div>
-        {alerts.length > 0 && <div className="flex flex-wrap gap-2">{alerts}</div>}
+        <EquipmentAlerts meta={meta} stare={data.stare} />
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => setShowEdit(true)}>Editează</Button>
           <Button variant="outline" onClick={() => setShowReassign(true)}>
@@ -384,39 +182,8 @@ export default function EquipmentDetail() {
             <Link to={ROUTES.EMPLOYEE_FORM}>Generare fișă</Link>
           </Button>
         </div>
-        {data.images && data.images.length > 0 ? (
-          <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
-            {data.images.map((img) => (
-              <div key={img.id} className="relative">
-                <img
-                  src={`${apiBase}${img.url}`}
-                  alt={data.nume}
-                  className="aspect-video rounded object-cover"
-                />
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  className="absolute right-1 top-1 h-6 w-6"
-                  onClick={() => setDeleteImageId(img.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-muted-foreground text-sm">Nu există imagini disponibile.</p>
-        )}
-        <div className="space-y-2">
-          <UploadButton
-            accept="image/png,image/jpeg"
-            onChange={handleImageUpload}
-            variant="outline"
-          >
-            <ImageUp className="mr-2 h-4 w-4" /> Încarcă imagine
-          </UploadButton>
-          {imageError && <p className="text-sm text-red-500">{imageError}</p>}
-        </div>
+        
+        <ImageGallery id={id!} images={data.images || []} refetch={refetch} />
         <Tabs defaultValue="detalii" className="space-y-6">
           <TabsList className="flex flex-wrap gap-2">
             {dedicatedEntries.length > 0 && <TabsTrigger value="detalii">Detalii</TabsTrigger>}
@@ -425,7 +192,7 @@ export default function EquipmentDetail() {
             )}
             <TabsTrigger value="documente">Documente</TabsTrigger>
             <TabsTrigger value="codqr">Cod QR</TabsTrigger>
-            {history.length > 0 && <TabsTrigger value="istoric">Istoric</TabsTrigger>}
+            <TabsTrigger value="istoric">Istoric</TabsTrigger>
           </TabsList>
           {dedicatedEntries.length > 0 && (
             <TabsContent value="detalii">
@@ -462,107 +229,16 @@ export default function EquipmentDetail() {
             </TabsContent>
           )}
           <TabsContent value="documente">
-            <div className="space-y-4">
-              <h2 className="font-medium">Documente</h2>
-              {data.documents && data.documents.length > 0 ? (
-                <Card className="p-4">
-                  <ul className="space-y-2 text-sm">
-                    {data.documents.map((doc) => (
-                      <li key={doc.id} className="flex items-center justify-between">
-                        <span>{doc.name}</span>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="link"
-                            className="h-auto p-0 font-normal"
-                            onClick={() => setSelectedDoc({ name: doc.name, path: doc.path })}
-                          >
-                            Vezi
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="icon"
-                            onClick={() => setDeleteDocId(doc.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </Card>
-              ) : (
-                <Card className="p-4">
-                  <p className="text-muted-foreground text-sm">Nu există documente disponibile.</p>
-                </Card>
-              )}
-              <div className="space-y-2">
-                <UploadButton
-                  accept="application/pdf"
-                  onChange={handleDocumentUpload}
-                  variant="outline"
-                >
-                  <FileUp className="mr-2 h-4 w-4" /> Încarcă document
-                </UploadButton>
-                {docError && <p className="text-sm text-red-500">{docError}</p>}
-              </div>
-            </div>
+             <DocumentSection
+              id={id!}
+              documents={data.documents || []}
+              refetch={refetch}
+            />
           </TabsContent>
           <TabsContent value="codqr">
-            <div className="space-y-4">
-              <h2 className="font-medium">Cod QR</h2>
-              <Card className="flex flex-col items-center gap-4 p-4">
-                <div ref={qrRef}>
-                  <QRCodeCanvas value={window.location.href} size={128} />
-                </div>
-                <div className="flex gap-2">
-                  <Button onClick={handleDownload}>Descarcă</Button>
-                  <Button variant="outline" onClick={handlePrint}>
-                    Printează
-                  </Button>
-                </div>
-              </Card>
-            </div>
+            <QRCodeSection id={id!} />
           </TabsContent>
-          {history.length > 0 && (
-            <TabsContent value="istoric">
-              <div className="space-y-4">
-                <h2 className="font-medium">Istoric</h2>
-                <Card className="p-4">
-                  <div className="space-y-4">
-                    <ul className="space-y-2 text-sm">
-                      {history.map((item) => {
-                        const Icon = EQUIPMENT_CHANGE_ICONS[item.tip];
-                        return (
-                          <li key={item.id} className="flex items-center justify-between">
-                            <span className="flex items-center gap-2">
-                              <Icon className={`h-4 w-4 ${EQUIPMENT_CHANGE_COLORS[item.tip]}`} />
-                              <span>
-                                {EQUIPMENT_CHANGE_LABELS[item.tip]}
-                                {item.angajat?.numeComplet && ` - ${item.angajat.numeComplet}`}
-                              </span>
-                            </span>
-                            <span className="text-muted-foreground">
-                              {new Date(item.createdAt).toLocaleString('ro-RO')}
-                            </span>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    {hasNextPage && (
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => fetchNextPage()}
-                        disabled={isFetchingNextPage}
-                      >
-                        {isFetchingNextPage ? 'Se încarcă...' : 'Încarcă mai mult'}
-                      </Button>
-                    )}
-                  </div>
-                </Card>
-              </div>
-            </TabsContent>
-          )}
+          <HistoryList id={id!} />
         </Tabs>
       </Container>
       {showEdit && (
@@ -581,64 +257,6 @@ export default function EquipmentDetail() {
           onClose={() => setShowReassign(false)}
           onSubmit={(eq) => handleReassignSubmit(eq as Echipament)}
         />
-      )}
-      {selectedDoc && (
-        <Dialog open onOpenChange={(open) => !open && setSelectedDoc(null)}>
-          <DialogContent className="max-w-4xl">
-            <DialogHeader>
-              <DialogTitle>{selectedDoc.name}</DialogTitle>
-            </DialogHeader>
-            <iframe src={`${apiBase}${selectedDoc.path}`} className="h-[80vh] w-full" />
-            <div className="mt-4 flex justify-end">
-              <a
-                href={`${apiBase}${selectedDoc.path}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary text-sm underline"
-              >
-                Descarcă / deschide în tab nou
-              </a>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
-      {deleteImageId && (
-        <Dialog open onOpenChange={(open) => !open && setDeleteImageId(null)}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Confirmare ștergere</DialogTitle>
-            </DialogHeader>
-            <p className="text-muted-foreground text-sm">
-              Sigur dorești să ștergi această imagine?
-            </p>
-            <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => setDeleteImageId(null)}>
-                Anulează
-              </Button>
-              <Button variant="destructive" onClick={handleDeleteImage}>
-                Confirmă
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
-      {deleteDocId && (
-        <Dialog open onOpenChange={(open) => !open && setDeleteDocId(null)}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Confirmare ștergere</DialogTitle>
-            </DialogHeader>
-            <p className="text-muted-foreground text-sm">Sigur dorești să ștergi acest document?</p>
-            <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => setDeleteDocId(null)}>
-                Anulează
-              </Button>
-              <Button variant="destructive" onClick={handleDeleteDocument}>
-                Confirmă
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
       )}
       {confirmDefect && (
         <Dialog open onOpenChange={setConfirmDefect}>
