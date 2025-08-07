@@ -5,7 +5,7 @@ import { genereazaProcesVerbal, type ProcesVerbalTip } from '@/features/proceseV
 import { queueProcesVerbal } from '@/features/proceseVerbale/pvQueue';
 import { getConfig } from '@/services/configService';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
-import { getApiErrorMessage } from '@/utils/apiError';
+import { handleApiError } from '@/utils/apiError';
 
 export default function ModalAsigneazaEchipament({
   angajatId,
@@ -82,7 +82,7 @@ export default function ModalAsigneazaEchipament({
     } catch (err) {
       toast({
         title: 'Eroare la asignare',
-        description: getApiErrorMessage(err),
+        description: handleApiError(err),
         variant: 'destructive',
       });
     }

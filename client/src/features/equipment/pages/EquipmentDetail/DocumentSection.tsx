@@ -6,6 +6,7 @@ import { FileUp, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import http from '@/services/http';
 import { toast } from 'react-toastify';
+import { handleApiError } from '@/utils/apiError';
 
 const apiBase = (import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '');
 
@@ -39,8 +40,7 @@ export default function DocumentSection({ id, documents, refetch }: Props) {
       refetch();
       toast.success('Document încărcat cu succes');
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: { message?: string } } };
-      const message = axiosErr.response?.data?.message || 'Eroare la încărcare';
+      const message = handleApiError(err, 'Eroare la încărcare');
       setDocError(message);
       toast.error(message);
     }
@@ -54,8 +54,7 @@ export default function DocumentSection({ id, documents, refetch }: Props) {
       refetch();
       toast.success('Document șters cu succes');
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: { message?: string } } };
-      toast.error(axiosErr.response?.data?.message || 'Eroare la ștergere');
+      toast.error(handleApiError(err, 'Eroare la ștergere'));
     }
   };
 

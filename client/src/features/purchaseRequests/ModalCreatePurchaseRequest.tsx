@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
-import { getApiErrorMessage } from '@/utils/apiError';
+import { handleApiError } from '@/utils/apiError';
 import { useCreatePurchaseRequest } from './purchaseRequestService';
 
 interface Props {
@@ -27,7 +27,7 @@ export default function ModalCreatePurchaseRequest({ equipmentType, onClose }: P
     } catch (err) {
       toast({
         title: 'Eroare',
-        description: getApiErrorMessage(err),
+        description: handleApiError(err),
         variant: 'destructive',
       });
     }

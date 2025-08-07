@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ROUTES } from '@/constants/routes';
 import type { Echipament } from '@/features/equipment';
 import { toast } from 'react-toastify';
+import { handleApiError } from '@/utils/apiError';
 import EquipmentAlerts from './EquipmentAlerts';
 import ImageGallery from './ImageGallery';
 import DocumentSection from './DocumentSection';
@@ -63,8 +64,7 @@ export default function EquipmentDetail() {
       refetch();
       toast.success('Echipament reasignat cu succes');
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: { message?: string } } };
-      toast.error(axiosErr.response?.data?.message || 'Eroare la reasignare');
+      toast.error(handleApiError(err, 'Eroare la reasignare'));
     }
   };
 
@@ -76,8 +76,7 @@ export default function EquipmentDetail() {
       refetch();
       toast.success('Echipament marcat ca defect');
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: { message?: string } } };
-      toast.error(axiosErr.response?.data?.message || 'Eroare la marcarea defectului');
+      toast.error(handleApiError(err, 'Eroare la marcarea defectului'));
     }
   };
 

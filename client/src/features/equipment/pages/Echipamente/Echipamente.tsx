@@ -2,7 +2,7 @@ import React, { useState, Suspense } from 'react';
 import type { Echipament } from '@/features/equipment/types';
 import { useEchipamente, useDeleteEchipament, useUpdateEchipament } from '@/features/equipment';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
-import { getApiErrorMessage } from '@/utils/apiError';
+import { handleApiError } from '@/utils/apiError';
 import {
   EquipmentFilter,
   EquipmentList,
@@ -95,7 +95,7 @@ export default function Echipamente() {
         console.error('❌ Eroare la update rapid:', err);
         toast({
           title: 'Eroare la actualizare',
-          description: getApiErrorMessage(err),
+          description: handleApiError(err),
           variant: 'destructive',
         });
       }
