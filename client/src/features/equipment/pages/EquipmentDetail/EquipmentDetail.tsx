@@ -1,4 +1,4 @@
-import { Fragment, useRef, useState, type JSX } from 'react';
+import { useRef, useState, type JSX } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, AlertTriangle, Clock, Trash2 } from 'lucide-react';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -355,7 +355,7 @@ export default function EquipmentDetail() {
                 <img
                   src={`${apiBase}${img.url}`}
                   alt={data.nume}
-                  className="aspect-video object-cover rounded"
+                  className="aspect-video rounded object-cover"
                 />
                 <Button
                   variant="destructive"
@@ -390,12 +390,12 @@ export default function EquipmentDetail() {
               <div className="space-y-4">
                 <h2 className="font-medium">Detalii</h2>
                 <Card className="p-4">
-                  <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2 md:grid-cols-3">
                     {dedicatedEntries.map(({ key, value }) => (
-                      <Fragment key={key}>
+                      <div key={key} className="grid grid-cols-[auto,1fr] gap-2">
                         <span className="font-medium">{key}</span>
                         <span className="text-muted-foreground">{String(value)}</span>
-                      </Fragment>
+                      </div>
                     ))}
                   </div>
                 </Card>
@@ -407,12 +407,12 @@ export default function EquipmentDetail() {
               <div className="space-y-4">
                 <h2 className="font-medium">Metadata</h2>
                 <Card className="p-4">
-                  <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2 md:grid-cols-3">
                     {flattenMetadata(remainingMetadata).map(([key, value]) => (
-                      <Fragment key={key}>
+                      <div key={key} className="grid grid-cols-[auto,1fr] gap-2">
                         <span className="font-medium">{key}</span>
                         <span className="text-muted-foreground">{value}</span>
-                      </Fragment>
+                      </div>
                     ))}
                   </div>
                 </Card>
