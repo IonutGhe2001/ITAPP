@@ -43,7 +43,19 @@ app.use(
 );
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        imgSrc: ["'self'", "data:", "blob:", ...allowedOrigins],
+        frameAncestors: ["'self'", ...allowedOrigins],
+      },
+    },
+  })
+);
 app.use(cookieParser());
 app.use(compression());
 
