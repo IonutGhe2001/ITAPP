@@ -8,6 +8,8 @@ import {
   Upload,
   Download,
   Replace,
+  ImageUp,
+  FileUp,
   type LucideIcon,
 } from 'lucide-react';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -30,6 +32,7 @@ import http from '@/services/http';
 import { QRCodeCanvas } from 'qrcode.react';
 import type { Echipament } from '@/features/equipment';
 import { toast } from 'react-toastify';
+import UploadButton from '@/components/UploadButton';
 const apiBase = (import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '');
 const AGE_WARNING_YEARS = 3;
 const WARRANTY_SOON_DAYS = 30;
@@ -393,7 +396,13 @@ export default function EquipmentDetail() {
           <p className="text-muted-foreground text-sm">Nu există imagini disponibile.</p>
         )}
         <div className="space-y-2">
-          <input type="file" accept="image/png,image/jpeg" onChange={handleImageUpload} />
+          <UploadButton
+            accept="image/png,image/jpeg"
+            onChange={handleImageUpload}
+            variant="outline"
+          >
+            <ImageUp className="mr-2 h-4 w-4" /> Încarcă imagine
+          </UploadButton>
           {imageError && <p className="text-sm text-red-500">{imageError}</p>}
         </div>
         <Tabs defaultValue="detalii" className="space-y-6">
@@ -475,7 +484,13 @@ export default function EquipmentDetail() {
                 </Card>
               )}
               <div className="space-y-2">
-                <input type="file" accept="application/pdf" onChange={handleDocumentUpload} />
+                <UploadButton
+                  accept="application/pdf"
+                  onChange={handleDocumentUpload}
+                  variant="outline"
+                >
+                  <FileUp className="mr-2 h-4 w-4" /> Încarcă document
+                </UploadButton>
                 {docError && <p className="text-sm text-red-500">{docError}</p>}
               </div>
             </div>
