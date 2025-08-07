@@ -320,7 +320,7 @@ export default function EquipmentDetail() {
 
   return (
     <>
-      <Container className="space-y-4 py-6">
+      <Container className="space-y-6 py-6">
         <div className="flex items-center gap-2">
           <Link to={ROUTES.EQUIPMENT}>
             <ArrowLeft className="h-5 w-5" />
@@ -335,8 +335,8 @@ export default function EquipmentDetail() {
           <p>Stare: {EQUIPMENT_STATUS_LABELS[data.stare] ?? data.stare}</p>
           {data.angajat && <p>Predat la: {data.angajat.numeComplet}</p>}
         </div>
-        {alerts.length > 0 && <div className="flex flex-wrap gap-2 pt-2">{alerts}</div>}
-        <div className="flex flex-wrap gap-2 pt-2">
+        {alerts.length > 0 && <div className="flex flex-wrap gap-2">{alerts}</div>}
+        <div className="flex flex-wrap gap-2">
           <Button onClick={() => setShowEdit(true)}>Editează</Button>
           <Button variant="outline" onClick={() => setShowReassign(true)}>
             Reasignare
@@ -371,11 +371,11 @@ export default function EquipmentDetail() {
         ) : (
           <p className="text-muted-foreground text-sm">Nu există imagini disponibile.</p>
         )}
-        <div className="mt-2">
+        <div className="space-y-2">
           <input type="file" accept="image/png,image/jpeg" onChange={handleImageUpload} />
           {imageError && <p className="text-sm text-red-500">{imageError}</p>}
         </div>
-        <Tabs defaultValue="detalii" className="space-y-4">
+        <Tabs defaultValue="detalii" className="space-y-6">
           <TabsList className="flex flex-wrap gap-2">
             {dedicatedEntries.length > 0 && <TabsTrigger value="detalii">Detalii</TabsTrigger>}
             {Object.keys(remainingMetadata).length > 0 && (
@@ -387,8 +387,8 @@ export default function EquipmentDetail() {
           </TabsList>
           {dedicatedEntries.length > 0 && (
             <TabsContent value="detalii">
-              <div>
-                <h2 className="mb-2 font-medium">Detalii</h2>
+              <div className="space-y-4">
+                <h2 className="font-medium">Detalii</h2>
                 <Card className="p-4">
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     {dedicatedEntries.map(({ key, value }) => (
@@ -404,8 +404,8 @@ export default function EquipmentDetail() {
           )}
           {Object.keys(remainingMetadata).length > 0 && (
             <TabsContent value="metadata">
-              <div>
-                <h2 className="mb-2 font-medium">Metadata</h2>
+              <div className="space-y-4">
+                <h2 className="font-medium">Metadata</h2>
                 <Card className="p-4">
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     {flattenMetadata(remainingMetadata).map(([key, value]) => (
@@ -420,8 +420,8 @@ export default function EquipmentDetail() {
             </TabsContent>
           )}
           <TabsContent value="documente">
-            <div>
-              <h2 className="mb-2 font-medium">Documente</h2>
+            <div className="space-y-4">
+              <h2 className="font-medium">Documente</h2>
               {data.documents && data.documents.length > 0 ? (
                 <Card className="p-4">
                   <ul className="space-y-2 text-sm">
@@ -453,15 +453,15 @@ export default function EquipmentDetail() {
                   <p className="text-muted-foreground text-sm">Nu există documente disponibile.</p>
                 </Card>
               )}
-              <div className="mt-2">
+              <div className="space-y-2">
                 <input type="file" accept="application/pdf" onChange={handleDocumentUpload} />
                 {docError && <p className="text-sm text-red-500">{docError}</p>}
               </div>
             </div>
           </TabsContent>
           <TabsContent value="codqr">
-            <div>
-              <h2 className="mb-2 font-medium">Cod QR</h2>
+            <div className="space-y-4">
+              <h2 className="font-medium">Cod QR</h2>
               <Card className="flex flex-col items-center gap-4 p-4">
                 <div ref={qrRef}>
                   <QRCodeCanvas value={window.location.href} size={128} />
@@ -477,32 +477,34 @@ export default function EquipmentDetail() {
           </TabsContent>
           {history.length > 0 && (
             <TabsContent value="istoric">
-              <div>
-                <h2 className="mb-2 font-medium">Istoric</h2>
+              <div className="space-y-4">
+                <h2 className="font-medium">Istoric</h2>
                 <Card className="p-4">
-                  <ul className="space-y-2 text-sm">
-                    {history.map((item) => (
-                      <li key={item.id} className="flex justify-between">
-                        <span>
-                          {EQUIPMENT_CHANGE_LABELS[item.tip]}
-                          {item.angajat?.numeComplet && ` - ${item.angajat.numeComplet}`}
-                        </span>
-                        <span className="text-muted-foreground">
-                          {new Date(item.createdAt).toLocaleString('ro-RO')}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                  {hasNextPage && (
-                    <Button
-                      variant="outline"
-                      className="mt-2 w-full"
-                      onClick={() => fetchNextPage()}
-                      disabled={isFetchingNextPage}
-                    >
-                      {isFetchingNextPage ? 'Se încarcă...' : 'Încarcă mai mult'}
-                    </Button>
-                  )}
+                  <div className="space-y-4">
+                    <ul className="space-y-2 text-sm">
+                      {history.map((item) => (
+                        <li key={item.id} className="flex justify-between">
+                          <span>
+                            {EQUIPMENT_CHANGE_LABELS[item.tip]}
+                            {item.angajat?.numeComplet && ` - ${item.angajat.numeComplet}`}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {new Date(item.createdAt).toLocaleString('ro-RO')}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                    {hasNextPage && (
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => fetchNextPage()}
+                        disabled={isFetchingNextPage}
+                      >
+                        {isFetchingNextPage ? 'Se încarcă...' : 'Încarcă mai mult'}
+                      </Button>
+                    )}
+                  </div>
                 </Card>
               </div>
             </TabsContent>
@@ -533,7 +535,7 @@ export default function EquipmentDetail() {
               <DialogTitle>{selectedDoc.name}</DialogTitle>
             </DialogHeader>
             <iframe src={`${apiBase}${selectedDoc.path}`} className="h-[80vh] w-full" />
-            <div className="flex justify-end pt-2">
+            <div className="mt-4 flex justify-end">
               <a
                 href={`${apiBase}${selectedDoc.path}`}
                 target="_blank"
