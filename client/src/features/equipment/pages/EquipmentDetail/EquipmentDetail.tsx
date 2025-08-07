@@ -1,6 +1,6 @@
 import { Fragment, useRef, useState, type JSX } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, AlertTriangle, Clock } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, Clock, Trash2 } from 'lucide-react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import Container from '@/components/Container';
 import { Card } from '@/components/ui/card';
@@ -72,6 +72,8 @@ export default function EquipmentDetail() {
   const [imageError, setImageError] = useState<string | null>(null);
   const [docError, setDocError] = useState<string | null>(null);
   const [selectedDoc, setSelectedDoc] = useState<{ name: string; path: string } | null>(null);
+  const [deleteImageId, setDeleteImageId] = useState<string | null>(null);
+  const [deleteDocId, setDeleteDocId] = useState<string | null>(null);
 
   const PAGE_SIZE = 20;
   const {
@@ -85,7 +87,7 @@ export default function EquipmentDetail() {
       http.get<EquipmentChange[]>(
         `/equipment-changes/history/${id}?skip=${pageParam}&take=${PAGE_SIZE}`
       ),
-      initialPageParam: 0,
+    initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length < PAGE_SIZE ? undefined : allPages.length * PAGE_SIZE,
     enabled: !!id,
@@ -117,9 +119,7 @@ export default function EquipmentDetail() {
       toast.success('Echipament marcat ca defect');
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string } } };
-      toast.error(
-        axiosErr.response?.data?.message || 'Eroare la marcarea defectului'
-      );
+      toast.error(axiosErr.response?.data?.message || 'Eroare la marcarea defectului');
     }
   };
   const handleDownload = () => {
@@ -184,6 +184,32 @@ export default function EquipmentDetail() {
       const message = axiosErr.response?.data?.message || 'Eroare la încărcare';
       setDocError(message);
       toast.error(message);
+    }
+  };
+
+  const handleDeleteImage = async () => {
+    if (!id || !deleteImageId) return;
+    try {
+      await http.delete(`/echipamente/${id}/images/${deleteImageId}`);
+      setDeleteImageId(null);
+      refetch();
+      toast.success('Imagine ștearsă cu succes');
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message?: string } } };
+      toast.error(axiosErr.response?.data?.message || 'Eroare la ștergere');
+    }
+  };
+
+  const handleDeleteDocument = async () => {
+    if (!id || !deleteDocId) return;
+    try {
+      await http.delete(`/echipamente/${id}/documents/${deleteDocId}`);
+      setDeleteDocId(null);
+      refetch();
+      toast.success('Document șters cu succes');
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message?: string } } };
+      toast.error(axiosErr.response?.data?.message || 'Eroare la ștergere');
     }
   };
 
@@ -325,12 +351,21 @@ export default function EquipmentDetail() {
         {data.images && data.images.length > 0 ? (
           <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
             {data.images.map((img) => (
-              <img
-                key={img.id}
-                src={`${apiBase}${img.url}`}
-                alt={data.nume}
-                className="h-40 w-full rounded object-cover"
-              />
+              <div key={img.id} className="relative">
+                <img
+                  src={`${apiBase}${img.url}`}
+                  alt={data.nume}
+                  className="h-40 w-full rounded object-cover"
+                />
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="absolute right-1 top-1 h-6 w-6"
+                  onClick={() => setDeleteImageId(img.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             ))}
           </div>
         ) : (
@@ -391,15 +426,24 @@ export default function EquipmentDetail() {
                 <Card className="p-4">
                   <ul className="space-y-2 text-sm">
                     {data.documents.map((doc) => (
-                      <li key={doc.id} className="flex justify-between">
+                      <li key={doc.id} className="flex items-center justify-between">
                         <span>{doc.name}</span>
-                        <Button
-                          variant="link"
-                          className="p-0 h-auto font-normal"
-                          onClick={() => setSelectedDoc({ name: doc.name, path: doc.path })}
-                        >
-                          Vezi
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="link"
+                            className="h-auto p-0 font-normal"
+                            onClick={() => setSelectedDoc({ name: doc.name, path: doc.path })}
+                          >
+                            Vezi
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            onClick={() => setDeleteDocId(doc.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -414,7 +458,7 @@ export default function EquipmentDetail() {
                 {docError && <p className="text-sm text-red-500">{docError}</p>}
               </div>
             </div>
-            </TabsContent>
+          </TabsContent>
           <TabsContent value="codqr">
             <div>
               <h2 className="mb-2 font-medium">Cod QR</h2>
@@ -488,19 +532,54 @@ export default function EquipmentDetail() {
             <DialogHeader>
               <DialogTitle>{selectedDoc.name}</DialogTitle>
             </DialogHeader>
-            <iframe
-              src={`${apiBase}${selectedDoc.path}`}
-              className="h-[80vh] w-full"
-            />
+            <iframe src={`${apiBase}${selectedDoc.path}`} className="h-[80vh] w-full" />
             <div className="flex justify-end pt-2">
               <a
                 href={`${apiBase}${selectedDoc.path}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary underline text-sm"
+                className="text-primary text-sm underline"
               >
                 Descarcă / deschide în tab nou
               </a>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+      {deleteImageId && (
+        <Dialog open onOpenChange={(open) => !open && setDeleteImageId(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirmare ștergere</DialogTitle>
+            </DialogHeader>
+            <p className="text-muted-foreground text-sm">
+              Sigur dorești să ștergi această imagine?
+            </p>
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="outline" onClick={() => setDeleteImageId(null)}>
+                Anulează
+              </Button>
+              <Button variant="destructive" onClick={handleDeleteImage}>
+                Confirmă
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+      {deleteDocId && (
+        <Dialog open onOpenChange={(open) => !open && setDeleteDocId(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirmare ștergere</DialogTitle>
+            </DialogHeader>
+            <p className="text-muted-foreground text-sm">Sigur dorești să ștergi acest document?</p>
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="outline" onClick={() => setDeleteDocId(null)}>
+                Anulează
+              </Button>
+              <Button variant="destructive" onClick={handleDeleteDocument}>
+                Confirmă
+              </Button>
             </div>
           </DialogContent>
         </Dialog>

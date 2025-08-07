@@ -9,8 +9,11 @@ export const getEquipmentDocument = (id: string) =>
 export const addEquipmentDocument = (
   echipamentId: string,
   name: string,
-  path: string,
+  path: string
 ) =>
   prisma.equipmentDocument.create({
     data: { echipamentId, name, path },
   });
+
+export const deleteEquipmentDocument = (id: string) =>
+  prisma.equipmentDocument.delete({ where: { id } });

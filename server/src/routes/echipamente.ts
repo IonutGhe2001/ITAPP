@@ -46,11 +46,7 @@ const uploadImage = multer({
 
 const handleUpload =
   (upload: ReturnType<multer.Multer["single"]>) =>
-  (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) => {
+  (req: express.Request, res: express.Response, next: express.NextFunction) => {
     upload(req, res, (err: unknown) => {
       if (err) {
         (req as any).multerError = err;
@@ -72,12 +68,22 @@ router.post(
   handleUpload(uploadDoc.single("file")),
   docController.uploadDocument
 );
+router.delete(
+  "/:id/documents/:docId",
+  authorizeRoles("admin"),
+  docController.deleteDocument
+);
 router.get("/:id/images", imageController.listImages);
 router.post(
   "/:id/images",
   authorizeRoles("admin"),
   handleUpload(uploadImage.single("file")),
   imageController.uploadImage
+);
+router.delete(
+  "/:id/images/:imageId",
+  authorizeRoles("admin"),
+  imageController.deleteImage
 );
 router.post(
   "/",

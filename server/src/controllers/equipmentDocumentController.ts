@@ -5,6 +5,7 @@ import {
   addEquipmentDocument,
   getEquipmentDocuments,
   getEquipmentDocument,
+  deleteEquipmentDocument,
 } from "../services/equipmentDocument.service";
 
 export const listDocuments = async (
@@ -70,6 +71,29 @@ export const downloadDocument = async (
       return;
     }
     res.download(filePath, doc.name);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteDocument = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id, docId } = req.params as { id: string; docId: string };
+    const doc = await getEquipmentDocument(docId);
+    if (!doc || doc.echipamentId !== id) {
+      res.status(404).json({ message: "Document negăsit" });
+      return;
+    }
+    const filePath = path.join(__dirname, "../../public", doc.path);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+    await deleteEquipmentDocument(docId);
+    res.status(204).send();
   } catch (err) {
     next(err);
   }
