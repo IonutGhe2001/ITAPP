@@ -17,34 +17,12 @@ import { ROUTES } from '@/constants/routes';
 import type { Echipament } from '@/features/equipment';
 import { toast } from 'react-toastify';
 import { handleApiError } from '@/utils/apiError';
+import flattenMetadata from '@/utils/flattenMetadata';
 import EquipmentAlerts from './EquipmentAlerts';
 import ImageGallery from './ImageGallery';
 import DocumentSection from './DocumentSection';
 import QRCodeSection from './QRCodeSection';
 import HistoryList from './HistoryList';
-
-function flattenMetadata(metadata: Record<string, unknown>, prefix = ''): [string, string][] {
-  return Object.entries(metadata).flatMap(([key, value]) => {
-    const prefixedKey = prefix ? `${prefix}.${key}` : key;
-
-    if (value && typeof value === 'object' && !Array.isArray(value)) {
-      return flattenMetadata(value as Record<string, unknown>, prefixedKey);
-    }
-
-    if (Array.isArray(value)) {
-      return [
-        [
-          prefixedKey,
-          value
-            .map((item) => (item && typeof item === 'object' ? JSON.stringify(item) : String(item)))
-            .join(', '),
-        ],
-      ];
-    }
-
-    return [[prefixedKey, String(value)]];
-  });
-}
 
 export default function EquipmentDetail() {
   const { id } = useParams();
