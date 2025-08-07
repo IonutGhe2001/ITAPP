@@ -12,7 +12,7 @@ import {
   ModalEditEchipament,
   ModalPredaEchipament,
 } from '@/features/equipment';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import ConfirmDialog from '@/components/ConfirmDialog';
 import { ROUTES } from '@/constants/routes';
 import type { Echipament } from '@/features/equipment';
 import { toast } from 'react-toastify';
@@ -228,11 +228,7 @@ export default function EquipmentDetail() {
             </TabsContent>
           )}
           <TabsContent value="documente">
-             <DocumentSection
-              id={id!}
-              documents={data.documents || []}
-              refetch={refetch}
-            />
+             <DocumentSection id={id!} documents={data.documents || []} refetch={refetch} />
           </TabsContent>
           <TabsContent value="codqr">
             <QRCodeSection id={id!} />
@@ -257,26 +253,12 @@ export default function EquipmentDetail() {
           onSubmit={(eq) => handleReassignSubmit(eq as Echipament)}
         />
       )}
-      {confirmDefect && (
-        <Dialog open onOpenChange={setConfirmDefect}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Confirmare defect</DialogTitle>
-            </DialogHeader>
-            <p className="text-muted-foreground text-sm">
-              Sigur dorești să marchezi acest echipament ca defect?
-            </p>
-            <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => setConfirmDefect(false)}>
-                Anulează
-              </Button>
-              <Button variant="destructive" onClick={handleMarkDefect}>
-                Confirmă
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      <ConfirmDialog
+        open={confirmDefect}
+        message="Sigur dorești să marchezi acest echipament ca defect?"
+        onCancel={() => setConfirmDefect(false)}
+        onConfirm={handleMarkDefect}
+      />
     </>
   );
 }

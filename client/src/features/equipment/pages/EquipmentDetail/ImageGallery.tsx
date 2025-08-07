@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import UploadButton from '@/components/UploadButton';
 import { Trash2, ImageUp } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import ConfirmDialog from '@/components/ConfirmDialog';
 import http from '@/services/http';
 import { toast } from 'react-toastify';
 import { handleApiError } from '@/utils/apiError';
@@ -81,35 +81,17 @@ export default function ImageGallery({ id, images, refetch }: Props) {
         <p className="text-muted-foreground text-sm">Nu există imagini disponibile.</p>
       )}
       <div className="space-y-2">
-        <UploadButton
-          accept="image/png,image/jpeg"
-          onChange={handleImageUpload}
-          variant="outline"
-        >
+        <UploadButton accept="image/png,image/jpeg" onChange={handleImageUpload} variant="outline">
           <ImageUp className="mr-2 h-4 w-4" /> Încarcă imagine
         </UploadButton>
         {imageError && <p className="text-sm text-red-500">{imageError}</p>}
       </div>
-      {deleteImageId && (
-        <Dialog open onOpenChange={(open) => !open && setDeleteImageId(null)}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Confirmare ștergere</DialogTitle>
-            </DialogHeader>
-            <p className="text-muted-foreground text-sm">
-              Sigur dorești să ștergi această imagine?
-            </p>
-            <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => setDeleteImageId(null)}>
-                Anulează
-              </Button>
-              <Button variant="destructive" onClick={handleDeleteImage}>
-                Confirmă
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      <ConfirmDialog
+        open={!!deleteImageId}
+        message="Sigur dorești să ștergi această imagine?"
+        onCancel={() => setDeleteImageId(null)}
+        onConfirm={handleDeleteImage}
+      />
     </>
   );
 }

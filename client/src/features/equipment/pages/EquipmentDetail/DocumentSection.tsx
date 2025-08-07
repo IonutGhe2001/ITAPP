@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import UploadButton from '@/components/UploadButton';
 import { FileUp, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import ConfirmDialog from '@/components/ConfirmDialog';
 import http from '@/services/http';
 import { toast } from 'react-toastify';
 import { handleApiError } from '@/utils/apiError';
@@ -89,11 +90,7 @@ export default function DocumentSection({ id, documents, refetch }: Props) {
         </Card>
       )}
       <div className="space-y-2">
-        <UploadButton
-          accept="application/pdf"
-          onChange={handleDocumentUpload}
-          variant="outline"
-        >
+        <UploadButton accept="application/pdf" onChange={handleDocumentUpload} variant="outline">
           <FileUp className="mr-2 h-4 w-4" /> Încarcă document
         </UploadButton>
         {docError && <p className="text-sm text-red-500">{docError}</p>}
@@ -118,24 +115,12 @@ export default function DocumentSection({ id, documents, refetch }: Props) {
           </DialogContent>
         </Dialog>
       )}
-      {deleteDocId && (
-        <Dialog open onOpenChange={(open) => !open && setDeleteDocId(null)}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Confirmare ștergere</DialogTitle>
-            </DialogHeader>
-            <p className="text-muted-foreground text-sm">Sigur dorești să ștergi acest document?</p>
-            <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => setDeleteDocId(null)}>
-                Anulează
-              </Button>
-              <Button variant="destructive" onClick={handleDeleteDocument}>
-                Confirmă
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      <ConfirmDialog
+        open={!!deleteDocId}
+        message="Sigur dorești să ștergi acest document?"
+        onCancel={() => setDeleteDocId(null)}
+        onConfirm={handleDeleteDocument}
+      />
     </div>
   );
 }
