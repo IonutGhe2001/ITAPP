@@ -17,8 +17,16 @@ router.use(authenticate);
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
+const docStorage = multer.diskStorage({
+  destination: path.join(__dirname, "../../public/equipment-documents"),
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
+  },
+});
+
 const uploadDoc = multer({
-  dest: path.join(__dirname, "../../public/equipment-documents"),
+  storage: docStorage,
   limits: { fileSize: MAX_FILE_SIZE },
   fileFilter: (req, file, cb) => {
     if (file.mimetype === "application/pdf") {
@@ -30,8 +38,16 @@ const uploadDoc = multer({
   },
 });
 
+const imageStorage = multer.diskStorage({
+  destination: path.join(__dirname, "../../public/equipment-images"),
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
+  },
+});
+
 const uploadImage = multer({
-  dest: path.join(__dirname, "../../public/equipment-images"),
+  storage: imageStorage,
   limits: { fileSize: MAX_FILE_SIZE },
   fileFilter: (req, file, cb) => {
     if (["image/png", "image/jpeg"].includes(file.mimetype)) {

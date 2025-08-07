@@ -27,7 +27,6 @@ import reportsRoutes from "./routes/reports";
 import purchaseRequestRoutes from "./routes/purchaseRequests";
 import onboardingRoutes from "./routes/onboarding";
 
-
 const app = express();
 const server = http.createServer(app);
 
@@ -73,6 +72,13 @@ app.use(
 app.use(
   "/equipment-documents",
   express.static(path.join(__dirname, "../public/equipment-documents"), {
+    maxAge: "1y",
+    etag: false,
+  })
+);
+app.use(
+  "/equipment-images",
+  express.static(path.join(__dirname, "../public/equipment-images"), {
     maxAge: "1y",
     etag: false,
   })
