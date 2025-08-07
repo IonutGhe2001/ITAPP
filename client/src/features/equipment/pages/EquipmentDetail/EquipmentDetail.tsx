@@ -355,7 +355,7 @@ export default function EquipmentDetail() {
                 <img
                   src={`${apiBase}${img.url}`}
                   alt={data.nume}
-                  className="h-40 w-full rounded object-cover"
+                  className="aspect-video object-cover rounded"
                 />
                 <Button
                   variant="destructive"
