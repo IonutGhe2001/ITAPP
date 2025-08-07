@@ -16,7 +16,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import Container from '@/components/Container';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Alert } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   useEchipament,
@@ -311,34 +311,46 @@ export default function EquipmentDetail() {
 
   if (meta.ageYears !== undefined && meta.ageYears >= AGE_WARNING_YEARS) {
     alerts.push(
-      <Badge variant="destructive" className="flex items-center gap-1" key="age">
-        <Clock className="h-3 w-3" /> Vechime {meta.ageYears} ani
-      </Badge>
+      <Alert variant="warning" icon={<Clock className="h-4 w-4" aria-hidden="true" />} key="age">
+        Vechime {meta.ageYears} ani
+      </Alert>
     );
   }
 
   if (meta.warrantyDaysLeft !== undefined) {
     if (meta.warrantyDaysLeft <= 0) {
       alerts.push(
-        <Badge variant="destructive" className="flex items-center gap-1" key="warranty">
-          <AlertTriangle className="h-3 w-3" /> Garanție expirată
-        </Badge>
+        <Alert
+          variant="destructive"
+          icon={<AlertTriangle className="h-4 w-4" aria-hidden="true" />}
+          key="warranty"
+        >
+          Garanție expirată
+        </Alert>
       );
     } else if (meta.warrantyDaysLeft <= WARRANTY_SOON_DAYS) {
       alerts.push(
-        <Badge variant="secondary" className="flex items-center gap-1" key="warranty-soon">
-          <Clock className="h-3 w-3" /> Garanția expiră în {meta.warrantyDaysLeft} zile
-        </Badge>
+        <Alert
+          variant="warning"
+          icon={<Clock className="h-4 w-4" aria-hidden="true" />}
+          key="warranty-soon"
+        >
+          Garanția expiră în {meta.warrantyDaysLeft} zile
+        </Alert>
       );
     }
   }
 
   if (meta.defectDays !== undefined && data.stare === 'mentenanta') {
-    const variant = meta.defectDays > DEFECT_WARNING_DAYS ? 'destructive' : 'secondary';
+    const variant = meta.defectDays > DEFECT_WARNING_DAYS ? 'destructive' : 'warning';
     alerts.push(
-      <Badge variant={variant} className="flex items-center gap-1" key="defect">
-        <AlertTriangle className="h-3 w-3" /> Defect de {meta.defectDays} zile
-      </Badge>
+      <Alert
+        variant={variant}
+        icon={<AlertTriangle className="h-4 w-4" aria-hidden="true" />}
+        key="defect"
+      >
+        Defect de {meta.defectDays} zile
+      </Alert>
     );
   }
 
