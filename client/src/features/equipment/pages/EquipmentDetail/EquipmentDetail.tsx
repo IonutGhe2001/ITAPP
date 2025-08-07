@@ -79,43 +79,42 @@ export default function EquipmentDetail() {
   }
 
   const rawMetadata = (data.metadata as Record<string, unknown>) || {};
+  const {
+    cpu: rawCpu,
+    ram: rawRam,
+    stocare: rawStocare,
+    storage: rawStorage,
+    os: rawOs,
+    versiuneFirmware: rawVersiuneFirmware,
+    firmwareVersion: rawFirmwareVersion,
+    numarInventar: rawNumarInventar,
+    inventoryNumber: rawInventoryNumber,
+    dataAchizitie: rawDataAchizitie,
+    purchaseDate: rawPurchaseDate,
+    garantie: rawGarantie,
+    warranty: rawWarranty,
+    ...remainingMetadata
+  } = rawMetadata as Record<string, unknown>;
+
   const dedicated = {
-    cpu: data.cpu ?? (rawMetadata.cpu as string),
-    ram: data.ram ?? (rawMetadata.ram as string),
-    stocare: data.stocare ?? (rawMetadata.stocare as string) ?? (rawMetadata.storage as string),
-    os: data.os ?? (rawMetadata.os as string),
+    cpu: data.cpu ?? (rawCpu as string),
+    ram: data.ram ?? (rawRam as string),
+    stocare:
+      data.stocare ?? (rawStocare as string) ?? (rawStorage as string),
+    os: data.os ?? (rawOs as string),
     versiuneFirmware:
       data.versiuneFirmware ??
-      ((rawMetadata.versiuneFirmware as string) || (rawMetadata.firmwareVersion as string)),
+      ((rawVersiuneFirmware as string) || (rawFirmwareVersion as string)),
     numarInventar:
       data.numarInventar ??
-      ((rawMetadata.numarInventar as string) || (rawMetadata.inventoryNumber as string)),
+      ((rawNumarInventar as string) || (rawInventoryNumber as string)),
     dataAchizitie:
       data.dataAchizitie ??
-      ((rawMetadata.dataAchizitie as string) || (rawMetadata.purchaseDate as string)),
+      ((rawDataAchizitie as string) || (rawPurchaseDate as string)),
     garantie:
-      data.garantie ?? ((rawMetadata.garantie as string) || (rawMetadata.warranty as string)),
+      data.garantie ?? ((rawGarantie as string) || (rawWarranty as string)),
   };
-
-  const remainingMetadata = { ...rawMetadata } as Record<string, unknown>;
-  [
-    'cpu',
-    'ram',
-    'stocare',
-    'storage',
-    'os',
-    'versiuneFirmware',
-    'firmwareVersion',
-    'numarInventar',
-    'inventoryNumber',
-    'dataAchizitie',
-    'purchaseDate',
-    'garantie',
-    'warranty',
-  ].forEach((key) => {
-    delete (remainingMetadata as Record<string, unknown>)[key];
-  });
-
+  
   const dedicatedEntries = [
     { key: 'CPU', value: dedicated.cpu },
     { key: 'RAM', value: dedicated.ram },
