@@ -1,6 +1,15 @@
 import { useRef, useState, type JSX } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, AlertTriangle, Clock, Trash2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  AlertTriangle,
+  Clock,
+  Trash2,
+  Upload,
+  Download,
+  Replace,
+  type LucideIcon,
+} from 'lucide-react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import Container from '@/components/Container';
 import { Card } from '@/components/ui/card';
@@ -37,6 +46,18 @@ const EQUIPMENT_CHANGE_LABELS: Record<EquipmentChange['tip'], string> = {
   ASSIGN: 'Predare',
   RETURN: 'Returnare',
   REPLACE: 'Înlocuire',
+};
+
+const EQUIPMENT_CHANGE_ICONS: Record<EquipmentChange['tip'], LucideIcon> = {
+  ASSIGN: Upload,
+  RETURN: Download,
+  REPLACE: Replace,
+};
+
+const EQUIPMENT_CHANGE_COLORS: Record<EquipmentChange['tip'], string> = {
+  ASSIGN: 'text-green-500',
+  RETURN: 'text-blue-500',
+  REPLACE: 'text-orange-500',
 };
 
 function flattenMetadata(metadata: Record<string, unknown>, prefix = ''): [string, string][] {
@@ -482,17 +503,23 @@ export default function EquipmentDetail() {
                 <Card className="p-4">
                   <div className="space-y-4">
                     <ul className="space-y-2 text-sm">
-                      {history.map((item) => (
-                        <li key={item.id} className="flex justify-between">
-                          <span>
-                            {EQUIPMENT_CHANGE_LABELS[item.tip]}
-                            {item.angajat?.numeComplet && ` - ${item.angajat.numeComplet}`}
-                          </span>
-                          <span className="text-muted-foreground">
-                            {new Date(item.createdAt).toLocaleString('ro-RO')}
-                          </span>
-                        </li>
-                      ))}
+                      {history.map((item) => {
+                        const Icon = EQUIPMENT_CHANGE_ICONS[item.tip];
+                        return (
+                          <li key={item.id} className="flex items-center justify-between">
+                            <span className="flex items-center gap-2">
+                              <Icon className={`h-4 w-4 ${EQUIPMENT_CHANGE_COLORS[item.tip]}`} />
+                              <span>
+                                {EQUIPMENT_CHANGE_LABELS[item.tip]}
+                                {item.angajat?.numeComplet && ` - ${item.angajat.numeComplet}`}
+                              </span>
+                            </span>
+                            <span className="text-muted-foreground">
+                              {new Date(item.createdAt).toLocaleString('ro-RO')}
+                            </span>
+                          </li>
+                        );
+                      })}
                     </ul>
                     {hasNextPage && (
                       <Button
