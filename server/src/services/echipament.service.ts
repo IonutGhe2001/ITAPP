@@ -2,8 +2,13 @@ import { prisma } from "../lib/prisma";
 // Proces verbal generation is handled separately; avoid importing related services here
 import { EQUIPMENT_STATUS } from "@shared/equipmentStatus";
 import type { PrismaClient } from "@prisma/client";
+import fs from "fs";
+import path from "path";
 
-type TransactionClient = Pick<PrismaClient, "echipament" | "equipmentChange">;
+type TransactionClient = Pick<
+  PrismaClient,
+  "echipament" | "equipmentChange" | "equipmentDocument" | "equipmentImage"
+>;
 
 type Echipament = NonNullable<
   Awaited<ReturnType<typeof prisma.echipament.findUnique>>
@@ -83,10 +88,7 @@ export const getEchipament = async (id: string) => {
     );
   }
 
-  if (
-    echipament.stare === EQUIPMENT_STATUS.MENTENANTA &&
-    echipament.defectAt
-  ) {
+  if (echipament.stare === EQUIPMENT_STATUS.MENTENANTA && echipament.defectAt) {
     const defectDate = new Date(echipament.defectAt);
     meta.defectDays = Math.floor(
       (now.getTime() - defectDate.getTime()) / (1000 * 60 * 60 * 24)
@@ -292,7 +294,33 @@ export const updateEchipament = async (
 };
 
 export const deleteEchipament = (id: string) => {
-  return prisma.echipament.delete({ where: { id } });
+  return prisma.$transaction(async (tx: TransactionClient) => {
+    const docs = await tx.equipmentDocument.findMany({
+      where: { echipamentId: id },
+    });
+    for (const doc of docs) {
+      const filePath = path.join(__dirname, "../../public", doc.path);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+    await tx.equipmentDocument.deleteMany({ where: { echipamentId: id } });
+
+    const images = await tx.equipmentImage.findMany({
+      where: { echipamentId: id },
+    });
+    for (const image of images) {
+      const filePath = path.join(__dirname, "../../public", image.url);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+    await tx.equipmentImage.deleteMany({ where: { echipamentId: id } });
+
+    await tx.equipmentChange.deleteMany({ where: { echipamentId: id } });
+
+    return tx.echipament.delete({ where: { id } });
+  });
 };
 
 export const getStats = async () => {
