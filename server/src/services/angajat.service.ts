@@ -123,16 +123,12 @@ export const deleteAngajat = (id: string) => {
         where: { angajatId: id },
         data: { angajatId: null, stare: "in_stoc" },
       });
+    }
 
       if (tx.equipmentChange) {
-        await tx.equipmentChange.createMany({
-          data: echipamente.map((eq: { id: string }) => ({
-            angajatId: id,
-            echipamentId: eq.id,
-            tip: "RETURN",
-          })),
-        });
-      }
+      await tx.equipmentChange.deleteMany({
+        where: { angajatId: id },
+      });
     }
 
     await tx.angajat.delete({ where: { id } });
