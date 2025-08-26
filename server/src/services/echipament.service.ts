@@ -226,6 +226,16 @@ export const updateEchipament = async (
       ) {
         updateData.defectAt = null;
       }
+      } else if (data.angajatId !== undefined) {
+      updateData.stare = data.angajatId
+        ? EQUIPMENT_STATUS.ALOCAT
+        : EQUIPMENT_STATUS.IN_STOC;
+      if (
+        current.stare === EQUIPMENT_STATUS.MENTENANTA &&
+        updateData.stare !== EQUIPMENT_STATUS.MENTENANTA
+      ) {
+        updateData.defectAt = null;
+      }
     }
 
     const updated = await tx.echipament.update({

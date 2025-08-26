@@ -28,36 +28,69 @@ beforeEach(() => {
 
 describe('updateEchipament', () => {
   it('assigns equipment to employee without generating proces verbal', async () => {
-    tx.echipament.findUnique.mockResolvedValue({ id: 'e1', tip: 'T', serie: 'S', angajatId: null });
-    tx.echipament.update.mockResolvedValue({ id: 'e1', angajatId: 'a1' });
+    tx.echipament.findUnique.mockResolvedValue({
+      id: 'e1',
+      tip: 'T',
+      serie: 'S',
+      angajatId: null,
+      stare: 'in_stoc',
+    });
+    tx.echipament.update.mockResolvedValue({ id: 'e1', angajatId: 'a1', stare: 'alocat' });
     mockedProcesVerbal.mockResolvedValue({ procesVerbal: { id: 'pv1' } } as any);
 
     const res = await updateEchipament('e1', { angajatId: 'a1' });
 
     expect(mockedProcesVerbal).not.toHaveBeenCalled();
-    expect(res).toEqual({ id: 'e1', angajatId: 'a1' });
+    expect(tx.echipament.update).toHaveBeenCalledWith({
+      where: { id: 'e1' },
+      data: expect.objectContaining({ angajatId: 'a1', stare: 'alocat' }),
+      include: { angajat: true },
+    });
+    expect(res).toEqual({ id: 'e1', angajatId: 'a1', stare: 'alocat' });
   });
 
   it('removes employee without generating proces verbal', async () => {
-    tx.echipament.findUnique.mockResolvedValue({ id: 'e1', tip: 'T', serie: 'S', angajatId: 'a1' });
-    tx.echipament.update.mockResolvedValue({ id: 'e1', angajatId: null });
+    tx.echipament.findUnique.mockResolvedValue({
+      id: 'e1',
+      tip: 'T',
+      serie: 'S',
+      angajatId: 'a1',
+      stare: 'alocat',
+    });
+    tx.echipament.update.mockResolvedValue({ id: 'e1', angajatId: null, stare: 'in_stoc' });
     mockedProcesVerbal.mockResolvedValue({ procesVerbal: { id: 'pv2' } } as any);
 
     const res = await updateEchipament('e1', { angajatId: null });
 
     expect(mockedProcesVerbal).not.toHaveBeenCalled();
-    expect(res).toEqual({ id: 'e1', angajatId: null });
+    expect(tx.echipament.update).toHaveBeenCalledWith({
+      where: { id: 'e1' },
+      data: expect.objectContaining({ angajatId: null, stare: 'in_stoc' }),
+      include: { angajat: true },
+    });
+    expect(res).toEqual({ id: 'e1', angajatId: null, stare: 'in_stoc' });
   });
 
   it('changes employee without generating proces verbal', async () => {
-    tx.echipament.findUnique.mockResolvedValue({ id: 'e1', tip: 'T', serie: 'S', angajatId: 'a1' });
-    tx.echipament.update.mockResolvedValue({ id: 'e1', angajatId: 'a2' });
+    tx.echipament.findUnique.mockResolvedValue({
+      id: 'e1',
+      tip: 'T',
+      serie: 'S',
+      angajatId: 'a1',
+      stare: 'alocat',
+    });
+    tx.echipament.update.mockResolvedValue({ id: 'e1', angajatId: 'a2', stare: 'alocat' });
     mockedProcesVerbal.mockResolvedValue({ procesVerbal: { id: 'pv3' } } as any);
 
     const res = await updateEchipament('e1', { angajatId: 'a2' });
 
     expect(mockedProcesVerbal).not.toHaveBeenCalled();
-    expect(res).toEqual({ id: 'e1', angajatId: 'a2' });
+    expect(tx.echipament.update).toHaveBeenCalledWith({
+      where: { id: 'e1' },
+      data: expect.objectContaining({ angajatId: 'a2', stare: 'alocat' }),
+      include: { angajat: true },
+    });
+    expect(res).toEqual({ id: 'e1', angajatId: 'a2', stare: 'alocat' });
   });
 
   it('updates technical details', async () => {
