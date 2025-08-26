@@ -10,6 +10,7 @@ import {
   orderEchipament as orderEchipamentService,
 } from "../services/echipament.service";
 import { emitUpdate } from "../lib/websocket";
+import XLSX from "xlsx";
 
 export const getEchipamente = async (
   _: Request,
@@ -24,6 +25,37 @@ export const getEchipamente = async (
   }
 };
 
+export const exportEchipamente = async (
+  _: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const echipamente = await getEchipamenteService();
+    const rows = echipamente.map((e) => ({
+      Nume: e.nume,
+      Serie: e.serie,
+      Tip: e.tip,
+      Angajat: e.angajat?.numeComplet || "",
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Echipamente");
+    const buffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="echipamente.xlsx"'
+    );
+    res.send(buffer);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const getEchipament = async (
   req: Request,
   res: Response,
@@ -33,7 +65,7 @@ export const getEchipament = async (
     const { id } = req.params;
     const echipament = await getEchipamentService(id);
     if (!echipament) {
-      res.status(404).json({ message: 'Echipament negăsit' });
+      res.status(404).json({ message: "Echipament negăsit" });
       return;
     }
     res.json(echipament);

@@ -1,6 +1,11 @@
 import React, { useState, Suspense } from 'react';
 import type { Echipament } from '@/features/equipment/types';
-import { useEchipamente, useDeleteEchipament, useUpdateEchipament } from '@/features/equipment';
+import {
+  useEchipamente,
+  useDeleteEchipament,
+  useUpdateEchipament,
+  exportEchipamente,
+} from '@/features/equipment';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 import { handleApiError } from '@/utils/apiError';
 import {
@@ -45,9 +50,7 @@ export default function Echipamente() {
     );
   }
 
-  const types = Array.from(
-    new Set(echipamente.map((e) => e.tip.trim().toLowerCase()))
-  ).sort();
+  const types = Array.from(new Set(echipamente.map((e) => e.tip.trim().toLowerCase()))).sort();
 
   const filtered = echipamente
     .filter((e: Echipament) => {
@@ -128,7 +131,23 @@ export default function Echipamente() {
             <EquipmentList echipamente={filtered} onEdit={handleEdit} onDelete={handleDelete} />
           )}
         </div>
-        <div>
+        <div className="space-y-4">
+          <Button
+            className="w-full"
+            onClick={async () => {
+              try {
+                await exportEchipamente();
+              } catch (err) {
+                toast({
+                  title: 'Eroare la export',
+                  description: handleApiError(err),
+                  variant: 'destructive',
+                });
+              }
+            }}
+          >
+            Exportă în Excel
+          </Button>
           <ImportEchipamente onImportSuccess={() => refetch()} />
         </div>
       </div>

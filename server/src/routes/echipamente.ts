@@ -74,6 +74,7 @@ const handleUpload =
 router.get("/", controller.getEchipamente);
 router.get("/stats", controller.getStats);
 router.get("/stock", controller.getAvailableStock);
+router.get("/export", controller.exportEchipamente);
 router.post("/order", authorizeRoles("admin"), controller.orderEchipament);
 router.get("/documents/:docId", docController.downloadDocument);
 router.get("/:id", controller.getEchipament);

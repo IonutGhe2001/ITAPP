@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import http from '@/services/http';
+import api from '@/services/api';
 import { getEchipamenteCache, setEchipamenteCache } from '@/utils/storage';
 import type { Echipament, EchipamentInput, EchipamentUpdateInput } from './types';
 
@@ -63,4 +64,15 @@ export const useDeleteEchipament = () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EQUIPMENT });
     },
   });
+};
+
+export const exportEchipamente = async () => {
+  const res = await api.get('/echipamente/export', { responseType: 'blob' });
+  const url = window.URL.createObjectURL(res.data);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'echipamente.xlsx';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
 };
