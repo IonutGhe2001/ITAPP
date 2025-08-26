@@ -12,6 +12,13 @@ import {
 import { emitUpdate } from "../lib/websocket";
 import XLSX from "xlsx";
 
+interface ExportableEchipament {
+  nume: string;
+  serie: string;
+  tip: string;
+  angajat?: { numeComplet?: string } | null;
+}
+
 export const getEchipamente = async (
   _: Request,
   res: Response,
@@ -32,7 +39,7 @@ export const exportEchipamente = async (
 ) => {
   try {
     const echipamente = await getEchipamenteService();
-    const rows = echipamente.map((e) => ({
+    const rows = echipamente.map((e: ExportableEchipament) => ({
       Nume: e.nume,
       Serie: e.serie,
       Tip: e.tip,
