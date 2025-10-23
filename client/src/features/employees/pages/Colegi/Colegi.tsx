@@ -105,6 +105,11 @@ export default function Colegi() {
   const highlightedId = searchParams.get('highlight');
   const initialQuery = searchParams.get('q') ?? '';
   const handledHighlightRef = useRef<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<List>(null);
+  const [width, setWidth] = useState(0);
+  const [height, setHeight] = useState(0);
+  const rowHeights = useRef<number[]>([]);
 
   useEffect(() => {
     const normalized = initialQuery.trim();
@@ -127,12 +132,6 @@ export default function Colegi() {
     setExpanded(new Set([highlightedId]));
     requestAnimationFrame(() => listRef.current?.scrollToItem(index, 'start'));
   }, [filtered, highlightedId, width, height, setExpanded]);
-
-  const containerRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<List>(null);
-  const [width, setWidth] = useState(0);
-  const [height, setHeight] = useState(0);
-  const rowHeights = useRef<number[]>([]);
 
   useLayoutEffect(() => {
     const node = containerRef.current;
