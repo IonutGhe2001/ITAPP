@@ -28,15 +28,15 @@ export const updatePurchaseRequestStatus = (
     });
 
     if (status === "DELIVERED" && request.status !== "DELIVERED") {
-      for (let i = 0; i < request.quantity; i++) {
-        await tx.echipament.create({
-          data: {
-            nume: request.equipmentType,
-            tip: request.equipmentType,
-            serie: `${request.id}-${i + 1}`,
-            stare: EQUIPMENT_STATUS.IN_STOC,
-          },
-        });
+      const equipments = Array.from({ length: request.quantity }, (_, index) => ({
+        nume: request.equipmentType,
+        tip: request.equipmentType,
+        serie: `${request.id}-${index + 1}`,
+        stare: EQUIPMENT_STATUS.IN_STOC,
+      }));
+
+      if (equipments.length > 0) {
+        await tx.echipament.createMany({ data: equipments });
       }
     }
 
