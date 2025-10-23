@@ -1,14 +1,5 @@
-declare module '@prisma/client' {
-  export const ProcesVerbalTip: {
-    PREDARE_PRIMIRE: 'PREDARE_PRIMIRE';
-    RESTITUIRE: 'RESTITUIRE';
-    SCHIMB: 'SCHIMB';
-  };
-  export const Prisma: any;
-  export class PrismaClient {
-    echipament: any;
-    angajat: any;
-    $transaction: any;
-    [key: string]: any;
-  }
-}
+/**
+ * Tests rely on the official Prisma types; this placeholder prevents duplicate
+ * hand-rolled declarations that previously conflicted with the generated client.
+ */
+export {};

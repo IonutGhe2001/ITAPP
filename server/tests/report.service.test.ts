@@ -104,7 +104,7 @@ const mockQueryRaw = jest.fn<
 
 jest.mock('../src/lib/prisma', () => ({
   prisma: {
-    $queryRaw: (...args: any[]) => mockQueryRaw(...args),
+    $queryRaw: (query: unknown) => mockQueryRaw(query),
   },
 }));
 

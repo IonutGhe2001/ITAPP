@@ -1,9 +1,5 @@
-import * as PrismaClient from "@prisma/client";
-import type { Prisma as PrismaNamespace } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@lib/prisma";
-
-const { Prisma } =
-  PrismaClient as unknown as { Prisma: PrismaNamespace };
 
 interface ReportQuery {
   department?: string;
@@ -52,7 +48,7 @@ export const getOnboardingReport = async ({
   endDate,
   status,
 }: ReportQuery) => {
-  const filters: PrismaNamespace.Sql[] = [];
+  const filters: Prisma.Sql[] = [];
 
   if (department) {
     filters.push(Prisma.sql`"department" = ${department}`);
@@ -69,9 +65,8 @@ export const getOnboardingReport = async ({
       ? Prisma.sql`WHERE ${Prisma.join(filters, Prisma.sql` AND `)}`
       : Prisma.sql``;
 
-  const rows = await prisma.$queryRaw<
-    Array<{ status: string; count: number | bigint }>
-  >(Prisma.sql`
+  const rows = (await prisma.$queryRaw(
+    Prisma.sql`
     SELECT status, COUNT(*)::int AS count
     FROM (
       SELECT CASE
@@ -89,12 +84,13 @@ export const getOnboardingReport = async ({
       ${whereClause}
     ) AS status_counts
     GROUP BY status
-  `);
+  `,
+  )) as Array<{ status: string; count: number | bigint }>;
 
   const formatted = rows.map((row) => ({
     status: row.status,
     count: typeof row.count === "bigint" ? Number(row.count) : row.count,
   }));
-  
+
   return status ? formatted.filter((r) => r.status === status) : formatted;
 };
