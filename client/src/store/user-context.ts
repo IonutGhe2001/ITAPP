@@ -4,7 +4,7 @@ import type { User } from '@/types/user';
 export type UserContextType = {
   user: User | null;
   setUser: (user: User | null) => void;
-  refreshUser: () => Promise<void>;
+  refreshUser: () => Promise<User | null>;
   loading: boolean;
 };
 

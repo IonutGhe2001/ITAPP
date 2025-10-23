@@ -40,10 +40,14 @@ export function getUser(): User | null {
   }
 }
 
-export function setUser(user: User): void {
+export function setUser(user: User | null): void {
   if (typeof window === 'undefined') return;
   try {
-    window.localStorage.setItem('user', JSON.stringify(user));
+    if (user) {
+      window.localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      window.localStorage.removeItem('user');
+    }
   } catch (error) {
     console.error('Failed to write user to localStorage', error);
   }
