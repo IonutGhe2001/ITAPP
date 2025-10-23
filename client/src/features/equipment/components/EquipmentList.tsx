@@ -29,9 +29,19 @@ function EquipmentList({ echipamente, onEdit, onDelete }: EquipmentListProps) {
     };
   }, []);
 
+  const itemKey = useCallback(
+    (index: number) => echipamente[index]?.id ?? index,
+    [echipamente]
+  );
+
   const Row = useCallback(
     ({ index, style }: { index: number; style: React.CSSProperties }) => {
-      const eq: Echipament = echipamente[index];
+      const eq = echipamente[index];
+
+      if (!eq) {
+        return null;
+      }
+
       return (
         <div style={style} className="p-2">
           <EquipmentCard
@@ -71,6 +81,7 @@ function EquipmentList({ echipamente, onEdit, onDelete }: EquipmentListProps) {
           itemCount={echipamente.length}
           itemSize={ITEM_HEIGHT}
           overscanCount={5}
+          itemKey={itemKey}
         >
           {Row}
         </List>
