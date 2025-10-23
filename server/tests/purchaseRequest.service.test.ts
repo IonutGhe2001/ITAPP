@@ -1,6 +1,17 @@
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { updatePurchaseRequestStatus } from '../src/services/purchaseRequest.service';
-import { EQUIPMENT_STATUS } from '@shared/equipmentStatus';
+import { EQUIPMENT_STATUS } from '../../shared/equipmentStatus';
+
+type EquipmentCreateManyData = {
+  nume: string;
+  tip: string;
+  serie: string;
+  stare: string;
+};
+
+type EquipmentCreateManyArgs = {
+  data: EquipmentCreateManyData[];
+};
 
 const tx = {
   purchaseRequest: {
@@ -55,7 +66,8 @@ describe('updatePurchaseRequestStatus', () => {
     );
 
     expect(tx.echipament.createMany).toHaveBeenCalledTimes(1);
-    const { data } = tx.echipament.createMany.mock.calls[0][0];
+    const { data } =
+      tx.echipament.createMany.mock.calls[0][0] as EquipmentCreateManyArgs;
     expect(data).toHaveLength(2);
     expect(data).toEqual([
       expect.objectContaining({
@@ -71,7 +83,7 @@ describe('updatePurchaseRequestStatus', () => {
         stare: EQUIPMENT_STATUS.IN_STOC,
       }),
     ]);
-    const serials = data.map((item: { serie: string }) => item.serie);
+    const serials = data.map((item: EquipmentCreateManyData) => item.serie);
     expect(new Set(serials).size).toBe(serials.length);
   });
 
@@ -101,15 +113,16 @@ describe('updatePurchaseRequestStatus', () => {
     );
 
     expect(tx.echipament.createMany).toHaveBeenCalledTimes(1);
-    const { data } = tx.echipament.createMany.mock.calls[0][0];
+    const { data } =
+      tx.echipament.createMany.mock.calls[0][0] as EquipmentCreateManyArgs;
     expect(data).toHaveLength(quantity);
 
-    const serials = data.map((item: { serie: string }) => item.serie);
+    const serials = data.map((item: EquipmentCreateManyData) => item.serie);
     expect(new Set(serials).size).toBe(quantity);
     expect(serials[0]).toBe('req-large-1');
     expect(serials[quantity - 1]).toBe(`req-large-${quantity}`);
 
-    data.forEach((item: { nume: string; tip: string; stare: string }) => {
+    data.forEach((item: EquipmentCreateManyData) => {
       expect(item).toEqual(
         expect.objectContaining({
           nume: 'Monitor',
