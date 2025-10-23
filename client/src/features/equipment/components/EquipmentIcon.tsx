@@ -25,7 +25,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 export interface EquipmentIconProps {
-  type: string;
+  type?: string | null;
   className?: string;
 }
 
@@ -33,9 +33,12 @@ export function EquipmentIcon({
   type,
   className = 'w-4 h-4 text-primary',
 }: EquipmentIconProps): JSX.Element {
-  const Icon = iconMap[type.toLowerCase()];
+  const normalizedType = typeof type === 'string' ? type.trim().toLowerCase() : undefined;
+  const Icon = normalizedType ? iconMap[normalizedType] : undefined;
+
   if (Icon) {
     return <Icon className={className} />;
   }
+  
   return <WrenchIcon className={className} />;
 }

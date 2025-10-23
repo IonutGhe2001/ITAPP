@@ -58,7 +58,14 @@ export default function Echipamente() {
   }
 
   const types = useMemo(
-    () => Array.from(new Set(echipamente.map((e) => e.tip.trim().toLowerCase()))).sort(),
+    () =>
+      Array.from(
+        new Set(
+          echipamente
+            .map((e) => (typeof e.tip === 'string' ? e.tip.trim().toLowerCase() : ''))
+            .filter((value): value is string => value.length > 0)
+        )
+      ).sort(),
     [echipamente]
   );
 
