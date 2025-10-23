@@ -10,6 +10,7 @@ import { logger } from "@lib/logger";
 import { errorHandler } from "./middlewares/errorHandler";
 import { logRequest } from "./utils/logger";
 import { initWebSocket } from "./lib/websocket";
+import { initPdfRenderer } from "./lib/pdfRenderer";
 import { env } from "./config";
 
 import authRoutes from "./routes/auth";
@@ -29,6 +30,12 @@ import onboardingRoutes from "./routes/onboarding";
 
 const app = express();
 const server = http.createServer(app);
+
+void initPdfRenderer().catch((error) =>
+  logger.warn("PDF export initialisation failed; falling back to JSON", {
+    error,
+  })
+);
 
 // Global Middlewares
 // When using credentials the origin cannot be "*". Default to the frontend

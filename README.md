@@ -23,6 +23,9 @@ The API supports uploading attachments for equipment with the following restrict
 
 - Node.js and npm
 - PostgreSQL instance for the server
+- System dependencies required by Chromium if you plan to use PDF exports (see the
+  [Puppeteer troubleshooting guide](https://pptr.dev/troubleshooting) for the list of
+  packages on your platform)
 
 ### Client
 
@@ -41,6 +44,14 @@ cp .env.example .env   # set DATABASE_URL, JWT_SECRET, etc.
 npm install
 npm run dev
 ```
+
+### PDF Exports
+
+The reports API uses a singleton Puppeteer browser that is started during server
+initialisation. Ensure Chromium can be launched in your environment (either via the
+bundled binary or by pointing `PUPPETEER_EXECUTABLE_PATH` to a system installation).
+If the browser cannot start, PDF requests will automatically fall back to JSON
+responses so CSV/JSON exports remain operational.
 
 The API defaults to <http://localhost:5000> and the client to <http://localhost:5173>.
 
