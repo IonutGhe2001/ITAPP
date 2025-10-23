@@ -1,4 +1,5 @@
 import { useState, useLayoutEffect, useRef, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAngajati, useDeleteAngajat } from '@/features/employees';
 import type { Angajat } from '@/features/equipment/types';
 import type { AngajatWithRelations } from '@/features/employees/angajatiService';
@@ -21,6 +22,7 @@ export default function Colegi() {
     () => data?.pages.flatMap((page) => page.data) ?? [],
     [data]
   );
+  const [searchParams] = useSearchParams();
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [selectedAngajatId, setSelectedAngajatId] = useState<string | null>(null);
   const [replaceData, setReplaceData] = useState<{
@@ -99,6 +101,32 @@ export default function Colegi() {
     functii,
     filtered,
   } = useColegiFilter(colegi);
+
+  const highlightedId = searchParams.get('highlight');
+  const initialQuery = searchParams.get('q') ?? '';
+  const handledHighlightRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const normalized = initialQuery.trim();
+    if (!normalized || search === normalized) return;
+    setSearch(normalized);
+  }, [initialQuery, search, setSearch]);
+
+  useEffect(() => {
+    if (!highlightedId) {
+      handledHighlightRef.current = null;
+    }
+  }, [highlightedId]);
+
+  useEffect(() => {
+    if (!highlightedId || handledHighlightRef.current === highlightedId) return;
+    if (!width || !height || filtered.length === 0) return;
+    const index = filtered.findIndex((c) => c.id === highlightedId);
+    if (index === -1) return;
+    handledHighlightRef.current = highlightedId;
+    setExpanded(new Set([highlightedId]));
+    requestAnimationFrame(() => listRef.current?.scrollToItem(index, 'start'));
+  }, [filtered, highlightedId, width, height, setExpanded]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<List>(null);
@@ -272,6 +300,7 @@ export default function Colegi() {
                 index={index}
                 style={style}
                 expanded={expanded.has(filtered[index].id)}
+                isHighlighted={filtered[index].id === highlightedId}
                 toggleExpand={toggleExpand}
                 handleRemoveEquipment={handleRemoveEquipment}
                 setEditColeg={setEditColeg}

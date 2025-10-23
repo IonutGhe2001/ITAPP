@@ -11,6 +11,7 @@ import { Pencil, Trash2, MoreHorizontal, AlertCircle } from 'lucide-react';
 import { EquipmentIcon } from '@/features/equipment';
 import type { Angajat, Echipament } from '@/features/equipment/types';
 import { useUpdateAngajat } from '@/features/employees';
+import { cn } from '@/lib/utils';
 
 interface ReplaceData {
   colegId: string;
@@ -23,6 +24,7 @@ interface ColegRowProps {
   index: number;
   style: React.CSSProperties;
   expanded: boolean;
+  isHighlighted?: boolean;
   toggleExpand: (id: string, index: number) => void;
   handleRemoveEquipment: (eqId: string, colegId: string) => void;
   setEditColeg: (c: Angajat) => void;
@@ -40,6 +42,7 @@ export default function ColegRow({
   index,
   style,
   expanded,
+  isHighlighted = false,
   toggleExpand,
   handleRemoveEquipment,
   setEditColeg,
@@ -62,7 +65,13 @@ export default function ColegRow({
 
   return (
     <div style={style} className="py-2">
-      <div ref={rowRef} className="bg-card relative flex flex-col gap-4 rounded-xl p-4 shadow-md">
+      <div
+        ref={rowRef}
+        className={cn(
+          'bg-card relative flex flex-col gap-4 rounded-xl p-4 shadow-md transition focus-within:ring-2 focus-within:ring-primary/60',
+          isHighlighted && 'ring-2 ring-primary/60'
+        )}
+      >
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="hover:bg-muted absolute right-2 top-2 rounded p-1">
