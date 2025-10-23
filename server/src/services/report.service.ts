@@ -1,4 +1,9 @@
+import * as PrismaClient from "@prisma/client";
+import type { Prisma as PrismaNamespace } from "@prisma/client";
 import { prisma } from "@lib/prisma";
+
+const { Prisma } =
+  PrismaClient as unknown as { Prisma: PrismaNamespace };
 
 interface ReportQuery {
   department?: string;
@@ -47,36 +52,49 @@ export const getOnboardingReport = async ({
   endDate,
   status,
 }: ReportQuery) => {
-  const where: { department?: string; createdAt?: { gte?: Date; lte?: Date } } =
-    {};
+  const filters: PrismaNamespace.Sql[] = [];
+
   if (department) {
-    where.department = department;
+    filters.push(Prisma.sql`"department" = ${department}`);
   }
-  if (startDate || endDate) {
-    where.createdAt = {};
-    if (startDate) {
-      where.createdAt.gte = new Date(startDate);
-    }
-    if (endDate) {
-      where.createdAt.lte = new Date(endDate);
-    }
+  if (startDate) {
+    filters.push(Prisma.sql`"createdAt" >= ${new Date(startDate)}`);
+  }
+  if (endDate) {
+    filters.push(Prisma.sql`"createdAt" <= ${new Date(endDate)}`);
   }
 
-  const onboardings = await prisma.onboarding.findMany({ where });
-  const counts: Record<string, number> = {};
-  for (const ob of onboardings) {
-    const tasks = (ob.tasks as { completed: boolean }[]) || [];
-    const completed = tasks.length > 0 && tasks.every((t) => t.completed);
-    const stat = completed ? "completed" : "in_progress";
-    counts[stat] = (counts[stat] || 0) + 1;
-  }
+  const whereClause =
+    filters.length > 0
+      ? Prisma.sql`WHERE ${Prisma.join(filters, Prisma.sql` AND `)}`
+      : Prisma.sql``;
 
-  let result = Object.entries(counts).map(([s, c]) => ({
-    status: s,
-    count: c,
+  const rows = await prisma.$queryRaw<
+    Array<{ status: string; count: number | bigint }>
+  >(Prisma.sql`
+    SELECT status, COUNT(*)::int AS count
+    FROM (
+      SELECT CASE
+        WHEN jsonb_typeof(COALESCE("tasks"::jsonb, '[]'::jsonb)) = 'array'
+             AND jsonb_array_length(COALESCE("tasks"::jsonb, '[]'::jsonb)) > 0
+             AND NOT EXISTS (
+               SELECT 1
+               FROM jsonb_array_elements(COALESCE("tasks"::jsonb, '[]'::jsonb)) elem
+               WHERE COALESCE((elem->>'completed')::boolean, false) = false
+             )
+          THEN 'completed'
+        ELSE 'in_progress'
+      END AS status
+      FROM "Onboarding"
+      ${whereClause}
+    ) AS status_counts
+    GROUP BY status
+  `);
+
+  const formatted = rows.map((row) => ({
+    status: row.status,
+    count: typeof row.count === "bigint" ? Number(row.count) : row.count,
   }));
-  if (status) {
-    result = result.filter((r) => r.status === status);
-  }
-  return result;
+  
+  return status ? formatted.filter((r) => r.status === status) : formatted;
 };

@@ -3,7 +3,7 @@ declare module '@prisma/client' {
     constructor(...args: any[]);
     [key: string]: any;
   }
-  export type Prisma = any;
+  export const Prisma: any;
   export enum ProcesVerbalTip {
     PREDARE_PRIMIRE = 'PREDARE_PRIMIRE',
     RESTITUIRE = 'RESTITUIRE',

@@ -4,6 +4,7 @@ declare module '@prisma/client' {
     RESTITUIRE: 'RESTITUIRE';
     SCHIMB: 'SCHIMB';
   };
+  export const Prisma: any;
   export class PrismaClient {
     echipament: any;
     angajat: any;
