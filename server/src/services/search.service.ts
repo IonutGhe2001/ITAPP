@@ -9,6 +9,8 @@ import {
   EmployeeSearchResult,
 } from "../types/search";
 
+const GLOBAL_SEARCH_LIMIT = 50;
+
 export const globalSearch = async (
   query: string
 ): Promise<GlobalSearchResult> => {
@@ -22,6 +24,7 @@ export const globalSearch = async (
   }
 
   const echipamente = (await prisma.echipament.findMany({
+    take: GLOBAL_SEARCH_LIMIT,
     where: {
       OR: [
         { nume: { contains: q, mode: "insensitive" } },
@@ -29,9 +32,11 @@ export const globalSearch = async (
       ],
     },
     include: { angajat: true },
+    orderBy: { createdAt: "desc" },
   })) as EquipmentSearchResult[];
 
   const angajati = (await prisma.angajat.findMany({
+    take: GLOBAL_SEARCH_LIMIT,
     where: {
       OR: [
         { numeComplet: { contains: q, mode: "insensitive" } },
@@ -53,6 +58,7 @@ export const globalSearch = async (
       cDataNotes: true,
       cDataCreated: true,
     },
+    orderBy: { createdAt: "desc" },
   })) as EmployeeSearchResult[];
 
   if (!echipamente.length && !angajati.length) {
@@ -74,7 +80,7 @@ export const getSuggestions = async (
   return computeSuggestions(q);
 };
 const MAX_SUGGESTION_ITEMS = 5;
-const SEARCH_SAMPLE_SIZE = 50;
+const SEARCH_SAMPLE_SIZE = 40;
 
 const computeSuggestions = async (
   query: string
