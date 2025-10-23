@@ -29,9 +29,13 @@ jest.mock('../src/lib/prisma', () => ({
   },
 }));
 
-const mockedPrisma = jest.requireMock('../src/lib/prisma').prisma as {
-  $transaction: jest.Mock;
-};
+const mockedPrisma = (
+  jest.requireMock('../src/lib/prisma') as {
+    prisma: {
+      $transaction: jest.Mock;
+    };
+  }
+).prisma;
 
 describe('updatePurchaseRequestStatus', () => {
   beforeEach(() => {
