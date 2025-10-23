@@ -31,7 +31,7 @@ import onboardingRoutes from "./routes/onboarding";
 const app = express();
 const server = http.createServer(app);
 
-void initPdfRenderer().catch((error) =>
+void initPdfRenderer().catch((error: unknown) =>
   logger.warn("PDF export initialisation failed; falling back to JSON", {
     error,
   })

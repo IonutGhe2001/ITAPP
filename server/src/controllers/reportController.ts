@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import * as reportService from "../services/report.service";
 import XLSX from "xlsx";
+import type { Page } from "puppeteer";
 import { withPdfPage } from "@lib/pdfRenderer";
 import { logger } from "@lib/logger";
 
@@ -58,7 +59,7 @@ const exportData = async (
       </html>
     `;
     try {
-      const buffer = await withPdfPage(async (page) => {
+      const buffer = await withPdfPage(async (page: Page) => {
         await page.setContent(html, { waitUntil: "domcontentloaded" });
         return page.pdf({ format: "A4" });
       });
