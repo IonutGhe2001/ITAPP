@@ -8,6 +8,7 @@ import {
   getStats as getStatsService,
   getAvailableStock as getAvailableStockService,
   orderEchipament as orderEchipamentService,
+  type GetEchipamenteParams,
 } from "../services/echipament.service";
 import { emitUpdate } from "../lib/websocket";
 import XLSX from "xlsx";
@@ -19,15 +20,7 @@ interface ExportableEchipament {
   angajat?: { numeComplet?: string } | null;
 }
 
-type ListEchipamenteQuery = {
-  page: number;
-  pageSize: number;
-  search?: string | null;
-  status?: string | null;
-  type?: string | null;
-  sort: "asc" | "desc";
-  sortBy: "nume" | "createdAt" | "tip" | "stare";
-};
+type ListEchipamenteQuery = GetEchipamenteParams;
 
 export const getEchipamente = async (
   req: Request,
@@ -53,7 +46,7 @@ export const getEchipamente = async (
       type: type ?? undefined,
       sort,
       sortBy,
-    });
+    } as GetEchipamenteParams);
 
     res.json(result);
   } catch (err) {

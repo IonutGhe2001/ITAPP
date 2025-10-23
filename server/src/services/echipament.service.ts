@@ -58,7 +58,7 @@ type EchipamentWithAngajat = Awaited<
       ReturnType<typeof prisma.angajat.findMany>
     >[number]> | null };
 
-type GetEchipamenteParams = {
+export type GetEchipamenteParams = {
   page: number;
   pageSize: number;
   search?: string | null;
