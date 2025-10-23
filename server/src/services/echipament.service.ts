@@ -1,7 +1,7 @@
 import { prisma } from "../lib/prisma";
 // Proces verbal generation is handled separately; avoid importing related services here
 import { EQUIPMENT_STATUS } from "@shared/equipmentStatus";
-import type { Prisma, PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 import fs from "fs";
 import path from "path";
 
@@ -52,7 +52,11 @@ const validateEchipamentUpdate = async (
   }
 };
 
-type EchipamentWithAngajat = Prisma.EchipamentGetPayload<{ include: { angajat: true } }>;
+type EchipamentWithAngajat = Awaited<
+  ReturnType<typeof prisma.echipament.findMany>
+>[number] & { angajat: NonNullable<Awaited<
+      ReturnType<typeof prisma.angajat.findMany>
+    >[number]> | null };
 
 type GetEchipamenteParams = {
   page: number;
@@ -76,43 +80,33 @@ export async function getEchipamente(
   }
 
   const { page, pageSize, search, status, type, sort, sortBy } = params;
-  const where: Prisma.EchipamentWhereInput = {};
-
-  if (status) {
-    where.stare = status.toLowerCase();
-  }
-
-  if (type) {
-    const normalizedType = type.trim();
-    if (normalizedType) {
-      where.tip = { equals: normalizedType, mode: "insensitive" };
-    }
-  }
-
+  const normalizedType = type?.trim();
   const searchTerm = search?.trim();
-  if (searchTerm) {
-    where.OR = [
-      { nume: { contains: searchTerm, mode: "insensitive" } },
-      { serie: { contains: searchTerm, mode: "insensitive" } },
-    ];
-  }
+  
+    const where = {
+    ...(status ? { stare: status.toLowerCase() } : {}),
+    ...(normalizedType
+      ? { tip: { equals: normalizedType, mode: "insensitive" } }
+      : {}),
+    ...(searchTerm
+      ? {
+          OR: [
+            { nume: { contains: searchTerm, mode: "insensitive" } },
+            { serie: { contains: searchTerm, mode: "insensitive" } },
+          ],
+        }
+      : {}),
+  };
 
   const skip = (page - 1) * pageSize;
-  const orderBy: Prisma.EchipamentOrderByWithRelationInput = {};
-
-  switch (sortBy) {
-    case "createdAt":
-      orderBy.createdAt = sort;
-      break;
-    case "tip":
-      orderBy.tip = sort;
-      break;
-    case "stare":
-      orderBy.stare = sort;
-      break;
-    default:
-      orderBy.nume = sort;
-  }
+  const orderBy =
+    sortBy === "createdAt"
+      ? { createdAt: sort }
+      : sortBy === "tip"
+        ? { tip: sort }
+        : sortBy === "stare"
+          ? { stare: sort }
+          : { nume: sort };
 
   const [items, total] = await prisma.$transaction([
     prisma.echipament.findMany({
