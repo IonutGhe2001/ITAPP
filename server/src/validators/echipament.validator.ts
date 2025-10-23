@@ -1,4 +1,21 @@
 import Joi from "joi";
+import { EQUIPMENT_STATUS } from "@shared/equipmentStatus";
+
+const statusValues = Object.values(EQUIPMENT_STATUS);
+
+export const listEchipamenteQuerySchema = Joi.object({
+  page: Joi.number().integer().min(1).default(1),
+  pageSize: Joi.number().integer().min(1).max(100).default(20),
+  search: Joi.string().trim().max(100).allow(null).empty("").optional(),
+  status: Joi.string()
+    .valid(...statusValues)
+    .insensitive()
+    .empty("")
+    .optional(),
+  type: Joi.string().trim().max(100).empty("").optional(),
+  sort: Joi.string().valid("asc", "desc").default("asc"),
+  sortBy: Joi.string().valid("nume", "createdAt", "tip", "stare").default("nume"),
+});
 
 export const createEchipamentSchema = Joi.object({
   nume: Joi.string().required(),

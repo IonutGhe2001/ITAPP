@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from 'react';
+import React, { Suspense, useMemo, useState } from 'react';
 import type { Echipament } from '@/features/equipment/types';
 import {
   useEchipamente,
@@ -20,20 +20,27 @@ import { Button } from '@/components/ui/button';
 const ModalAddEchipament = React.lazy(() => import('@/pages/Dashboard/modals/ModalAddEchipament'));
 
 export default function Echipamente() {
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('');
+  const [type, setType] = useState('');
+  const [sort, setSort] = useState<'asc' | 'desc'>('asc');
+
   const {
     data: echipamente = [],
     refetch,
     isLoading,
-  } = useEchipamente() as {
-    data: Echipament[] | undefined;
-    refetch: () => void;
-    isLoading: boolean;
-  };
-
-  const [search, setSearch] = useState('');
-  const [status, setStatus] = useState('');
-  const [type, setType] = useState('');
-  const [sort, setSort] = useState('asc');
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    total,
+  } = useEchipamente({
+    search: search.trim(),
+    status: status || undefined,
+    type: type || undefined,
+    sort,
+    autoFetchAll: false,
+    pageSize: 30,
+  });
 
   const [selected, setSelected] = useState<(Echipament & { __editMode?: boolean }) | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -50,24 +57,12 @@ export default function Echipamente() {
     );
   }
 
-  const types = Array.from(new Set(echipamente.map((e) => e.tip.trim().toLowerCase()))).sort();
+  const types = useMemo(
+    () => Array.from(new Set(echipamente.map((e) => e.tip.trim().toLowerCase()))).sort(),
+    [echipamente]
+  );
 
-  const filtered = echipamente
-    .filter((e: Echipament) => {
-      if (status && e.stare !== status) return false;
-      if (type && e.tip.trim().toLowerCase() !== type) return false;
-
-      const q = search.trim().toLowerCase();
-      if (q) {
-        if (!e.nume.toLowerCase().includes(q) && !e.serie?.toLowerCase().includes(q)) {
-          return false;
-        }
-      }
-      return true;
-    })
-    .sort((a: Echipament, b: Echipament) =>
-      sort === 'asc' ? a.nume.localeCompare(b.nume) : b.nume.localeCompare(a.nume)
-    );
+      const hasActiveFilters = Boolean(search.trim() || status || type);
 
   const handleDelete = async (id: string) => {
     await deleteMutation.mutateAsync(id);
@@ -117,10 +112,10 @@ export default function Echipamente() {
             sort={sort}
             onSearchChange={(value: string) => setSearch(value)}
             onStatusChange={(value: string) => setStatus(value)}
-            onSortChange={(value: string) => setSort(value)}
+            onSortChange={(value: string) => setSort(value as 'asc' | 'desc')}
           />
           <EquipmentTypeFilter types={types} selected={type} onChange={setType} />
-          {filtered.length === 0 && search.trim() ? (
+          {echipamente.length === 0 && hasActiveFilters ? (
             <div className="text-muted-foreground py-10 text-center text-sm">
               <p>Nu s-au găsit echipamente.</p>
               <Button className="mt-2" onClick={() => setShowAddModal(true)}>
@@ -128,7 +123,19 @@ export default function Echipamente() {
               </Button>
             </div>
           ) : (
-            <EquipmentList echipamente={filtered} onEdit={handleEdit} onDelete={handleDelete} />
+            <EquipmentList echipamente={echipamente} onEdit={handleEdit} onDelete={handleDelete} />
+          )}
+          {hasNextPage && (
+            <div className="mt-4 flex justify-center">
+              <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+                {isFetchingNextPage ? 'Se încarcă...' : 'Încarcă mai multe'}
+              </Button>
+            </div>
+          )}
+          {total > 0 && (
+            <p className="text-muted-foreground mt-2 text-center text-xs">
+              Afișate {echipamente.length} din {total} echipamente
+            </p>
           )}
         </div>
         <div className="space-y-4">

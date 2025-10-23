@@ -1,7 +1,7 @@
 import { prisma } from "../lib/prisma";
 // Proces verbal generation is handled separately; avoid importing related services here
 import { EQUIPMENT_STATUS } from "@shared/equipmentStatus";
-import type { PrismaClient } from "@prisma/client";
+import type { Prisma, PrismaClient } from "@prisma/client";
 import fs from "fs";
 import path from "path";
 
@@ -52,9 +52,81 @@ const validateEchipamentUpdate = async (
   }
 };
 
-export const getEchipamente = () => {
-  return prisma.echipament.findMany({ include: { angajat: true } });
+type EchipamentWithAngajat = Prisma.EchipamentGetPayload<{ include: { angajat: true } }>;
+
+type GetEchipamenteParams = {
+  page: number;
+  pageSize: number;
+  search?: string | null;
+  status?: string | null;
+  type?: string | null;
+  sort: "asc" | "desc";
+  sortBy: "nume" | "createdAt" | "tip" | "stare";
 };
+
+export function getEchipamente(): Promise<EchipamentWithAngajat[]>;
+export function getEchipamente(
+  params: GetEchipamenteParams
+): Promise<{ items: EchipamentWithAngajat[]; total: number }>;
+export async function getEchipamente(
+  params?: GetEchipamenteParams
+): Promise<EchipamentWithAngajat[] | { items: EchipamentWithAngajat[]; total: number }> {
+  if (!params) {
+    return prisma.echipament.findMany({ include: { angajat: true } });
+  }
+
+  const { page, pageSize, search, status, type, sort, sortBy } = params;
+  const where: Prisma.EchipamentWhereInput = {};
+
+  if (status) {
+    where.stare = status.toLowerCase();
+  }
+
+  if (type) {
+    const normalizedType = type.trim();
+    if (normalizedType) {
+      where.tip = { equals: normalizedType, mode: "insensitive" };
+    }
+  }
+
+  const searchTerm = search?.trim();
+  if (searchTerm) {
+    where.OR = [
+      { nume: { contains: searchTerm, mode: "insensitive" } },
+      { serie: { contains: searchTerm, mode: "insensitive" } },
+    ];
+  }
+
+  const skip = (page - 1) * pageSize;
+  const orderBy: Prisma.EchipamentOrderByWithRelationInput = {};
+
+  switch (sortBy) {
+    case "createdAt":
+      orderBy.createdAt = sort;
+      break;
+    case "tip":
+      orderBy.tip = sort;
+      break;
+    case "stare":
+      orderBy.stare = sort;
+      break;
+    default:
+      orderBy.nume = sort;
+  }
+
+  const [items, total] = await prisma.$transaction([
+    prisma.echipament.findMany({
+      where,
+      include: { angajat: true },
+      skip,
+      take: pageSize,
+      orderBy,
+    }),
+    prisma.echipament.count({ where }),
+  ]);
+
+  return { items, total };
+}
 
 // Fetch a single equipment entry along with its assigned employee
 export const getEchipament = async (id: string) => {

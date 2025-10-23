@@ -8,6 +8,7 @@ import { validateRequest } from "../middlewares/validateRequest";
 import {
   createEchipamentSchema,
   updateEchipamentSchema,
+  listEchipamenteQuerySchema,
 } from "../validators/echipament.validator";
 import { authenticate, authorizeRoles } from "../middlewares/authMiddleware";
 
@@ -71,7 +72,7 @@ const handleUpload =
     });
   };
 
-router.get("/", controller.getEchipamente);
+router.get("/", validateRequest(listEchipamenteQuerySchema, "query"), controller.getEchipamente);
 router.get("/stats", controller.getStats);
 router.get("/stock", controller.getAvailableStock);
 router.get("/export", controller.exportEchipamente);

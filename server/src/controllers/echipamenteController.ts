@@ -19,14 +19,43 @@ interface ExportableEchipament {
   angajat?: { numeComplet?: string } | null;
 }
 
+type ListEchipamenteQuery = {
+  page: number;
+  pageSize: number;
+  search?: string | null;
+  status?: string | null;
+  type?: string | null;
+  sort: "asc" | "desc";
+  sortBy: "nume" | "createdAt" | "tip" | "stare";
+};
+
 export const getEchipamente = async (
-  _: Request,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const echipamente = await getEchipamenteService();
-    res.json(echipamente);
+    const {
+      page,
+      pageSize,
+      search,
+      status,
+      type,
+      sort,
+      sortBy,
+    } = req.query as unknown as ListEchipamenteQuery;
+
+    const result = await getEchipamenteService({
+      page,
+      pageSize,
+      search: search ?? undefined,
+      status: status ?? undefined,
+      type: type ?? undefined,
+      sort,
+      sortBy,
+    });
+
+    res.json(result);
   } catch (err) {
     next(err);
   }
