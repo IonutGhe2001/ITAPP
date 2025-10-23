@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import type { Angajat } from '@/features/equipment/types';
 const ModalAddColeg = React.lazy(() => import('./ModalAddColeg'));
 import { useCreateEchipament, useEchipamente } from '@/features/equipment';
-import { useAngajati } from '@/features/employees';
+import { useAllAngajati } from '@/features/employees';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 import { useEchipamentForm } from './useEchipamentForm';
 import EchipamentForm from '@/features/equipment/components/EchipamentForm';
@@ -33,7 +33,7 @@ export default function ModalAddEchipament({
     buildPayload,
   } = useEchipamentForm(initialData);
 
-  const { data: angajati = [] } = useAngajati();
+  const { data: angajati = [] } = useAllAngajati();
   const { data: echipamente = [] } = useEchipamente();
   const createMutation = useCreateEchipament();
   const { toast } = useToast();

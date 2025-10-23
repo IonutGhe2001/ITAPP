@@ -1,7 +1,37 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useInfiniteQuery,
+  useQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import http from '@/services/http';
-import type { Angajat } from '@/features/equipment/types';
+import type { Angajat, Echipament } from '@/features/equipment/types';
+
+export interface PaginatedAngajatiResponse {
+  data: AngajatWithRelations[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  hasMore: boolean;
+}
+
+export interface GetAngajatiParams {
+  pageSize?: number;
+  department?: string;
+  status?: string;
+}
+
+const DEFAULT_QUERY_PARAMS: GetAngajatiParams = Object.freeze({});
+
+export interface AngajatWithRelations extends Angajat {
+  departmentConfigId?: string | null;
+  dataAngajare?: string;
+  echipamente: Echipament[];
+  checklist?: string[];
+  licenses?: string[];
+}
 
 export interface AngajatInput {
   numeComplet: string;
@@ -31,12 +61,29 @@ export interface AngajatUpdateInput {
 
 export const getAngajat = (id: string) => http.get<Angajat>(`/angajati/${id}`);
 
-export const getAngajati = () => http.get<Angajat[]>(`/angajati`);
+export const getAngajati = (params: GetAngajatiParams & { page?: number } = {}) =>
+  http.get<PaginatedAngajatiResponse>('/angajati', {
+    params,
+  });
 
-export const useAngajati = () =>
-  useQuery<Angajat[]>({
-    queryKey: QUERY_KEYS.EMPLOYEES,
-    queryFn: () => http.get<Angajat[]>('/angajati'),
+export const getAllAngajati = () =>
+  http.get<AngajatWithRelations[]>(`/angajati/full`);
+
+export const useAngajati = (params: GetAngajatiParams = DEFAULT_QUERY_PARAMS) =>
+  useInfiniteQuery<PaginatedAngajatiResponse, Error>({
+    queryKey: [...QUERY_KEYS.EMPLOYEES, params],
+    initialPageParam: 1,
+    queryFn: ({ pageParam = 1 }) =>
+      http.get<PaginatedAngajatiResponse>('/angajati', {
+        params: { ...params, page: pageParam },
+      }),
+    getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.page + 1 : undefined),
+  });
+
+export const useAllAngajati = () =>
+  useQuery<AngajatWithRelations[]>({
+    queryKey: [...QUERY_KEYS.EMPLOYEES, 'full'],
+    queryFn: () => http.get<AngajatWithRelations[]>('/angajati/full'),
   });
 
 export const useCreateAngajat = () => {

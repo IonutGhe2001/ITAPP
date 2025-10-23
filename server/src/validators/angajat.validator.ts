@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { EmailAccountStatus } from "@prisma/client";
 
 export const createAngajatSchema = Joi.object({
   numeComplet: Joi.string().min(2).required(),
@@ -30,4 +31,13 @@ export const createEmailAccountSchema = Joi.object({
   email: Joi.string().email().required(),
   responsible: Joi.string().min(2).required(),
   link: Joi.string().uri().allow(null, ""),
+});
+
+export const getAngajatiQuerySchema = Joi.object({
+  page: Joi.number().integer().min(1).default(1),
+  pageSize: Joi.number().integer().min(1).max(100).default(25),
+  department: Joi.string().uuid().optional(),
+  status: Joi.string()
+    .valid(...Object.values(EmailAccountStatus))
+    .optional(),
 });

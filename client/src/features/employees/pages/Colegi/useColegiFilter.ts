@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import type { Angajat, Echipament } from '@/features/equipment/types';
+import type { Angajat } from '@/features/equipment/types';
+import type { AngajatWithRelations } from '@/features/employees/angajatiService';
 
 export default function useColegiFilter(
-  colegi: (Angajat & { echipamente: Echipament[] })[],
+  colegi: AngajatWithRelations[],
 ) {
   const [search, setSearch] = useState('');
   const [functieFilter, setFunctieFilter] = useState('');

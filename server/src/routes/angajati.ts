@@ -5,6 +5,7 @@ import {
   createAngajatSchema,
   updateAngajatSchema,
   createEmailAccountSchema,
+  getAngajatiQuerySchema,
 } from "../validators/angajat.validator";
 import { authenticate, authorizeRoles } from "../middlewares/authMiddleware";
 
@@ -12,7 +13,8 @@ const router = express.Router();
 
 router.use(authenticate);
 
-router.get("/", controller.getAngajati);
+router.get("/", validateRequest(getAngajatiQuerySchema, "query"), controller.getAngajati);
+router.get("/full", controller.getAllAngajati);
 router.get("/:id", controller.getAngajatById);
 router.post(
   "/",

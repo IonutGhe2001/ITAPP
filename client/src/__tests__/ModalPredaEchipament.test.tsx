@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import ModalPredaEchipament from '@/features/equipment/components/ModalPredaEchipament';
 
 vi.mock('@/features/employees', () => ({
-  useAngajati: () => ({ data: [{ id: '1', numeComplet: 'John Doe' }] }),
+  useAllAngajati: () => ({ data: [{ id: '1', numeComplet: 'John Doe' }] }),
 }));
 
 describe('ModalPredaEchipament accessibility', () => {

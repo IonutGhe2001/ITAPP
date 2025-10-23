@@ -13,6 +13,11 @@ export interface Angajat {
   cDataId?: string;
   cDataNotes?: string;
   cDataCreated: boolean;
+  departmentConfigId?: string | null;
+  dataAngajare?: string;
+  checklist?: string[];
+  licenses?: string[];
+  echipamente?: Echipament[];
   emailAccountStatus?: 'PENDING' | 'CREATED';
   emailAccountCreatedAt?: string;
   emailAccountResponsible?: string;

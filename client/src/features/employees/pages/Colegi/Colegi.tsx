@@ -1,6 +1,7 @@
-import { useState, useLayoutEffect, useRef, useEffect } from 'react';
+import { useState, useLayoutEffect, useRef, useEffect, useMemo } from 'react';
 import { useAngajati, useDeleteAngajat } from '@/features/employees';
-import type { Angajat, Echipament } from '@/features/equipment/types';
+import type { Angajat } from '@/features/equipment/types';
+import type { AngajatWithRelations } from '@/features/employees/angajatiService';
 import { useUpdateEchipament } from '@/features/equipment';
 import { genereazaProcesVerbal, type ProcesVerbalTip } from '@/features/proceseVerbale';
 import { queueProcesVerbal, getQueue, removeFromQueue } from '@/features/proceseVerbale/pvQueue';
@@ -14,15 +15,12 @@ import { VariableSizeList as List } from 'react-window';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 
 export default function Colegi() {
-  const {
-    data: colegi = [],
-    refetch,
-    isLoading,
-  } = useAngajati() as {
-    data: (Angajat & { echipamente: Echipament[] })[] | undefined;
-    refetch: () => void;
-    isLoading: boolean;
-  };
+  const { data, refetch, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useAngajati();
+  const colegi: AngajatWithRelations[] = useMemo(
+    () => data?.pages.flatMap((page) => page.data) ?? [],
+    [data]
+  );
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [selectedAngajatId, setSelectedAngajatId] = useState<string | null>(null);
   const [replaceData, setReplaceData] = useState<{
@@ -100,7 +98,7 @@ export default function Colegi() {
     setSortOrder,
     functii,
     filtered,
-  } = useColegiFilter(colegi as (Angajat & { echipamente: Echipament[] })[]);
+  } = useColegiFilter(colegi);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<List>(null);
@@ -153,7 +151,7 @@ export default function Colegi() {
     try {
       await deleteMutation.mutateAsync(id);
       toast({ title: 'Coleg șters' });
-      refetch();
+      await refetch();
       setExpanded(new Set());
     } catch {
       toast({
@@ -178,10 +176,10 @@ export default function Colegi() {
         window.open(url, '_blank');
       } else {
         queueProcesVerbal(colegId, 'RESTITUIRE', { predate: [eqId] });
-      }
-      addPendingPV(colegId, { predate: [eqId] });
-      toast({ title: 'Echipament eliberat', description: 'Proces verbal în așteptare' });
-      refetch();
+    }
+    addPendingPV(colegId, { predate: [eqId] });
+    toast({ title: 'Echipament eliberat', description: 'Proces verbal în așteptare' });
+    await refetch();
     } catch {
       toast({
         title: 'Eroare',
@@ -299,6 +297,17 @@ export default function Colegi() {
               )}
             </div>
           </div>
+        )}
+      </div>
+
+      <div className="flex flex-col items-center gap-3">
+        {isFetchingNextPage && (
+          <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
+        )}
+        {hasNextPage && (
+          <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} variant="outline">
+            {isFetchingNextPage ? 'Se încarcă...' : 'Încarcă mai mulți colegi'}
+          </Button>
         )}
       </div>
 

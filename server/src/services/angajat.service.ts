@@ -1,41 +1,86 @@
 import { prisma } from "../lib/prisma";
-import type { PrismaClient } from "@prisma/client";
+import type { Prisma, PrismaClient, EmailAccountStatus } from "@prisma/client";
 
-export const getAngajati = () => {
-  return prisma.angajat.findMany({
-    select: {
-      id: true,
-      numeComplet: true,
-      functie: true,
-      dataAngajare: true,
-      email: true,
-      telefon: true,
-      departmentConfigId: true,
-      checklist: true,
-      licenses: true,
-      cDataUsername: true,
-      cDataId: true,
-      cDataNotes: true,
-      cDataCreated: true,
-      emailAccountStatus: true,
-      emailAccountCreatedAt: true,
-      emailAccountResponsible: true,
-      emailAccountLink: true,
-      echipamente: {
-        where: {
-          angajatId: {
-            not: null,
-          },
-        },
-        select: {
-          id: true,
-          nume: true,
-          tip: true,
-          serie: true,
-          stare: true,
-        },
+const angajatSelect = {
+  id: true,
+  numeComplet: true,
+  functie: true,
+  dataAngajare: true,
+  email: true,
+  telefon: true,
+  departmentConfigId: true,
+  checklist: true,
+  licenses: true,
+  cDataUsername: true,
+  cDataId: true,
+  cDataNotes: true,
+  cDataCreated: true,
+  emailAccountStatus: true,
+  emailAccountCreatedAt: true,
+  emailAccountResponsible: true,
+  emailAccountLink: true,
+  echipamente: {
+    where: {
+      angajatId: {
+        not: null,
       },
     },
+    select: {
+      id: true,
+      nume: true,
+      tip: true,
+      serie: true,
+      stare: true,
+    },
+    },
+} satisfies Prisma.AngajatSelect;
+
+export interface GetAngajatiParams {
+  page: number;
+  pageSize: number;
+  department?: string;
+  status?: EmailAccountStatus;
+}
+
+export const getAngajati = async ({
+  page,
+  pageSize,
+  department,
+  status,
+}: GetAngajatiParams) => {
+  const where: Prisma.AngajatWhereInput = {
+    ...(department ? { departmentConfigId: department } : {}),
+    ...(status ? { emailAccountStatus: status } : {}),
+  };
+
+  const [total, angajati] = await prisma.$transaction([
+    prisma.angajat.count({ where }),
+    prisma.angajat.findMany({
+      where,
+      select: angajatSelect,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      orderBy: { numeComplet: "asc" },
+    }),
+  ]);
+
+  const totalPages = pageSize > 0 ? Math.ceil(total / pageSize) : 0;
+  const hasMore = pageSize > 0 ? page * pageSize < total : false;
+
+  return {
+    data: angajati,
+    total,
+    page,
+    pageSize,
+    totalPages,
+    hasMore,
+  };
+};
+
+export const getAllAngajati = () => {
+  return prisma.angajat.findMany({
+    select: angajatSelect,
+    orderBy: { numeComplet: "asc" },
   });
 };
 

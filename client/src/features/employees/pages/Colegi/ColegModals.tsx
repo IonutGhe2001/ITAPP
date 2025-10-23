@@ -29,7 +29,7 @@ interface ColegModalsProps {
   showAddModal: boolean;
   setShowAddModal: (v: boolean) => void;
   search: string;
-  refetch: () => void;
+  refetch: () => Promise<unknown>;
   setExpanded: React.Dispatch<React.SetStateAction<Set<string>>>;
   handleDelete: (id: string) => void;
   onPVChange: (colegId: string, change: { predate?: string[]; primite?: string[] }) => void;
@@ -62,7 +62,7 @@ export default function ColegModals({
           onClose={() => setSelectedAngajatId(null)}
           onPendingPV={(change) => onPVChange(selectedAngajatId, change)}
           onSuccess={() => {
-            refetch();
+            void refetch();
             setExpanded(new Set());
             setSelectedAngajatId(null);
           }}
@@ -99,7 +99,7 @@ export default function ColegModals({
           onPendingPV={(change) => onPVChange(replaceData.colegId, change)}
           onClose={() => setReplaceData(null)}
           onSuccess={() => {
-            refetch();
+            void refetch();
             setExpanded(new Set());
             setReplaceData(null);
           }}
@@ -110,7 +110,7 @@ export default function ColegModals({
           coleg={editColeg}
           onClose={() => setEditColeg(null)}
           onSuccess={() => {
-            refetch();
+            void refetch();
             setExpanded(new Set());
           }}
         />

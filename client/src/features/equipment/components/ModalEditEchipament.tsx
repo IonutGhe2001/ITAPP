@@ -2,7 +2,7 @@ import React, { memo, Suspense, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useUpdateEchipament, useEchipamente } from '@/features/equipment';
-import { useAngajati } from '@/features/employees';
+import { useAllAngajati } from '@/features/employees';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 import { handleApiError } from '@/utils/apiError';
 import { useEchipamentForm } from '@/pages/Dashboard/modals/useEchipamentForm';
@@ -35,7 +35,7 @@ function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipa
     buildPayload,
   } = useEchipamentForm(initialData);
 
-  const { data: angajati = [] } = useAngajati();
+  const { data: angajati = [] } = useAllAngajati();
   const { data: echipamente = [] } = useEchipamente();
   const updateMutation = useUpdateEchipament();
   const { toast } = useToast();

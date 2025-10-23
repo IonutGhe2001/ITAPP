@@ -1,14 +1,41 @@
 import { Request, Response, NextFunction } from "express";
 import * as angajatService from "../services/angajat.service";
 import { emitUpdate } from "../lib/websocket";
+import type { EmailAccountStatus } from "@prisma/client";
+
+type GetAngajatiQuery = {
+  page: number;
+  pageSize: number;
+  department?: string;
+  status?: EmailAccountStatus;
+};
 
 export const getAngajati = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { page, pageSize, department, status } = req.query as GetAngajatiQuery;
+    const response = await angajatService.getAngajati({
+      page,
+      pageSize,
+      department,
+      status,
+    });
+    res.json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getAllAngajati = async (
   _: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const angajati = await angajatService.getAngajati();
+    const angajati = await angajatService.getAllAngajati();
     res.json(angajati);
   } catch (err) {
     next(err);

@@ -5,10 +5,18 @@ import Colegi from '../features/employees/pages/Colegi/Colegi';
 import ColegRow from '../features/employees/pages/Colegi/ColegRow';
 
 vi.mock('@/features/employees', () => ({
-  useAngajati: () => ({ data: [], refetch: vi.fn() }),
+  useAngajati: () => ({
+    data: { pages: [{ data: [] }] },
+    refetch: vi.fn(),
+    isLoading: false,
+    fetchNextPage: vi.fn(),
+    hasNextPage: false,
+    isFetchingNextPage: false,
+  }),
   useDeleteAngajat: () => ({ mutateAsync: vi.fn() }),
   useUpdateAngajat: () => ({ mutate: vi.fn() }),
-  }));
+  useAllAngajati: () => ({ data: [] }),
+}));
 
 vi.mock('@/features/equipment', () => ({
   useUpdateEchipament: () => ({ mutateAsync: vi.fn() }),

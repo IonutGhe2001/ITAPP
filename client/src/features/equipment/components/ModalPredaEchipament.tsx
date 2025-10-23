@@ -8,11 +8,11 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { useAngajati } from '@/features/employees';
+import { useAllAngajati } from '@/features/employees';
 import type { ModalPredaEchipamentProps, Angajat } from '@/features/equipment/types';
 
 function ModalPredaEchipament({ echipament, onClose, onSubmit }: ModalPredaEchipamentProps) {
-  const { data: angajati = [] } = useAngajati();
+  const { data: angajati = [] } = useAllAngajati();
   const [angajatId, setAngajatId] = useState<string>('');
   const triggerRef = useRef<HTMLButtonElement>(null);
 

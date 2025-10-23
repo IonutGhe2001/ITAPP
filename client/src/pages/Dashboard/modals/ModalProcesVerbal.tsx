@@ -12,7 +12,7 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 import { Expand, X } from 'lucide-react';
-import { getAngajati } from '@/features/employees';
+import { getAllAngajati } from '@/features/employees';
 import http from '@/services/http';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 
@@ -29,7 +29,7 @@ export default function ModalProcesVerbal({ onClose }: ModalProcesVerbalProps) {
   const { toast } = useToast();
 
   useEffect(() => {
-    getAngajati()
+    getAllAngajati()
       .then(setAngajati)
       .catch((err: unknown) => console.error('Eroare la încărcare angajați', err));
   }, []);
