@@ -8,6 +8,7 @@ import {
 } from '@/features/equipment';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 import { handleApiError } from '@/utils/apiError';
+import { useAuth } from '@/context/useAuth';
 import {
   EquipmentFilter,
   EquipmentList,
@@ -25,10 +26,15 @@ export default function Echipamente() {
   const [type, setType] = useState('');
   const [sort, setSort] = useState<'asc' | 'desc'>('asc');
 
+  const { isAuthenticated } = useAuth();
+  const queryEnabled = isAuthenticated;
+
   const {
     data: echipamente = [],
     refetch,
     isLoading,
+    isError,
+    error,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
@@ -40,6 +46,7 @@ export default function Echipamente() {
     sort,
     autoFetchAll: false,
     pageSize: 30,
+    enabled: queryEnabled,
   });
 
   const [selected, setSelected] = useState<(Echipament & { __editMode?: boolean }) | null>(null);
@@ -54,6 +61,18 @@ export default function Echipamente() {
       <div className="flex h-screen items-center justify-center">
         <div className="border-primary h-10 w-10 animate-spin rounded-full border-4 border-t-transparent"></div>
       </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Container className="py-6">
+        <div className="text-muted-foreground flex flex-col items-center justify-center gap-4 py-24 text-center">
+          <p className="text-foreground text-lg font-semibold">Nu am putut încărca echipamentele.</p>
+          <p className="max-w-md text-sm">{handleApiError(error)}</p>
+          <Button onClick={() => refetch()}>Reîncearcă</Button>
+        </div>
+      </Container>
     );
   }
 

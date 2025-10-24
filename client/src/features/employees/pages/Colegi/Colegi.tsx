@@ -14,10 +14,23 @@ import Container from '@/components/Container';
 import { Button } from '@/components/ui/button';
 import { VariableSizeList as List } from 'react-window';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
+import { useAuth } from '@/context/useAuth';
+import { handleApiError } from '@/utils/apiError';
 
 export default function Colegi() {
-  const { data, refetch, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useAngajati();
+  const { isAuthenticated } = useAuth();
+  const queryEnabled = isAuthenticated;
+
+  const {
+    data,
+    refetch,
+    isLoading,
+    isError,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useAngajati(undefined, { enabled: queryEnabled });
   const colegi: AngajatWithRelations[] = useMemo(
     () => data?.pages.flatMap((page) => page.data) ?? [],
     [data]
@@ -221,6 +234,18 @@ export default function Colegi() {
       <div className="flex h-screen items-center justify-center">
         <div className="border-primary h-10 w-10 animate-spin rounded-full border-4 border-t-transparent"></div>
       </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Container className="py-6">
+        <div className="text-muted-foreground flex flex-col items-center justify-center gap-4 py-24 text-center">
+          <p className="text-foreground text-lg font-semibold">Nu am putut încărca lista de colegi.</p>
+          <p className="max-w-md text-sm">{handleApiError(error)}</p>
+          <Button onClick={() => refetch()}>Reîncearcă</Button>
+        </div>
+      </Container>
     );
   }
   

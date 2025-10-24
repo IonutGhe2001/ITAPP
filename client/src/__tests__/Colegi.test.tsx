@@ -41,6 +41,10 @@ vi.mock('@/hooks/use-toast/use-toast-hook', () => ({
   useToast: () => ({ toast: vi.fn() }),
 }));
 
+vi.mock('@/context/useAuth', () => ({
+  useAuth: () => ({ isAuthenticated: true, loading: false }),
+}));
+
 describe('Colegi', () => {
   it('renders search input', () => {
     render(

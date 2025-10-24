@@ -25,6 +25,10 @@ export interface GetAngajatiParams {
 
 const DEFAULT_QUERY_PARAMS: GetAngajatiParams = Object.freeze({});
 
+interface UseAngajatiOptions {
+  enabled?: boolean;
+}
+
 export interface AngajatWithRelations extends Angajat {
   departmentConfigId?: string | null;
   dataAngajare?: string;
@@ -69,16 +73,23 @@ export const getAngajati = (params: GetAngajatiParams & { page?: number } = {}) 
 export const getAllAngajati = () =>
   http.get<AngajatWithRelations[]>(`/angajati/full`);
 
-export const useAngajati = (params: GetAngajatiParams = DEFAULT_QUERY_PARAMS) =>
-  useInfiniteQuery<PaginatedAngajatiResponse, Error>({
-    queryKey: [...QUERY_KEYS.EMPLOYEES, params],
+export const useAngajati = (
+  params?: GetAngajatiParams,
+  options: UseAngajatiOptions = {}
+) => {
+  const queryParams = params ?? DEFAULT_QUERY_PARAMS;
+
+  return useInfiniteQuery<PaginatedAngajatiResponse, Error>({
+    queryKey: [...QUERY_KEYS.EMPLOYEES, queryParams],
     initialPageParam: 1,
+    enabled: options.enabled ?? true,
     queryFn: ({ pageParam = 1 }) =>
       http.get<PaginatedAngajatiResponse>('/angajati', {
-        params: { ...params, page: pageParam },
+        params: { ...queryParams, page: pageParam },
       }),
     getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.page + 1 : undefined),
   });
+};
 
 export const useAllAngajati = () =>
   useQuery<AngajatWithRelations[]>({
