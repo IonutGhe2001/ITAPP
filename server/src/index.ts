@@ -1,6 +1,6 @@
 import express from "express";
 import http from "http";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import path from "path";
@@ -27,6 +27,7 @@ import departmentConfigRoutes from "./routes/departmentConfig";
 import reportsRoutes from "./routes/reports";
 import purchaseRequestRoutes from "./routes/purchaseRequests";
 import onboardingRoutes from "./routes/onboarding";
+import testLoginRoutes from "./routes/testLogin";
 
 const app = express();
 const server = http.createServer(app);
@@ -40,14 +41,56 @@ void initPdfRenderer().catch((error: unknown) =>
 // Global Middlewares
 // When using credentials the origin cannot be "*". Default to the frontend
 // development URL if no environment variable is provided.
-const allowedOrigins = env.CORS_ORIGIN.split(",").filter(Boolean);
+const configuredOrigins = env.CORS_ORIGIN.split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const defaultOrigins = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+];
+
+const allowedOrigins = Array.from(new Set([...defaultOrigins, ...configuredOrigins]));
+
+const tunnelOriginPatterns = [
+  /\.trycloudflare\.com$/,
+  /\.cfargotunnel\.com$/,
+  /\.ngrok-free\.app$/,
+  /\.ngrok\.io$/,
+];
+
+const corsOptions: CorsOptions = {
+  origin(origin, callback) {
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    try {
+      const hostname = new URL(origin).hostname;
+      if (tunnelOriginPatterns.some((pattern) => pattern.test(hostname))) {
+        return callback(null, true);
+      }
+    } catch (error) {
+      logger.warn("Invalid origin received in CORS middleware", {
+        origin,
+        error,
+      });
+      return callback(error as Error);
+    }
+
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+};
+
 initWebSocket(server, allowedOrigins);
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  })
-);
+app.use(cors(corsOptions));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(
@@ -57,8 +100,24 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        imgSrc: ["'self'", "data:", "blob:", ...allowedOrigins],
-        frameAncestors: ["'self'", ...allowedOrigins],
+        imgSrc: [
+          "'self'",
+          "data:",
+          "blob:",
+          ...allowedOrigins,
+          "https://*.trycloudflare.com",
+          "https://*.cfargotunnel.com",
+          "https://*.ngrok-free.app",
+          "https://*.ngrok.io",
+        ],
+        frameAncestors: [
+          "'self'",
+          ...allowedOrigins,
+          "https://*.trycloudflare.com",
+          "https://*.cfargotunnel.com",
+          "https://*.ngrok-free.app",
+          "https://*.ngrok.io",
+        ],
       },
     },
   })
@@ -105,6 +164,10 @@ app.use(
 app.use("/api/auth/login", loginLimiter);
 app.use(logRequest);
 
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/echipamente", echipamenteRoutes);
@@ -120,6 +183,7 @@ app.use("/config", configRoutes);
 app.use("/api/department-configs", departmentConfigRoutes);
 app.use("/api/reports", reportsRoutes);
 app.use("/api/onboarding", onboardingRoutes);
+app.use(testLoginRoutes);
 
 // Error handler middleware (final)
 app.use(errorHandler);

@@ -1,0 +1,11 @@
+# Sample Cloudflare Tunnel configuration for local staging tests
+# Replace the tunnel ID, credentials path, and hostnames with your own values.
+tunnel: <YOUR_TUNNEL_ID>
+credentials-file: /home/user/.cloudflared/<YOUR_TUNNEL_ID>.json
+
+ingress:
+  - hostname: api.example.com
+    service: http://localhost:8080
+  - hostname: app.example.com
+    service: http://localhost:3000
+  - service: http_status:404
