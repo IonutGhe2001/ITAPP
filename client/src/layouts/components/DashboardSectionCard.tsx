@@ -16,17 +16,18 @@ function DashboardSectionCard({ children, className, title, icon }: DashboardSec
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       className={cn(
-        'bg-card border-border rounded-2xl border shadow-md transition-transform hover:-translate-y-1 hover:shadow-lg',
+        'group relative overflow-hidden rounded-[28px] border border-border/60 bg-background/80 shadow-lg shadow-primary/5 backdrop-blur transition hover:-translate-y-1 hover:shadow-xl',
+        "before:absolute before:inset-x-0 before:-top-32 before:h-40 before:bg-gradient-to-b before:from-primary/20 before:via-transparent before:to-transparent before:opacity-0 before:transition-opacity before:duration-500 group-hover:before:opacity-100",
         className
       )}
     >
       {(title || icon) && (
-        <div className="text-foreground flex items-center gap-2 p-6 pb-0 text-xl font-semibold">
-          {icon && <span className="text-2xl">{icon}</span>}
-          {title}
+        <div className="relative flex items-center gap-3 px-6 pt-6 text-lg font-semibold text-foreground">
+          {icon && <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-primary/10 text-primary">{icon}</span>}
+          <span>{title}</span>
         </div>
       )}
-      <div className="flex h-full flex-col overflow-hidden p-6 pt-4">{children}</div>
+      <div className="relative flex h-full flex-col overflow-hidden p-6 pt-4">{children}</div>
     </motion.section>
   );
 }

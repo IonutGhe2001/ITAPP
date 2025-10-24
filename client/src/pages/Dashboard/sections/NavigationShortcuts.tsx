@@ -61,19 +61,23 @@ export default function NavigationShortcuts() {
             onKeyDown={(e) => e.key === 'Enter' && navigate(shortcut.route)}
             role="button"
             tabIndex={0}
-            className={`border-border group flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition duration-300 hover:scale-[1.02] focus:outline-none focus:ring-2 ${
-              isActive
-                ? 'bg-primary/10 border-primary/30 ring-primary/30 ring-1'
-                : 'bg-muted hover:bg-muted/80'
+            className={`group relative flex cursor-pointer items-center gap-4 rounded-2xl border border-border/60 bg-background/80 p-4 shadow-inner shadow-primary/5 transition hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/30 ${
+              isActive ? 'border-primary/50 shadow-primary/20' : ''
             }`}
           >
             <div
-              className={`flex h-10 w-10 items-center justify-center rounded-full ${shortcut.color} transition-all`}
+              className={`relative flex h-12 w-12 items-center justify-center rounded-xl ${shortcut.color}`}
             >
               {shortcut.icon}
             </div>
-            <span className="text-foreground text-sm font-medium group-hover:underline">
-              {shortcut.label}
+            <div className="flex flex-1 flex-col gap-1">
+              <span className="text-foreground text-sm font-semibold group-hover:text-primary">
+                {shortcut.label}
+              </span>
+              <span className="text-muted-foreground text-xs">Navighează cu Ctrl + {shortcut.keybinding}</span>
+            </div>
+            <span className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wide">
+              Ctrl + {shortcut.keybinding}
             </span>
           </li>
         );

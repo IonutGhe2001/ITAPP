@@ -57,7 +57,7 @@ export default function RecentUpdates() {
     return () => {
       socket?.disconnect();
     };
-  }, []);
+  }, [toast]);
 
   const filteredUpdates = updates.filter((u) =>
     filter ? u.type.toLowerCase().includes(filter.toLowerCase()) : true
@@ -65,21 +65,27 @@ export default function RecentUpdates() {
 
   return (
     <div className="min-h-0 w-full flex-1 space-y-4 overflow-y-auto pr-1">
-      <ul>
+      <ul className="space-y-3">
         {filteredUpdates.map((update) => (
           <li
             key={update.id}
-            className="border-border bg-card flex items-start gap-4 rounded-xl border p-4 shadow-sm transition hover:shadow-md"
+            className="group relative flex items-start gap-4 overflow-hidden rounded-2xl border border-border/60 bg-background/80 p-4 shadow-inner shadow-primary/5 transition hover:-translate-y-1 hover:shadow-lg"
           >
-            <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-full">
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary/40 via-primary/20 to-transparent opacity-0 transition group-hover:opacity-100" />
+            <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-muted/60 text-primary">
               {updateIcons[update.type]}
             </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="outline">{update.type}</Badge>
                 <span className="text-muted-foreground text-xs">
                   {formatDistanceToNow(new Date(update.timestamp), { addSuffix: true, locale: ro })}
                 </span>
+                {update.importance === 'high' && (
+                  <Badge variant="destructive" className="text-[10px]">
+                    important
+                  </Badge>
+                )}
               </div>
               <p className="text-foreground text-sm leading-tight">{update.message}</p>
             </div>

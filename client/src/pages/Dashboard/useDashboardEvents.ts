@@ -35,10 +35,14 @@ export function useDashboardEvents() {
     await deleteMutation.mutateAsync(id);
   };
 
-  const handleDayDoubleClick = (date: Date) => {
+  const openCreateEvent = (date: Date = new Date()) => {
     setFormDate(date);
     setEditing(null);
     setShowFormModal(true);
+  };
+
+  const handleDayDoubleClick = (date: Date) => {
+    openCreateEvent(date);
   };
 
   const handleEditEvent = (event: Eveniment) => {
@@ -63,5 +67,6 @@ export function useDashboardEvents() {
     handleDayDoubleClick,
     handleEditEvent,
     setShowFormModal,
+    openCreateEvent,
   };
 }

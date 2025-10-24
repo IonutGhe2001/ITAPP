@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense, lazy } from 'react';
+import { useEffect, useState, Suspense, lazy, useMemo } from 'react';
 import { UserPlusIcon, LaptopIcon, FileTextIcon, UserCogIcon, DownloadIcon } from 'lucide-react';
 const ModalAddColeg = lazy(() => import('../modals/ModalAddColeg'));
 const ModalAddEchipament = lazy(() => import('../modals/ModalAddEchipament'));
@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { getQueueCount, getQueue, clearQueue } from '@/features/proceseVerbale/pvQueue';
 import { genereazaProcesVerbal } from '@/features/proceseVerbale';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
+import { cn } from '@/lib/utils';
 
 export default function QuickActions() {
   const [showColegModal, setShowColegModal] = useState(false);
@@ -76,32 +77,29 @@ export default function QuickActions() {
     }
   };
 
+  const buttonClasses = useMemo(
+    () =>
+      cn(
+        'group relative flex h-28 w-full min-w-[150px] flex-col items-center justify-center gap-2 rounded-2xl border border-border/60 bg-background/80 px-4 text-center text-sm font-medium text-foreground shadow-inner shadow-primary/5 transition hover:-translate-y-1 hover:shadow-lg',
+        "after:absolute after:inset-0 after:rounded-2xl after:bg-gradient-to-br after:from-primary/10 after:via-transparent after:to-transparent after:opacity-0 after:transition-all group-hover:after:opacity-100"
+      ),
+    []
+  );
+
   return (
     <>
-      <div className="mx-auto grid w-full max-w-5xl grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-4">
-        <Button
-          onClick={() => setShowColegModal(true)}
-          variant="outline"
-          className="bg-chart-3/10 text-foreground flex h-[100px] w-full min-w-[150px] flex-col items-center justify-center gap-2 whitespace-normal break-words rounded-2xl border px-4 py-2 text-center text-sm font-medium transition-all hover:scale-105"
-        >
+      <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-4">
+        <Button onClick={() => setShowColegModal(true)} variant="ghost" className={buttonClasses}>
           <UserPlusIcon className="h-5 w-5" />
           <span className="whitespace-normal break-words leading-tight">Adaugă coleg</span>
         </Button>
 
-        <Button
-          onClick={() => setShowEchipamentModal(true)}
-          variant="outline"
-          className="bg-chart-3/10 text-foreground flex h-[100px] w-full min-w-[150px] flex-col items-center justify-center gap-2 whitespace-normal break-words rounded-2xl border px-4 py-2 text-center text-sm font-medium transition-all hover:scale-105"
-        >
+        <Button onClick={() => setShowEchipamentModal(true)} variant="ghost" className={buttonClasses}>
           <LaptopIcon className="h-5 w-5" />
           <span className="whitespace-normal break-words leading-tight">Adaugă echipament</span>
         </Button>
 
-        <Button
-          onClick={handleProces}
-          variant="outline"
-          className="bg-chart-3/10 text-foreground relative flex h-[100px] w-full min-w-[150px] flex-col items-center justify-center gap-2 whitespace-normal break-words rounded-2xl border px-4 py-2 text-center text-sm font-medium transition-all hover:scale-105"
-        >
+        <Button onClick={handleProces} variant="ghost" className={cn(buttonClasses, 'relative')}>
           <FileTextIcon className="h-5 w-5" />
           <span className="whitespace-normal break-words leading-tight">
             Generează proces verbal
@@ -113,20 +111,12 @@ export default function QuickActions() {
           )}
         </Button>
 
-        <Button
-          onClick={() => setShowCreateUserModal(true)}
-          variant="outline"
-          className="bg-chart-3/10 text-foreground flex h-[100px] w-full min-w-[150px] flex-col items-center justify-center gap-2 whitespace-normal break-words rounded-2xl border px-4 py-2 text-center text-sm font-medium transition-all hover:scale-105"
-        >
+        <Button onClick={() => setShowCreateUserModal(true)} variant="ghost" className={buttonClasses}>
           <UserCogIcon className="h-5 w-5" />
           <span className="whitespace-normal break-words leading-tight">Creează cont</span>
         </Button>
 
-        <Button
-          onClick={handleExportJSON}
-          variant="outline"
-          className="bg-chart-3/10 text-foreground flex h-[100px] w-full min-w-[150px] flex-col items-center justify-center gap-2 whitespace-normal break-words rounded-2xl border px-4 py-2 text-center text-sm font-medium transition-all hover:scale-105"
-        >
+        <Button onClick={handleExportJSON} variant="ghost" className={buttonClasses}>
           <DownloadIcon className="h-5 w-5" />
           <span className="whitespace-normal break-words leading-tight">Exportă JSON</span>
         </Button>
