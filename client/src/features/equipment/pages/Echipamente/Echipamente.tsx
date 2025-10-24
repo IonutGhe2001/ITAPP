@@ -56,6 +56,18 @@ export default function Echipamente() {
   const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
 
+  const types = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          echipamente
+            .map((e) => (typeof e.tip === 'string' ? e.tip.trim().toLowerCase() : ''))
+            .filter((value): value is string => value.length > 0)
+        )
+      ).sort(),
+    [echipamente]
+  );
+
   if (isLoading && echipamente.length === 0) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -76,19 +88,7 @@ export default function Echipamente() {
     );
   }
 
-  const types = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          echipamente
-            .map((e) => (typeof e.tip === 'string' ? e.tip.trim().toLowerCase() : ''))
-            .filter((value): value is string => value.length > 0)
-        )
-      ).sort(),
-    [echipamente]
-  );
-
-      const hasActiveFilters = Boolean(search.trim() || status || type);
+  const hasActiveFilters = Boolean(search.trim() || status || type);
 
   const handleDelete = async (id: string) => {
     await deleteMutation.mutateAsync(id);
