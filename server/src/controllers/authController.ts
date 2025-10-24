@@ -41,6 +41,11 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const getMe = async (req: Request, res: Response) => {
+  // dacă tokenul e de test (venit din /test-login), nu mai interogăm baza de date
+  if (req.user?.role === "tester" || req.user?.id === -1) {
+    return res.json(req.user);
+  }
+
   const userId = req.user!.id;
   try {
     const user = await getUserById(Number(userId));
@@ -53,6 +58,7 @@ export const getMe = async (req: Request, res: Response) => {
       .json({ message: "Eroare la preluarea utilizatorului" });
   }
 };
+
 
 export const updateMe = async (req: Request, res: Response) => {
   const userId = req.user!.id;
