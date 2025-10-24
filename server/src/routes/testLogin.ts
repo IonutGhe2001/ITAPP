@@ -71,7 +71,9 @@ router.post(
       at: new Date().toISOString(),
       email: userEmail,
       ip: req.ip,
+      forwardedFor: req.headers["x-forwarded-for"],
       origin: req.get("origin") ?? "unknown",
+      userAgent: req.get("user-agent") ?? "unknown",
     };
     logger.info("[test-login] audit", auditEntry);
 

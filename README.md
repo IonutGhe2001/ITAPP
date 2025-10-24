@@ -59,69 +59,107 @@ The API defaults to <http://localhost:8080> and the client to <http://localhost:
 
 Run `npm run format` from the repository root to format all files with Prettier.
 
-## Staging test login and tunnels
+## Staging via Cloudflare Tunnel
 
-### Local staging bypass
+Staging deployments rely on a Cloudflare Tunnel that publishes
+`api-staging.<domeniu>.com` for the API and `app-staging.<domeniu>.com` for the
+client. The `/test-login` endpoint remains gated behind
+`NODE_ENV=staging`/`AUTH_DISABLED=true` and issues a `token` cookie marked as
+`HttpOnly`, `Secure`, `SameSite=None` with a 10 minute TTL before redirecting to
+`FRONTEND_ROOT`.
 
-The `/test-login` endpoint is only available when `NODE_ENV=staging` or when the
-`AUTH_DISABLED` flag is enabled. For local automated checks you can bypass
-authentication by starting the API with the flag set:
+### Environment preparation
 
-```bash
-cd server
-AUTH_DISABLED=true npm run dev
+1. Copy the `.env.example` files and provide staging values:
+
+   ```bash
+   cd server
+   cp .env.example .env
+   # Minimum staging configuration
+   NODE_ENV=staging
+   FRONTEND_ROOT=https://app-staging.<domeniu>.com
+   CORS_ORIGIN=https://app-staging.<domeniu>.com
+   TEST_LOGIN_SECRET=$(openssl rand -hex 16)
+   npm install
+   ```
+
+2. Seed the dedicated tester account (password defaults to `staging-login` or
+   the value provided in `STAGING_TESTER_PASSWORD`):
+
+   ```bash
+   npm run seed:staging-tester
+   ```
+
+### Cloudflare Tunnel configuration
+
+Update `cloudflared/config.yml` with your tunnel ID and credentials file. The
+default mapping publishes both staging hostnames:
+
+```yaml
+tunnel: <YOUR_TUNNEL_ID>
+credentials-file: /home/user/.cloudflared/<YOUR_TUNNEL_ID>.json
+
+ingress:
+  - hostname: api-staging.<domeniu>.com
+    service: http://localhost:8080
+  - hostname: app-staging.<domeniu>.com
+    service: http://localhost:3000
+  - service: http_status:404
 ```
 
-The endpoint issues a short-lived JWT cookie for `tester@local.test` and then
-redirects to the URL defined in `FRONTEND_ROOT` (default
-`http://localhost:3000`). The cookie is marked `HttpOnly; Secure; SameSite=None`
-and expires after 10 minutes.
+### DNS records
 
-### Generating a test secret
+Create two CNAME records in Cloudflare DNS:
 
-When running against a shared staging environment keep `AUTH_DISABLED=false`
-and provision a short secret for `TEST_LOGIN_SECRET`. A simple way to generate
-one is:
+- `api-staging` → `<YOUR_TUNNEL_ID>.cfargotunnel.com`
+- `app-staging` → `<YOUR_TUNNEL_ID>.cfargotunnel.com`
+
+Both entries must be proxied (orange cloud enabled) so Cloudflare terminates
+TLS and attaches the correct host headers.
+
+### Running the stack
+
+1. Start the API in staging mode:
 
 ```bash
-openssl rand -hex 16
-```
+   cd server
+   NODE_ENV=staging npm run dev
+   ```
 
-### Exercising the endpoint
+2. Build and serve the client pointing at the staging API:
 
-You can trigger the bypass manually with `curl`. The example below assumes the
-API is running on <http://localhost:8080> and that `AUTH_DISABLED=true` (omit the
-`token` field or replace it with `TEST_LOGIN_SECRET` when authentication is
-enabled):
+```bash
+   cd client
+   npm install
+   VITE_API_URL=https://api-staging.<domeniu>.com/api npm run build
+   npm run preview -- --host 0.0.0.0 --port 3000
+   ```
+
+3. Launch the tunnel:
+
+```bash
+   cd cloudflared
+   cloudflared tunnel run
+   ```
+
+### Verifying the staging login bypass
+
+With the tunnel active, confirm the flow with `curl` while persisting the
+session cookie:
 
 ```bash
 curl -i \
-  -X POST http://localhost:8080/test-login \
+  -X POST https://api-staging.<domeniu>.com/test-login \
   -H "Content-Type: application/json" \
-  -d '{"userEmail":"tester@local.test"}' \
-  -c cookies.txt \
+  -d '{"token":"'$TEST_LOGIN_SECRET'","userEmail":"tester@local.test"}' \
+  --cookie-jar staging.cookies \
   -L
+
+curl -i \
+  https://api-staging.<domeniu>.com/api/auth/me \
+  --cookie staging.cookies
 ```
 
-The `-c cookies.txt` flag persists the issued cookie so that it can be reused by
-automated tools.
-
-## Exposing the stack for staging tunnels
-
-### Cloudflare Tunnel
-
-The repository includes `cloudflared/config.yml` with a sample mapping for the
-API (port 8080) and the web app (port 3000). Update the tunnel ID, credentials
-path and hostnames, then run `cloudflared tunnel run`.
-
-### ngrok
-
-As an alternative, expose the services with ngrok:
-
-```bash
-ngrok http 8080 --host-header="localhost:8080"
-ngrok http 3000 --host-header="localhost:3000"
-```
-
-Both commands enable HTTPS endpoints that are compatible with the CORS
-configuration used by `/test-login`.
+The first command receives the `302` redirect to `FRONTEND_ROOT` while storing
+the JWT in `staging.cookies`. The second command reuses the cookie to confirm
+that `/api/auth/me` recognises the staged tester session.

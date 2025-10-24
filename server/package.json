@@ -6,6 +6,7 @@
     "test": "jest",
     "dev": "prisma generate && ts-node-dev -r tsconfig-paths/register src/index.ts",
     "seed": "ts-node prisma/seed.ts",
+    "seed:staging-tester": "ts-node scripts/create-staging-tester.ts",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "analyze:search": "ts-node scripts/analyze-search-plan.ts"
   },

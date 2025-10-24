@@ -32,6 +32,8 @@ import testLoginRoutes from "./routes/testLogin";
 const app = express();
 const server = http.createServer(app);
 
+app.set("trust proxy", 1);
+
 void initPdfRenderer().catch((error: unknown) =>
   logger.warn("PDF export initialisation failed; falling back to JSON", {
     error,
@@ -45,45 +47,34 @@ const configuredOrigins = env.CORS_ORIGIN.split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-const defaultOrigins = [
-  "http://localhost:3000",
-  "http://127.0.0.1:3000",
-  "http://localhost:5173",
-  "http://127.0.0.1:5173",
-];
+const derivedOrigins = env.FRONTEND_ROOT ? [env.FRONTEND_ROOT] : [];
 
-const allowedOrigins = Array.from(new Set([...defaultOrigins, ...configuredOrigins]));
+const defaultOrigins = env.NODE_ENV === "staging"
+  ? []
+  : [
+      "http://localhost:3000",
+      "http://127.0.0.1:3000",
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+    ];
 
-const tunnelOriginPatterns = [
-  /\.trycloudflare\.com$/,
-  /\.cfargotunnel\.com$/,
-  /\.ngrok-free\.app$/,
-  /\.ngrok\.io$/,
-];
+const allowedOrigins = configuredOrigins.length
+  ? Array.from(new Set([...configuredOrigins, ...derivedOrigins]))
+  : Array.from(new Set([...defaultOrigins, ...derivedOrigins]));
+
+if (env.NODE_ENV === "staging" && configuredOrigins.length === 0) {
+  throw new Error(
+    "CORS_ORIGIN must be configured for staging deployments (e.g. https://app-staging.example.com)"
+  );
+}
 
 const corsOptions: CorsOptions = {
   origin(origin, callback) {
-    if (!origin) {
+    if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
 
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    try {
-      const hostname = new URL(origin).hostname;
-      if (tunnelOriginPatterns.some((pattern) => pattern.test(hostname))) {
-        return callback(null, true);
-      }
-    } catch (error) {
-      logger.warn("Invalid origin received in CORS middleware", {
-        origin,
-        error,
-      });
-      return callback(error as Error);
-    }
-
+    logger.warn("Blocked origin in CORS middleware", { origin });
     return callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
@@ -100,24 +91,8 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        imgSrc: [
-          "'self'",
-          "data:",
-          "blob:",
-          ...allowedOrigins,
-          "https://*.trycloudflare.com",
-          "https://*.cfargotunnel.com",
-          "https://*.ngrok-free.app",
-          "https://*.ngrok.io",
-        ],
-        frameAncestors: [
-          "'self'",
-          ...allowedOrigins,
-          "https://*.trycloudflare.com",
-          "https://*.cfargotunnel.com",
-          "https://*.ngrok-free.app",
-          "https://*.ngrok.io",
-        ],
+        imgSrc: ["'self'", "data:", "blob:", ...allowedOrigins],
+        frameAncestors: ["'self'", ...allowedOrigins],
       },
     },
   })
