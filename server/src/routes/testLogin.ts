@@ -21,6 +21,38 @@ const limiter = rateLimit({
 const isTestLoginEnabled = () =>
   env.NODE_ENV === "staging" || env.AUTH_DISABLED === "true";
 
+router.get("/test-login", limiter, (req: Request, res: Response) => {
+  if (env.AUTH_DISABLED !== "true") return res.status(403).json({ error: "test-login disabled" });
+
+  const providedToken = String(req.query.token || "");
+  const expectedToken = env.TEST_LOGIN_SECRET;
+  if (!expectedToken || providedToken !== expectedToken)
+    return res.status(401).json({ error: "invalid token" });
+
+  const userEmail = String(req.query.userEmail || "tester@local.test");
+
+  const payload = {
+    id: -1,
+    email: userEmail,
+    role: "tester",
+    nume: "Test",
+    prenume: "User",
+    functie: "Tester",
+  };
+
+  const jwtToken = jwt.sign(payload, env.JWT_SECRET, { expiresIn: "1h" });
+
+  res.cookie("token", jwtToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    maxAge: 60 * 60 * 1000,
+  });
+
+  res.redirect(302, `${env.FRONTEND_ROOT}#token=${jwtToken}`);
+});
+
 router.post(
   "/test-login",
   limiter,
