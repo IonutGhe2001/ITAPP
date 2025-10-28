@@ -30,8 +30,8 @@ import { AlertItem } from './components/AlertItem';
 import { EmptyState } from './components/EmptyState';
 import { KpiCard } from './components/KpiCard';
 import { PvQueue } from './components/PVQueue';
-import { CalendarCard } from './components/CalendarCard';
-import { QuickActionsCard } from './components/QuickActionsCard';
+import { CalendarCompact } from './components/CalendarCompact';
+import { QuickActionsCompact } from './components/QuickActionsCompact';
 
 const EquipmentStatusChart = lazy(() => import('./components/EquipmentStatusChart'));
 
@@ -183,7 +183,7 @@ export default function Dashboard() {
   };
 
   return (
-    <main className="mx-auto max-w-screen-2xl space-y-6 px-4 py-6 lg:px-6">
+    <main className="max-w-screen-2xl mx-auto px-4 lg:px-6 space-y-6 py-6">
       <header className="space-y-2">
         <h1 className="text-3xl font-semibold text-foreground sm:text-4xl">Panou echipamente IT APP</h1>
         <p className="max-w-3xl text-sm text-muted-foreground sm:text-base">
@@ -191,14 +191,20 @@ export default function Dashboard() {
         </p>
       </header>
 
-      <section className="grid w-full gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid w-full grid-cols-1 items-start gap-4 sm:grid-cols-2 xl:grid-cols-12">
         {overviewQuery.isLoading
           ? KPI_SKELETONS.map((_, index) => (
-              <div key={index} className="min-h-[128px] animate-pulse rounded-xl border border-border bg-muted/30" aria-hidden />
+              <div
+                key={index}
+                className="min-h-[128px] animate-pulse rounded-xl border border-border bg-muted/30 xl:col-span-3"
+                aria-hidden
+              />
             ))
           : formattedKpis.length ? (
               formattedKpis.map((stat) => (
-                <KpiCard key={stat.key} title={stat.label} value={stat.value} delta={stat.delta} trend={stat.trend} href={stat.href} />
+                <div key={stat.key} className="xl:col-span-3">
+                  <KpiCard title={stat.label} value={stat.value} delta={stat.delta} trend={stat.trend} href={stat.href} />
+                </div>
               ))
             ) : (
               <div className="col-span-full">
@@ -210,114 +216,116 @@ export default function Dashboard() {
             )}
       </section>
 
-      <section className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[2fr_1fr]">
-        <div className="space-y-6">
-          <div className="space-y-6 xl:max-h-[70vh] xl:overflow-y-auto xl:pr-1">
-            <Card className="h-auto self-start border border-border bg-card/80 shadow-none">
-              <CardHeader className="flex flex-row items-start justify-between gap-4 border-b border-border/60 pb-4">
-                <div className="space-y-1">
-                  <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
-                    <BarChart3 className="h-5 w-5 text-primary" aria-hidden />
-                    Stare echipamente
-                  </CardTitle>
-                  <CardDescription>Analizează distribuția echipamentelor active, alocate și retrase.</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-6">
-                {equipmentStatusQuery.isLoading ? (
-                  <div className="h-[320px] animate-pulse rounded-lg bg-muted/30" aria-hidden />
-                ) : equipmentStatusQuery.data?.length ? (
-                  <Suspense fallback={<div className="h-[320px] animate-pulse rounded-lg bg-muted/30" aria-hidden />}>
-                    <EquipmentStatusChart data={equipmentStatusQuery.data} />
-                  </Suspense>
-                ) : (
-                  <EmptyState
-                    title="Nu există date despre inventar"
-                    description="Importă stocurile de echipamente pentru a vedea evoluția în timp."
-                    action={<Button type="button" size="sm">Importă inventar</Button>}
-                  />
-                )}
-              </CardContent>
-            </Card>
+      <section className="grid grid-cols-1 items-start gap-6 xl:grid-cols-12">
+        <Card className="h-auto self-start border border-border/80 bg-card/90 shadow-sm xl:col-span-8">
+          <CardHeader className="flex flex-col gap-2 border-b border-border/60 p-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="space-y-1">
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                <BarChart3 className="h-5 w-5 text-primary" aria-hidden />
+                Stare echipamente
+              </CardTitle>
+              <CardDescription>Analizează distribuția echipamentelor active, alocate și retrase.</CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="p-4">
+            {equipmentStatusQuery.isLoading ? (
+              <div className="h-[320px] animate-pulse rounded-lg bg-muted/30" aria-hidden />
+            ) : equipmentStatusQuery.data?.length ? (
+              <Suspense fallback={<div className="h-[320px] animate-pulse rounded-lg bg-muted/30" aria-hidden />}>
+                <EquipmentStatusChart data={equipmentStatusQuery.data} />
+              </Suspense>
+            ) : (
+              <EmptyState
+                title="Nu există date despre inventar"
+                description="Importă stocurile de echipamente pentru a vedea evoluția în timp."
+                action={<Button type="button" size="sm">Importă inventar</Button>}
+              />
+            )}
+          </CardContent>
+        </Card>
 
-            <Card className="h-auto self-start border border-border bg-card/80 shadow-none">
-              <CardHeader className="flex flex-row items-start justify-between gap-4 border-b border-border/60 pb-4">
-                <div className="space-y-1">
-                  <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
-                    <AlertCircle className="h-5 w-5 text-primary" aria-hidden />
-                    Alerte prioritare
-                  </CardTitle>
-                  <CardDescription>Primești maximum trei alerte critice pentru inventar.</CardDescription>
-                </div>
-                <Button type="button" variant="outline" size="sm">Vezi toate</Button>
-              </CardHeader>
-              <CardContent className="space-y-3 pt-6">
-                {alertsQuery.isLoading ? (
-                  ALERT_SKELETONS.map((_, index) => (
-                    <div key={index} className="h-20 animate-pulse rounded-lg border border-border bg-muted/30" aria-hidden />
-                  ))
-                ) : alerts.length ? (
-                  alerts.map((alert) => <AlertItem key={alert.id} alert={alert} />)
-                ) : (
-                  <EmptyState
-                    title="Nu există alerte active"
-                    description="Verificăm constant inventarul și îți vom semnala rapid problemele."
-                  />
-                )}
-              </CardContent>
-            </Card>
+        <Card className="h-auto self-start border border-border/80 bg-card/90 shadow-sm xl:col-span-4">
+          <CardHeader className="flex flex-col gap-2 border-b border-border/60 p-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="space-y-1">
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                <AlertCircle className="h-5 w-5 text-primary" aria-hidden />
+                Alerte prioritare
+              </CardTitle>
+              <CardDescription>Primești maximum trei alerte critice pentru inventar.</CardDescription>
+            </div>
+            <Button type="button" variant="outline" size="sm">Vezi toate</Button>
+          </CardHeader>
+          <CardContent className="space-y-3 p-4">
+            {alertsQuery.isLoading ? (
+              ALERT_SKELETONS.map((_, index) => (
+                <div key={index} className="h-20 animate-pulse rounded-lg border border-border bg-muted/30" aria-hidden />
+              ))
+            ) : alerts.length ? (
+              alerts.map((alert) => <AlertItem key={alert.id} alert={alert} />)
+            ) : (
+              <EmptyState
+                title="Nu există alerte active"
+                description="Verificăm constant inventarul și îți vom semnala rapid problemele."
+              />
+            )}
+          </CardContent>
+        </Card>
+      </section>
 
-            <Card className="h-auto self-start border border-border bg-card/80 shadow-none">
-              <CardHeader className="flex flex-row items-start gap-4 border-b border-border/60 pb-4">
-                <div className="space-y-1">
-                  <CardTitle className="text-lg font-semibold text-foreground">Coada de PV</CardTitle>
-                  <CardDescription>Finalizează documentele de predare pentru alocările recente.</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  <PvQueue items={pvQueueItems} isLoading={pvQueueQuery.isLoading} onGenerate={handleGeneratePv} />
-                </div>
-              </CardContent>
-            </Card>
+          <section className="grid grid-cols-1 items-start gap-6 xl:grid-cols-12">
+        <Card className="h-auto self-start border border-border/80 bg-card/90 shadow-sm xl:col-span-8">
+          <CardHeader className="flex flex-col gap-2 border-b border-border/60 p-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="space-y-1">
+              <CardTitle className="text-lg font-semibold text-foreground">Coada de PV</CardTitle>
+              <CardDescription>Finalizează documentele de predare pentru alocările recente.</CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
+              <PvQueue items={pvQueueItems} isLoading={pvQueueQuery.isLoading} onGenerate={handleGeneratePv} />
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="xl:col-span-4">
+          <div className="space-y-6 sticky top-20">
+            <QuickActionsCompact />
+
+            <CalendarCompact
+              events={eventsQuery.data ?? []}
+              eventsForSelectedDay={eventsForSelectedDay}
+              currentMonth={currentMonth}
+              selectedDate={selectedDate}
+              onMonthChange={setCurrentMonth}
+              onSelectDate={setSelectedDate}
+              onCreate={handleCreateEvent}
+              onUpdate={handleUpdateEvent}
+              onDelete={handleDeleteEvent}
+              isLoading={isInitialEventsLoading}
+              isSaving={isSavingEvent}
+              deletingId={deletingEventId}
+            />
           </div>
-
-          <Card className="h-auto self-start border border-border bg-card/80 shadow-none">
-            <CardHeader className="flex flex-row items-start gap-4 border-b border-border/60 pb-4">
-              <div className="space-y-1">
-                <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
-                  <Activity className="h-5 w-5 text-primary" aria-hidden />
-                  Activitate recentă
-                </CardTitle>
-                <CardDescription>Ultimele actualizări pentru inventar și alocări.</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="max-h-[75vh] space-y-4 overflow-y-auto pr-1">
-                <ActivityFeed items={recentActivity} isLoading={activityQuery.isLoading} />
-              </div>
-            </CardContent>
-          </Card>
         </div>
+      </section>
 
-        <div className="sticky top-20 space-y-6 xl:max-w-[460px]">
-          <QuickActionsCard />
-
-          <CalendarCard
-            events={eventsQuery.data ?? []}
-            eventsForSelectedDay={eventsForSelectedDay}
-            currentMonth={currentMonth}
-            selectedDate={selectedDate}
-            onMonthChange={setCurrentMonth}
-            onSelectDate={setSelectedDate}
-            onCreate={handleCreateEvent}
-            onUpdate={handleUpdateEvent}
-            onDelete={handleDeleteEvent}
-            isLoading={isInitialEventsLoading}
-            isSaving={isSavingEvent}
-            deletingId={deletingEventId}
-          />
-        </div>
+        <section className="grid grid-cols-1 items-start gap-6 xl:grid-cols-12">
+        <Card className="h-auto self-start border border-border/80 bg-card/90 shadow-sm xl:col-span-12">
+          <CardHeader className="flex flex-col gap-2 border-b border-border/60 p-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="space-y-1">
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                <Activity className="h-5 w-5 text-primary" aria-hidden />
+                Activitate recentă
+              </CardTitle>
+              <CardDescription>Ultimele actualizări pentru inventar și alocări.</CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="max-h-[75vh] space-y-4 overflow-y-auto pr-1">
+              <ActivityFeed items={recentActivity} isLoading={activityQuery.isLoading} />
+            </div>
+          </CardContent>
+        </Card>
       </section>
     </main>
   );

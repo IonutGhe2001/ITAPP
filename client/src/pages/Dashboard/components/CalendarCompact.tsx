@@ -10,7 +10,7 @@ import type { CalendarEvent, CalendarEventInput } from '../api';
 import { EventList, type EventListHandle } from './EventList';
 import { MiniCalendar } from './MiniCalendar';
 
-interface CalendarCardProps {
+interface CalendarCompactProps {
   events: CalendarEvent[];
   eventsForSelectedDay: CalendarEvent[];
   currentMonth: Date;
@@ -25,7 +25,7 @@ interface CalendarCardProps {
   deletingId?: string | null;
 }
 
-export function CalendarCard({
+export function CalendarCompact({
   events,
   eventsForSelectedDay,
   currentMonth,
@@ -38,7 +38,7 @@ export function CalendarCard({
   isLoading,
   isSaving,
   deletingId,
-}: CalendarCardProps) {
+}: CalendarCompactProps) {
   const eventListRef = useRef<EventListHandle>(null);
 
   const selectedDayLabel = useMemo(
@@ -48,19 +48,19 @@ export function CalendarCard({
 
   return (
     <Card className="h-auto w-full self-start border border-border/80 bg-card/90 shadow-sm">
-      <CardHeader className="flex items-center justify-between gap-4 border-b border-border/60 pb-5">
-        <CardTitle className="text-lg font-semibold text-foreground">Calendar</CardTitle>
+      <CardHeader className="flex items-center justify-between gap-3 space-y-0 border-b border-border/60 p-4">
+        <CardTitle className="text-base font-semibold text-foreground sm:text-lg">Calendar</CardTitle>
         <Button
           type="button"
           size="sm"
-          className="gap-1"
+          className="gap-2"
           onClick={() => eventListRef.current?.openCreateDialog()}
         >
           <Plus className="size-4" aria-hidden />
-          Adaugă
+          Add
         </Button>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent className="space-y-4 p-4">
         <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-[220px_1fr]">
           <div className="rounded-xl border border-border/60 bg-background/60 p-4 shadow-sm">
             <MiniCalendar
@@ -72,22 +72,24 @@ export function CalendarCard({
               isLoading={isLoading}
             />
           </div>
-          <div className="space-y-5 rounded-xl border border-border/60 bg-background/60 p-5 shadow-sm">
+          <div className="space-y-4 rounded-xl border border-border/60 bg-background/60 p-4 shadow-sm">
             <div className="space-y-2">
               <p className="text-sm font-semibold text-foreground md:text-base">{selectedDayLabel}</p>
               <p className="text-xs text-muted-foreground md:text-sm">Evenimente planificate pentru această zi.</p>
             </div>
-            <EventList
-              ref={eventListRef}
-              date={selectedDate}
-              events={eventsForSelectedDay}
-              onCreate={onCreate}
-              onUpdate={onUpdate}
-              onDelete={onDelete}
-              isLoading={isLoading}
-              isSaving={isSaving}
-              deletingId={deletingId}
-            />
+            <div className="max-h-[340px] space-y-3 overflow-y-auto pr-1">
+              <EventList
+                ref={eventListRef}
+                date={selectedDate}
+                events={eventsForSelectedDay}
+                onCreate={onCreate}
+                onUpdate={onUpdate}
+                onDelete={onDelete}
+                isLoading={isLoading}
+                isSaving={isSaving}
+                deletingId={deletingId}
+              />
+            </div>
           </div>
         </div>
       </CardContent>

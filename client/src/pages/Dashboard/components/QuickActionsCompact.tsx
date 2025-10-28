@@ -3,17 +3,17 @@ import { cn } from '@/lib/utils';
 
 import { QuickActions } from './QuickActions';
 
-interface QuickActionsCardProps {
+interface QuickActionsCompactProps {
   className?: string;
 }
 
-export function QuickActionsCard({ className }: QuickActionsCardProps) {
+export function QuickActionsCompact({ className }: QuickActionsCompactProps) {
   return (
     <Card className={cn('h-auto self-start border border-border/80 bg-card/90 shadow-sm', className)}>
-      <CardHeader className="border-b border-border/60 pb-4">
-        <CardTitle className="text-lg font-semibold text-foreground">Acțiuni rapide</CardTitle>
+      <CardHeader className="flex items-center justify-between gap-3 space-y-0 border-b border-border/60 p-4">
+        <CardTitle className="text-base font-semibold text-foreground sm:text-lg">Acțiuni rapide</CardTitle>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent className="space-y-4 p-4">
         <QuickActions />
       </CardContent>
     </Card>
