@@ -47,10 +47,13 @@ export function QuickActions({ actions }: QuickActionsProps) {
       {items.map((action) => {
         const Icon = action.icon;
         return (
-          <li key={action.id} className="flex items-start justify-between gap-3 rounded-lg border border-border bg-card/60 p-4">
+          <li key={action.id} className="flex items-start justify-between gap-4 rounded-lg border border-border/70 bg-card/70 p-4">
             <div className="flex items-start gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary" aria-hidden>
-                <Icon className="h-5 w-5" />
+              <span
+                className="inline-flex items-center justify-center size-10 rounded-full bg-primary/10 text-primary"
+                aria-hidden
+              >
+                <Icon className="size-5 stroke-[1.5]" />
               </span>
               <div className="space-y-1">
                 <p className="text-sm font-semibold text-foreground">{action.label}</p>

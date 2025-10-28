@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { ro } from 'date-fns/locale';
-import { CalendarDays, Clock, MapPin, Pencil, Plus, Trash2 } from 'lucide-react';
+import { CalendarDays, Clock, MapPin, Pencil, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -11,6 +11,10 @@ import { cn } from '@/lib/utils';
 
 import type { CalendarEvent, CalendarEventInput } from '../api';
 import { EmptyState } from './EmptyState';
+
+export interface EventListHandle {
+  openCreateDialog: () => void;
+}
 
 interface EventListProps {
   date: Date;
@@ -36,16 +40,10 @@ type EventFormState = {
 
 const skeletonItems = Array.from({ length: 3 });
 
-export function EventList({
-  date,
-  events,
-  onCreate,
-  onUpdate,
-  onDelete,
-  isLoading,
-  isSaving,
-  deletingId,
-}: EventListProps) {
+export const EventList = forwardRef<EventListHandle, EventListProps>(function EventList(
+  { date, events, onCreate, onUpdate, onDelete, isLoading, isSaving, deletingId }: EventListProps,
+  ref
+) {
   const [mode, setMode] = useState<FormMode>('create');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [form, setForm] = useState<EventFormState>(() => ({
@@ -60,6 +58,8 @@ export function EventList({
     setForm({ date: format(date, 'yyyy-MM-dd'), title: '', time: '', location: '', description: '' });
     setIsDialogOpen(true);
   };
+
+  useImperativeHandle(ref, () => ({ openCreateDialog }));
 
   const openEditDialog = (event: CalendarEvent) => {
     setMode('edit');
@@ -112,15 +112,9 @@ export function EventList({
 
   return (
     <div className="flex h-full flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold text-foreground">{formattedDate}</p>
-          <p className="text-xs text-muted-foreground">Gestionează evenimentele planificate pentru această zi.</p>
-        </div>
-        <Button type="button" size="sm" onClick={openCreateDialog} className="gap-1">
-          <Plus className="h-4 w-4" aria-hidden />
-          Adaugă
-        </Button>
+      <div className="sr-only">
+        <p>{formattedDate}</p>
+        <p>Evenimente pentru această zi.</p>
       </div>
 
       {isLoading ? (
@@ -130,24 +124,24 @@ export function EventList({
           ))}
         </div>
       ) : events.length ? (
-        <ul className="space-y-2" aria-live="polite">
+        <ul className="max-h-[340px] space-y-2 overflow-y-auto pr-1" aria-live="polite">
           {events.map((event) => {
             const isDeleting = deletingId === event.id;
             return (
               <li
                 key={event.id}
-                className="flex items-start justify-between gap-3 rounded-lg border border-border bg-card/60 p-4"
+                className="flex items-start justify-between gap-3 rounded-lg border border-border/70 bg-card/70 p-4"
                 aria-busy={isDeleting}
               >
                 <div className="space-y-2">
                   <p className="text-sm font-semibold text-foreground">{event.title}</p>
                   <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
                     <span className="inline-flex items-center gap-1">
-                      <Clock className="h-4 w-4" aria-hidden />
+                      <Clock className="size-4 text-muted-foreground" aria-hidden />
                       {event.time ?? 'Toată ziua'}
                     </span>
                     <span className="inline-flex items-center gap-1">
-                      <MapPin className="h-4 w-4" aria-hidden />
+                      <MapPin className="size-4 text-muted-foreground" aria-hidden />
                       {event.location ?? 'Locație în curs de confirmare'}
                     </span>
                   </div>
@@ -163,7 +157,7 @@ export function EventList({
                     onClick={() => openEditDialog(event)}
                     aria-label={`Editează ${event.title}`}
                   >
-                    <Pencil className="h-4 w-4" aria-hidden />
+                    <Pencil className="size-4" aria-hidden />
                   </Button>
                   <Button
                     type="button"
@@ -173,7 +167,7 @@ export function EventList({
                     aria-label={`Șterge ${event.title}`}
                     disabled={isDeleting}
                   >
-                    <Trash2 className="h-4 w-4" aria-hidden />
+                    <Trash2 className="size-4" aria-hidden />
                   </Button>
                 </div>
               </li>
@@ -182,8 +176,8 @@ export function EventList({
         </ul>
       ) : (
         <EmptyState
-          title="Nu sunt evenimente"
-          description="Adaugă unul cu butonul de mai sus."
+          title="Nu sunt evenimente planificate"
+          description="Adaugă rapid activități pentru această zi."
           icon={<CalendarDays className="h-5 w-5" />}
         />
       )}
@@ -276,4 +270,4 @@ export function EventList({
       </Dialog>
     </div>
   );
-}
+});

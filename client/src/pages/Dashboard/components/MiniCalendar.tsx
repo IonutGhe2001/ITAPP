@@ -1,16 +1,5 @@
 import { useMemo } from 'react';
-import {
-  addDays,
-  eachDayOfInterval,
-  endOfMonth,
-  endOfWeek,
-  format,
-  isSameDay,
-  isSameMonth,
-  isToday,
-  startOfMonth,
-  startOfWeek,
-} from 'date-fns';
+import { addDays, endOfMonth, format, isSameDay, isSameMonth, isToday, startOfMonth, startOfWeek } from 'date-fns';
 import { ro } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -45,9 +34,8 @@ export function MiniCalendar({ events, currentMonth, selectedDate, onMonthChange
   }, [events]);
 
   const visibleDays = useMemo(() => {
-    const start = startOfWeek(currentMonth, { locale: ro, weekStartsOn: 1 });
-    const end = endOfWeek(endOfMonth(currentMonth), { locale: ro, weekStartsOn: 1 });
-    return eachDayOfInterval({ start, end });
+    const start = startOfWeek(startOfMonth(currentMonth), { locale: ro, weekStartsOn: 1 });
+    return Array.from({ length: 42 }, (_, index) => addDays(start, index));
   }, [currentMonth]);
 
   const handlePrevMonth = () => onMonthChange(startOfMonth(addDays(currentMonth, -1)));
@@ -62,39 +50,38 @@ export function MiniCalendar({ events, currentMonth, selectedDate, onMonthChange
 
   return (
     <div className="space-y-4" aria-live="polite">
-      <div className="flex items-start justify-between gap-3">
-        <div className="space-y-1">
-          <p className="text-sm font-semibold text-foreground">{format(currentMonth, 'MMMM yyyy', { locale: ro })}</p>
-          <p className="text-xs text-muted-foreground">Selectează o dată pentru a vedea detaliile.</p>
-        </div>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-semibold text-foreground">
+          {format(currentMonth, 'MMMM yyyy', { locale: ro })}
+        </p>
         <div className="flex items-center gap-1.5">
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="size-8"
             onClick={handlePrevMonth}
             aria-label="Luna precedentă"
           >
-            <ChevronLeft className="h-3.5 w-3.5" />
+            <ChevronLeft className="size-3.5" />
           </Button>
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="size-8"
             onClick={handleNextMonth}
             aria-label="Luna următoare"
           >
-            <ChevronRight className="h-3.5 w-3.5" />
+            <ChevronRight className="size-3.5" />
           </Button>
         </div>
       </div>
 
       {isLoading ? (
         <div className="space-y-2">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <div key={index} className="h-7 animate-pulse rounded bg-muted/40" />
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div key={index} className="h-7 animate-pulse rounded-md bg-muted/40" />
           ))}
         </div>
       ) : (
@@ -104,35 +91,31 @@ export function MiniCalendar({ events, currentMonth, selectedDate, onMonthChange
               <span key={index}>{day}</span>
             ))}
           </div>
-          <div className="grid grid-cols-7 gap-1 text-xs sm:text-sm">
+          <div className="grid grid-cols-7 gap-1">
             {visibleDays.map((day) => {
               const key = format(day, 'yyyy-MM-dd');
               const hasEvents = Boolean(eventsByDate[key]?.length);
               const active = isSameDay(day, selectedDate);
+              const inMonth = isSameMonth(day, currentMonth);
               return (
                 <button
                   key={key}
                   type="button"
                   onClick={() => handleSelectDay(day)}
-                  aria-pressed={active}
+                  aria-selected={active}
+                  aria-current={isToday(day) ? 'date' : undefined}
                   className={cn(
-                    'relative flex h-9 items-center justify-center rounded-md border border-transparent bg-card/60 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary sm:text-sm',
-                    active ? 'border-primary bg-primary/10 text-primary' : 'hover:border-border hover:bg-accent/30'
+                    'relative inline-flex size-8 items-center justify-center rounded-md text-xs font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 md:size-9 aria-selected:bg-primary aria-selected:text-primary-foreground',
+                    inMonth ? 'text-foreground' : 'text-muted-foreground/60',
+                    active && 'bg-primary text-primary-foreground'
                   )}
-                  data-today={isToday(day) ? 'true' : undefined}
                 >
-                  <span
-                    className={
-                      isSameMonth(day, currentMonth)
-                        ? 'text-foreground'
-                        : 'text-muted-foreground'
-                    }
-                  >
-                    {format(day, 'd')}
-                  </span>
-                  {active ? <span className="absolute inset-x-1 bottom-1 h-1 rounded-full bg-primary" aria-hidden /> : null}
+                  {format(day, 'd')}
                   {!active && hasEvents ? (
-                    <span className="absolute inset-x-2 bottom-1 h-1 rounded-full bg-muted-foreground/70" aria-hidden />
+                    <span className="absolute -bottom-1 inline-flex h-1.5 w-1.5 rounded-full bg-muted-foreground/80" aria-hidden />
+                  ) : null}
+                  {active ? (
+                    <span className="absolute -bottom-1 inline-flex h-1.5 w-1.5 rounded-full bg-primary-foreground/80" aria-hidden />
                   ) : null}
                   {isToday(day) ? <span className="sr-only">Astăzi</span> : null}
                 </button>
