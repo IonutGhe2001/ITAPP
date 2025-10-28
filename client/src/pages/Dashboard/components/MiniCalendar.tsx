@@ -61,30 +61,32 @@ export function MiniCalendar({ events, currentMonth, selectedDate, onMonthChange
   };
 
   return (
-    <div className="flex h-full flex-col gap-4" aria-live="polite">
-      <div className="flex items-center justify-between">
-        <div>
+    <div className="space-y-4" aria-live="polite">
+      <div className="flex items-start justify-between gap-3">
+        <div className="space-y-1">
           <p className="text-sm font-semibold text-foreground">{format(currentMonth, 'MMMM yyyy', { locale: ro })}</p>
-          <p className="text-xs text-muted-foreground">Selectează o zi pentru a vedea evenimentele programate.</p>
+          <p className="text-xs text-muted-foreground">Selectează o dată pentru a vedea detaliile.</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <Button
             type="button"
             variant="ghost"
             size="icon"
+            className="h-8 w-8"
             onClick={handlePrevMonth}
             aria-label="Luna precedentă"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-3.5 w-3.5" />
           </Button>
           <Button
             type="button"
             variant="ghost"
             size="icon"
+            className="h-8 w-8"
             onClick={handleNextMonth}
             aria-label="Luna următoare"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>
@@ -92,17 +94,17 @@ export function MiniCalendar({ events, currentMonth, selectedDate, onMonthChange
       {isLoading ? (
         <div className="space-y-2">
           {Array.from({ length: 5 }).map((_, index) => (
-            <div key={index} className="h-8 animate-pulse rounded bg-muted/40" />
+            <div key={index} className="h-7 animate-pulse rounded bg-muted/40" />
           ))}
         </div>
       ) : (
         <div className="space-y-3">
-          <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-muted-foreground">
+          <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
             {weekdays.map((day, index) => (
               <span key={index}>{day}</span>
             ))}
           </div>
-          <div className="grid grid-cols-7 gap-1 text-sm">
+          <div className="grid grid-cols-7 gap-1 text-xs sm:text-sm">
             {visibleDays.map((day) => {
               const key = format(day, 'yyyy-MM-dd');
               const hasEvents = Boolean(eventsByDate[key]?.length);
@@ -114,7 +116,7 @@ export function MiniCalendar({ events, currentMonth, selectedDate, onMonthChange
                   onClick={() => handleSelectDay(day)}
                   aria-pressed={active}
                   className={cn(
-                    'relative flex h-10 items-center justify-center rounded-md border border-transparent bg-card/60 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary',
+                    'relative flex h-9 items-center justify-center rounded-md border border-transparent bg-card/60 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary sm:text-sm',
                     active ? 'border-primary bg-primary/10 text-primary' : 'hover:border-border hover:bg-accent/30'
                   )}
                   data-today={isToday(day) ? 'true' : undefined}

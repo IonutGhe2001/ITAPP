@@ -112,7 +112,7 @@ export function EventList({
 
   return (
     <div className="flex h-full flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-foreground">{formattedDate}</p>
           <p className="text-xs text-muted-foreground">Gestionează evenimentele planificate pentru această zi.</p>
@@ -182,9 +182,9 @@ export function EventList({
         </ul>
       ) : (
         <EmptyState
-          title="Niciun eveniment planificat"
-          description="Folosește butonul de mai sus pentru a programa activități."
-          icon={<CalendarDays className="h-6 w-6" />}
+          title="Nu sunt evenimente"
+          description="Adaugă unul cu butonul de mai sus."
+          icon={<CalendarDays className="h-5 w-5" />}
         />
       )}
 
