@@ -5,7 +5,7 @@ import type { Alert } from '../api';
 
 const severityConfig: Record<Alert['severity'], { label: string; icon: typeof AlertTriangle; className: string }> = {
   critical: {
-    label: 'Prioritate critică'
+    label: 'Prioritate critică',
     icon: ShieldAlert,
     className: 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300',
   },
@@ -35,7 +35,7 @@ export function AlertItem({ alert }: AlertItemProps) {
 
   return (
     <article className="flex gap-3 rounded-lg border border-border bg-card/60 p-4 shadow-none">
-      <div className={`flex h-10 w-10 items-center justify-center rounded-full ${config.className}`} aria-hidden>
+      <div className={`flex h-10 w-10 items-center justify-center rounded-full ${config.className}`} aria-hidden="true">
         <Icon className="h-5 w-5" />
       </div>
       <div className="flex flex-1 flex-col gap-1">

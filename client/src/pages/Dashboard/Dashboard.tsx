@@ -31,7 +31,7 @@ import { EmptyState } from './components/EmptyState';
 import { EventList } from './components/EventList';
 import { KpiCard } from './components/KpiCard';
 import { MiniCalendar } from './components/MiniCalendar';
-import { PvQueue } from './components/PvQueue';
+import { PvQueue } from './components/PVQueue'
 import { QuickActions } from './components/QuickActions';
 
 const EquipmentStatusChart = lazy(() => import('./components/EquipmentStatusChart'));
@@ -108,7 +108,6 @@ export default function Dashboard() {
   const eventsQuery = useQuery<CalendarEvent[]>({
     queryKey: ['events', monthRange.from, monthRange.to],
     queryFn: () => getEvents({ from: monthRange.from, to: monthRange.to }),
-    keepPreviousData: true,
     staleTime: 30_000,
   });
 
