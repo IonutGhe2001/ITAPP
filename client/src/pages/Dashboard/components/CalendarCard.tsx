@@ -47,8 +47,8 @@ export function CalendarCard({
   );
 
   return (
-    <Card className="h-auto self-start border border-border bg-card/80 shadow-none xl:max-w-[460px]">
-      <CardHeader className="flex flex-row items-center justify-between gap-4 border-b border-border/60 pb-4">
+    <Card className="h-auto w-full self-start border border-border/80 bg-card/90 shadow-sm">
+      <CardHeader className="flex flex-row items-center justify-between gap-4 border-b border-border/60 pb-5">
         <CardTitle className="text-lg font-semibold text-foreground">Calendar</CardTitle>
         <Button
           type="button"
@@ -61,19 +61,21 @@ export function CalendarCard({
         </Button>
       </CardHeader>
       <CardContent className="pt-6">
-        <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-[220px_1fr]">
-          <MiniCalendar
-            events={events}
-            currentMonth={currentMonth}
-            selectedDate={selectedDate}
-            onMonthChange={onMonthChange}
-            onSelectDate={onSelectDate}
-            isLoading={isLoading}
-          />
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm font-semibold text-foreground">{selectedDayLabel}</p>
-              <p className="text-xs text-muted-foreground">Evenimente planificate pentru această zi.</p>
+        <div className="grid grid-cols-1 items-start gap-7 md:grid-cols-[minmax(0,260px)_1fr] lg:grid-cols-[300px_1fr]">
+          <div className="rounded-xl border border-border/60 bg-background/60 p-4 shadow-sm md:p-5">
+            <MiniCalendar
+              events={events}
+              currentMonth={currentMonth}
+              selectedDate={selectedDate}
+              onMonthChange={onMonthChange}
+              onSelectDate={onSelectDate}
+              isLoading={isLoading}
+            />
+          </div>
+          <div className="space-y-6 rounded-xl border border-border/60 bg-background/60 p-5 shadow-sm md:p-6">
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-foreground md:text-base">{selectedDayLabel}</p>
+              <p className="text-xs text-muted-foreground md:text-sm">Evenimente planificate pentru această zi.</p>
             </div>
             <EventList
               ref={eventListRef}
