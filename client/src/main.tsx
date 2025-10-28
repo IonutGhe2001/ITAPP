@@ -12,12 +12,13 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Providers } from '@/context/Providers';
+import { getToken, setToken } from '@/utils/storage';
 
 // 1) ia tokenul din hash și persistă-l
 const params = new URLSearchParams(location.hash.replace(/^#/, ''));
 const tokenFromHash = params.get('token');
 if (tokenFromHash) {
-  localStorage.setItem('authToken', tokenFromHash);
+  setToken(tokenFromHash);
   history.replaceState(null, '', location.pathname + location.search);
 }
 
@@ -26,7 +27,7 @@ axios.defaults.baseURL = import.meta.env.VITE_API_URL; // ex: https://<API>/api
 axios.defaults.withCredentials = false;
 
 axios.interceptors.request.use((cfg: InternalAxiosRequestConfig) => {
-  const tk = localStorage.getItem('authToken');
+  const tk = getToken();
   const headers = new AxiosHeaders(cfg.headers);   // normalizează tipul
   if (tk) headers.set('Authorization', `Bearer ${tk}`);
   cfg.headers = headers;

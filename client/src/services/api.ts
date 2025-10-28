@@ -1,5 +1,6 @@
 import axios, { AxiosHeaders, type InternalAxiosRequestConfig } from 'axios';
 import { ROUTES } from '@/constants/routes';
+import { getToken } from '@/utils/storage';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -18,7 +19,7 @@ const api = axios.create({
 
 // === Auth Bearer interceptor ===
 api.interceptors.request.use((cfg: InternalAxiosRequestConfig) => {
-  const tk = localStorage.getItem('authToken');
+  const tk = getToken();
   const headers = new AxiosHeaders(cfg.headers);
   if (tk) headers.set('Authorization', `Bearer ${tk}`);
   cfg.headers = headers;

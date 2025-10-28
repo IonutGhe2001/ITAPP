@@ -1,10 +1,12 @@
 import type { User } from '@/types/user';
 import type { Echipament } from '@/features/equipment/types';
 
+export const AUTH_TOKEN_KEY = 'authToken';
+
 export function getToken(): string | null {
   if (typeof window === 'undefined') return null;
   try {
-    return window.localStorage.getItem('token');
+    return window.localStorage.getItem(AUTH_TOKEN_KEY);
   } catch (error) {
     console.error('Failed to read token from localStorage', error);
     return null;
@@ -14,7 +16,7 @@ export function getToken(): string | null {
 export function setToken(token: string): void {
   if (typeof window === 'undefined') return;
   try {
-    window.localStorage.setItem('token', token);
+    window.localStorage.setItem(AUTH_TOKEN_KEY, token);
   } catch (error) {
     console.error('Failed to write token to localStorage', error);
   }
@@ -23,7 +25,7 @@ export function setToken(token: string): void {
 export function removeToken(): void {
   if (typeof window === 'undefined') return;
   try {
-    window.localStorage.removeItem('token');
+    window.localStorage.removeItem(AUTH_TOKEN_KEY);
   } catch (error) {
     console.error('Failed to remove token from localStorage', error);
   }
