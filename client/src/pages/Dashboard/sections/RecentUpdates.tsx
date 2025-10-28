@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { io, type Socket } from 'socket.io-client';
 import api from '@/services/api';
 import { formatDistanceToNow } from 'date-fns';
@@ -28,6 +28,11 @@ export default function RecentUpdates() {
   const [filter] = useState<string | null>(null);
   const [updates, setUpdates] = useState<Update[]>([]);
   const { toast } = useToast();
+  const toastRef = useRef(toast);
+
+  useEffect(() => {
+    toastRef.current = toast;
+  }, [toast]);
 
   useEffect(() => {
     let socket: Socket | null = null;
@@ -44,21 +49,24 @@ export default function RecentUpdates() {
     fetchUpdates();
 
     const baseUrl = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL;
-    const url = baseUrl.replace(/\/api$/, '');
-    socket = io(url, { withCredentials: true });
+    if (baseUrl) {
+      const url = baseUrl.replace(/\/api$/, '');
+      socket = io(url, { withCredentials: true });
 
     socket.on('update', (update: Update) => {
-      toast({ title: update.type, description: update.message });
-      setUpdates((prev) => [update, ...prev]);
-    });
+        toastRef.current({ title: update.type, description: update.message });
+        setUpdates((prev) => [update, ...prev]);
+      });
 
-    socket.on('connect_error', fetchUpdates);
-    socket.on('disconnect', fetchUpdates);
-
+      socket.on('connect_error', fetchUpdates);
+      socket.on('disconnect', fetchUpdates);
+    }
     return () => {
       socket?.disconnect();
     };
-  }, [toast]);
+  // toastRef keeps the latest toast function, so we only need to set up once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const filteredUpdates = updates.filter((u) =>
     filter ? u.type.toLowerCase().includes(filter.toLowerCase()) : true
