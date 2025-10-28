@@ -212,7 +212,7 @@ export default function Dashboard() {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-12">
-        <Card className="col-span-12 border border-border bg-card/80 shadow-none xl:col-span-7">
+        <Card className="col-span-12 flex h-full flex-col border border-border bg-card/80 shadow-none xl:col-span-7">
           <CardHeader className="flex flex-row items-start justify-between gap-4 border-b border-border/60 pb-4">
             <div className="space-y-1">
               <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
@@ -222,7 +222,7 @@ export default function Dashboard() {
               <CardDescription>Analizează distribuția echipamentelor active, alocate și retrase.</CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="pt-6">
+          <CardContent className="flex-1 pt-6">
             {equipmentStatusQuery.isLoading ? (
               <div className="h-[320px] animate-pulse rounded-lg bg-muted/30" aria-hidden />
             ) : equipmentStatusQuery.data?.length ? (
@@ -239,7 +239,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-          <Card className="col-span-12 border border-border bg-card/80 shadow-none xl:col-span-5">
+          <Card className="col-span-12 flex h-full flex-col border border-border bg-card/80 shadow-none xl:col-span-5">
           <CardHeader className="flex flex-row items-start justify-between gap-4 border-b border-border/60 pb-4">
             <div className="space-y-1">
               <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
@@ -250,7 +250,7 @@ export default function Dashboard() {
             </div>
             <Button type="button" variant="outline" size="sm">Vezi toate</Button>
           </CardHeader>
-          <CardContent className="space-y-3 pt-6">
+          <CardContent className="flex-1 space-y-3 pt-6">
             {alertsQuery.isLoading ? (
               ALERT_SKELETONS.map((_, index) => (
                 <div key={index} className="h-20 animate-pulse rounded-lg border border-border bg-muted/30" aria-hidden />
@@ -267,32 +267,32 @@ export default function Dashboard() {
         </Card>
       </section>
 
-            <section className="grid gap-6 xl:grid-cols-12">
-        <Card className="col-span-12 border border-border bg-card/80 shadow-none xl:col-span-7">
+     <section className="grid gap-6 xl:grid-cols-12">
+        <Card className="col-span-12 flex h-full flex-col border border-border bg-card/80 shadow-none xl:col-span-7">
           <CardHeader className="flex flex-row items-start gap-4 border-b border-border/60 pb-4">
             <div className="space-y-1">
               <CardTitle className="text-lg font-semibold text-foreground">Coada de PV</CardTitle>
               <CardDescription>Finalizează documentele de predare pentru alocările recente.</CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="pt-6">
+          <CardContent className="flex-1 pt-6">
             <PvQueue items={pvQueueItems} isLoading={pvQueueQuery.isLoading} onGenerate={handleGeneratePv} />
           </CardContent>
         </Card>
 
-        <Card className="col-span-12 border border-border bg-card/80 shadow-none xl:col-span-5">
+        <Card className="col-span-12 flex h-full flex-col border border-border bg-card/80 shadow-none xl:col-span-5">
           <CardHeader className="border-b border-border/60 pb-4">
             <CardTitle className="text-lg font-semibold text-foreground">Acțiuni rapide</CardTitle>
             <CardDescription>Accesează cele mai frecvente acțiuni pentru echipa de operațiuni.</CardDescription>
           </CardHeader>
-          <CardContent className="pt-6">
+          <CardContent className="flex-1 pt-6">
             <QuickActions />
           </CardContent>
         </Card>
       </section>
 
       <section className="grid gap-6 xl:grid-cols-12">
-        <Card className="col-span-12 border border-border bg-card/80 shadow-none xl:col-span-7">
+        <Card className="col-span-12 flex h-full flex-col border border-border bg-card/80 shadow-none xl:col-span-7">
           <CardHeader className="flex flex-row items-start gap-4 border-b border-border/60 pb-4">
             <div className="space-y-1">
               <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
@@ -302,12 +302,12 @@ export default function Dashboard() {
               <CardDescription>Ultimele actualizări pentru inventar și alocări.</CardDescription>
             </div>
             </CardHeader>
-          <CardContent className="pt-6">
+          <CardContent className="flex-1 pt-6">
             <ActivityFeed items={recentActivity} isLoading={activityQuery.isLoading} />
           </CardContent>
         </Card>
 
-        <Card className="col-span-12 border border-border bg-card/80 shadow-none xl:col-span-5">
+        <Card className="col-span-12 flex h-full flex-col border border-border bg-card/80 shadow-none xl:col-span-5">
           <CardHeader className="flex flex-row items-start gap-4 border-b border-border/60 pb-4">
             <div className="space-y-1">
               <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
@@ -317,8 +317,8 @@ export default function Dashboard() {
               <CardDescription>Organizează evenimentele și verificările din depozit.</CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="pt-6">
-            <div className="grid gap-6 lg:grid-cols-2">
+          <CardContent className="flex-1 pt-6">
+            <div className="grid h-full gap-6 lg:grid-cols-2">
               <MiniCalendar
                 events={eventsQuery.data ?? []}
                 currentMonth={currentMonth}

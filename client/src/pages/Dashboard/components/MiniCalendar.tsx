@@ -61,7 +61,7 @@ export function MiniCalendar({ events, currentMonth, selectedDate, onMonthChange
   };
 
   return (
-    <div className="flex flex-col gap-4" aria-live="polite">
+    <div className="flex h-full flex-col gap-4" aria-live="polite">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-semibold text-foreground">{format(currentMonth, 'MMMM yyyy', { locale: ro })}</p>
