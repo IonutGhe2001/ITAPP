@@ -51,6 +51,16 @@ export default defineConfig(({ mode }) => {
         },
       }),
     ],
+    optimizeDeps: {
+      include: [
+        'recharts',
+        'recharts-scale',
+        'd3-scale',
+        'd3-shape',
+        'd3-format',
+        'd3-time-format',
+      ],
+    },
     resolve: {
       alias: {
         '@': resolve(__dirname, 'src'),
@@ -62,6 +72,9 @@ export default defineConfig(({ mode }) => {
         '@services': resolve(__dirname, 'src/services'),
         '@shared': resolve(__dirname, '../shared'),
       },
+    },
+    ssr: {
+      noExternal: ['recharts'],
     },
     test: {
       environment: 'jsdom',
