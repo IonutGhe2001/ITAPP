@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import type { Angajat } from '@/features/equipment/types';
 import type { AngajatWithRelations } from '@/features/employees/angajatiService';
 
 export default function useColegiFilter(

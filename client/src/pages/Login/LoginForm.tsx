@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
@@ -63,13 +62,10 @@ export default function LoginForm() {
   };
 
   return (
-    <motion.form
+    <form
       onSubmit={handleSubmit}
       noValidate
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="w-full max-w-xs space-y-6"
+      className="w-full max-w-xs space-y-6 animate-fade-in-down"
     >
       {error && <div className="text-center text-sm text-red-600">{error}</div>}
 
@@ -131,6 +127,6 @@ export default function LoginForm() {
       >
         {loading ? t('login.loading') : t('login.submit')}
       </button>
-    </motion.form>
+    </form>
   );
 }

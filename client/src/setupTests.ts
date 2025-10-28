@@ -1,14 +1,18 @@
 import '@testing-library/jest-dom';
 
 class ResizeObserver {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  constructor(_callback: ResizeObserverCallback) {}
   observe() {}
   unobserve() {}
   disconnect() {}
 }
 
-interface GlobalWithResizeObserver {
-  ResizeObserver: typeof ResizeObserver;
-}
+type GlobalWithResizeObserver = typeof globalThis & {
+  ResizeObserver?: typeof ResizeObserver;
+};
 
-(globalThis as GlobalWithResizeObserver).ResizeObserver =
-  (globalThis as GlobalWithResizeObserver).ResizeObserver || ResizeObserver;
+const globalWithResizeObserver = globalThis as GlobalWithResizeObserver;
+
+globalWithResizeObserver.ResizeObserver =
+  globalWithResizeObserver.ResizeObserver ?? ResizeObserver;
