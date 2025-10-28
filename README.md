@@ -45,6 +45,52 @@ npm install
 npm run dev
 ```
 
+### Environment configuration
+
+The project keeps environment variables close to the code that consumes them:
+
+- `client/.env` – values read by Vite at build/dev time (prefixed with `VITE_`).
+- `server/.env` – runtime configuration for the Express API.
+- `shared/` does not require additional variables.
+
+Copy the provided `.env.example` files whenever you set up a new environment and
+adjust only the variables that differ from local development.
+
+#### Local development (localhost)
+
+1. `cd client && cp .env.example .env`
+2. `cd server && cp .env.example .env`
+3. Ensure the following key values are present (the examples below are already
+   baked into the default `.env` files):
+
+   ```ini
+   # client/.env
+   VITE_API_URL=http://localhost:8080/api
+
+   # server/.env
+   NODE_ENV=development
+   FRONTEND_ROOT=http://localhost:5173
+   CORS_ORIGIN=http://localhost:5173,http://localhost:3000
+   AUTH_DISABLED=false
+   ```
+
+The server uses these values to accept requests from the local Vite dev server
+and to redirect development login flows back to the client.
+
+#### Staging / production
+
+When publishing the stack, update the same files with public hostnames:
+
+- `client/.env` → point `VITE_API_URL` to the deployed API (including `/api`).
+- `server/.env` → set `NODE_ENV=production` (or `staging`), configure
+  `FRONTEND_ROOT`/`CORS_ORIGIN` with the deployed front-end origin, provide
+  strong secrets (`JWT_SECRET`, optional `TEST_LOGIN_SECRET`), and switch the
+  database URL to the managed instance.
+
+Keep `AUTH_DISABLED=false` in production. Only enable the automated login flow
+(`AUTH_DISABLED=true`) on ephemeral staging environments that are protected by
+other means (e.g. Cloudflare Access).
+
 ### PDF Exports
 
 The reports API uses a singleton Puppeteer browser that is started during server
