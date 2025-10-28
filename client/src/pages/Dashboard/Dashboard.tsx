@@ -1,199 +1,215 @@
-'use client';
+import { lazy, Suspense, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Activity, AlertCircle, BarChart3 } from 'lucide-react';
 
-import { useMemo } from 'react';
-import { format } from 'date-fns';
-import { ro } from 'date-fns/locale';
-import DashboardSectionCard from '@layouts/components/DashboardSectionCard';
-import NavigationShortcuts from './sections/NavigationShortcuts';
-import OverviewCards from './sections/OverviewCards';
-import QuickActions from './sections/QuickActions';
-import RecentUpdates from './sections/RecentUpdates';
-import { EventCalendar, EventList, EventForm } from '@/features/events';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import {
-  BarChartIcon,
-  FlashlightIcon,
-  CompassIcon,
-  Clock4Icon,
-  CalendarCheckIcon,
-  SparklesIcon,
-} from 'lucide-react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import Container from '@/components/Container';
-import { cn } from '@/lib/utils';
+  getActivity,
+  getAlerts,
+  getEquipmentStatus,
+  getEvents,
+  getOverviewStats,
+  type ActivityItem,
+  type Alert,
+  type EquipmentStatusSummary,
+  type OverviewStat,
+} from './api';
+import { AlertItem } from './components/AlertItem';
+import { ActivityFeed } from './components/ActivityFeed';
+import { EmptyState } from './components/EmptyState';
+import { KpiCard } from './components/KpiCard';
+import { MiniCalendar } from './components/MiniCalendar';
+import { QuickActions } from './components/QuickActions';
 
-import { computeHighlightDates } from './utils';
-import { useDashboardEvents } from './useDashboardEvents';
+const EquipmentStatusChart = lazy(() => import('./components/EquipmentStatusChart'));
+
+const KPI_SKELETONS = Array.from({ length: 4 });
+const ALERT_SKELETONS = Array.from({ length: 3 });
+
+const compactNumberFormatter = new Intl.NumberFormat('ro-RO', {
+  notation: 'compact',
+  maximumFractionDigits: 1,
+});
+
+function formatKpiValue(value: number, suffix?: string) {
+  const formattedValue =
+    value >= 1000
+      ? compactNumberFormatter.format(value)
+      : Number.isInteger(value)
+      ? value.toString()
+      : value.toFixed(1);
+  return suffix ? `${formattedValue}${suffix}` : formattedValue;
+}
 
 export default function Dashboard() {
-  const {
-    selectedDay,
-    setSelectedDay,
-    eventsInDay,
-    evenimente,
-    editing,
-    formDate,
-    showFormModal,
-    handleCreate,
-    handleUpdate,
-    handleDelete,
-    handleDayDoubleClick,
-    handleEditEvent,
-    setShowFormModal,
-  } = useDashboardEvents();
+  const { data: overviewStats, isLoading: isLoadingOverview } = useQuery<OverviewStat[]>({
+    queryKey: ['stats', 'overview'],
+    queryFn: getOverviewStats,
+    staleTime: 60_000,
+  });
 
-  const today = new Date();
+  const { data: equipmentStatus, isLoading: isLoadingEquipment } = useQuery<EquipmentStatusSummary[]>({
+    queryKey: ['stats', 'equipment-status'],
+    queryFn: getEquipmentStatus,
+    staleTime: 60_000,
+  });
 
-  const upcomingEvent = useMemo(() => {
-    const now = new Date();
-    return (
-      evenimente
-        .map((event) => ({ event, date: new Date(event.data) }))
-        .filter(({ date }) => !Number.isNaN(date.getTime()) && date >= now)
-        .sort((a, b) => a.date.getTime() - b.date.getTime())[0] ?? null
-    );
-  }, [evenimente]);
+  const { data: alerts, isLoading: isLoadingAlerts } = useQuery<Alert[]>({
+    queryKey: ['alerts'],
+    queryFn: getAlerts,
+    staleTime: 30_000,
+  });
 
-  const upcomingEventTitle = upcomingEvent?.event.titlu ?? 'Niciun eveniment programat';
-  const upcomingEventSubtitle = upcomingEvent
-    ? `${format(upcomingEvent.date, 'd MMMM yyyy', { locale: ro })}${
-        upcomingEvent.event.ora ? ` · ${upcomingEvent.event.ora}` : ''
-      }`
-    : 'Planifică următoarele activități.';
+  const { data: activity, isLoading: isLoadingActivity } = useQuery<ActivityItem[]>({
+    queryKey: ['activity'],
+    queryFn: getActivity,
+    staleTime: 30_000,
+  });
 
-  const highlightCards = useMemo(
-    () => [
-      {
-        id: 'today',
-        label: 'Evenimente astăzi',
-        value: eventsInDay.length.toString().padStart(2, '0'),
-        description: 'Monitorizate în calendarul intern.',
-      },
-      {
-        id: 'total',
-        label: 'Total evenimente active',
-        value: evenimente.length.toString().padStart(2, '0'),
-        description: 'Sincronizate cu echipa și resursele.',
-      },
-      {
-        id: 'next',
-        label: 'Următorul eveniment',
-        value: upcomingEventTitle,
-        description: upcomingEventSubtitle,
-      },
-    ],
-    [eventsInDay.length, evenimente.length, upcomingEventSubtitle, upcomingEventTitle]
+  const { data: events, isLoading: isLoadingEvents } = useQuery({
+    queryKey: ['events'],
+    queryFn: getEvents,
+    staleTime: 60_000,
+  });
+
+  const formattedKpis = useMemo(
+    () =>
+      (overviewStats ?? []).map((stat) => ({
+        ...stat,
+        displayValue: formatKpiValue(stat.value, stat.suffix),
+      })),
+    [overviewStats]
   );
 
+  const topAlerts = useMemo(() => (alerts ?? []).slice(0, 3), [alerts]);
+  const recentActivity = useMemo(() => (activity ?? []).slice(0, 10), [activity]);
+
+  const handleKpiClick = (id: string) => {
+    console.info(`KPI clicked: ${id}`);
+  };
+
   return (
-    <div className="relative">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-br from-primary/20 via-background to-background opacity-80 blur-3xl" />
-      <Container className="relative z-10 py-10">
-        <div className="flex flex-col gap-10">
-          <section className="relative overflow-hidden rounded-3xl border border-border/60 bg-background/80 p-8 shadow-[0_20px_80px_-40px_rgba(15,23,42,0.55)] backdrop-blur">
-            <div className="absolute -right-16 -top-24 h-56 w-56 rounded-full bg-primary/20 blur-3xl" aria-hidden />
-            <div className="absolute -bottom-32 -left-10 h-64 w-64 rounded-full bg-muted/40 blur-3xl" aria-hidden />
-            <div className="relative flex flex-col gap-8">
-              <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-                <div className="space-y-3">
-                  <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-primary">
-                    <SparklesIcon className="h-3 w-3" /> Panou general
-                  </span>
-                  <div>
-                    <h1 className="text-foreground text-3xl font-semibold md:text-4xl">Dashboard ITAPP</h1>
-                    <p className="text-muted-foreground mt-2 max-w-2xl text-sm md:text-base">
-                      Vizualizează performanța echipei, organizează evenimentele și accesează rapid zonele operaționale. Un spațiu modern, construit pentru ritmul accelerat al internshipului.
-                    </p>
-                  </div>
-                </div>
-                <div className="border-border/70 bg-background/80 relative flex w-full max-w-xs flex-col gap-1 rounded-2xl border p-5 text-left shadow-inner">
-                  <span className="text-muted-foreground text-xs uppercase tracking-wider">Astăzi</span>
-                  <span className="text-foreground text-2xl font-semibold">
-                    {format(today, 'd MMMM yyyy', { locale: ro })}
-                  </span>
-                  <span className="text-muted-foreground/80 text-sm">
-                    {format(today, 'EEEE', { locale: ro })}
-                  </span>
-                </div>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {highlightCards.map((card) => (
-                  <div
-                    key={card.id}
-                    className="border-border/60 bg-background/70 group relative flex flex-col gap-2 overflow-hidden rounded-2xl border p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg"
-                  >
-                    <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
-                      {card.label}
-                    </span>
-                    <span
-                      className={cn(
-                        'text-foreground font-semibold',
-                        card.id === 'next' ? 'text-lg leading-tight' : 'text-2xl'
-                      )}
-                    >
-                      {card.value}
-                    </span>
-                    <span className="text-muted-foreground text-xs leading-relaxed">{card.description}</span>
-                    <span className="from-primary/20 via-transparent to-transparent pointer-events-none absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  </div>
-                ))}
-              </div>
+    <main className="space-y-8 px-4 py-6 sm:px-6 lg:px-8">
+      <header className="max-w-3xl space-y-2">
+        <h1 className="text-3xl font-semibold text-foreground sm:text-4xl">Panou operațional IT APP</h1>
+        <p className="text-sm text-muted-foreground sm:text-base">
+          Monitorizează indicatorii cheie ai infrastructurii, urmărește activitatea echipei și acționează rapid atunci când apar
+          alerte importante.
+        </p>
+      </header>
+
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {isLoadingOverview
+          ? KPI_SKELETONS.map((_, index) => (
+              <div key={index} className="h-[124px] animate-pulse rounded-xl border border-border bg-muted/30" aria-hidden />
+            ))
+          : formattedKpis.map((stat) => (
+              <KpiCard
+                key={stat.id}
+                title={stat.label}
+                value={stat.displayValue}
+                delta={stat.delta}
+                trend={stat.trend}
+                onClick={() => handleKpiClick(stat.id)}
+              />
+            ))}
+      </section>
+
+      <div className="grid gap-6 xl:grid-cols-12">
+        <Card className="col-span-12 shadow-none border border-border bg-card/80 xl:col-span-7">
+          <CardHeader className="flex flex-row items-start justify-between gap-4 border-b border-border/60 pb-4">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                <BarChart3 className="h-5 w-5 text-primary" aria-hidden />
+                Stare echipamente
+              </CardTitle>
+              <CardDescription>Distribuția echipamentelor funcționale, în mentenanță și offline.</CardDescription>
             </div>
-          </section>
+          </CardHeader>
+          <CardContent className="pt-6">
+            {isLoadingEquipment ? (
+              <div className="h-[320px] animate-pulse rounded-lg bg-muted/30" aria-hidden />
+            ) : equipmentStatus && equipmentStatus.length ? (
+              <Suspense fallback={<div className="h-[320px] animate-pulse rounded-lg bg-muted/30" aria-hidden />}>
+                <EquipmentStatusChart data={equipmentStatus} />
+              </Suspense>
+            ) : (
+              <EmptyState
+                title="Nu există date despre echipamente"
+                description="Importă inventarul pentru a vedea starea echipamentelor."
+                action={<Button type="button" size="sm">Importă date</Button>}
+              />
+            )}
+          </CardContent>
+        </Card>
 
-        <DashboardSectionCard title="Prezentare generală" icon={<BarChartIcon />}>
-            <div className="flex flex-wrap justify-start gap-4 sm:justify-center">
-              <OverviewCards />
+          <Card className="col-span-12 shadow-none border border-border bg-card/80 xl:col-span-5">
+          <CardHeader className="flex flex-row items-start justify-between gap-4 border-b border-border/60 pb-4">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                <AlertCircle className="h-5 w-5 text-primary" aria-hidden />
+                Alerte active
+              </CardTitle>
+              <CardDescription>Primește maximum trei alerte relevante pentru echipă.</CardDescription>
             </div>
-            </DashboardSectionCard>
+            <Button type="button" variant="outline" size="sm">Vezi toate</Button>
+          </CardHeader>
+          <CardContent className="space-y-3 pt-6">
+            {isLoadingAlerts ? (
+              ALERT_SKELETONS.map((_, index) => (
+                <div key={index} className="h-20 animate-pulse rounded-lg border border-border bg-muted/30" aria-hidden />
+              ))
+            ) : topAlerts.length ? (
+              topAlerts.map((alert) => <AlertItem key={alert.id} alert={alert} />)
+            ) : (
+              <EmptyState
+                title="Nicio alertă activă"
+                description="Monitorizăm în continuare. Vei fi notificat când apare ceva important."
+              />
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
-          <DashboardSectionCard title="Evenimente" icon={<CalendarCheckIcon />} className="border-dashed border-border/70">
-            <div className="flex flex-col gap-6 overflow-hidden lg:flex-row">
-              <div className="rounded-2xl border border-border/60 bg-background/80 p-4 shadow-sm lg:w-[360px]">
-                <EventCalendar
-                  selected={selectedDay}
-                  onSelect={setSelectedDay}
-                  onDoubleClick={handleDayDoubleClick}
-                  highlightDates={computeHighlightDates(evenimente)}
-                />
-              </div>
-              <div className="flex-1 space-y-4">
-                <div className="rounded-2xl border border-border/60 bg-background/80 p-4 shadow-sm">
-                  <EventList events={eventsInDay} onEdit={handleEditEvent} onDelete={handleDelete} />
-                </div>
-              </div>
+            <div className="grid gap-6 xl:grid-cols-12">
+        <Card className="col-span-12 shadow-none border border-border bg-card/80 xl:col-span-7">
+          <CardHeader className="flex flex-row items-start gap-4 border-b border-border/60 pb-4">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                <Activity className="h-5 w-5 text-primary" aria-hidden />
+                Activitate recentă
+              </CardTitle>
+              <CardDescription>Ultimele actualizări din echipa de operațiuni IT.</CardDescription>
             </div>
-          </DashboardSectionCard>
+            </CardHeader>
+          <CardContent className="pt-6">
+            <ActivityFeed items={recentActivity} isLoading={isLoadingActivity} />
+          </CardContent>
+        </Card>
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="space-y-6">
-              <DashboardSectionCard title="Acțiuni rapide" icon={<FlashlightIcon />}>
-                <QuickActions />
-              </DashboardSectionCard>
+        <div className="col-span-12 flex flex-col gap-6 xl:col-span-5">
+          <Card className="shadow-none border border-border bg-card/80">
+            <CardHeader className="border-b border-border/60 pb-4">
+              <CardTitle className="text-lg font-semibold text-foreground">Acțiuni rapide</CardTitle>
+              <CardDescription>Alege una dintre acțiunile frecvente pentru a reacționa imediat.</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <QuickActions />
+            </CardContent>
+          </Card>
 
-            <DashboardSectionCard title="Navigare" icon={<CompassIcon />}>
-                <NavigationShortcuts />
-              </DashboardSectionCard>
-            </div>
-
-            <DashboardSectionCard title="Activitate recentă" icon={<Clock4Icon />} className="flex h-[420px] flex-col">
-              <RecentUpdates />
-            </DashboardSectionCard>
-          </div>
-
-          <Dialog open={showFormModal} onOpenChange={setShowFormModal}>
-            <DialogContent className="sm:max-w-xl">
-              {formDate && (
-                <EventForm
-                  selectedDay={formDate}
-                  initial={editing}
-                  onSave={editing ? handleUpdate : (_id: number | null, data) => handleCreate(data)}
-                  onCancel={() => setShowFormModal(false)}
-                />
-              )}
-            </DialogContent>
-          </Dialog>
+            <Card className="shadow-none border border-border bg-card/80">
+            <CardHeader className="border-b border-border/60 pb-4">
+              <CardTitle className="text-lg font-semibold text-foreground">Calendar</CardTitle>
+              <CardDescription>Evenimente planificate pe zile. Lista este actualizată zilnic.</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <MiniCalendar events={events ?? []} isLoading={isLoadingEvents} />
+            </CardContent>
+          </Card>
         </div>
-        </Container>
-    </div>
+        </div>
+    </main>
   );
 }
