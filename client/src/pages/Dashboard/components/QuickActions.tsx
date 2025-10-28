@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { LifeBuoy, Plus, Rocket, ServerCog } from 'lucide-react';
+import { Download, FileText, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
@@ -7,38 +7,31 @@ interface QuickAction {
   id: string;
   label: string;
   description: string;
-  icon: typeof LifeBuoy;
+  icon: typeof Plus;
   onSelect: () => void;
 }
 
 const defaultActions: QuickAction[] = [
   {
-    id: 'new-ticket',
-    label: 'Ticket nou',
-    description: 'Înregistrează un incident pentru echipa de suport.',
-    icon: LifeBuoy,
-    onSelect: () => console.info('Ticket nou inițiat'),
-  },
-  {
-    id: 'deploy',
-    label: 'Lansare deployment',
-    description: 'Pregătește un nou release pentru mediul de staging.',
-    icon: Rocket,
-    onSelect: () => console.info('Deployment planificat'),
-  },
-  {
-    id: 'request-access',
-    label: 'Solicitare acces',
-    description: 'Trimite o cerere pentru resurse interne sensibile.',
+    id: 'add-equipment',
+    label: 'Adaugă echipament',
+    description: 'Înregistrează rapid un activ nou în inventar.',
     icon: Plus,
-    onSelect: () => console.info('Solicitare acces trimisă'),
+    onSelect: () => console.info('Acțiune: adaugă echipament'),
   },
   {
-    id: 'maintenance',
-    label: 'Programare mentenanță',
-    description: 'Rezervă un interval pentru mentenanța echipamentelor.',
-    icon: ServerCog,
-    onSelect: () => console.info('Mentenanță programată'),
+    id: 'generate-pv',
+    label: 'Generează PV',
+    description: 'Pornește procesul de creare a unui nou proces-verbal.',
+    icon: FileText,
+    onSelect: () => console.info('Acțiune: generează PV'),
+  },
+  {
+    id: 'export-csv',
+    label: 'Exportă CSV',
+    description: 'Descarcă lista de echipamente într-un fișier CSV.',
+    icon: Download,
+    onSelect: () => console.info('Acțiune: exportă CSV'),
   },
 ];
 

@@ -4,17 +4,17 @@ import { ro } from 'date-fns/locale';
 import type { Alert } from '../api';
 
 const severityConfig: Record<Alert['severity'], { label: string; icon: typeof AlertTriangle; className: string }> = {
-  high: {
-    label: 'Prioritate ridicată',
+  critical: {
+    label: 'Prioritate critică'
     icon: ShieldAlert,
     className: 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300',
   },
-  medium: {
-    label: 'Necesită atenție',
+  warning: {
+    label: 'Avertizare',
     icon: AlertTriangle,
     className: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
   },
-  low: {
+  info: {
     label: 'Informare',
     icon: Bell,
     className: 'bg-sky-100 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300',

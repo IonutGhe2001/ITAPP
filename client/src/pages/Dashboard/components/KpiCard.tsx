@@ -1,26 +1,29 @@
-import type { MouseEventHandler } from 'react';
-import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowDownRight, ArrowUpRight, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface KpiCardProps {
   title: string;
   value: string;
   delta: number;
-  trend: 'up' | 'down';
-  onClick?: MouseEventHandler<HTMLButtonElement>;
+  trend: 'up' | 'down' | 'neutral';
+  href?: string;
 }
 
-export function KpiCard({ title, value, delta, trend, onClick }: KpiCardProps) {
-  const Icon = trend === 'up' ? ArrowUpRight : ArrowDownRight;
-  const deltaLabel = `${trend === 'down' ? '−' : '+'}${Math.abs(delta).toFixed(1)}%`;
+export function KpiCard({ title, value, delta, trend, href }: KpiCardProps) {
+  const Icon = trend === 'up' ? ArrowUpRight : trend === 'down' ? ArrowDownRight : Minus;
+  const deltaLabel = `${trend === 'down' ? '−' : trend === 'up' ? '+' : ''}${Math.abs(delta).toFixed(1)}%`;
+  const Component = href ? Link : 'button';
+  const componentProps = href
+    ? { to: href, role: 'link' as const }
+    : { type: 'button' as const };
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
+    <Component
+      {...componentProps}
       className={cn(
         'group flex h-full flex-col justify-between rounded-xl border border-border bg-card px-5 py-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary',
-        'shadow-none hover:border-primary/40 hover:bg-accent/30',
+        'shadow-none hover:border-primary/40 hover:bg-accent/30'
       )}
     >
       <div className="flex items-center justify-between gap-3">
@@ -28,14 +31,21 @@ export function KpiCard({ title, value, delta, trend, onClick }: KpiCardProps) {
         <span
           className={cn(
             'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium',
-            trend === 'up' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300',
+            trend === 'up'
+              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
+              : trend === 'down'
+              ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300'
+              : 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-300'
           )}
         >
           <Icon className="h-3.5 w-3.5" aria-hidden />
           {deltaLabel}
         </span>
       </div>
-      <p className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{value}</p>
-    </button>
+      <div className="space-y-1">
+        <p className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{value}</p>
+        <p className="text-xs text-muted-foreground">Față de ultimele 7 zile</p>
+      </div>
+    </Component>
   );
 }

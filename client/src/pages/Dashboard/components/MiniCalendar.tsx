@@ -1,7 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import {
   addDays,
-  addMonths,
   eachDayOfInterval,
   endOfMonth,
   endOfWeek,
@@ -11,18 +10,20 @@ import {
   isToday,
   startOfMonth,
   startOfWeek,
-  subMonths,
 } from 'date-fns';
 import { ro } from 'date-fns/locale';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { CalendarEvent } from '../api';
-import { EmptyState } from './EmptyState';
 
 interface MiniCalendarProps {
   events: CalendarEvent[];
+  currentMonth: Date;
+  selectedDate: Date;
+  onMonthChange: (month: Date) => void;
+  onSelectDate: (date: Date) => void;
   isLoading?: boolean;
 }
 
@@ -31,10 +32,7 @@ const weekdays = Array.from({ length: 7 }, (_, index) =>
   format(addDays(weekdayReference, index), 'EE', { locale: ro })
 );
 
-export function MiniCalendar({ events, isLoading }: MiniCalendarProps) {
-  const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
-  const [selectedDate, setSelectedDate] = useState(() => new Date());
-
+export function MiniCalendar({ events, currentMonth, selectedDate, onMonthChange, onSelectDate, isLoading }: MiniCalendarProps) {
   const eventsByDate = useMemo(() => {
     const grouped = events.reduce<Record<string, CalendarEvent[]>>((acc, event) => {
       const key = event.date;
@@ -52,21 +50,14 @@ export function MiniCalendar({ events, isLoading }: MiniCalendarProps) {
     return eachDayOfInterval({ start, end });
   }, [currentMonth]);
 
-  const selectedKey = format(selectedDate, 'yyyy-MM-dd');
-  const eventsForSelectedDay = useMemo(() => {
-    const dayEvents = eventsByDate[selectedKey] ?? [];
-    return [...dayEvents].sort((a, b) => {
-      if (!a.time || !b.time) return (a.time ?? '').localeCompare(b.time ?? '');
-      return a.time.localeCompare(b.time);
-    });
-  }, [eventsByDate, selectedKey]);
-
-  const handlePrevMonth = () => setCurrentMonth((value) => subMonths(value, 1));
-  const handleNextMonth = () => setCurrentMonth((value) => addMonths(value, 1));
+  const handlePrevMonth = () => onMonthChange(startOfMonth(addDays(currentMonth, -1)));
+  const handleNextMonth = () => onMonthChange(startOfMonth(addDays(endOfMonth(currentMonth), 1)));
 
   const handleSelectDay = (day: Date) => {
-    setSelectedDate(day);
-    setCurrentMonth(startOfMonth(day));
+    onSelectDate(day);
+    if (!isSameMonth(day, currentMonth)) {
+      onMonthChange(startOfMonth(day));
+    }
   };
 
   return (
@@ -148,40 +139,6 @@ export function MiniCalendar({ events, isLoading }: MiniCalendarProps) {
           </div>
         </div>
       )}
-
-      <div className="space-y-3">
-        <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-          <CalendarIcon className="h-4 w-4" aria-hidden />
-          {format(selectedDate, 'd MMMM yyyy', { locale: ro })}
-        </div>
-        {isLoading ? (
-          <div className="space-y-2">
-            {Array.from({ length: 2 }).map((_, index) => (
-              <div key={index} className="h-12 animate-pulse rounded-lg border border-border bg-muted/40" />
-            ))}
-          </div>
-        ) : eventsForSelectedDay.length ? (
-          <ul className="space-y-2 text-sm">
-            {eventsForSelectedDay.map((event) => (
-              <li key={event.id} className="flex items-start gap-3 rounded-lg border border-border bg-card/60 p-3">
-                <Clock className="mt-0.5 h-4 w-4 text-primary" aria-hidden />
-                <div className="space-y-1">
-                  <p className="font-medium text-foreground">{event.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {event.time ? `${event.time} · ` : ''}
-                    {event.location ?? 'Locație în curs de confirmare'}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <EmptyState
-            title="Niciun eveniment în această zi"
-            description="Planifică activități pentru a le vedea aici."
-          />
-        )}
-      </div>
     </div>
   );
 }

@@ -11,22 +11,24 @@ import {
   type TooltipProps,
 } from 'recharts';
 import type { Payload } from 'recharts/types/component/DefaultTooltipContent';
-import type { EquipmentStatusSummary } from '../api';
+import type { EquipmentStatusRecord } from '../api';
 
 interface EquipmentStatusChartProps {
-  data: EquipmentStatusSummary[];
+  data: EquipmentStatusRecord[];
 }
 
 const colors = {
-  online: '#22c55e',
-  maintenance: '#f97316',
-  offline: '#ef4444',
+  in_stock: '#0ea5e9',
+  allocated: '#22c55e',
+  repair: '#f97316',
+  retired: '#64748b',
 };
 
-const tooltipLabels: Record<'online' | 'maintenance' | 'offline', string> = {
-  online: 'Funcționale',
-  maintenance: 'În mentenanță',
-  offline: 'Offline',
+const tooltipLabels: Record<keyof typeof colors, string> = {
+  in_stock: 'În stoc',
+  allocated: 'Alocate',
+  repair: 'În reparație',
+  retired: 'Retrase',
 };
 
 const renderTooltip = ({
@@ -35,7 +37,7 @@ const renderTooltip = ({
 }: TooltipProps<number, string> & { payload?: ReadonlyArray<Payload<number, string>> }) => {
   if (!active || !payload?.length) return null;
   const typedPayload = payload as ReadonlyArray<Payload<number, string>>;
-  const category = (typedPayload[0].payload as EquipmentStatusSummary).category;
+  const category = (typedPayload[0].payload as EquipmentStatusRecord).status;
 
   return (
     <div className="rounded-lg border border-border bg-background px-3 py-2 text-sm shadow-sm">
@@ -63,19 +65,21 @@ export default function EquipmentStatusChart({ data }: EquipmentStatusChartProps
   return (
     <div className="h-[320px]" role="img" aria-label="Stare echipamente pe categorii">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={chartData} barGap={8} barSize={22}>
+        <BarChart data={chartData} barGap={10} barSize={28}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis dataKey="category" stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} />
+          <XAxis dataKey="status" stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} />
           <YAxis stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} allowDecimals={false} />
           <Tooltip cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} content={renderTooltip} />
           <Legend
-            verticalAlign="top"
-            align="right"
+            verticalAlign="bottom"
+            align="center"
             formatter={(value: string) => tooltipLabels[value as keyof typeof tooltipLabels] ?? value}
+            wrapperStyle={{ paddingTop: 16 }}
           />
-          <Bar dataKey="online" stackId="status" name="Funcționale" fill={colors.online} radius={[4, 4, 0, 0]} />
-          <Bar dataKey="maintenance" stackId="status" name="În mentenanță" fill={colors.maintenance} radius={[4, 4, 0, 0]} />
-          <Bar dataKey="offline" stackId="status" name="Offline" fill={colors.offline} radius={[4, 4, 0, 0]} />
+          <Bar dataKey="allocated" stackId="status" name="Alocate" fill={colors.allocated} radius={[4, 4, 0, 0]} />
+          <Bar dataKey="in_stock" stackId="status" name="În stoc" fill={colors.in_stock} radius={[4, 4, 0, 0]} />
+          <Bar dataKey="repair" stackId="status" name="În reparație" fill={colors.repair} radius={[4, 4, 0, 0]} />
+          <Bar dataKey="retired" stackId="status" name="Retrase" fill={colors.retired} radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

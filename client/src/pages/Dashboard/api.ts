@@ -1,22 +1,27 @@
-import { addDays, formatISO } from 'date-fns';
+import { addDays, formatISO, startOfMonth } from 'date-fns';
 
-export type OverviewStat = {
-  id: string;
-  label: string;
-  value: number;
-  suffix?: string;
-  delta: number;
-  trend: 'up' | 'down';
+export type OverviewStatsResponse = {
+  total: number;
+  in_stock: number;
+  allocated: number;
+  repair_retired: number;
+  deltas: {
+    total: number;
+    in_stock: number;
+    allocated: number;
+    repair_retired: number;
+  };
 };
 
-export type EquipmentStatusSummary = {
-  category: string;
-  online: number;
-  maintenance: number;
-  offline: number;
+export type EquipmentStatusRecord = {
+  status: string;
+  in_stock: number;
+  allocated: number;
+  repair: number;
+  retired: number;
 };
 
-export type AlertSeverity = 'low' | 'medium' | 'high';
+export type AlertSeverity = 'info' | 'warning' | 'critical';
 
 export type Alert = {
   id: string;
@@ -24,6 +29,15 @@ export type Alert = {
   description: string;
   severity: AlertSeverity;
   timestamp: string;
+};
+
+export type PvQueueItem = {
+  id: string;
+  employee: string;
+  equipment: string;
+  allocationDate: string;
+  location: string;
+  status: 'pending' | 'overdue';
 };
 
 export type ActivityItem = {
@@ -43,156 +57,269 @@ export type CalendarEvent = {
   description?: string;
 };
 
-type MockEndpoint = '/stats/overview' | '/stats/equipment-status' | '/alerts' | '/activity' | '/events';
+export type CalendarEventInput = Omit<CalendarEvent, 'id'>;
+
+type MockEndpoint =
+  | '/stats/overview'
+  | '/stats/equipment-status'
+  | '/alerts'
+  | '/pv/queue'
+  | '/activity'
+  | '/events';
 
 type MockDatabase = Record<MockEndpoint, unknown>;
 
 const now = new Date();
 
 const mockDatabase: MockDatabase = {
-  '/stats/overview': [
-    { id: 'incidents', label: 'Incidente rezolvate', value: 128, delta: 12.5, trend: 'up' },
-    { id: 'uptime', label: 'Uptime infrastructură', value: 99.2, suffix: '%', delta: -0.4, trend: 'down' },
-    { id: 'deployments', label: 'Deployments săptămâna aceasta', value: 34, delta: 8.1, trend: 'up' },
-    { id: 'tickets', label: 'Tichete deschise', value: 18, delta: -5.4, trend: 'down' },
-  ] satisfies OverviewStat[],
+  '/stats/overview': {
+    total: 428,
+    in_stock: 196,
+    allocated: 182,
+    repair_retired: 50,
+    deltas: {
+      total: 4.5,
+      in_stock: -2.1,
+      allocated: 6.8,
+      repair_retired: -1.4,
+    },
+  } satisfies OverviewStatsResponse,
   '/stats/equipment-status': [
-    { category: 'Rețea', online: 18, maintenance: 3, offline: 1 },
-    { category: 'Servere', online: 12, maintenance: 2, offline: 2 },
-    { category: 'Workstation', online: 42, maintenance: 6, offline: 4 },
-    { category: 'IoT', online: 25, maintenance: 4, offline: 5 },
-  ] satisfies EquipmentStatusSummary[],
+    { status: 'Laptopuri', in_stock: 68, allocated: 54, repair: 6, retired: 4 },
+    { status: 'Desktopuri', in_stock: 42, allocated: 31, repair: 8, retired: 6 },
+    { status: 'Tablete', in_stock: 24, allocated: 18, repair: 3, retired: 2 },
+    { status: 'Telefoane', in_stock: 36, allocated: 28, repair: 5, retired: 3 },
+    { status: 'Periferice', in_stock: 26, allocated: 20, repair: 4, retired: 5 },
+  ] satisfies EquipmentStatusRecord[],
   '/alerts': [
     {
       id: 'alert-1',
-      title: 'Consum mare de resurse pe clusterul QA',
-      description: 'Clusterul QA rulează la 92% CPU. Verifică workload-urile programate.',
-      severity: 'high',
+      title: 'Garanție expirată în 7 zile',
+      description: 'Laptop Dell #A483 își încheie garanția în mai puțin de o săptămână.',
+      severity: 'warning',
       timestamp: addDays(now, -1).toISOString(),
     },
     {
       id: 'alert-2',
-      title: 'Actualizare firmware disponibilă',
-      description: 'Patch critic de securitate pentru routerele din zona de birouri.',
-      severity: 'medium',
+      title: 'Echipament nealocat de 10 zile',
+      description: 'Monitor LG #M204 este în depozit fără titular din 10 zile.',
+      severity: 'info',
       timestamp: addDays(now, -2).toISOString(),
     },
     {
       id: 'alert-3',
-      title: 'Backup finalizat',
-      description: 'Backupul incremental pentru platforma de billing a fost finalizat.',
-      severity: 'low',
+      title: 'PV lipsă după alocare',
+      description: 'Telefon iPhone 12 #T092 nu are PV generat după predare.',
+      severity: 'critical',
       timestamp: addDays(now, -3).toISOString(),
     },
+    {
+      id: 'alert-4',
+      title: 'Garanție expirată astăzi',
+      description: 'Switch Cisco #S415 expiră astăzi, programează o revizie.',
+      severity: 'critical',
+      timestamp: addDays(now, -4).toISOString(),
+    },
   ] satisfies Alert[],
+  '/pv/queue': [
+    {
+      id: 'pv-1',
+      employee: 'Ioana Popescu',
+      equipment: 'Laptop Lenovo ThinkPad X1',
+      allocationDate: addDays(now, -5).toISOString(),
+      location: 'București - Sediu Central',
+      status: 'pending',
+    },
+    {
+      id: 'pv-2',
+      employee: 'Radu Marinescu',
+      equipment: 'Telefon Samsung S22',
+      allocationDate: addDays(now, -9).toISOString(),
+      location: 'Cluj - Hub Support',
+      status: 'overdue',
+    },
+    {
+      id: 'pv-3',
+      employee: 'Laura Dima',
+      equipment: 'Monitor LG UltraFine 27"',
+      allocationDate: addDays(now, -2).toISOString(),
+      location: 'Iași - Customer Care',
+      status: 'pending',
+    },
+    {
+      id: 'pv-4',
+      employee: 'Mihai Preda',
+      equipment: 'Lentile VR Oculus Quest',
+      allocationDate: addDays(now, -12).toISOString(),
+      location: 'Brașov - Laborator',
+      status: 'overdue',
+    },
+  ] satisfies PvQueueItem[],
   '/activity': [
     {
       id: 'activity-1',
-      actor: 'Mara T.',
-      action: 'a aprobat',
-      target: 'cererea de acces pentru noul stagiar',
-      timestamp: addDays(now, -0.5).toISOString(),
+      actor: 'Alex Ionescu',
+      action: 'a înregistrat',
+      target: 'un nou laptop în inventar',
+      timestamp: addDays(now, -0.3).toISOString(),
     },
     {
       id: 'activity-2',
-      actor: 'Ioan P.',
+      actor: 'Maria Călin',
       action: 'a actualizat',
-      target: 'documentația VPN',
+      target: 'statutul unui router în reparație',
       timestamp: addDays(now, -1).toISOString(),
     },
     {
       id: 'activity-3',
-      actor: 'Andreea C.',
-      action: 'a creat',
-      target: 'un ticket pentru monitorizarea serviciului VoIP',
-      timestamp: addDays(now, -1.2).toISOString(),
+      actor: 'Tudor Pavel',
+      action: 'a generat',
+      target: 'un PV pentru echipa de marketing',
+      timestamp: addDays(now, -1.4).toISOString(),
     },
     {
       id: 'activity-4',
-      actor: 'Radu G.',
-      action: 'a marcat',
-      target: '2 echipamente ca fiind în mentenanță',
-      timestamp: addDays(now, -1.5).toISOString(),
+      actor: 'Irina Florescu',
+      action: 'a predat',
+      target: '3 telefoane noi către HR',
+      timestamp: addDays(now, -1.6).toISOString(),
     },
     {
       id: 'activity-5',
-      actor: 'Elena B.',
-      action: 'a publicat',
-      target: 'raportul de audit lunar',
+      actor: 'Vlad Petre',
+      action: 'a importat',
+      target: 'un CSV cu rezerve de echipamente',
       timestamp: addDays(now, -2).toISOString(),
     },
     {
       id: 'activity-6',
-      actor: 'Matei S.',
-      action: 'a distribuit',
-      target: 'credențiale temporare pentru contractori',
+      actor: 'Anca Dumitru',
+      action: 'a marcat',
+      target: 'două imprimante ca retrase',
       timestamp: addDays(now, -2.5).toISOString(),
     },
     {
       id: 'activity-7',
-      actor: 'Camelia D.',
-      action: 'a sincronizat',
-      target: 'alertările SIEM cu instrumentele interne',
+      actor: 'Răzvan Georgescu',
+      action: 'a închis',
+      target: 'cererea de service pentru un server',
       timestamp: addDays(now, -3).toISOString(),
     },
     {
       id: 'activity-8',
-      actor: 'Mihai A.',
-      action: 'a finalizat',
-      target: 'migrări pentru 5 conturi de utilizatori',
-      timestamp: addDays(now, -4).toISOString(),
+      actor: 'Sorina Matei',
+      action: 'a mutat',
+      target: 'două laptopuri în depozitul București',
+      timestamp: addDays(now, -3.3).toISOString(),
     },
     {
       id: 'activity-9',
-      actor: 'Daria F.',
-      action: 'a verificat',
-      target: 'nivelul de stoc al componentelor hardware',
-      timestamp: addDays(now, -4.5).toISOString(),
+      actor: 'Marius Tudor',
+      action: 'a creat',
+      target: 'o solicitare de reparație pentru 4 periferice',
+      timestamp: addDays(now, -4.1).toISOString(),
     },
     {
       id: 'activity-10',
-      actor: 'Sorin L.',
-      action: 'a resetat',
-      target: 'switch-ul din sala de ședințe',
-      timestamp: addDays(now, -5).toISOString(),
+      actor: 'Elena Rusu',
+      action: 'a reatribuit',
+      target: 'două monitoare echipei finance',
+      timestamp: addDays(now, -4.6).toISOString(),
     },
   ] satisfies ActivityItem[],
-  '/events': Array.from({ length: 14 }, (_, idx) => {
-    const date = addDays(now, idx - 4);
+  '/events': Array.from({ length: 12 }, (_, index) => {
+    const baseDate = addDays(startOfMonth(now), index - 6);
     return {
-      id: `event-${idx + 1}`,
-      date: formatISO(date, { representation: 'date' }),
-      title: idx % 3 === 0 ? 'Revizuire securitate' : idx % 3 === 1 ? 'Întâlnire cu furnizorii' : 'Sesiune de suport',
-      time: idx % 2 === 0 ? '10:00' : '15:30',
-      location: idx % 2 === 0 ? 'Sala Atlas' : 'Online',
+      id: `event-${index + 1}`,
+      date: formatISO(baseDate, { representation: 'date' }),
+      title: index % 3 === 0 ? 'Inventariere zonă depozit' : index % 3 === 1 ? 'Verificare garanții' : 'Training echipă',
+      time: index % 2 === 0 ? '09:30' : '14:00',
+      location: index % 2 === 0 ? 'Sediu central' : 'Online',
+      description: 'Eveniment de coordonare pentru echipa IT.',
     } satisfies CalendarEvent;
   }),
 };
 
-const NETWORK_DELAY = 450;
+const NETWORK_DELAY = 400;
 
-async function mockGet<T>(endpoint: MockEndpoint): Promise<T> {
+function deepClone<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T;
+}
+
+async function wait() {
   await new Promise((resolve) => setTimeout(resolve, NETWORK_DELAY));
-  const data = mockDatabase[endpoint];
-  return JSON.parse(JSON.stringify(data)) as T;
 }
 
-export function getOverviewStats() {
-  return mockGet<OverviewStat[]>('/stats/overview');
+export async function getOverviewStats(): Promise<OverviewStatsResponse> {
+  await wait();
+  return deepClone(mockDatabase['/stats/overview'] as OverviewStatsResponse);
 }
 
-export function getEquipmentStatus() {
-  return mockGet<EquipmentStatusSummary[]>('/stats/equipment-status');
+export async function getEquipmentStatus(): Promise<EquipmentStatusRecord[]> {
+  await wait();
+  return deepClone(mockDatabase['/stats/equipment-status'] as EquipmentStatusRecord[]);
 }
 
-export function getAlerts() {
-  return mockGet<Alert[]>('/alerts');
+export async function getAlerts(limit = 3): Promise<Alert[]> {
+  await wait();
+  const alerts = mockDatabase['/alerts'] as Alert[];
+  return deepClone(alerts.slice(0, limit));
 }
 
-export function getActivity() {
-  return mockGet<ActivityItem[]>('/activity');
+export async function getPvQueue(limit = 10): Promise<PvQueueItem[]> {
+  await wait();
+  const queue = mockDatabase['/pv/queue'] as PvQueueItem[];
+  return deepClone(queue.slice(0, limit));
 }
 
-export function getEvents() {
-  return mockGet<CalendarEvent[]>('/events');
+export async function getActivity(limit = 10): Promise<ActivityItem[]> {
+  await wait();
+  const activity = mockDatabase['/activity'] as ActivityItem[];
+  return deepClone(activity.slice(0, limit));
+}
+
+export async function getEvents(params?: { from?: string; to?: string }): Promise<CalendarEvent[]> {
+  await wait();
+  const events = mockDatabase['/events'] as CalendarEvent[];
+  if (!params?.from && !params?.to) {
+    return deepClone(events);
+  }
+  return deepClone(
+    events.filter((event) => {
+      if (params.from && event.date < params.from) return false;
+      if (params.to && event.date > params.to) return false;
+      return true;
+    })
+  );
+}
+
+export async function createEvent(payload: CalendarEventInput): Promise<CalendarEvent> {
+  await wait();
+  const events = mockDatabase['/events'] as CalendarEvent[];
+  const newEvent: CalendarEvent = {
+    ...payload,
+    id: crypto.randomUUID?.() ?? `event-${events.length + 1}-${Date.now()}`,
+  };
+  events.push(newEvent);
+  mockDatabase['/events'] = events;
+  return deepClone(newEvent);
+}
+
+export async function updateEvent(id: string, payload: CalendarEventInput): Promise<CalendarEvent> {
+  await wait();
+  const events = mockDatabase['/events'] as CalendarEvent[];
+  const index = events.findIndex((item) => item.id === id);
+  if (index === -1) {
+    throw new Error('Event not found');
+  }
+  const updated = { ...events[index], ...payload } satisfies CalendarEvent;
+  events[index] = updated;
+  mockDatabase['/events'] = events;
+  return deepClone(updated);
+}
+
+export async function deleteEvent(id: string): Promise<void> {
+  await wait();
+  const events = mockDatabase['/events'] as CalendarEvent[];
+  mockDatabase['/events'] = events.filter((event) => event.id !== id);
 }
