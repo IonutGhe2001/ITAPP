@@ -9,10 +9,6 @@ build/
 prisma/dev.db
 prisma/dev.db-journal
 
-# Environment
-.env
-.env.local
-
 # Logs
 *.log
 

@@ -2,7 +2,6 @@
 # GLOBAL IGNORE
 # ----------------------------
 node_modules/
-.env
 *.log
 .DS_Store
 Thumbs.db
@@ -12,8 +11,6 @@ Thumbs.db
 # CLIENT-SPECIFIC (vite / react)
 # ----------------------------
 client/dist/
-client/.env
-client/.env.local
 client/.vite/
 client/.next/
 client/.cache/
@@ -29,8 +26,6 @@ client/.coverage/
 # ----------------------------
 server/dist/
 server/build/
-server/.env
-server/.env.local
 
 # Prisma DB files
 server/prisma/dev.db*
