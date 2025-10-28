@@ -6,8 +6,9 @@ import api from '@/services/api';
 import { formatDistanceToNow } from 'date-fns';
 import { ro } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
-import { UserIcon, MonitorIcon, PhoneIcon } from 'lucide-react';
+import { UserIcon, MonitorIcon, PhoneIcon, AlertTriangleIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
+import { cn } from '@/lib/utils';
 
 const updateIcons = {
   Echipament: <MonitorIcon className="h-4 w-4" />,
@@ -57,34 +58,56 @@ export default function RecentUpdates() {
     return () => {
       socket?.disconnect();
     };
-  }, []);
+  }, [toast]);
 
   const filteredUpdates = updates.filter((u) =>
     filter ? u.type.toLowerCase().includes(filter.toLowerCase()) : true
   );
 
   return (
-    <div className="min-h-0 w-full flex-1 space-y-4 overflow-y-auto pr-1">
-      <ul>
-        {filteredUpdates.map((update) => (
-          <li
-            key={update.id}
-            className="border-border bg-card flex items-start gap-4 rounded-xl border p-4 shadow-sm transition hover:shadow-md"
-          >
-            <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-full">
-              {updateIcons[update.type]}
-            </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <Badge variant="outline">{update.type}</Badge>
-                <span className="text-muted-foreground text-xs">
-                  {formatDistanceToNow(new Date(update.timestamp), { addSuffix: true, locale: ro })}
-                </span>
+    <div className="relative flex-1 overflow-hidden">
+      <div className="absolute left-6 top-6 bottom-6 hidden w-px bg-border/60 lg:block" aria-hidden />
+      <ul className="flex flex-col gap-4 overflow-y-auto pr-1">
+        {filteredUpdates.length === 0 && (
+          <li className="text-muted-foreground text-sm">Nu există activitate recentă.</li>
+        )}
+        {filteredUpdates.map((update) => {
+          const isImportant = update.importance === 'high';
+          return (
+            <li
+              key={update.id}
+              className={cn(
+                'group relative flex gap-4 rounded-2xl border border-border/60 bg-background/80 p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg',
+                isImportant && 'border-primary/50 bg-primary/5'
+              )}
+            >
+              <span className="from-primary/20 via-primary/0 to-transparent pointer-events-none absolute left-[18px] top-0 hidden h-full w-px bg-gradient-to-b lg:block" />
+              <span className="absolute left-3 top-6 hidden h-3 w-3 rounded-full bg-primary/60 lg:block" aria-hidden />
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted/70 text-primary shadow-inner ring-1 ring-border/50">
+                {updateIcons[update.type]}
               </div>
-              <p className="text-foreground text-sm leading-tight">{update.message}</p>
-            </div>
-          </li>
-        ))}
+              <div className="flex flex-1 flex-col gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge
+                    variant="outline"
+                    className={cn(isImportant && 'border-destructive/60 text-destructive')}
+                  >
+                    {update.type}
+                  </Badge>
+                  {isImportant && (
+                    <Badge variant="destructive" className="gap-1">
+                      <AlertTriangleIcon className="h-3 w-3" /> Prioritar
+                    </Badge>
+                  )}
+                  <span className="text-muted-foreground text-xs">
+                    {formatDistanceToNow(new Date(update.timestamp), { addSuffix: true, locale: ro })}
+                  </span>
+                </div>
+                <p className="text-foreground text-sm leading-relaxed">{update.message}</p>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
