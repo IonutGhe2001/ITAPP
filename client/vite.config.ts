@@ -10,6 +10,7 @@ const __dirname = dirname(__filename);
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
+  const proxyTarget = env.VITE_API_URL || 'http://localhost:8080/api';
 
   return {
     plugins: [
@@ -70,7 +71,7 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         '/api': {
-          target: env.VITE_API_URL,
+          target: proxyTarget,
           changeOrigin: true,
         },
       },
