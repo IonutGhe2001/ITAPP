@@ -1,19 +1,12 @@
 import axios, { AxiosHeaders, type InternalAxiosRequestConfig } from 'axios';
 import { ROUTES } from '@/constants/routes';
 import { getToken } from '@/utils/storage';
+import { resolveApiBaseUrl } from '@/utils/apiBaseUrl';
 
-const apiUrl = import.meta.env.VITE_API_URL;
-
-if (!apiUrl) {
-  if (import.meta.env.DEV) {
-    console.warn('VITE_API_URL is not defined. Falling back to "/api"');
-  } else {
-    throw new Error('VITE_API_URL is not defined');
-  }
-}
+const apiBaseUrl = resolveApiBaseUrl();
 
 const api = axios.create({
-  baseURL: apiUrl,   // ex: https://preliminary-find-basin-janet.trycloudflare.com/api
+  baseURL: apiBaseUrl,   // ex: https://preliminary-find-basin-janet.trycloudflare.com/api
   withCredentials: false, // fără cookie-uri
 });
 
@@ -43,7 +36,8 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
+export { apiBaseUrl };
 export default api;

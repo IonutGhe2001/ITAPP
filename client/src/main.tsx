@@ -13,6 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Providers } from '@/context/Providers';
 import { getToken, setToken } from '@/utils/storage';
+import { resolveApiBaseUrl } from '@/utils/apiBaseUrl';
 
 // 1) ia tokenul din hash și persistă-l
 const params = new URLSearchParams(location.hash.replace(/^#/, ''));
@@ -23,7 +24,7 @@ if (tokenFromHash) {
 }
 
 // 2) axios base + Bearer via AxiosHeaders; fără cookie-uri
-axios.defaults.baseURL = import.meta.env.VITE_API_URL; // ex: https://<API>/api
+axios.defaults.baseURL = resolveApiBaseUrl(); // ex: https://<API>/api
 axios.defaults.withCredentials = false;
 
 axios.interceptors.request.use((cfg: InternalAxiosRequestConfig) => {
