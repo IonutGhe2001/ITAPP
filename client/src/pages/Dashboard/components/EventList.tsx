@@ -124,7 +124,7 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
           ))}
         </div>
       ) : events.length ? (
-        <ul className="max-h-[360px] space-y-4 overflow-y-auto pr-1.5" aria-live="polite">
+        <ul className="max-h-[340px] space-y-4 overflow-y-auto pr-1.5" aria-live="polite">
           {events.map((event) => {
             const isDeleting = deletingId === event.id;
             const eventDateLabel = format(new Date(event.date), 'd MMMM yyyy', { locale: ro });

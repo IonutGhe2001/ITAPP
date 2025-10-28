@@ -14,7 +14,7 @@ export function KpiCard({ title, value, delta, trend, href }: KpiCardProps) {
   const Icon = trend === 'up' ? ArrowUpRight : trend === 'down' ? ArrowDownRight : Minus;
   const deltaLabel = `${trend === 'down' ? '−' : trend === 'up' ? '+' : ''}${Math.abs(delta).toFixed(1)}%`;
   const baseClasses = cn(
-    'group flex h-full flex-col justify-between rounded-xl border border-border bg-card px-5 py-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary',
+    'group flex min-h-[128px] flex-col justify-between rounded-xl border border-border bg-card px-5 py-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary',
     'shadow-none hover:border-primary/40 hover:bg-accent/30'
   );
 

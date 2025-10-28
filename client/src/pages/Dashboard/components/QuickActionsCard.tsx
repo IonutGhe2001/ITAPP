@@ -9,7 +9,7 @@ interface QuickActionsCardProps {
 
 export function QuickActionsCard({ className }: QuickActionsCardProps) {
   return (
-    <Card className={cn('h-auto self-start border border-border bg-card/80 shadow-none', className)}>
+    <Card className={cn('h-auto self-start border border-border/80 bg-card/90 shadow-sm', className)}>
       <CardHeader className="border-b border-border/60 pb-4">
         <CardTitle className="text-lg font-semibold text-foreground">Acțiuni rapide</CardTitle>
       </CardHeader>
