@@ -25,15 +25,15 @@ export default function SignatureEditor({ signature, isEditing, onChange }: Sign
   const remove = () => onChange(null);
 
   return (
-    <div className="relative">
+    <div className="relative flex h-full w-full items-center justify-center">
       {signature ? (
         <img
           src={signature}
           alt="Semnătură"
-          className="border-border max-h-32 w-32 border object-contain"
+          className="max-h-20 w-full max-w-[14rem] object-contain"
         />
       ) : (
-        <div className="text-muted-foreground flex h-32 w-32 items-center justify-center border border-dashed">
+        <div className="text-muted-foreground flex h-full w-full items-center justify-center text-sm">
           Fără semnătură
         </div>
       )}
@@ -42,7 +42,7 @@ export default function SignatureEditor({ signature, isEditing, onChange }: Sign
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="bg-primary text-primary-foreground absolute bottom-0 right-0 cursor-pointer rounded-full p-2 shadow"
+            className="bg-primary text-primary-foreground absolute bottom-2 right-2 rounded-full p-2 shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <Pencil size={16} />
           </button>
@@ -50,7 +50,7 @@ export default function SignatureEditor({ signature, isEditing, onChange }: Sign
             <button
               type="button"
               onClick={remove}
-              className="bg-destructive text-destructive-foreground absolute right-0 top-0 rounded-full p-1 shadow"
+              className="bg-destructive text-destructive-foreground absolute right-2 top-2 rounded-full p-1.5 shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2"
             >
               <X size={14} />
             </button>
@@ -61,10 +61,19 @@ export default function SignatureEditor({ signature, isEditing, onChange }: Sign
         <DialogContent>
           <SignaturePad ref={padRef} />
           <div className="mt-4 flex justify-end gap-2">
-            <Button type="button" variant="ghost" onClick={() => padRef.current?.clear()}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => padRef.current?.clear()}
+              className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            >
               Curăță
             </Button>
-            <Button type="button" onClick={save}>
+            <Button
+              type="button"
+              onClick={save}
+              className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            >
               Salvează
             </Button>
           </div>

@@ -40,7 +40,7 @@ export function PvQueue({ items, isLoading, onGenerate, className }: PvQueueProp
     <div className={cn('flex h-full min-h-0 flex-col gap-4', className)}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-semibold text-foreground">Procès-verbal în așteptare</p>
+          <p className="text-sm font-semibold text-foreground">Proces-verbal în așteptare</p>
           <p className="text-xs text-muted-foreground">
             Gestionează rapid documentele de predare pentru echipamentele recent alocate.
           </p>
