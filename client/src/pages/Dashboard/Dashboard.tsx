@@ -217,7 +217,7 @@ export default function Dashboard() {
       </section>
 
       <section className="grid grid-cols-1 items-stretch gap-6 xl:grid-cols-12">
-        <Card className="flex h-full flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-8">
+        <Card className="flex min-h-[520px] flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-8">
           <CardHeader className="flex flex-col gap-2 border-b border-border/60 p-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-1">
               <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
@@ -227,11 +227,11 @@ export default function Dashboard() {
               <CardDescription>Analizează distribuția echipamentelor active, alocate și retrase.</CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="flex-1 p-4">
+          <CardContent className="flex min-h-0 flex-1 flex-col p-4">
             {equipmentStatusQuery.isLoading ? (
               <div className="h-[320px] animate-pulse rounded-lg bg-muted/30" aria-hidden />
             ) : equipmentStatusQuery.data?.length ? (
-              <Suspense fallback={<div className="h-[320px] animate-pulse rounded-lg bg-muted/30" aria-hidden />}> 
+              <Suspense fallback={<div className="h-[320px] animate-pulse rounded-lg bg-muted/30" aria-hidden />}>
                 <EquipmentStatusChart data={equipmentStatusQuery.data} />
               </Suspense>
             ) : (
@@ -244,7 +244,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="flex h-full flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-4">
+        <Card className="flex min-h-[520px] flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-4">
           <CardHeader className="flex flex-col gap-2 border-b border-border/60 p-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-1">
               <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
@@ -255,7 +255,7 @@ export default function Dashboard() {
             </div>
             <Button type="button" variant="outline" size="sm">Vezi toate</Button>
           </CardHeader>
-          <CardContent className="flex-1 space-y-3 p-4">
+          <CardContent className="flex min-h-0 flex-1 flex-col space-y-3 p-4">
             {alertsQuery.isLoading ? (
               ALERT_SKELETONS.map((_, index) => (
                 <div key={index} className="h-20 animate-pulse rounded-lg border border-border bg-muted/30" aria-hidden />
@@ -273,27 +273,25 @@ export default function Dashboard() {
       </section>
 
       <section className="grid grid-cols-1 items-stretch gap-6 xl:grid-cols-12">
-        <Card className="flex h-full flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-8">
+        <Card className="flex min-h-[520px] flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-8">
           <CardHeader className="flex flex-col gap-2 border-b border-border/60 p-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-1">
               <CardTitle className="text-lg font-semibold text-foreground">Coada de PV</CardTitle>
               <CardDescription>Finalizează documentele de predare pentru alocările recente.</CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="flex-1 p-4">
-            <div className="flex h-full min-h-0 flex-col space-y-4 overflow-y-auto pr-1">
-              <PvQueue items={pvQueueItems} isLoading={pvQueueQuery.isLoading} onGenerate={handleGeneratePv} />
-            </div>
+          <CardContent className="flex min-h-0 flex-1 flex-col p-4">
+            <PvQueue items={pvQueueItems} isLoading={pvQueueQuery.isLoading} onGenerate={handleGeneratePv} />
           </CardContent>
         </Card>
 
-        <div className="flex h-full flex-col xl:col-span-4">
-          <QuickActionsCompact />
+        <div className="flex min-h-0 flex-col xl:col-span-4">
+          <QuickActionsCompact className="flex-1" />
         </div>
       </section>
 
-        <section className="grid grid-cols-1 items-stretch gap-6 xl:grid-cols-12">
-        <div className="flex h-full flex-col xl:col-span-8">
+      <section className="grid grid-cols-1 items-stretch gap-6 xl:grid-cols-12">
+        <div className="flex min-h-0 flex-col xl:col-span-8">
           <CalendarCompact
             events={eventsQuery.data ?? []}
             eventsForSelectedDay={eventsForSelectedDay}
@@ -310,7 +308,7 @@ export default function Dashboard() {
           />
         </div>
 
-        <Card className="flex h-full flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-4">
+        <Card className="flex min-h-[520px] flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-4">
           <CardHeader className="flex flex-col gap-2 border-b border-border/60 p-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-1">
               <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
@@ -320,9 +318,11 @@ export default function Dashboard() {
               <CardDescription>Ultimele actualizări pentru inventar și alocări.</CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="flex-1 p-4">
-            <div className="flex h-full min-h-0 flex-col space-y-4 overflow-y-auto pr-1">
-              <ActivityFeed items={recentActivity} isLoading={activityQuery.isLoading} />
+          <CardContent className="flex min-h-0 flex-1 flex-col p-4">
+            <div className="flex min-h-0 flex-1 flex-col">
+              <div className="flex-1 overflow-y-auto pr-1">
+                <ActivityFeed items={recentActivity} isLoading={activityQuery.isLoading} />
+              </div>
             </div>
           </CardContent>
         </Card>

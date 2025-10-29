@@ -5,6 +5,7 @@ import { Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 import type { CalendarEvent, CalendarEventInput } from '../api';
 import { EventList, type EventListHandle } from './EventList';
@@ -23,6 +24,7 @@ interface CalendarCompactProps {
   isLoading?: boolean;
   isSaving?: boolean;
   deletingId?: string | null;
+  className?: string;
 }
 
 export function CalendarCompact({
@@ -38,6 +40,7 @@ export function CalendarCompact({
   isLoading,
   isSaving,
   deletingId,
+  className,
 }: CalendarCompactProps) {
   const eventListRef = useRef<EventListHandle>(null);
 
@@ -47,8 +50,8 @@ export function CalendarCompact({
   );
 
   return (
-    <Card className="flex h-full w-full flex-col border border-border/80 bg-card/90 shadow-sm">
-      <CardHeader className="flex items-center justify-between gap-3 space-y-0 border-b border-border/60 p-4">
+    <Card className={cn('flex min-h-[520px] w-full flex-col border border-border/80 bg-card/90 shadow-sm', className)}>
+      <CardHeader className="flex items-center justify-between gap-3 space-y-0 border-b border-border/60 p-5">
         <CardTitle className="text-base font-semibold text-foreground sm:text-lg">Calendar</CardTitle>
         <Button
           type="button"
@@ -60,9 +63,9 @@ export function CalendarCompact({
           Add
         </Button>
       </CardHeader>
-      <CardContent className="flex-1 space-y-4 p-4">
-        <div className="grid h-full grid-cols-1 items-start gap-4 md:grid-cols-[220px_1fr]">
-          <div className="rounded-xl border border-border/60 bg-background/60 p-4 shadow-sm">
+      <CardContent className="flex min-h-0 flex-1 flex-col space-y-5 p-5">
+        <div className="grid h-full min-h-0 grid-cols-1 items-start gap-5 md:grid-cols-[240px_1fr]">
+          <div className="rounded-xl border border-border/60 bg-background/60 p-5 shadow-sm">
             <MiniCalendar
               events={events}
               currentMonth={currentMonth}
@@ -72,12 +75,12 @@ export function CalendarCompact({
               isLoading={isLoading}
             />
           </div>
-          <div className="flex h-full min-h-0 flex-col space-y-4 rounded-xl border border-border/60 bg-background/60 p-4 shadow-sm">
+          <div className="flex h-full min-h-0 flex-col gap-5 rounded-xl border border-border/60 bg-background/60 p-5 shadow-sm">
             <div className="space-y-2">
               <p className="text-sm font-semibold text-foreground md:text-base">{selectedDayLabel}</p>
               <p className="text-xs text-muted-foreground md:text-sm">Evenimente planificate pentru această zi.</p>
             </div>
-            <div className="flex-1 space-y-3 overflow-y-auto pr-1">
+            <div className="flex-1 min-h-0">
               <EventList
                 ref={eventListRef}
                 date={selectedDate}

@@ -49,17 +49,17 @@ export function MiniCalendar({ events, currentMonth, selectedDate, onMonthChange
   };
 
   return (
-    <div className="space-y-4" aria-live="polite">
-      <div className="flex items-center justify-between gap-3">
+    <div className="space-y-5" aria-live="polite">
+      <div className="flex items-center justify-between gap-4">
         <p className="text-sm font-semibold text-foreground">
           {format(currentMonth, 'MMMM yyyy', { locale: ro })}
         </p>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            className="size-8"
+            className="size-9"
             onClick={handlePrevMonth}
             aria-label="Luna precedentă"
           >
@@ -69,7 +69,7 @@ export function MiniCalendar({ events, currentMonth, selectedDate, onMonthChange
             type="button"
             variant="ghost"
             size="icon"
-            className="size-8"
+            className="size-9"
             onClick={handleNextMonth}
             aria-label="Luna următoare"
           >
@@ -85,13 +85,13 @@ export function MiniCalendar({ events, currentMonth, selectedDate, onMonthChange
           ))}
         </div>
       ) : (
-        <div className="space-y-3">
-          <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className="space-y-4">
+          <div className="grid grid-cols-7 gap-2 text-center text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
             {weekdays.map((day, index) => (
               <span key={index}>{day}</span>
             ))}
           </div>
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-2">
             {visibleDays.map((day) => {
               const key = format(day, 'yyyy-MM-dd');
               const hasEvents = Boolean(eventsByDate[key]?.length);
@@ -105,7 +105,7 @@ export function MiniCalendar({ events, currentMonth, selectedDate, onMonthChange
                   aria-selected={active}
                   aria-current={isToday(day) ? 'date' : undefined}
                   className={cn(
-                    'relative inline-flex size-8 items-center justify-center rounded-md text-xs font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 md:size-9 aria-selected:bg-primary aria-selected:text-primary-foreground',
+                    'relative inline-flex size-9 items-center justify-center rounded-md text-xs font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 md:size-10 aria-selected:bg-primary aria-selected:text-primary-foreground',
                     inMonth ? 'text-foreground' : 'text-muted-foreground/60',
                     active && 'bg-primary text-primary-foreground'
                   )}

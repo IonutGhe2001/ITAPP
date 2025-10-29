@@ -111,7 +111,7 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
   };
 
   return (
-    <div className="flex h-full flex-col gap-5">
+    <div className="flex h-full min-h-0 flex-col gap-5">
       <div className="sr-only">
         <p>{formattedDate}</p>
         <p>Evenimente pentru această zi.</p>
@@ -124,7 +124,7 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
           ))}
         </div>
       ) : events.length ? (
-        <ul className="max-h-[340px] space-y-4 overflow-y-auto pr-1.5" aria-live="polite">
+        <ul className="flex h-full flex-col gap-4 overflow-y-auto pr-1.5" aria-live="polite">
           {events.map((event) => {
             const isDeleting = deletingId === event.id;
             const eventDateLabel = format(new Date(event.date), 'd MMMM yyyy', { locale: ro });

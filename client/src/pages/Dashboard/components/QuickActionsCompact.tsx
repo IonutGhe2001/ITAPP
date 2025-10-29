@@ -9,7 +9,7 @@ interface QuickActionsCompactProps {
 
 export function QuickActionsCompact({ className }: QuickActionsCompactProps) {
   return (
-    <Card className={cn('flex h-full flex-col border border-border/80 bg-card/90 shadow-sm', className)}>
+    <Card className={cn('flex min-h-[520px] flex-col border border-border/80 bg-card/90 shadow-sm', className)}>
       <CardHeader className="flex items-center justify-between gap-3 space-y-0 border-b border-border/60 p-4">
         <CardTitle className="text-base font-semibold text-foreground sm:text-lg">Acțiuni rapide</CardTitle>
       </CardHeader>
