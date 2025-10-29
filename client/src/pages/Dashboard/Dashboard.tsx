@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Activity, AlertCircle, BarChart3 } from 'lucide-react';
 import { endOfMonth, format, formatISO, startOfMonth } from 'date-fns';
@@ -61,6 +61,8 @@ const ALERT_SKELETONS = Array.from({ length: 3 });
 export default function Dashboard() {
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
   const [selectedDate, setSelectedDate] = useState(() => new Date());
+  const quickActionsRef = useRef<HTMLDivElement | null>(null);
+  const [quickActionsHeight, setQuickActionsHeight] = useState<number>();
   const queryClient = useQueryClient();
 
   const overviewQuery = useQuery<OverviewStatsResponse>({
@@ -154,6 +156,54 @@ export default function Dashboard() {
   const pvQueueItems = useMemo(() => pvQueueQuery.data ?? [], [pvQueueQuery.data]);
   const recentActivity = useMemo(() => activityQuery.data ?? [], [activityQuery.data]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const element = quickActionsRef.current;
+    if (!element) return;
+
+    const mediaQuery = window.matchMedia('(min-width: 1280px)');
+
+    const updateHeight = () => {
+      const card = quickActionsRef.current;
+      if (!card) return;
+      if (!mediaQuery.matches) {
+        setQuickActionsHeight(undefined);
+        return;
+      }
+
+      setQuickActionsHeight(card.getBoundingClientRect().height);
+    };
+
+    updateHeight();
+
+    const handleMediaChange = () => updateHeight();
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', handleMediaChange);
+    } else if (typeof mediaQuery.addListener === 'function') {
+      mediaQuery.addListener(handleMediaChange);
+    }
+
+    let observer: ResizeObserver | undefined;
+    if ('ResizeObserver' in window) {
+      observer = new ResizeObserver(() => {
+        updateHeight();
+      });
+      observer.observe(element);
+    }
+
+    return () => {
+      if (typeof mediaQuery.removeEventListener === 'function') {
+        mediaQuery.removeEventListener('change', handleMediaChange);
+      } else if (typeof mediaQuery.removeListener === 'function') {
+        mediaQuery.removeListener(handleMediaChange);
+      }
+
+      observer?.disconnect();
+    };
+  }, []);
+
   const selectedDateKey = useMemo(() => format(selectedDate, 'yyyy-MM-dd'), [selectedDate]);
   const eventsForSelectedDay = useMemo(() => {
     const events = eventsQuery.data ?? [];
@@ -186,7 +236,7 @@ export default function Dashboard() {
     <main className="max-w-screen-2xl mx-auto px-4 lg:px-6 space-y-6 py-6">
       <header className="space-y-2">
         <h1 className="text-3xl font-semibold text-foreground sm:text-4xl">Panou echipamente IT APP</h1>
-        <p className="max-w-3xl text-sm text-muted-foreground sm:text-base">
+        <p className="text-sm text-muted-foreground sm:text-base">
           Monitorizează inventarul, urmărește procesele-verbale și planifică activitățile echipei dintr-o singură interfață.
         </p>
       </header>
@@ -273,7 +323,14 @@ export default function Dashboard() {
       </section>
 
       <section className="grid grid-cols-1 items-stretch gap-6 xl:grid-cols-12">
-        <Card className="flex min-h-[520px] flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-8">
+        <Card
+          className="flex flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-8"
+          style={
+            quickActionsHeight
+              ? { height: quickActionsHeight, maxHeight: quickActionsHeight }
+              : undefined
+          }
+        >
           <CardHeader className="flex flex-col gap-2 border-b border-border/60 p-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-1">
               <CardTitle className="text-lg font-semibold text-foreground">Coada de PV</CardTitle>
@@ -285,8 +342,8 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <div className="flex min-h-0 flex-col xl:col-span-4">
-          <QuickActionsCompact className="flex-1" />
+        <div className="xl:col-span-4">
+          <QuickActionsCompact ref={quickActionsRef} />
         </div>
       </section>
 
@@ -305,10 +362,11 @@ export default function Dashboard() {
             isLoading={isInitialEventsLoading}
             isSaving={isSavingEvent}
             deletingId={deletingEventId}
+            className="h-full"
           />
         </div>
 
-        <Card className="flex min-h-[520px] flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-4">
+        <Card className="flex min-h-[520px] h-full flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-4">
           <CardHeader className="flex flex-col gap-2 border-b border-border/60 p-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-1">
               <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">

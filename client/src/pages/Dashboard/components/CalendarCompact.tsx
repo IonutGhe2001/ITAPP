@@ -51,7 +51,7 @@ export function CalendarCompact({
 
   return (
     <Card className={cn('flex min-h-[520px] w-full flex-col border border-border/80 bg-card/90 shadow-sm', className)}>
-      <CardHeader className="flex items-center justify-between gap-3 space-y-0 border-b border-border/60 p-5">
+      <CardHeader className="flex items-center justify-between gap-3 space-y-0 border-b border-border/60 p-6">
         <CardTitle className="text-base font-semibold text-foreground sm:text-lg">Calendar</CardTitle>
         <Button
           type="button"
@@ -63,36 +63,34 @@ export function CalendarCompact({
           Add
         </Button>
       </CardHeader>
-      <CardContent className="flex min-h-0 flex-1 flex-col space-y-5 p-5">
-        <div className="grid h-full min-h-0 grid-cols-1 items-start gap-5 md:grid-cols-[240px_1fr]">
-          <div className="rounded-xl border border-border/60 bg-background/60 p-5 shadow-sm">
-            <MiniCalendar
-              events={events}
-              currentMonth={currentMonth}
-              selectedDate={selectedDate}
-              onMonthChange={onMonthChange}
-              onSelectDate={onSelectDate}
-              isLoading={isLoading}
-            />
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-6 p-6">
+        <div className="rounded-xl border border-border/60 bg-background/60 p-6 shadow-sm">
+          <MiniCalendar
+            events={events}
+            currentMonth={currentMonth}
+            selectedDate={selectedDate}
+            onMonthChange={onMonthChange}
+            onSelectDate={onSelectDate}
+            isLoading={isLoading}
+          />
+        </div>
+        <div className="flex min-h-0 flex-1 flex-col gap-4 rounded-xl border border-border/60 bg-background/60 p-6 shadow-sm">
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-foreground md:text-base">{selectedDayLabel}</p>
+            <p className="text-xs text-muted-foreground md:text-sm">Evenimente planificate pentru această zi.</p>
           </div>
-          <div className="flex h-full min-h-0 flex-col gap-5 rounded-xl border border-border/60 bg-background/60 p-5 shadow-sm">
-            <div className="space-y-2">
-              <p className="text-sm font-semibold text-foreground md:text-base">{selectedDayLabel}</p>
-              <p className="text-xs text-muted-foreground md:text-sm">Evenimente planificate pentru această zi.</p>
-            </div>
-            <div className="flex-1 min-h-0">
-              <EventList
-                ref={eventListRef}
-                date={selectedDate}
-                events={eventsForSelectedDay}
-                onCreate={onCreate}
-                onUpdate={onUpdate}
-                onDelete={onDelete}
-                isLoading={isLoading}
-                isSaving={isSaving}
-                deletingId={deletingId}
-              />
-            </div>
+          <div className="flex-1 min-h-0">
+            <EventList
+              ref={eventListRef}
+              date={selectedDate}
+              events={eventsForSelectedDay}
+              onCreate={onCreate}
+              onUpdate={onUpdate}
+              onDelete={onDelete}
+              isLoading={isLoading}
+              isSaving={isSaving}
+              deletingId={deletingId}
+            />
           </div>
         </div>
       </CardContent>
