@@ -347,8 +347,8 @@ export default function Dashboard() {
         </div>
       </section>
 
-      <section className="grid grid-cols-1 items-stretch gap-6 xl:grid-cols-12">
-        <div className="flex min-h-0 flex-col xl:col-span-8">
+      <section className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2 xl:grid-cols-12">
+        <div className="flex min-h-0 flex-col xl:col-span-6">
           <CalendarCompact
             events={eventsQuery.data ?? []}
             eventsForSelectedDay={eventsForSelectedDay}
@@ -366,7 +366,7 @@ export default function Dashboard() {
           />
         </div>
 
-        <Card className="flex h-full min-h-[420px] flex-col border border-border/80 bg-card/90 shadow-sm lg:min-h-[460px] xl:min-h-[500px] xl:col-span-4">
+        <Card className="flex h-full min-h-[420px] flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-6">
           <CardHeader className="flex flex-col gap-2 border-b border-border/60 p-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-1">
               <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">

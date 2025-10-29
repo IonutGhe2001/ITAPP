@@ -52,7 +52,7 @@ export function CalendarCompact({
   return (
     <Card
       className={cn(
-        'flex h-full min-h-[420px] w-full flex-col border border-border/80 bg-card/90 shadow-sm lg:min-h-[460px] xl:min-h-[500px]',
+        'flex h-full min-h-[420px] w-full flex-col border border-border/80 bg-card/90 shadow-sm',
         className
       )}
     >
