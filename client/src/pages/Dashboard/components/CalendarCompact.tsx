@@ -47,7 +47,7 @@ export function CalendarCompact({
   );
 
   return (
-    <Card className="h-auto w-full self-start border border-border/80 bg-card/90 shadow-sm">
+    <Card className="flex h-full w-full flex-col border border-border/80 bg-card/90 shadow-sm">
       <CardHeader className="flex items-center justify-between gap-3 space-y-0 border-b border-border/60 p-4">
         <CardTitle className="text-base font-semibold text-foreground sm:text-lg">Calendar</CardTitle>
         <Button
@@ -60,8 +60,8 @@ export function CalendarCompact({
           Add
         </Button>
       </CardHeader>
-      <CardContent className="space-y-4 p-4">
-        <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-[220px_1fr]">
+      <CardContent className="flex-1 space-y-4 p-4">
+        <div className="grid h-full grid-cols-1 items-start gap-4 md:grid-cols-[220px_1fr]">
           <div className="rounded-xl border border-border/60 bg-background/60 p-4 shadow-sm">
             <MiniCalendar
               events={events}
@@ -72,12 +72,12 @@ export function CalendarCompact({
               isLoading={isLoading}
             />
           </div>
-          <div className="space-y-4 rounded-xl border border-border/60 bg-background/60 p-4 shadow-sm">
+          <div className="flex h-full min-h-0 flex-col space-y-4 rounded-xl border border-border/60 bg-background/60 p-4 shadow-sm">
             <div className="space-y-2">
               <p className="text-sm font-semibold text-foreground md:text-base">{selectedDayLabel}</p>
               <p className="text-xs text-muted-foreground md:text-sm">Evenimente planificate pentru această zi.</p>
             </div>
-            <div className="max-h-[340px] space-y-3 overflow-y-auto pr-1">
+            <div className="flex-1 space-y-3 overflow-y-auto pr-1">
               <EventList
                 ref={eventListRef}
                 date={selectedDate}
