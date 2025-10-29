@@ -366,7 +366,7 @@ export default function Dashboard() {
           />
         </div>
 
-        <Card className="flex min-h-[520px] h-full flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-4">
+        <Card className="flex h-full min-h-[420px] flex-col border border-border/80 bg-card/90 shadow-sm lg:min-h-[460px] xl:min-h-[500px] xl:col-span-4">
           <CardHeader className="flex flex-col gap-2 border-b border-border/60 p-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-1">
               <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
@@ -376,8 +376,8 @@ export default function Dashboard() {
               <CardDescription>Ultimele actualizări pentru inventar și alocări.</CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="flex min-h-0 flex-1 flex-col p-4">
-            <div className="flex min-h-0 flex-1 flex-col">
+          <CardContent className="flex min-h-0 flex-1 flex-col gap-4 p-4 sm:p-5">
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border/60 bg-background/60 p-4">
               <div className="flex-1 overflow-y-auto pr-1">
                 <ActivityFeed items={recentActivity} isLoading={activityQuery.isLoading} />
               </div>
