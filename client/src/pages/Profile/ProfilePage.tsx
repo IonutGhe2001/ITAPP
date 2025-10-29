@@ -4,19 +4,50 @@ import { useTranslation } from 'react-i18next';
 import { useUser } from '@/context/useUser';
 import type { User } from '@/types/user';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
-import Container from '@/components/Container';
 import Avatar from '@/components/Avatar';
 import ProfileInput from '@/components/ProfileInput';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const SignatureEditor = React.lazy(() => import('@/components/SignatureEditor'));
+
+const kpiMetrics = [
+  { label: 'Active Assets', value: '18' },
+  { label: 'Open Tickets', value: '3' },
+  { label: 'Pending Trainings', value: '2' },
+  { label: 'Approvals', value: '5' },
+];
+
+const recentActivities = [
+  { title: 'Password changed', time: '2 hours ago' },
+  { title: 'New device enrolled', time: 'Yesterday' },
+  { title: 'Security training completed', time: '2 days ago' },
+  { title: 'Logged in from mobile', time: '3 days ago' },
+  { title: 'Approved hardware request', time: 'Last week' },
+];
+
+const activeSessions = [
+  { device: 'MacBook Pro · Chrome', location: 'Bucharest, RO', lastActive: '3 mins ago' },
+  { device: 'iPhone 14 · Safari', location: 'Cluj, RO', lastActive: '1 hour ago' },
+  { device: 'Surface Laptop · Edge', location: 'Remote', lastActive: 'Yesterday' },
+];
 
 export default function ProfilePage() {
   const { user, setUser } = useUser();
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [original, setOriginal] = useState<User | null>(user ?? null);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -77,192 +108,446 @@ export default function ProfilePage() {
     fileInputRef.current?.click();
   };
 
-  return (
-    <Container className="max-w-3xl space-y-6 px-6 py-8">
-      <header className="space-y-2 border-b border-border/60 pb-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-foreground text-3xl font-semibold">{t('profile.heading')}</h1>
-        </div>
-        <p className="text-muted-foreground text-sm">
-          {t('profile.breadcrumb', { defaultValue: t('profile.heading') })}
-        </p>
-      </header>
+  const metaItems = [
+    {
+      label: t('profile.meta.department', { defaultValue: 'Department' }),
+      value: user?.functie || '-',
+    },
+    {
+      label: t('profile.meta.location', { defaultValue: 'Location' }),
+      value: 'Bucharest HQ',
+    },
+    {
+      label: t('profile.meta.lastLogin', { defaultValue: 'Last login' }),
+      value: 'Today, 09:24',
+    },
+  ];
 
-      <Card className="border border-border/60 shadow-sm">
-        <CardContent className="p-4 sm:p-6">
-          <div className="grid gap-6 md:grid-cols-[192px,1fr]">
-            <div className="space-y-6">
-              <div className="flex flex-col items-center gap-4 md:items-start">
+      return (
+    <div className="mx-auto max-w-6xl px-6 py-8">
+      <div className="space-y-6">
+        <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent shadow-sm">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.4),transparent_55%)]" />
+          <div className="relative flex flex-col gap-8 p-8 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+              <div className="flex flex-col items-center gap-4">
                 <Avatar
                   src={user?.profilePicture ?? undefined}
                   name={fullName}
-                  className="h-28 w-28 rounded-full ring-2 ring-primary/20 shadow-sm"
+                  className="h-28 w-28 rounded-full border-2 border-white/60 shadow-lg ring-4 ring-primary/20"
                 />
-                <input
-                  ref={fileInputRef}
-                  id={fileInputId}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-              {isEditing && (
-                  <div className="flex w-full flex-wrap items-center justify-center gap-2 md:justify-start">
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <input
+                    ref={fileInputRef}
+                    id={fileInputId}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={triggerFileDialog}
+                    className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  >
+                    {t('profile.buttons.uploadPhoto', { defaultValue: 'Upload photo' })}
+                  </Button>
+                  {user?.profilePicture ? (
                     <Button
                       type="button"
                       size="sm"
-                      onClick={triggerFileDialog}
-                      className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                    >
-                      {t('profile.buttons.uploadPhoto', { defaultValue: 'Upload photo' })}
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="secondary"
-                      onClick={triggerFileDialog}
-                      className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                    >
-                      {t('profile.buttons.changePhoto', { defaultValue: 'Change' })}
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
+                      variant="outline"
                       onClick={handleRemoveImage}
-                      disabled={!user?.profilePicture}
                       className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                     >
                       {t('profile.buttons.removePhoto', { defaultValue: 'Remove' })}
                     </Button>
-                  </div>
-                )}
-              </div>
-
-        <div className="space-y-3">
-                <p className="text-muted-foreground text-sm font-medium">
-                  {t('profile.labels.digitalSignature', { defaultValue: 'Digital signature' })}
-                </p>
-                <div className="flex h-24 items-center justify-center rounded-xl border border-border/50 bg-muted/30">
-                  <Suspense
-                    fallback={
-                      <div className="flex items-center justify-center">
-                        <div className="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"></div>
-                      </div>
-                    }
-                  >
-                    <SignatureEditor
-                      signature={user?.digitalSignature ?? null}
-                      isEditing={isEditing}
-                      onChange={(sig) => {
-                        if (user) {
-                          setUser({ ...user, digitalSignature: sig });
-                        }
-                      }}
-                    />
-                  </Suspense>
+                  ) : null}
                 </div>
               </div>
-            </div>
-
-            <div className="space-y-6">
-              {isEditing ? (
-                <>
-                  <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
-                    <ProfileInput
-                      label={t('profile.labels.lastName')}
-                      value={user?.nume}
-                      onChange={handleChange('nume')}
-                    />
-                    <ProfileInput
-                      label={t('profile.labels.firstName')}
-                      value={user?.prenume}
-                      onChange={handleChange('prenume')}
-                    />
-                    <ProfileInput
-                      label={t('profile.labels.position')}
-                      value={user?.functie}
-                      onChange={handleChange('functie')}
-                    />
-                    <ProfileInput
-                      label={t('profile.labels.phone')}
-                      value={user?.telefon || ''}
-                      onChange={handleChange('telefon')}
-                    />
-                  </div>
-                  <div className="border-t border-border/60 pt-4">
-                    <ProfileField label={t('profile.labels.email')} value={user?.email} />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
-                    <ProfileField
-                      label={t('profile.labels.fullName')}
-                      value={fullName || '-'}
-                    />
-                    <ProfileField label={t('profile.labels.position')} value={user?.functie || '-'} />
-                  </div>
-                  <div className="border-t border-border/60 pt-4">
-                    <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
-                      <ProfileField label={t('profile.labels.email')} value={user?.email || '-'} />
-                      <ProfileField label={t('profile.labels.phone')} value={user?.telefon || '-'} />
+            <div className="space-y-4 text-center sm:text-left">
+                <div>
+                  <h1 className="text-foreground text-3xl font-semibold tracking-tight">{fullName || t('profile.heading')}</h1>
+                  <p className="text-muted-foreground text-base">
+                    {user?.functie || t('profile.labels.position', { defaultValue: 'Role' })}
+                  </p>
+                </div>
+                <dl className="grid gap-3 text-sm text-left sm:grid-cols-3">
+                  {metaItems.map((item) => (
+                    <div key={item.label} className="rounded-xl bg-background/60 px-4 py-3 shadow-sm">
+                      <dt className="text-muted-foreground text-xs uppercase tracking-wide">{item.label}</dt>
+                      <dd className="text-foreground mt-1 text-sm font-medium">{item.value}</dd>
                     </div>
-                  </div>
-                </>
-              )}
+                  ))}
+                </dl>
+              </div>
             </div>
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-3 border-t border-border/60 p-4 sm:flex-row sm:justify-end sm:gap-4">
-          {isEditing ? (
-            <div className="flex w-full flex-col-reverse gap-3 sm:w-auto sm:flex-row sm:justify-end">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={handleCancel}
-                className="w-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:w-auto"
-              >
-                {t('profile.buttons.cancel')}
-              </Button>
-              <Button
-                type="button"
-                onClick={handleSave}
-                disabled={isSaving}
-                className="w-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:w-auto"
-              >
-                {isSaving ? t('profile.buttons.saving') : t('profile.buttons.save')}
-              </Button>
-            </div>
-          ) : (
-            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:justify-end">
+          <div className="flex flex-col gap-3 sm:flex-row">
               <Button
                 type="button"
                 variant="outline"
-                className="w-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:w-auto"
+                onClick={() => setIsPasswordDialogOpen(true)}
+                className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 {t('profile.buttons.changePassword', { defaultValue: 'Change password' })}
               </Button>
               <Button
                 type="button"
                 onClick={() => setIsEditing(true)}
-                className="w-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:w-auto"
+                className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
-                {t('profile.buttons.edit')}
+                {t('profile.buttons.edit', { defaultValue: 'Edit profile' })}
               </Button>
             </div>
-          )}
-        </CardFooter>
-      </Card>
-    </Container>
+          </div>
+        </div>
+
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="bg-transparent border-b border-border/60 justify-start gap-2 rounded-none p-0">
+            <TabsTrigger value="overview" className="rounded-full px-4 py-2 text-sm">
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="details" className="rounded-full px-4 py-2 text-sm">
+              Details
+            </TabsTrigger>
+            <TabsTrigger value="security" className="rounded-full px-4 py-2 text-sm">
+              Security
+            </TabsTrigger>
+            <TabsTrigger value="devices" className="rounded-full px-4 py-2 text-sm">
+              Devices
+            </TabsTrigger>
+            <TabsTrigger value="activity" className="rounded-full px-4 py-2 text-sm">
+              Activity
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid gap-6 lg:grid-cols-12">
+              <div className="space-y-6 lg:col-span-8">
+                <section className="rounded-2xl border border-border/60 bg-card/90 p-6 shadow-sm">
+                  <header className="mb-4 flex items-center justify-between">
+                    <h2 className="text-lg font-semibold">{t('profile.sections.contact', { defaultValue: 'Contact & Organization' })}</h2>
+                  </header>
+                  <dl className="grid gap-4 sm:grid-cols-2">
+                    <DefinitionItem label={t('profile.labels.fullName')} value={fullName || '-'} />
+                    <DefinitionItem label={t('profile.labels.position')} value={user?.functie || '-'} />
+                    <DefinitionItem label={t('profile.labels.email')} value={user?.email || '-'} />
+                    <DefinitionItem label={t('profile.labels.phone')} value={user?.telefon || '-'} />
+                  </dl>
+                </section>
+
+                <section className="rounded-2xl border border-border/60 bg-card/90 p-6 shadow-sm">
+                  <header className="mb-4 flex items-center justify-between">
+                    <div>
+                      <h2 className="text-lg font-semibold">
+                        {t('profile.labels.digitalSignature', { defaultValue: 'Digital signature' })}
+                      </h2>
+                      <p className="text-muted-foreground text-sm">
+                        {t('profile.signature.description', { defaultValue: 'Preview of your current digital signature.' })}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setIsEditing(true)}
+                        className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                      >
+                        {t('profile.buttons.replace', { defaultValue: 'Replace' })}
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                      >
+                        {t('profile.buttons.download', { defaultValue: 'Download' })}
+                      </Button>
+                    </div>
+                  </header>
+                  <div className="flex h-48 items-center justify-center rounded-xl border border-dashed border-border/60 bg-muted/20">
+                    {user?.digitalSignature ? (
+                      <img
+                        src={user.digitalSignature}
+                        alt={t('profile.labels.digitalSignature', { defaultValue: 'Digital signature' })}
+                        className="max-h-32 object-contain"
+                      />
+                    ) : (
+                      <p className="text-muted-foreground text-sm">
+                        {t('profile.signature.empty', { defaultValue: 'No signature on file.' })}
+                      </p>
+                    )}
+                  </div>
+                </section>
+
+                <section className="rounded-2xl border border-border/60 bg-card/90 p-6 shadow-sm">
+                  <header className="mb-4 flex items-center justify-between">
+                    <h2 className="text-lg font-semibold">{t('profile.sections.preferences', { defaultValue: 'Preferences' })}</h2>
+                  </header>
+                  <div className="space-y-4">
+                    <PreferenceRow label={t('profile.preferences.language', { defaultValue: 'Language' })} value="English (US)" />
+                    <PreferenceRow label={t('profile.preferences.timezone', { defaultValue: 'Timezone' })} value="GMT+02:00" />
+                    <PreferenceToggle label={t('profile.preferences.theme', { defaultValue: 'Dark theme' })} active />
+                    <PreferenceToggle label={t('profile.preferences.notifications', { defaultValue: 'Notifications' })} active />
+                  </div>
+                </section>
+              </div>
+
+              <div className="space-y-6 lg:col-span-4">
+                <section className="rounded-2xl border border-border/60 bg-card/90 p-6 shadow-sm">
+                  <header className="mb-4">
+                    <h2 className="text-lg font-semibold">{t('profile.sections.kpi', { defaultValue: 'Key metrics' })}</h2>
+                  </header>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {kpiMetrics.map((metric) => (
+                      <div key={metric.label} className="rounded-xl bg-muted/20 p-4">
+                        <p className="text-muted-foreground text-xs uppercase">{metric.label}</p>
+                        <p className="text-foreground mt-2 text-2xl font-semibold">{metric.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="rounded-2xl border border-border/60 bg-card/90 p-6 shadow-sm">
+                  <header className="mb-4">
+                    <h2 className="text-lg font-semibold">{t('profile.sections.recentActivity', { defaultValue: 'Recent activity' })}</h2>
+                  </header>
+                  <div className="h-[280px] overflow-y-auto pr-1">
+                    <ul className="space-y-4">
+                      {recentActivities.map((activity) => (
+                        <li key={activity.title} className="rounded-lg border border-border/50 bg-background/60 p-4">
+                          <p className="text-sm font-medium text-foreground">{activity.title}</p>
+                          <p className="text-muted-foreground text-xs">{activity.time}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </section>
+
+                <section className="rounded-2xl border border-border/60 bg-card/90 p-6 shadow-sm">
+                  <header className="mb-4 flex items-center justify-between">
+                    <h2 className="text-lg font-semibold">{t('profile.sections.sessions', { defaultValue: 'Active sessions' })}</h2>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                    >
+                      {t('profile.buttons.signOutOthers', { defaultValue: 'Sign out others' })}
+                    </Button>
+                  </header>
+                  <div className="overflow-hidden rounded-xl border border-border/50">
+                    <table className="min-w-full text-left text-sm">
+                      <thead className="bg-muted/40 text-muted-foreground">
+                        <tr>
+                          <th className="px-4 py-3 font-medium">Device</th>
+                          <th className="px-4 py-3 font-medium">Location</th>
+                          <th className="px-4 py-3 font-medium">Last active</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {activeSessions.map((session) => (
+                          <tr key={session.device} className="border-t border-border/40">
+                            <td className="px-4 py-3">{session.device}</td>
+                            <td className="px-4 py-3 text-muted-foreground">{session.location}</td>
+                            <td className="px-4 py-3 text-muted-foreground">{session.lastActive}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </TabsContent>
+          <TabsContent value="details">
+            <div className="rounded-2xl border border-border/60 bg-card/90 p-6 text-sm text-muted-foreground shadow-sm">
+              {t('profile.tabs.details', { defaultValue: 'Detailed profile information will appear here.' })}
+            </div>
+          </TabsContent>
+          <TabsContent value="security">
+            <div className="rounded-2xl border border-border/60 bg-card/90 p-6 text-sm text-muted-foreground shadow-sm">
+              {t('profile.tabs.security', { defaultValue: 'Security settings overview.' })}
+            </div>
+          </TabsContent>
+          <TabsContent value="devices">
+            <div className="rounded-2xl border border-border/60 bg-card/90 p-6 text-sm text-muted-foreground shadow-sm">
+              {t('profile.tabs.devices', { defaultValue: 'Connected devices and enrollment status.' })}
+            </div>
+          </TabsContent>
+          <TabsContent value="activity">
+            <div className="rounded-2xl border border-border/60 bg-card/90 p-6 text-sm text-muted-foreground shadow-sm">
+              {t('profile.tabs.activity', { defaultValue: 'Full activity log and audit trail.' })}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      <Dialog open={isEditing} onOpenChange={(open) => (!open ? handleCancel() : setIsEditing(true))}>
+        <DialogContent className="sm:left-auto sm:right-0 sm:top-0 sm:h-full sm:max-w-xl sm:translate-x-0 sm:translate-y-0 sm:rounded-l-3xl">
+          <DialogHeader className="space-y-1">
+            <DialogTitle>{t('profile.drawer.title', { defaultValue: 'Edit profile' })}</DialogTitle>
+            <DialogDescription>
+              {t('profile.drawer.description', { defaultValue: 'Update your personal and organizational details.' })}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 overflow-y-auto pr-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <ProfileInput label={t('profile.labels.lastName')} value={user?.nume} onChange={handleChange('nume')} />
+              <ProfileInput label={t('profile.labels.firstName')} value={user?.prenume} onChange={handleChange('prenume')} />
+              <ProfileInput label={t('profile.labels.position')} value={user?.functie} onChange={handleChange('functie')} />
+              <ProfileInput
+                label={t('profile.labels.phone')}
+                value={user?.telefon || ''}
+                onChange={handleChange('telefon')}
+              />
+            </div>
+            <div className="rounded-2xl border border-border/60 bg-card/90 p-4 shadow-sm">
+              <h3 className="text-sm font-semibold">
+                {t('profile.labels.digitalSignature', { defaultValue: 'Digital signature' })}
+              </h3>
+              <div className="mt-4">
+                <Suspense
+                  fallback={
+                    <div className="flex h-32 items-center justify-center">
+                      <div className="border-primary h-10 w-10 animate-spin rounded-full border-2 border-t-transparent" />
+                    </div>
+                  }
+                >
+                  <SignatureEditor
+                    signature={user?.digitalSignature ?? null}
+                    isEditing={isEditing}
+                    onChange={(sig) => {
+                      if (user) {
+                        setUser({ ...user, digitalSignature: sig });
+                      }
+                    }}
+                  />
+                </Suspense>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-border/60 bg-card/90 p-4 shadow-sm">
+              <h3 className="text-sm font-semibold">
+                {t('profile.sections.preferences', { defaultValue: 'Preferences' })}
+              </h3>
+              <div className="mt-4 space-y-4">
+                <PreferenceRow label={t('profile.preferences.language', { defaultValue: 'Language' })} value="English (US)" />
+                <PreferenceRow label={t('profile.preferences.timezone', { defaultValue: 'Timezone' })} value="GMT+02:00" />
+                <PreferenceToggle label={t('profile.preferences.theme', { defaultValue: 'Dark theme' })} active />
+                <PreferenceToggle label={t('profile.preferences.notifications', { defaultValue: 'Notifications' })} active />
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleCancel}
+              className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            >
+              {t('profile.buttons.cancel')}
+            </Button>
+            <Button
+              type="button"
+              onClick={handleSave}
+              disabled={isSaving}
+              className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            >
+              {isSaving ? t('profile.buttons.saving') : t('profile.buttons.save')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('profile.dialogs.changePassword.title', { defaultValue: 'Change password' })}</DialogTitle>
+            <DialogDescription>
+              {t('profile.dialogs.changePassword.description', {
+                defaultValue: 'Update your account password to keep your profile secure.',
+              })}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="current-password">
+                {t('profile.dialogs.changePassword.current', { defaultValue: 'Current password' })}
+              </Label>
+              <Input id="current-password" type="password" autoComplete="current-password" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="new-password">
+                {t('profile.dialogs.changePassword.new', { defaultValue: 'New password' })}
+              </Label>
+              <Input id="new-password" type="password" autoComplete="new-password" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirm-password">
+                {t('profile.dialogs.changePassword.confirm', { defaultValue: 'Confirm password' })}
+              </Label>
+              <Input id="confirm-password" type="password" autoComplete="new-password" />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setIsPasswordDialogOpen(false)}
+              className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            >
+              {t('profile.buttons.cancel')}
+            </Button>
+            <Button
+              type="button"
+              onClick={() => setIsPasswordDialogOpen(false)}
+              className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            >
+              {t('profile.buttons.save')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
 
-function ProfileField({ label, value }: { label: string; value?: string }) {
+function DefinitionItem({ label, value }: { label: string; value?: string }) {
   return (
-    <div className="space-y-1">
-      <p className="text-muted-foreground text-sm">{label}</p>
-      <p className="text-foreground text-base font-medium">{value}</p>
+    <div className="rounded-xl border border-border/40 bg-background/80 p-4">
+      <dt className="text-muted-foreground text-xs uppercase tracking-wide">{label}</dt>
+      <dd className="text-foreground mt-1 text-sm font-medium">{value || '-'}</dd>
+    </div>
+  );
+}
+
+function PreferenceRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between rounded-xl border border-border/40 bg-background/80 px-4 py-3">
+      <p className="text-sm font-medium text-foreground">{label}</p>
+      <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">{value}</span>
+    </div>
+  );
+}
+
+function PreferenceToggle({ label, active }: { label: string; active?: boolean }) {
+  return (
+    <div className="flex items-center justify-between rounded-xl border border-border/40 bg-background/80 px-4 py-3">
+      <p className="text-sm font-medium text-foreground">{label}</p>
+      <span
+        className={`relative inline-flex h-6 w-12 items-center rounded-full border transition-colors ${
+          active ? 'border-primary bg-primary/80' : 'border-border bg-muted'
+        }`}
+        role="switch"
+        aria-checked={active}
+      >
+        <span
+          className={`inline-block h-4 w-4 rounded-full bg-background transition-transform duration-200 ${
+            active ? 'translate-x-6' : 'translate-x-2'
+          }`}
+        />
+      </span>
     </div>
   );
 }
