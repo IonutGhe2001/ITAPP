@@ -1,5 +1,5 @@
-import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
-import { format } from 'date-fns';
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { format, isValid, parseISO } from 'date-fns';
 import { ro } from 'date-fns/locale';
 import { CalendarDays, Clock, MapPin, Pencil, Trash2 } from 'lucide-react';
 
@@ -7,7 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
 
 import type { CalendarEvent, CalendarEventInput } from '../api';
 import { EmptyState } from './EmptyState';
@@ -40,6 +43,35 @@ type EventFormState = {
 
 const skeletonItems = Array.from({ length: 3 });
 
+const TIME_NONE_VALUE = 'all-day';
+
+const TIME_OPTIONS = [
+  '07:00',
+  '07:30',
+  '08:00',
+  '08:30',
+  '09:00',
+  '09:30',
+  '10:00',
+  '10:30',
+  '11:00',
+  '11:30',
+  '12:00',
+  '12:30',
+  '13:00',
+  '13:30',
+  '14:00',
+  '14:30',
+  '15:00',
+  '15:30',
+  '16:00',
+  '16:30',
+  '17:00',
+  '17:30',
+  '18:00',
+  '18:30',
+];
+
 export const EventList = forwardRef<EventListHandle, EventListProps>(function EventList(
   { date, events, onCreate, onUpdate, onDelete, isLoading, isSaving, deletingId }: EventListProps,
   ref
@@ -50,13 +82,28 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
     date: format(date, 'yyyy-MM-dd'),
     title: '',
   }));
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const datePickerRef = useRef<HTMLDivElement | null>(null);
 
   const formattedDate = useMemo(() => format(date, 'd MMMM yyyy', { locale: ro }), [date]);
+
+  const selectedDate = useMemo(() => {
+    if (!form.date) {
+      return undefined;
+    }
+    const parsed = parseISO(form.date);
+    return isValid(parsed) ? parsed : undefined;
+  }, [form.date]);
+
+  const dateLabel = selectedDate
+    ? format(selectedDate, 'EEEE, d MMMM yyyy', { locale: ro })
+    : 'Selectează data';
 
   const openCreateDialog = () => {
     setMode('create');
     setForm({ date: format(date, 'yyyy-MM-dd'), title: '', time: '', location: '', description: '' });
     setIsDialogOpen(true);
+    setIsDatePickerOpen(false);
   };
 
   useImperativeHandle(ref, () => ({ openCreateDialog }));
@@ -72,6 +119,7 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
       description: event.description ?? '',
     });
     setIsDialogOpen(true);
+    setIsDatePickerOpen(false);
   };
 
   const resetForm = () => {
@@ -81,6 +129,7 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
   const closeDialog = () => {
     setIsDialogOpen(false);
     resetForm();
+    setIsDatePickerOpen(false);
   };
 
   const handleSubmit = async () => {
@@ -108,6 +157,41 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
 
   const handleDelete = async (id: string) => {
     await onDelete(id);
+  };
+
+  useEffect(() => {
+    if (!isDatePickerOpen) {
+      return;
+    }
+
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (datePickerRef.current && !datePickerRef.current.contains(event.target as Node)) {
+        setIsDatePickerOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isDatePickerOpen]);
+
+  useEffect(() => {
+    if (!isDialogOpen) {
+      setIsDatePickerOpen(false);
+    }
+  }, [isDialogOpen]);
+
+  const handleDateSelect = (day?: Date) => {
+    if (!day) {
+      return;
+    }
+
+    setForm((state) => ({ ...state, date: format(day, 'yyyy-MM-dd') }));
+    setIsDatePickerOpen(false);
   };
 
   return (
@@ -220,13 +304,55 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
           >
             <div className="space-y-2">
               <Label htmlFor="event-date">Data</Label>
-              <Input
-                id="event-date"
-                type="date"
-                value={form.date}
-                onChange={(event) => setForm((state) => ({ ...state, date: event.target.value }))}
-                required
-              />
+              <div className="relative" ref={datePickerRef}>
+                <Button
+                  id="event-date"
+                  type="button"
+                  variant="outline"
+                  className={cn(
+                    'w-full justify-between gap-2 text-left font-normal',
+                    !selectedDate && 'text-muted-foreground'
+                  )}
+                  onClick={() => setIsDatePickerOpen((state) => !state)}
+                  aria-haspopup="dialog"
+                  aria-expanded={isDatePickerOpen}
+                >
+                  <span className="line-clamp-1 flex-1 text-sm">{dateLabel}</span>
+                  <CalendarDays className="h-4 w-4 text-muted-foreground" aria-hidden />
+                </Button>
+                {isDatePickerOpen ? (
+                  <div className="border-border bg-popover text-popover-foreground absolute left-0 right-0 z-50 mt-2 rounded-xl border p-3 shadow-lg">
+                    <DayPicker
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={handleDateSelect}
+                      defaultMonth={selectedDate ?? new Date()}
+                      showOutsideDays
+                      locale={{ ...ro, options: { weekStartsOn: 1 } }}
+                      className="mx-auto"
+                      classNames={{
+                        months: 'flex flex-col space-y-4',
+                        month: 'space-y-4',
+                        caption: 'flex items-center justify-between px-1',
+                        caption_label: 'text-sm font-semibold text-foreground',
+                        nav: 'flex items-center gap-1',
+                        nav_button:
+                          'border-border/70 text-muted-foreground hover:bg-muted/60 focus-visible:ring-ring flex h-8 w-8 items-center justify-center rounded-lg border bg-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+                        table: 'w-full border-collapse space-y-1',
+                        head_row: 'flex',
+                        head_cell: 'text-muted-foreground w-9 text-xs font-medium',
+                        row: 'flex w-full',
+                        cell: 'relative h-9 w-9 text-center text-sm focus-within:relative focus-within:z-20',
+                        day: 'hover:bg-primary/10 focus-visible:ring-ring text-foreground inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+                        day_selected: 'bg-primary text-primary-foreground hover:bg-primary/90',
+                        day_today: 'text-primary font-semibold',
+                        day_outside: 'text-muted-foreground/50',
+                        day_disabled: 'text-muted-foreground/40',
+                      }}
+                    />
+                  </div>
+                ) : null}
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="event-title">Titlu</Label>
@@ -241,12 +367,30 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="event-time">Ora</Label>
-                <Input
-                  id="event-time"
-                  type="time"
-                  value={form.time ?? ''}
-                  onChange={(event) => setForm((state) => ({ ...state, time: event.target.value }))}
-                />
+                <Select
+                  value={form.time && form.time.trim() ? form.time : TIME_NONE_VALUE}
+                  onValueChange={(value) =>
+                    setForm((state) => ({
+                      ...state,
+                      time: value === TIME_NONE_VALUE ? '' : value,
+                    }))
+                  }
+                >
+                  <SelectTrigger id="event-time" className="h-10 justify-between">
+                    <div className="flex w-full items-center gap-2 text-left">
+                      <Clock className="h-4 w-4 text-muted-foreground" aria-hidden />
+                      <SelectValue placeholder="Selectează ora" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent position="popper" className="max-h-72">
+                    <SelectItem value={TIME_NONE_VALUE}>Toată ziua</SelectItem>
+                    {TIME_OPTIONS.map((timeOption) => (
+                      <SelectItem key={timeOption} value={timeOption}>
+                        {timeOption}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="event-location">Locație</Label>
