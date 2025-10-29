@@ -1,7 +1,8 @@
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { format, isValid, parseISO } from 'date-fns';
+import type { Locale } from 'date-fns';
 import { ro } from 'date-fns/locale';
-import { CalendarDays, Clock, MapPin, Pencil, Trash2 } from 'lucide-react';
+import { CalendarDays, Clock, MapPin, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -9,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { DayPicker } from 'react-day-picker';
+import { DayPicker, type MonthCaptionProps, useDayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 
 import type { CalendarEvent, CalendarEventInput } from '../api';
@@ -71,6 +72,50 @@ const TIME_OPTIONS = [
   '18:00',
   '18:30',
 ];
+
+const CalendarMonthCaption = ({ calendarMonth, className, ...divProps }: MonthCaptionProps) => {
+  const { goToMonth, previousMonth, nextMonth, labels, dayPickerProps } = useDayPicker();
+  const locale = (dayPickerProps.locale as Locale | undefined) ?? ro;
+  const isNavigationDisabled = Boolean(dayPickerProps.disableNavigation);
+  const monthLabel = format(calendarMonth.date, 'MMMM yyyy', { locale });
+
+  return (
+    <div
+      {...divProps}
+      className={cn('flex items-center gap-2 px-1 text-foreground', className)}
+    >
+      <button
+        type="button"
+        onClick={() => {
+          if (!isNavigationDisabled && previousMonth) {
+            goToMonth(previousMonth);
+          }
+        }}
+        disabled={isNavigationDisabled || !previousMonth}
+        aria-label={previousMonth ? labels.labelPrevious(previousMonth) : undefined}
+        className="border-border/70 text-muted-foreground hover:bg-muted/60 focus-visible:ring-ring inline-flex h-8 w-8 items-center justify-center rounded-lg border bg-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <ChevronLeft className="h-4 w-4" aria-hidden />
+      </button>
+      <span className="flex-1 text-center text-sm font-semibold capitalize" role="status" aria-live="polite">
+        {monthLabel}
+      </span>
+      <button
+        type="button"
+        onClick={() => {
+          if (!isNavigationDisabled && nextMonth) {
+            goToMonth(nextMonth);
+          }
+        }}
+        disabled={isNavigationDisabled || !nextMonth}
+        aria-label={nextMonth ? labels.labelNext(nextMonth) : undefined}
+        className="border-border/70 text-muted-foreground hover:bg-muted/60 focus-visible:ring-ring inline-flex h-8 w-8 items-center justify-center rounded-lg border bg-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <ChevronRight className="h-4 w-4" aria-hidden />
+      </button>
+    </div>
+  );
+};
 
 export const EventList = forwardRef<EventListHandle, EventListProps>(function EventList(
   { date, events, onCreate, onUpdate, onDelete, isLoading, isSaving, deletingId }: EventListProps,
@@ -329,20 +374,21 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
                       defaultMonth={selectedDate ?? new Date()}
                       showOutsideDays
                       locale={{ ...ro, options: { weekStartsOn: 1 } }}
+                      components={{
+                        MonthCaption: CalendarMonthCaption,
+                      }}
                       className="mx-auto"
                       classNames={{
                         months: 'flex flex-col space-y-4',
                         month: 'space-y-4',
-                        caption: 'flex items-center justify-between px-1',
-                        caption_label: 'text-sm font-semibold text-foreground',
-                        nav: 'flex items-center gap-1',
-                        nav_button:
-                          'border-border/70 text-muted-foreground hover:bg-muted/60 focus-visible:ring-ring flex h-8 w-8 items-center justify-center rounded-lg border bg-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-                        table: 'w-full border-collapse space-y-1',
-                        head_row: 'flex',
-                        head_cell: 'text-muted-foreground w-9 text-xs font-medium',
-                        row: 'flex w-full',
-                        cell: 'relative h-9 w-9 text-center text-sm focus-within:relative focus-within:z-20',
+                        caption: 'px-1',
+                        caption_label: 'sr-only',
+                        nav: 'hidden',
+                        table: 'w-full border-collapse',
+                        head_row: 'grid grid-cols-7',
+                        head_cell: 'text-muted-foreground text-xs font-medium uppercase text-center tracking-wide',
+                        row: 'grid grid-cols-7 gap-y-1',
+                        cell: 'flex h-9 items-center justify-center text-sm',
                         day: 'hover:bg-primary/10 focus-visible:ring-ring text-foreground inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
                         day_selected: 'bg-primary text-primary-foreground hover:bg-primary/90',
                         day_today: 'text-primary font-semibold',

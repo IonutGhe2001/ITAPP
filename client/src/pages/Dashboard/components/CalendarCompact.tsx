@@ -65,7 +65,7 @@ export function CalendarCompact({
           onClick={() => eventListRef.current?.openCreateDialog()}
         >
           <Plus className="size-4" aria-hidden />
-          Add
+          Adauga
         </Button>
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-6 p-5 sm:p-6">
