@@ -159,19 +159,21 @@ export function EventDatePicker({
             classNames={{
               months: 'flex flex-col space-y-4',
               month: 'space-y-4',
-              caption: 'px-1',
+              month_caption: 'px-1',
               caption_label: 'sr-only',
               nav: 'hidden',
-              table: 'w-full table-fixed border-collapse',
-              head_row: '',
-              head_cell: 'text-center text-xs font-medium uppercase tracking-wide',
-              row: '',
-              cell: 'p-0 text-center align-middle',
-              day: 'inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium hover:bg-primary/10 focus-visible:ring-2 focus-visible:ring-ring',
-              day_selected: 'bg-primary text-primary-foreground hover:bg-primary/90',
-              day_today: 'text-primary font-semibold',
-              day_outside: 'text-muted-foreground/50',
-              day_disabled: 'text-muted-foreground/40',
+              month_grid: 'w-full table-fixed border-collapse',
+              weekdays: '',
+              weekday: 'text-center text-xs font-medium uppercase tracking-wide',
+              weeks: '',
+              week: '',
+              day: 'p-0 text-center align-middle',
+              day_button:
+                'inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              selected: 'bg-primary text-primary-foreground hover:bg-primary/90',
+              today: 'text-primary font-semibold',
+              outside: 'text-muted-foreground/50',
+              disabled: 'text-muted-foreground/40',
             }}
           />
         </div>
