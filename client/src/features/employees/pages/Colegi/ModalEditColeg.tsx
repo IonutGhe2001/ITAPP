@@ -101,7 +101,7 @@ export default function ModalEditColeg({
               </Label>
               <Input
                 id={field}
-                value={formData[field as keyof typeof formData] as any}
+                value={String(formData[field as keyof typeof formData] ?? '')}
                 onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
               />
               {errors[field] && <p className="mt-1 text-xs text-red-500">{errors[field]}</p>}

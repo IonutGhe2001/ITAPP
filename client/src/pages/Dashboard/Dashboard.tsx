@@ -78,20 +78,20 @@ export default function Dashboard() {
   });
 
   const alertsQuery = useQuery<Alert[]>({
-    queryKey: ['alerts', 3],
-    queryFn: () => getAlerts(3),
+    queryKey: ['alerts'],
+    queryFn: getAlerts,
     staleTime: 30_000,
   });
 
   const pvQueueQuery = useQuery<PvQueueItem[]>({
-    queryKey: ['pv', 'queue', 10],
-    queryFn: () => getPvQueue(10),
+    queryKey: ['pv', 'queue'],
+    queryFn: getPvQueue,
     staleTime: 30_000,
   });
 
   const activityQuery = useQuery<ActivityItem[]>({
-    queryKey: ['activity', 10],
-    queryFn: () => getActivity(10),
+    queryKey: ['activity'],
+    queryFn: getActivity,
     staleTime: 30_000,
   });
 

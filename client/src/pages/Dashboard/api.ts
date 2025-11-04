@@ -90,19 +90,19 @@ export async function getEquipmentStatus(): Promise<EquipmentStatusRecord[]> {
   return [];
 }
 
-export async function getAlerts(_limit = 3): Promise<Alert[]> {
+export async function getAlerts(): Promise<Alert[]> {
   // This endpoint doesn't exist yet in the backend, so we'll return empty array for now
   // TODO: Implement this endpoint in the backend
   return [];
 }
 
-export async function getPvQueue(_limit = 10): Promise<PvQueueItem[]> {
+export async function getPvQueue(): Promise<PvQueueItem[]> {
   // This endpoint doesn't exist yet in the backend, so we'll return empty array for now
   // TODO: Implement this endpoint in the backend
   return [];
 }
 
-export async function getActivity(_limit = 10): Promise<ActivityItem[]> {
+export async function getActivity(): Promise<ActivityItem[]> {
   // This endpoint doesn't exist yet in the backend, so we'll return empty array for now
   // TODO: Implement this endpoint in the backend
   return [];
