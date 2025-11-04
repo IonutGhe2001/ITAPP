@@ -24,10 +24,8 @@ import StatusBadge from '@/components/StatusBadge';
 import { useAngajati, useDeleteAngajat } from '@/features/employees';
 import type { Angajat } from '@/features/equipment/types';
 import type { AngajatWithRelations } from '@/features/employees/angajatiService';
-import { useUpdateEchipament } from '@/features/equipment';
 import { genereazaProcesVerbal, type ProcesVerbalTip } from '@/features/proceseVerbale';
-import { queueProcesVerbal, getQueue, removeFromQueue } from '@/features/proceseVerbale/pvQueue';
-import { getConfig } from '@/services/configService';
+import { getQueue, removeFromQueue } from '@/features/proceseVerbale/pvQueue';
 import ColegRow from './ColegRow';
 import ColegModals from './ColegModals';
 import useColegiFilter, {
@@ -64,6 +62,9 @@ const EMPLOYEE_SORT_OPTIONS: { value: EmployeeSortOption; label: string }[] = [
   { value: 'name-desc', label: 'Name Z–A' },
   { value: 'created-desc', label: 'Creation date' },
 ];
+
+const DEFAULT_ROW_HEIGHT = 72;
+const TABLE_HEADER_HEIGHT = 56;
 
 const parseStatusParam = (value: string | null): EmployeeStatusFilter => {
   if (!value) return 'all';
@@ -175,7 +176,7 @@ export default function Colegi() {
   const initialStatus = parseStatusParam(searchParams.get('status'));
   const initialSort = parseSortParam(searchParams.get('sort'));
 
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [, setExpanded] = useState<Set<string>>(new Set());
   const [selectedAngajatId, setSelectedAngajatId] = useState<string | null>(null);
   const [replaceData, setReplaceData] = useState<{
     colegId: string;
@@ -187,7 +188,6 @@ export default function Colegi() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [detailColeg, setDetailColeg] = useState<AngajatWithRelations | null>(null);
   const deleteMutation = useDeleteAngajat();
-  const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
   const [pendingPV, setPendingPV] = useState<
     Record<string, { predate: string[]; primite: string[] }>
@@ -363,7 +363,6 @@ export default function Colegi() {
     const index = filtered.findIndex((c) => c.id === highlightedId);
     if (index === -1) return;
     handledHighlightRef.current = highlightedId;
-    setExpanded(new Set([highlightedId]));
     requestAnimationFrame(() => listRef.current?.scrollToItem(index, 'start'));
   }, [filtered, highlightedId, width, height]);
 
@@ -426,26 +425,13 @@ export default function Colegi() {
     };
   }, []);
 
-  const getSize = (index: number) => rowHeights.current[index] ?? 200;
+  const getSize = (index: number) => rowHeights.current[index] ?? DEFAULT_ROW_HEIGHT;
 
   const setSize = (index: number, size: number) => {
     if (rowHeights.current[index] !== size) {
       rowHeights.current[index] = size;
       listRef.current?.resetAfterIndex(index);
     }
-  };
-
-  const toggleExpand = (id: string, index: number) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-    requestAnimationFrame(() => listRef.current?.resetAfterIndex(index));
   };
 
   const handleDelete = async (id: string) => {
@@ -462,33 +448,6 @@ export default function Colegi() {
       });
     }
   };
-
-  const handleRemoveEquipment = async (eqId: string, colegId: string) => {
-    try {
-      await updateMutation.mutateAsync({
-        id: eqId,
-        data: { angajatId: null, stare: 'in_stoc' },
-      });
-      const { pvGenerationMode } = await getConfig();
-      if (pvGenerationMode === 'auto') {
-        const url = await genereazaProcesVerbal(colegId, 'RESTITUIRE', {
-          predate: [eqId],
-        });
-        window.open(url, '_blank');
-      } else {
-        queueProcesVerbal(colegId, 'RESTITUIRE', { predate: [eqId] });
-      }
-      addPendingPV(colegId, { predate: [eqId] });
-      toast({ title: 'Echipament eliberat', description: 'Proces verbal în așteptare' });
-      await refetch();
-    } catch {
-      toast({
-        title: 'Eroare',
-        description: 'Nu s-a putut actualiza echipamentul',
-        variant: 'destructive',
-      });
-    }
-  };
   
   const handleScrollToPending = () => {
     const firstId = pendingPVEmployees[0];
@@ -496,7 +455,6 @@ export default function Colegi() {
     const index = filtered.findIndex((c) => c.id === firstId);
     if (index >= 0) {
       listRef.current?.scrollToItem(index, 'start');
-      setExpanded(new Set([firstId]));
     }
   };
 
@@ -505,20 +463,26 @@ export default function Colegi() {
   const showSkeleton = isLoading && colegi.length === 0;
 
   const renderSkeleton = () => (
-    <div className="grid gap-4 sm:grid-cols-2">
-      {Array.from({ length: 4 }).map((_, index) => (
+    <div className="divide-y divide-slate-200">
+      {Array.from({ length: 6 }).map((_, index) => (
         <div
           key={index}
-          className="animate-pulse rounded-2xl border border-primary/10 bg-gradient-to-br from-white to-rose-50/70 p-6 shadow-md shadow-primary/10"
+          className="grid min-h-[72px] animate-pulse grid-cols-6 items-center gap-x-4 gap-y-2 bg-white px-3 py-3 sm:grid-cols-12 sm:px-4"
         >
-          <div className="flex items-start gap-4">
-            <div className="h-14 w-14 rounded-full bg-primary/10" />
-            <div className="flex-1 space-y-3">
-              <div className="h-3.5 w-1/3 rounded-full bg-primary/10" />
-              <div className="h-3 w-1/4 rounded-full bg-primary/10" />
-              <div className="h-3 w-1/5 rounded-full bg-primary/10" />
+          <div className="order-1 col-span-4 flex items-center gap-3 sm:col-span-4">
+            <div className="h-12 w-12 rounded-full bg-slate-200/80" />
+            <div className="flex-1 space-y-2">
+              <div className="h-3 rounded bg-slate-200/90" />
+              <div className="h-2.5 w-3/4 rounded bg-slate-200/70" />
             </div>
           </div>
+          <div className="order-2 col-span-2 flex justify-end sm:order-6 sm:col-span-1">
+            <div className="h-8 w-8 rounded bg-slate-200/70" />
+          </div>
+          <div className="order-3 col-span-6 h-2.5 rounded bg-slate-200/70 sm:order-2 sm:col-span-2" />
+          <div className="order-4 col-span-6 h-2.5 rounded bg-slate-200/70 sm:order-3 sm:col-span-3" />
+          <div className="order-5 col-span-3 h-2.5 rounded bg-slate-200/60 sm:order-4 sm:col-span-1" />
+          <div className="order-6 col-span-3 h-6 rounded-full bg-slate-200/80 sm:order-5 sm:col-span-1" />
         </div>
       ))}
     </div>
@@ -528,7 +492,7 @@ export default function Colegi() {
 
   if (isError) {
     content = (
-      <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-primary/10 bg-white p-12 text-center shadow-lg shadow-primary/10">
+      <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-slate-200 bg-white p-12 text-center">
         <AlertTriangle className="h-10 w-10 text-amber-500" aria-hidden="true" />
         <div className="space-y-1">
           <p className="text-lg font-semibold text-foreground">Nu am putut încărca lista de colegi.</p>
@@ -542,40 +506,51 @@ export default function Colegi() {
   } else if (showSkeleton) {
     content = renderSkeleton();
   } else if (hasData && width > 0 && height > 0) {
+    const listHeight = Math.max(height - TABLE_HEADER_HEIGHT, DEFAULT_ROW_HEIGHT * 3);
+
     content = (
-      <List
-        ref={listRef}
-        height={height}
-        width={width}
-        itemCount={filtered.length}
-        itemSize={getSize}
-        overscanCount={6}
-      >
-        {({ index, style }) => (
-          <ColegRow
-            coleg={filtered[index]}
-            index={index}
-            style={style}
-            expanded={expanded.has(filtered[index].id)}
-            isHighlighted={filtered[index].id === highlightedId}
-            toggleExpand={toggleExpand}
-            handleRemoveEquipment={handleRemoveEquipment}
-            setEditColeg={setEditColeg}
-            setConfirmDelete={setConfirmDelete}
-            handleDelete={handleDelete}
-            setSelectedAngajatId={setSelectedAngajatId}
-            setReplaceData={setReplaceData}
-            setSize={setSize}
-            pendingPV={pendingPV[filtered[index].id]}
-            onGeneratePV={handleGeneratePV}
-            onOpenDetails={setDetailColeg}
-          />
-        )}
-      </List>
+      <div className="flex h-full flex-col">
+        <div className="border-b border-slate-200 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500 sm:hidden">
+          Lista colegi
+        </div>
+        <div className="sticky top-0 z-10 hidden border-b border-slate-200 bg-white px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-slate-500 sm:grid sm:grid-cols-12 sm:items-center">
+          <span className="col-span-4">Coleg</span>
+          <span className="col-span-2">Departament</span>
+          <span className="col-span-3">Contact</span>
+          <span className="col-span-1 text-center">Echip.</span>
+          <span className="col-span-1">Status</span>
+          <span className="col-span-1 text-right">Acțiuni</span>
+        </div>
+        <List
+          ref={listRef}
+          height={listHeight}
+          width={width}
+          itemCount={filtered.length}
+          itemSize={getSize}
+          overscanCount={6}
+        >
+          {({ index, style }) => (
+            <ColegRow
+              coleg={filtered[index]}
+              index={index}
+              style={style}
+              isHighlighted={filtered[index].id === highlightedId}
+              setEditColeg={setEditColeg}
+              setConfirmDelete={setConfirmDelete}
+              handleDelete={handleDelete}
+              setSelectedAngajatId={setSelectedAngajatId}
+              setSize={setSize}
+              pendingPV={pendingPV[filtered[index].id]}
+              onGeneratePV={handleGeneratePV}
+              onOpenDetails={setDetailColeg}
+            />
+          )}
+        </List>
+      </div>
     );
   } else if (!isLoading && !hasData) {
     content = (
-      <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-primary/10 bg-gradient-to-br from-white to-rose-50/80 p-12 text-center shadow-lg shadow-primary/10">
+      <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-slate-200 bg-white p-12 text-center">
         <svg
           width="96"
           height="96"
@@ -609,62 +584,49 @@ export default function Colegi() {
 
   const showToolbar = !isError;
   const containerClasses = cn(
-    'min-h-[320px]',
-    !isError
-      ? 'rounded-3xl border border-primary/10 bg-white p-4 shadow-lg shadow-primary/10'
-      : 'rounded-3xl border border-dashed border-primary/20 bg-white p-6 text-foreground shadow-lg shadow-primary/10',
-    !isError && hasData && 'p-0',
+    'min-h-[320px] rounded-2xl border bg-white',
+    isError ? 'border-dashed border-slate-300 p-6 text-slate-700' : 'border-slate-200',
+    !isError && (hasData || showSkeleton) ? 'overflow-hidden p-0' : !isError ? 'p-6' : null,
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-rose-50/40 to-white pb-12 text-foreground">
-      <header className="pt-10">
-        <Container>
-          <div className="rounded-3xl border border-primary/15 bg-white p-8 shadow-2xl shadow-primary/10">
-            <div className="flex flex-wrap items-start justify-between gap-6">
-              <div className="max-w-2xl space-y-4">
-                <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-primary">
-                  Echipa
-                </span>
-                <h1 className="text-4xl font-bold tracking-tight text-foreground">Colegi</h1>
-                <p className="text-base text-muted-foreground">
-                  Monitorizează colegii, statusul conturilor și echipamentele alocate într-un singur loc.
-                </p>
-              </div>
-              <Button
-                onClick={() => setShowAddModal(true)}
-                className="h-11 rounded-full px-6 text-sm font-semibold shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5"
-              >
-                <UserPlus className="mr-2 h-4 w-4" aria-hidden="true" /> Adaugă coleg
-              </Button>
+    <div className="min-h-screen bg-white pb-12 text-slate-900">
+      <header className="border-b border-slate-200 bg-white">
+        <Container className="py-10">
+          <div className="flex flex-wrap items-start justify-between gap-6">
+            <div className="max-w-2xl space-y-3">
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Echipa</span>
+              <h1 className="text-4xl font-semibold tracking-tight">Colegi</h1>
+              <p className="text-sm text-slate-600">
+                Monitorizează colegii, statusul conturilor și echipamentele alocate într-un singur loc.
+              </p>
             </div>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {highlightCards.map(({ label, value, description, icon: Icon }) => (
-                <div
-                  key={label}
-                  className="group relative overflow-hidden rounded-2xl border border-primary/10 bg-white p-5 shadow-sm transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg"
-                >
-                  <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-primary/80 to-primary/60" aria-hidden="true" />
-                  <div className="flex items-start justify-between">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-primary/80">{label}</span>
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                      <Icon className="h-4 w-4" aria-hidden="true" />
-                    </div>
+            <Button onClick={() => setShowAddModal(true)} className="h-11 rounded-full px-6 text-sm font-semibold">
+              <UserPlus className="mr-2 h-4 w-4" aria-hidden="true" /> Adaugă coleg
+            </Button>
+          </div>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {highlightCards.map(({ label, value, description, icon: Icon }) => (
+              <div key={label} className="rounded-xl border border-slate-200 bg-white p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</span>
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600">
+                    <Icon className="h-4 w-4" aria-hidden="true" />
                   </div>
-                  <p className="mt-6 text-3xl font-semibold tracking-tight text-foreground">
-                    {value.toLocaleString('ro-RO')}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{description}</p>
                 </div>
-              ))}
-            </div>
+              <p className="mt-4 text-3xl font-semibold tracking-tight">
+                  {value.toLocaleString('ro-RO')}
+                </p>
+                <p className="text-xs text-slate-500">{description}</p>
+              </div>
+            ))}
           </div>
         </Container>
       </header>
 
       <Container className="mt-10 space-y-6">
         {hasPendingPV && !isError && (
-          <div className="flex flex-col gap-3 rounded-3xl border border-primary/10 bg-white p-5 shadow-lg shadow-primary/10">
+          <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-wrap items-center gap-3">
                 <StatusBadge label="Procese verbale în lucru" tone="warning" withDot />
@@ -678,7 +640,7 @@ export default function Colegi() {
                 variant="outline"
                 size="sm"
                 onClick={handleScrollToPending}
-                className="rounded-full border-primary/20 bg-white px-4 text-xs font-semibold text-primary shadow-sm transition hover:border-primary/40 hover:text-primary"
+                className="rounded-full border-slate-300 bg-white px-4 text-xs font-semibold text-slate-700 hover:bg-slate-100"
               >
                 Vezi detalii
               </Button>
@@ -704,7 +666,7 @@ export default function Colegi() {
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
                     placeholder="Caută după nume, rol sau departament"
-                    className="h-11 w-full rounded-2xl border border-primary/10 bg-white pl-10 text-sm shadow-sm transition focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/60"
+                    className="h-11 w-full rounded-xl border border-slate-300 bg-white pl-10 text-sm focus-visible:border-slate-500 focus-visible:ring-2 focus-visible:ring-slate-400"
                     aria-label="Search employees"
                   />
                 </div>
@@ -723,7 +685,7 @@ export default function Colegi() {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="h-11 w-full justify-between rounded-2xl border border-primary/10 bg-white text-sm font-medium shadow-sm transition hover:border-primary/30 hover:text-primary"
+                      className="h-11 w-full justify-between rounded-xl border border-slate-300 bg-white text-sm font-medium hover:border-slate-400"
                     >
                       <div className="flex items-center gap-2">
                         <Filter className="h-4 w-4" aria-hidden="true" />
@@ -736,7 +698,7 @@ export default function Colegi() {
                       )}
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-64 rounded-2xl shadow-lg">
+                  <DropdownMenuContent align="start" className="w-64 rounded-xl border border-slate-200 bg-white">
                     <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
                       Selectează funcțiile
                     </DropdownMenuLabel>
@@ -760,10 +722,10 @@ export default function Colegi() {
 
               <div>
                 <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as EmployeeStatusFilter)}>
-                  <SelectTrigger className="h-11 w-full rounded-2xl border border-primary/10 bg-white text-sm font-medium shadow-sm transition hover:border-primary/30 hover:text-primary">
+                  <SelectTrigger className="h-11 w-full rounded-xl border border-slate-300 bg-white text-sm font-medium hover:border-slate-400">
                     <SelectValue placeholder="Status cont" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-2xl shadow-lg">
+                  <SelectContent className="rounded-xl border border-slate-200 bg-white">
                     {EMPLOYEE_STATUS_OPTIONS.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
@@ -775,10 +737,10 @@ export default function Colegi() {
 
               <div>
                 <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as EmployeeSortOption)}>
-                  <SelectTrigger className="h-11 w-full rounded-2xl border border-primary/10 bg-white text-sm font-medium shadow-sm transition hover:border-primary/30 hover:text-primary">
+                  <SelectTrigger className="h-11 w-full rounded-xl border border-slate-300 bg-white text-sm font-medium hover:border-slate-400">
                     <SelectValue placeholder="Sortare" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-2xl shadow-lg">
+                  <SelectContent className="rounded-xl border border-slate-200 bg-white">
                     {EMPLOYEE_SORT_OPTIONS.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}

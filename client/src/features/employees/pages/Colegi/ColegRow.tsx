@@ -1,49 +1,23 @@
 import { useLayoutEffect, useMemo, useRef } from 'react';
-import {
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import Avatar from '@/components/Avatar';
 import ActionsMenu from '@/components/ActionsMenu';
 import StatusBadge from '@/components/StatusBadge';
-import { EquipmentIcon } from '@/features/equipment';
 import type { Angajat, Echipament } from '@/features/equipment/types';
 import type { AngajatWithRelations } from '@/features/employees/angajatiService';
-import { useUpdateAngajat } from '@/features/employees';
 import { cn } from '@/lib/utils';
-import {
-  AlertTriangle,
-  BadgeCheck,
-  ChevronDown,
-  ChevronUp,
-  Laptop2,
-  Mail,
-  MapPin,
-  Phone,
-  UserRound,
-} from 'lucide-react';
+import { Mail, Phone } from 'lucide-react';
 import { getEmployeeLifecycleStatus } from './useColegiFilter';
-
-interface ReplaceData {
-  colegId: string;
-  equipmentId: string;
-  type: string;
-}
 
 interface ColegRowProps {
   coleg: Angajat & { echipamente: Echipament[] };
   index: number;
   style: React.CSSProperties;
-  expanded: boolean;
   isHighlighted?: boolean;
-  toggleExpand: (id: string, index: number) => void;
-  handleRemoveEquipment: (eqId: string, colegId: string) => void;
   setEditColeg: (c: Angajat) => void;
   setConfirmDelete: (c: Angajat) => void;
   handleDelete: (id: string) => void;
   setSelectedAngajatId: (id: string) => void;
-  setReplaceData: (data: ReplaceData) => void;
   setSize: (index: number, size: number) => void;
   pendingPV?: { predate: string[]; primite: string[] };
   onGeneratePV: (colegId: string) => void;
@@ -75,25 +49,26 @@ export default function ColegRow({
   coleg,
   index,
   style,
-  expanded,
   isHighlighted = false,
-  toggleExpand,
-  handleRemoveEquipment,
   setEditColeg,
   setConfirmDelete,
   handleDelete,
   setSelectedAngajatId,
-  setReplaceData,
   setSize,
   pendingPV,
   onGeneratePV,
   onOpenDetails,
 }: ColegRowProps) {
   const rowRef = useRef<HTMLDivElement>(null);
-  const updateAngajat = useUpdateAngajat();
   const lifecycleStatus = getEmployeeLifecycleStatus(coleg as AngajatWithRelations);
   const department = useMemo(() => getDepartmentName(coleg as AngajatWithRelations), [coleg]);
   const pendingPVCount = (pendingPV?.predate?.length ?? 0) + (pendingPV?.primite?.length ?? 0);
+  const equipmentCount = Array.isArray(coleg.echipamente) ? coleg.echipamente.length : 0;
+
+  const statusLabel =
+    lifecycleStatus === 'active' ? 'Activ' : lifecycleStatus === 'pending' ? 'În așteptare' : 'Inactiv';
+  const statusTone =
+    lifecycleStatus === 'active' ? 'success' : lifecycleStatus === 'pending' ? 'warning' : 'neutral';
 
   useLayoutEffect(() => {
     const node = rowRef.current;
@@ -102,7 +77,7 @@ export default function ColegRow({
     const measuredHeight = node.getBoundingClientRect().height;
 
     const parent = node.parentElement;
-    let wrapperPadding = 24;
+    let wrapperPadding = 0;
 
     if (parent && typeof window !== 'undefined') {
       const styles = window.getComputedStyle(parent);
@@ -112,7 +87,7 @@ export default function ColegRow({
 
     const nextSize = Math.ceil(measuredHeight + wrapperPadding);
     setSize(index, nextSize);
-  }, [index, coleg, expanded, setSize]);
+  }, [index, coleg, setSize]);
 
   const handleDeleteAction = () => {
     if (coleg.echipamente.length > 0) {
@@ -122,241 +97,102 @@ export default function ColegRow({
     }
   };
 
-  const handleToggleExpand = () => toggleExpand(coleg.id, index);
-
   const handleOpenDetails = () => onOpenDetails(coleg as AngajatWithRelations);
 
   const statusIndicatorClass = lifecycleTone[lifecycleStatus];
-
-  const emailBadge = coleg.emailAccountStatus
-    ? coleg.emailAccountStatus === 'PENDING'
-      ? { label: 'Email pending', tone: 'warning' as const }
-      : { label: 'Email activ', tone: 'success' as const }
-    : null;
-
   const showPendingPV = pendingPVCount > 0;
 
   return (
-    <div style={style} className="px-3 py-3">
-      <article
+    <div style={style} className="px-2 sm:px-4">
+      <div
         ref={rowRef}
+        role="row"
         className={cn(
-          'relative flex flex-col gap-4 rounded-2xl border border-primary/10 bg-white p-6 shadow-lg shadow-primary/10 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-xl focus-within:ring-2 focus-within:ring-primary/50 focus-within:ring-offset-4 focus-within:ring-offset-white',
-          isHighlighted && 'ring-2 ring-primary/50',
+          'grid min-h-[72px] grid-cols-6 items-center gap-x-4 gap-y-2 rounded-lg border-b border-slate-200/70 bg-white px-2 py-3 text-sm transition-colors hover:bg-slate-50 focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/50 focus-within:ring-offset-2 focus-within:ring-offset-white sm:grid-cols-12 sm:px-4',
+          isHighlighted && 'ring-2 ring-primary/40',
         )}
       >
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+        <div className="order-1 col-span-4 flex items-center gap-3 sm:col-span-4">
           <div className="relative flex-shrink-0">
-            <Avatar name={coleg.numeComplet} className="h-16 w-16" />
+            <Avatar name={coleg.numeComplet} className="h-12 w-12" />
             <span
               className={cn(
-                'absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-white shadow',
+                'absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white',
                 statusIndicatorClass,
               )}
               aria-hidden="true"
             />
           </div>
-
-          <div className="flex-1 space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <button
-                type="button"
-                onClick={handleOpenDetails}
-                className="text-left text-lg font-semibold tracking-tight text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-              >
-                {coleg.numeComplet}
-              </button>
-              <ActionsMenu srLabel={`Acțiuni pentru ${coleg.numeComplet}`}>
-                <DropdownMenuItem onSelect={handleOpenDetails}>Profil angajat</DropdownMenuItem>
-                <DropdownMenuItem onSelect={handleToggleExpand}>
-                  {expanded ? 'Ascunde echipamentele' : 'Vezi echipamentele'}
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setSelectedAngajatId(coleg.id)}>
-                  Asignează echipament
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setEditColeg(coleg)}>Editează</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive" onSelect={handleDeleteAction}>
-                  Șterge
-                </DropdownMenuItem>
-              </ActionsMenu>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-              <span className="inline-flex items-center gap-1 font-medium">
-                <UserRound className="h-4 w-4" aria-hidden="true" />
-                {coleg.functie}
-              </span>
-              {department && (
-                <span className="inline-flex items-center gap-1">
-                  <MapPin className="h-4 w-4" aria-hidden="true" />
-                  {department}
-                </span>
-              )}
-              <StatusBadge label={lifecycleStatus === 'active' ? 'Activ' : lifecycleStatus === 'pending' ? 'În așteptare' : 'Inactiv'} tone={lifecycleStatus === 'active' ? 'success' : lifecycleStatus === 'pending' ? 'warning' : 'neutral'} withDot />
-            </div>
-
-            <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-              {coleg.email && (
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-primary/70" aria-hidden="true" />
-                  <a href={`mailto:${coleg.email}`} className="hover:underline">
-                    {coleg.email}
-                  </a>
-                </div>
-              )}
-              {coleg.telefon && (
-                <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-primary/70" aria-hidden="true" />
-                  <a href={`tel:${coleg.telefon}`} className="hover:underline">
-                    {coleg.telefon}
-                  </a>
-                </div>
-              )}
-              {coleg.cDataUsername && (
-                <div className="flex items-center gap-2">
-                  <Laptop2 className="h-4 w-4 text-primary/70" aria-hidden="true" />
-                  <span className="truncate">c-data: {coleg.cDataUsername}</span>
-                </div>
-              )}
-              {coleg.cDataId && (
-                <div className="flex items-center gap-2">
-                  <BadgeCheck className="h-4 w-4 text-primary/70" aria-hidden="true" />
-                  <span>ID: {coleg.cDataId}</span>
-                </div>
-              )}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-              <span>
-                Cont c-data: {coleg.cDataCreated ? 'Creat' : 'Necreat'}
-                {!coleg.cDataCreated && coleg.emailAccountStatus !== 'PENDING' && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      updateAngajat.mutate({
-                        id: coleg.id,
-                        data: { cDataCreated: true },
-                      })
-                    }
-                    className="ml-2 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary transition hover:bg-primary/20"
-                  >
-                    Marchează creat
-                  </button>
-                )}
-              </span>
-              {emailBadge && <StatusBadge label={emailBadge.label} tone={emailBadge.tone} />}
-              {coleg.emailAccountStatus === 'CREATED' && coleg.emailAccountLink && (
-                <a
-                  href={coleg.emailAccountLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-                >
-                  Deschide e-mail
-                </a>
-              )}
-            {coleg.cDataNotes && <span className="line-clamp-1">{coleg.cDataNotes}</span>}
-              {showPendingPV && (
-                <StatusBadge label="Proces verbal în așteptare" tone="warning" withDot />
-              )}
-            </div>
-          </div>
-        </div>
-
-        {expanded && (
-          <div className="rounded-2xl border border-primary/10 bg-primary/5 p-4">
-            {coleg.echipamente.length === 0 ? (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <AlertTriangle className="h-4 w-4" aria-hidden="true" />
-                Nu are echipamente alocate.
-              </div>
-            ) : (
-              <div className="grid gap-3">
-                {coleg.echipamente.map((echipament) => (
-                  <div
-                    key={echipament.id}
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/10 bg-white p-3 shadow-sm transition hover:border-primary/30 hover:shadow-md"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                        <EquipmentIcon type={echipament.tip} className="h-5 w-5" />
-                      </div>
-                      <div className="space-y-1 text-sm">
-                        <p className="font-medium text-foreground">{echipament.nume}</p>
-                        <p className="text-xs text-muted-foreground">Serie: {echipament.serie}</p>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <StatusBadge
-                        label={echipament.tip}
-                        tone="info"
-                        className="uppercase"
-                      />
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemoveEquipment(echipament.id, coleg.id)}
-                          className="h-7 rounded-lg px-2 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
-                        >
-                          Elimină
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() =>
-                            setReplaceData({ colegId: coleg.id, equipmentId: echipament.id, type: echipament.tip })
-                          }
-                          className="h-7 rounded-lg px-2 text-xs text-primary hover:bg-primary/10"
-                        >
-                          Schimbă
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleToggleExpand}
-            className="flex items-center gap-1 rounded-lg text-sm text-primary hover:bg-primary/10"
-          >
-            {expanded ? 'Ascunde echipamentele' : 'Vezi echipamentele'}
-            {expanded ? (
-              <ChevronUp className="h-4 w-4" aria-hidden="true" />
-            ) : (
-              <ChevronDown className="h-4 w-4" aria-hidden="true" />
-            )}
-          </Button>
-          <div className="flex flex-wrap items-center gap-2">
-            {showPendingPV && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onGeneratePV(coleg.id)}
-                className="rounded-lg text-sm text-primary hover:bg-primary/10"
-              >
-                Generează PV
-              </Button>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setSelectedAngajatId(coleg.id)}
-              className="rounded-lg border-primary/20 bg-white text-sm shadow-sm transition hover:border-primary/40 hover:text-primary"
+          <div className="min-w-0">
+            <button
+              type="button"
+              onClick={handleOpenDetails}
+              className="line-clamp-1 text-left text-base font-semibold text-slate-900 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
             >
-              Asignează echipament
-            </Button>
+              {coleg.numeComplet}
+            </button>
+            <span className="line-clamp-1 text-xs text-slate-500">{coleg.functie}</span>
           </div>
         </div>
-      </article>
+        <div className="order-3 col-span-6 text-sm text-slate-600 sm:order-2 sm:col-span-2">
+          {department ? <span className="line-clamp-1">{department}</span> : <span className="text-slate-400">-</span>}
+        </div>
+        <div className="order-4 col-span-6 flex flex-col gap-1 text-sm text-slate-600 sm:order-3 sm:col-span-3 sm:flex-row sm:items-center sm:gap-4">
+          {coleg.email ? (
+            <a
+              href={`mailto:${coleg.email}`}
+              className="inline-flex items-center gap-1 whitespace-pre-wrap text-slate-600 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            >
+              <Mail className="h-4 w-4 text-slate-400" aria-hidden="true" />
+              <span className="truncate">{coleg.email}</span>
+            </a>
+          ) : (
+            <span className="text-slate-400">-</span>
+          )}
+          {coleg.telefon && (
+            <a
+              href={`tel:${coleg.telefon}`}
+              className="inline-flex items-center gap-1 whitespace-nowrap text-slate-600 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            >
+              <Phone className="h-4 w-4 text-slate-400" aria-hidden="true" />
+              <span>{coleg.telefon}</span>
+            </a>
+          )}
+        </div>
+        <div className="order-5 col-span-3 flex items-center gap-2 text-sm font-medium text-slate-700 sm:order-4 sm:col-span-1 sm:justify-center">
+          {equipmentCount}
+        </div>
+        <div className="order-6 col-span-3 flex flex-col gap-1 sm:order-5 sm:col-span-1">
+          <StatusBadge label={statusLabel} tone={statusTone} withDot aria-label={`Status: ${statusLabel}`} />
+          {showPendingPV && (
+            <button
+              type="button"
+              onClick={() => onGeneratePV(coleg.id)}
+              className="text-left text-xs font-medium text-amber-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            >
+              Procese verbale ({pendingPVCount})
+            </button>
+          )}
+        </div>
+        <div className="order-2 col-span-2 flex justify-end sm:order-6 sm:col-span-1">
+          <ActionsMenu srLabel={`Acțiuni pentru ${coleg.numeComplet}`}>
+            <DropdownMenuItem onSelect={handleOpenDetails}>Vezi profil</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => setSelectedAngajatId(coleg.id)}>
+              Asignează echipament
+            </DropdownMenuItem>
+            {showPendingPV && (
+              <DropdownMenuItem onSelect={() => onGeneratePV(coleg.id)}>
+                Generează PV
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuItem onSelect={() => setEditColeg(coleg)}>Editează</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="text-destructive" onSelect={handleDeleteAction}>
+              Șterge
+            </DropdownMenuItem>
+          </ActionsMenu>
+        </div>
+      </div>
     </div>
   );
 }
