@@ -40,11 +40,11 @@ import { handleApiError } from '@/utils/apiError';
 import { Search, Filter, UserPlus, Loader2, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+
+
 const EMPLOYEE_STATUS_OPTIONS: { value: EmployeeStatusFilter; label: string }[] = [
   { value: 'all', label: 'All statuses' },
   { value: 'active', label: 'Active accounts' },
-  { value: 'pending', label: 'Pending setup' },
-  { value: 'inactive', label: 'Inactive' },
 ];
 
 const EMPLOYEE_SORT_OPTIONS: { value: EmployeeSortOption; label: string }[] = [
@@ -278,20 +278,41 @@ export default function Colegi() {
     const node = containerRef.current;
     if (!node) return;
 
-    const computeHeight = () => {
-      const offsetHeight = node.offsetHeight || node.clientHeight || 0;
-      if (offsetHeight > 0) return offsetHeight;
+    const parseSize = (value: string) => Number.parseFloat(value) || 0;
+
+    const computeContentHeight = () => {
+      const borderBoxHeight = node.offsetHeight || node.clientHeight || 0;
+      if (borderBoxHeight > 0 && typeof window !== 'undefined') {
+        const styles = window.getComputedStyle(node);
+        const paddingY = parseSize(styles.paddingTop) + parseSize(styles.paddingBottom);
+        const borderY =
+          parseSize(styles.borderTopWidth) + parseSize(styles.borderBottomWidth);
+        const contentHeight = borderBoxHeight - paddingY - borderY;
+        if (contentHeight > 0) {
+          return contentHeight;
+        }
+      }
+
       if (typeof window === 'undefined') return getInitialHeight();
       const rect = node.getBoundingClientRect();
       const viewportHeight = window.innerHeight || 0;
-      const available = Math.max(viewportHeight - rect.top - 120, 320);
-      return available;
+      return Math.max(viewportHeight - rect.top - 120, 320);
     };
 
     const updateSize = () => {
-      const nextWidth = node.offsetWidth || node.clientWidth || getInitialWidth();
-      const nextHeight = computeHeight();
-      setWidth((prev) => (prev !== nextWidth ? nextWidth : prev));
+      const styles = typeof window !== 'undefined' ? window.getComputedStyle(node) : null;
+
+      const paddingX = styles
+        ? parseSize(styles.paddingLeft) + parseSize(styles.paddingRight)
+        : 0;
+      const borderX = styles
+        ? parseSize(styles.borderLeftWidth) + parseSize(styles.borderRightWidth)
+        : 0;
+      const rawWidth = node.offsetWidth || node.clientWidth || getInitialWidth();
+      const contentWidth = Math.max(rawWidth - paddingX - borderX, 320);
+      const nextHeight = computeContentHeight();
+
+      setWidth((prev) => (prev !== contentWidth ? contentWidth : prev));
       setHeight((prev) => (prev !== nextHeight ? nextHeight : prev));
     };
 
