@@ -108,7 +108,7 @@ export default function ColegRow({
         ref={rowRef}
         role="row"
         className={cn(
-          'grid min-h-[72px] grid-cols-6 items-center gap-x-4 gap-y-2 rounded-lg border-b border-slate-200/70 bg-white px-2 py-3 text-sm transition-colors hover:bg-slate-50 focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/50 focus-within:ring-offset-2 focus-within:ring-offset-white sm:grid-cols-12 sm:px-4',
+          'grid min-h-[72px] grid-cols-6 items-center gap-x-4 gap-y-2 rounded-lg border-b border-slate-200/70 bg-white px-2 py-3 text-sm transition-colors hover:bg-slate-50 focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/50 focus-within:ring-offset-2 focus-within:ring-offset-white sm:grid-cols-11 sm:px-4',
           isHighlighted && 'ring-2 ring-primary/40',
         )}
       >
@@ -137,7 +137,7 @@ export default function ColegRow({
         <div className="order-3 col-span-6 text-sm text-slate-600 sm:order-2 sm:col-span-2">
           {department ? <span className="line-clamp-1">{department}</span> : <span className="text-slate-400">-</span>}
         </div>
-        <div className="order-4 col-span-6 flex flex-col gap-1 text-sm text-slate-600 sm:order-3 sm:col-span-3 sm:flex-row sm:items-center sm:gap-4">
+        <div className="order-4 col-span-6 flex flex-col gap-1 text-sm text-slate-600 sm:order-3 sm:col-span-3">
           {coleg.email ? (
             <a
               href={`mailto:${coleg.email}`}
@@ -158,12 +158,6 @@ export default function ColegRow({
               <span>{coleg.telefon}</span>
             </a>
           )}
-        </div>
-        <div className="order-5 col-span-3 flex items-center gap-2 text-sm font-medium text-slate-700 sm:order-4 sm:col-span-1 sm:justify-center">
-          {equipmentCount}
-        </div>
-        <div className="order-6 col-span-3 flex flex-col gap-1 sm:order-5 sm:col-span-1">
-          <StatusBadge label={statusLabel} tone={statusTone} withDot aria-label={`Status: ${statusLabel}`} />
           {showPendingPV && (
             <button
               type="button"
@@ -174,7 +168,10 @@ export default function ColegRow({
             </button>
           )}
         </div>
-        <div className="order-2 col-span-2 flex justify-end sm:order-6 sm:col-span-1">
+        <div className="order-5 col-span-3 flex items-center gap-2 text-sm font-medium text-slate-700 sm:order-4 sm:col-span-1 sm:justify-center">
+          {equipmentCount}
+        </div>
+        <div className="order-2 col-span-2 flex justify-end sm:order-5 sm:col-span-1">
           <ActionsMenu srLabel={`Acțiuni pentru ${coleg.numeComplet}`}>
             <DropdownMenuItem onSelect={handleOpenDetails}>Vezi profil</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => setSelectedAngajatId(coleg.id)}>
