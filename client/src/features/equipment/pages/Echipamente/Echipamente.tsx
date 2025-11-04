@@ -6,9 +6,7 @@ import {
   useEchipamente,
   useDeleteEchipament,
   useUpdateEchipament,
-  exportEchipamente,
   ModalEditEchipament,
-  ImportEchipamente,
   ModalPredaEchipament,
 } from '@/features/equipment';
 import EquipmentRow from '@/features/equipment/components/EquipmentRow';
@@ -26,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, AlertTriangle, Search, Plus, Laptop2, Package, Wrench, ShoppingCart } from 'lucide-react';
+import { Loader2, AlertTriangle, Search, Plus, Laptop2, Package, Wrench } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -93,7 +91,7 @@ export default function Echipamente() {
 
   const [search, setSearch] = useState(() => searchParams.get('q') ?? '');
   const [status, setStatus] = useState(() => searchParams.get('status') ?? '');
-  const [type, setType] = useState(() => searchParams.get('type') ?? '');
+  const [type] = useState(() => searchParams.get('type') ?? '');
   const [sort, setSort] = useState<EquipmentSortOption>(() => parseSortParam(searchParams.get('sort')));
 
   const requestSort = sort === 'name-desc' ? 'desc' : 'asc';
@@ -107,7 +105,6 @@ export default function Echipamente() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    total,
   } = useEchipamente({
     search: search.trim(),
     status: status || undefined,
@@ -125,17 +122,6 @@ export default function Echipamente() {
   const deleteMutation = useDeleteEchipament();
   const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
-
-  const types = useMemo(() => {
-    const unique = new Set<string>();
-    echipamente.forEach((eq) => {
-      if (typeof eq.tip === 'string') {
-        const normalized = eq.tip.trim();
-        if (normalized) unique.add(normalized);
-      }
-    });
-    return Array.from(unique).sort(localeCompare);
-  }, [echipamente]);
 
   const equipmentMetrics = useMemo(() => {
     if (echipamente.length === 0) {

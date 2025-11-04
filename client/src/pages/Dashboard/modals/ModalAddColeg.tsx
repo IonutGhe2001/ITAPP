@@ -53,7 +53,7 @@ export default function ModalAddColeg({
     try {
       const payload = {
         ...formData,
-        departmentConfigId: formData.departmentConfigId || null,
+        departmentConfigId: formData.departmentConfigId || undefined,
       };
       await createMutation.mutateAsync(payload);
       toast({ title: 'Coleg adăugat', description: 'Coleg adăugat cu succes.' });

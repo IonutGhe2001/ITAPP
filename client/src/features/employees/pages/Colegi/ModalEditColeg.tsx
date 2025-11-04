@@ -57,7 +57,7 @@ export default function ModalEditColeg({
     try {
       const payload = {
         ...formData,
-        departmentConfigId: formData.departmentConfigId || null,
+        departmentConfigId: formData.departmentConfigId || undefined,
       };
       await updateMutation.mutateAsync({ id: coleg.id, data: payload });
       toast({ title: 'Coleg actualizat', description: 'Modificările au fost salvate.' });

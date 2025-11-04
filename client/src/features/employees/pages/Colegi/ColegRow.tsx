@@ -2,7 +2,6 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import Avatar from '@/components/Avatar';
 import ActionsMenu from '@/components/ActionsMenu';
-import StatusBadge from '@/components/StatusBadge';
 import type { Angajat, Echipament } from '@/features/equipment/types';
 import type { AngajatWithRelations } from '@/features/employees/angajatiService';
 import { cn } from '@/lib/utils';
@@ -64,11 +63,6 @@ export default function ColegRow({
   const department = useMemo(() => getDepartmentName(coleg as AngajatWithRelations), [coleg]);
   const pendingPVCount = (pendingPV?.predate?.length ?? 0) + (pendingPV?.primite?.length ?? 0);
   const equipmentCount = Array.isArray(coleg.echipamente) ? coleg.echipamente.length : 0;
-
-  const statusLabel =
-    lifecycleStatus === 'active' ? 'Activ' : lifecycleStatus === 'pending' ? 'În așteptare' : 'Inactiv';
-  const statusTone =
-    lifecycleStatus === 'active' ? 'success' : lifecycleStatus === 'pending' ? 'warning' : 'neutral';
 
   useLayoutEffect(() => {
     const node = rowRef.current;

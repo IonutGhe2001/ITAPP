@@ -1,8 +1,8 @@
-import { useLayoutEffect, useRef, useMemo } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import ActionsMenu from '@/components/ActionsMenu';
 import StatusBadge from '@/components/StatusBadge';
-import EquipmentIcon from './EquipmentIcon';
+import { EquipmentIcon } from './EquipmentIcon';
 import type { Echipament } from '@/features/equipment/types';
 import { EQUIPMENT_STATUS_LABELS } from '@/features/equipment/types';
 import { cn } from '@/lib/utils';
