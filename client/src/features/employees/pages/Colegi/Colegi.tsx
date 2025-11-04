@@ -527,7 +527,7 @@ export default function Colegi() {
         <Container className="py-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight">Employees</h1>
+              <h1 className="text-2xl font-semibold tracking-tight">Colegi</h1>
               <p className="text-muted-foreground text-sm">
                 Monitorizează colegii, statusul conturilor și echipamentele alocate.
               </p>
@@ -560,7 +560,7 @@ export default function Colegi() {
                 <Input
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Search name, role, department"
+                  placeholder="Cauta dupa nume, rol sau department"
                   className="h-11 rounded-xl border border-slate-200/80 bg-white/90 pl-9 text-sm shadow-sm transition focus-visible:ring-2 focus-visible:ring-primary dark:border-slate-700/70 dark:bg-slate-900/70"
                   aria-label="Search employees"
                 />

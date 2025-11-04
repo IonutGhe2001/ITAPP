@@ -307,7 +307,7 @@ export default function Echipamente() {
         <Container className="py-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight">Equipment</h1>
+              <h1 className="text-2xl font-semibold tracking-tight">Echipamente</h1>
               <p className="text-sm text-muted-foreground">Administrează parcul de echipamente și asignările curente.</p>
             </div>
           <Button onClick={() => setShowAddModal(true)} className="rounded-xl px-4 py-2 shadow-sm">

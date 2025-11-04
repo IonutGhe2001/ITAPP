@@ -96,9 +96,22 @@ export default function ColegRow({
   const pendingPVCount = (pendingPV?.predate?.length ?? 0) + (pendingPV?.primite?.length ?? 0);
 
   useLayoutEffect(() => {
-    if (rowRef.current) {
-      setSize(index, rowRef.current.getBoundingClientRect().height + 28);
+    const node = rowRef.current;
+    if (!node) return;
+
+    const measuredHeight = node.getBoundingClientRect().height;
+
+    const parent = node.parentElement;
+    let wrapperPadding = 24;
+
+    if (parent && typeof window !== 'undefined') {
+      const styles = window.getComputedStyle(parent);
+      const parseSize = (value: string) => Number.parseFloat(value) || 0;
+      wrapperPadding = parseSize(styles.paddingTop) + parseSize(styles.paddingBottom);
     }
+
+    const nextSize = Math.ceil(measuredHeight + wrapperPadding);
+    setSize(index, nextSize);
   }, [index, coleg, expanded, setSize]);
 
   const handleDeleteAction = () => {
