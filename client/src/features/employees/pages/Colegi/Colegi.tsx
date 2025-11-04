@@ -31,13 +31,25 @@ import { getConfig } from '@/services/configService';
 import ColegRow from './ColegRow';
 import ColegModals from './ColegModals';
 import useColegiFilter, {
+  getEmployeeLifecycleStatus,
   type EmployeeSortOption,
   type EmployeeStatusFilter,
 } from './useColegiFilter';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 import { useAuth } from '@/context/useAuth';
 import { handleApiError } from '@/utils/apiError';
-import { Search, Filter, UserPlus, Loader2, AlertTriangle } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import {
+  Search,
+  Filter,
+  UserPlus,
+  Loader2,
+  AlertTriangle,
+  Users,
+  UserCheck,
+  Clock3,
+  Laptop2,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 
@@ -86,6 +98,66 @@ export default function Colegi() {
     [data],
   );
 
+  const employeeMetrics = useMemo(() => {
+    if (colegi.length === 0) {
+      return { total: 0, active: 0, pending: 0, equipment: 0 };
+    }
+
+    return colegi.reduce(
+      (acc, coleg) => {
+        const status = getEmployeeLifecycleStatus(coleg);
+        if (status === 'active') acc.active += 1;
+        if (status === 'pending') acc.pending += 1;
+        acc.equipment += Array.isArray(coleg.echipamente)
+          ? coleg.echipamente.length
+          : 0;
+        return acc;
+      },
+      {
+        total: colegi.length,
+        active: 0,
+        pending: 0,
+        equipment: 0,
+      },
+    );
+  }, [colegi]);
+
+  const highlightCards = useMemo(
+    () =>
+      [
+        {
+          label: 'Colegi înregistrați',
+          value: employeeMetrics.total,
+          description: 'În platformă',
+          icon: Users,
+        },
+        {
+          label: 'Conturi active',
+          value: employeeMetrics.active,
+          description: 'Cu acces confirmat',
+          icon: UserCheck,
+        },
+        {
+          label: 'În așteptare',
+          value: employeeMetrics.pending,
+          description: 'Invitații ce necesită acțiune',
+          icon: Clock3,
+        },
+        {
+          label: 'Echipamente alocate',
+          value: employeeMetrics.equipment,
+          description: 'Dispozitive în uz',
+          icon: Laptop2,
+        },
+      ] satisfies Array<{
+        label: string;
+        value: number;
+        description: string;
+        icon: LucideIcon;
+      }>,
+    [employeeMetrics],
+  );
+
   const [searchParams, setSearchParams] = useSearchParams();
   const highlightedId = searchParams.get('highlight');
   const initialQuery = searchParams.get('q') ?? '';
@@ -120,6 +192,16 @@ export default function Colegi() {
   const [pendingPV, setPendingPV] = useState<
     Record<string, { predate: string[]; primite: string[] }>
   >({});
+  const pendingPVEmployees = useMemo(() => Object.keys(pendingPV), [pendingPV]);
+  const pendingPVTotal = useMemo(
+    () =>
+      Object.values(pendingPV).reduce(
+        (total, entry) =>
+          total + (entry?.predate?.length ?? 0) + (entry?.primite?.length ?? 0),
+        0,
+      ),
+    [pendingPV],
+  );
 
   const {
     search,
@@ -138,6 +220,17 @@ export default function Colegi() {
     initialStatus,
     initialSort,
   });
+  const filteredCount = filtered.length;
+  const hasActiveFilters =
+    Boolean(search.trim()) || functieFilter.length > 0 || statusFilter !== 'all';
+  const filteredSummary = useMemo(() => {
+    if (employeeMetrics.total === 0) return 'Niciun coleg';
+    const suffix = filteredCount === 1 ? '' : 'i';
+    if (filteredCount === employeeMetrics.total) {
+      return `${filteredCount} coleg${suffix}`;
+    }
+    return `${filteredCount} din ${employeeMetrics.total} coleg${suffix}`;
+  }, [employeeMetrics.total, filteredCount]);
 
   const handledHighlightRef = useRef<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -398,7 +491,7 @@ export default function Colegi() {
   };
   
   const handleScrollToPending = () => {
-    const firstId = Object.keys(pendingPV)[0];
+    const firstId = pendingPVEmployees[0];
     if (!firstId) return;
     const index = filtered.findIndex((c) => c.id === firstId);
     if (index >= 0) {
@@ -408,22 +501,22 @@ export default function Colegi() {
   };
 
   const hasData = filtered.length > 0;
-  const hasPendingPV = Object.keys(pendingPV).length > 0;
+  const hasPendingPV = pendingPVEmployees.length > 0;
   const showSkeleton = isLoading && colegi.length === 0;
 
   const renderSkeleton = () => (
-    <div className="grid gap-4">
+    <div className="grid gap-4 sm:grid-cols-2">
       {Array.from({ length: 4 }).map((_, index) => (
         <div
           key={index}
-          className="animate-pulse rounded-3xl border border-slate-200/70 bg-white/70 p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-900/60"
+          className="animate-pulse rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm ring-1 ring-inset ring-white/60 dark:border-slate-800/70 dark:bg-slate-900/70"
         >
           <div className="flex items-start gap-4">
             <div className="h-14 w-14 rounded-full bg-slate-200 dark:bg-slate-700" />
             <div className="flex-1 space-y-3">
-              <div className="h-3.5 w-1/3 rounded-full bg-slate-200 dark:bg-slate-700" />
-              <div className="h-3 w-1/4 rounded-full bg-slate-200 dark:bg-slate-700" />
-              <div className="h-3 w-1/5 rounded-full bg-slate-200 dark:bg-slate-700" />
+              <div className="h-3.5 w-1/3 rounded-full bg-slate-200/70 dark:bg-slate-700" />
+              <div className="h-3 w-1/4 rounded-full bg-slate-200/70 dark:bg-slate-700" />
+              <div className="h-3 w-1/5 rounded-full bg-slate-200/70 dark:bg-slate-700" />
             </div>
           </div>
         </div>
@@ -435,13 +528,13 @@ export default function Colegi() {
 
   if (isError) {
     content = (
-      <div className="text-muted-foreground flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-slate-300/70 bg-white/70 p-12 text-center shadow-sm dark:border-slate-700/70 dark:bg-slate-900/60">
+      <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-slate-200/70 bg-white/95 p-12 text-center shadow-sm ring-1 ring-inset ring-white/70 dark:border-slate-800/70 dark:bg-slate-900/70">
         <AlertTriangle className="h-10 w-10 text-amber-500" aria-hidden="true" />
         <div className="space-y-1">
-          <p className="text-foreground text-lg font-semibold">Nu am putut încărca lista de colegi.</p>
-          <p className="mx-auto max-w-md text-sm">{handleApiError(error)}</p>
+          <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">Nu am putut încărca lista de colegi.</p>
+          <p className="mx-auto max-w-md text-sm text-slate-600 dark:text-slate-300">{handleApiError(error)}</p>
         </div>
-        <Button onClick={() => refetch()} variant="default">
+        <Button onClick={() => refetch()} variant="default" className="rounded-full px-5">
           Reîncearcă
         </Button>
       </div>
@@ -482,7 +575,7 @@ export default function Colegi() {
     );
   } else if (!isLoading && !hasData) {
     content = (
-      <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300/70 bg-white/70 p-12 text-center shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+      <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-slate-200/70 bg-gradient-to-br from-white/95 to-slate-100/70 p-12 text-center shadow-sm ring-1 ring-inset ring-white/70 dark:border-slate-800/70 dark:bg-slate-900/70">
         <svg
           width="96"
           height="96"
@@ -503,11 +596,11 @@ export default function Colegi() {
             opacity="0.7"
           />
         </svg>
-        <div className="mt-4 space-y-2">
-          <p className="text-foreground text-lg font-semibold">Nu există colegi înregistrați.</p>
-          <p className="text-muted-foreground text-sm">Adaugă primul membru al echipei pentru a începe să gestionezi echipamentele.</p>
+        <div className="space-y-2">
+          <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">Nu există colegi înregistrați.</p>
+          <p className="text-sm text-slate-600 dark:text-slate-300">Adaugă primul membru al echipei pentru a începe să gestionezi echipamentele.</p>
         </div>
-        <Button className="mt-6" onClick={() => setShowAddModal(true)}>
+        <Button className="mt-4 rounded-full px-5" onClick={() => setShowAddModal(true)}>
           <UserPlus className="mr-2 h-4 w-4" aria-hidden="true" /> Adaugă coleg
         </Button>
       </div>
@@ -517,120 +610,182 @@ export default function Colegi() {
   const showToolbar = !isError;
   const containerClasses = cn(
     'min-h-[320px]',
-    !isError && hasData &&
-      'rounded-3xl border border-slate-200/80 bg-white/80 p-2 shadow-sm dark:border-slate-800/80 dark:bg-slate-900/60',
+    !isError
+      ? 'rounded-3xl border border-slate-200/70 bg-white/95 p-4 shadow-sm ring-1 ring-inset ring-white/70 dark:border-slate-800/70 dark:bg-slate-900/70 dark:ring-0'
+      : 'rounded-3xl border border-dashed border-slate-300/70 bg-white/90 p-6 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/60',
+    !isError && hasData && 'p-0',
   );
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] pb-10 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/90 backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/80">
-        <Container className="py-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-semibold tracking-tight">Colegi</h1>
-              <p className="text-muted-foreground text-sm">
-                Monitorizează colegii, statusul conturilor și echipamentele alocate.
-              </p>
+    <div className="min-h-screen bg-slate-50 pb-12 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+      <header className="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 text-white">
+        <Container className="py-12">
+          <div className="space-y-8">
+            <div className="flex flex-wrap items-start justify-between gap-6">
+              <div className="max-w-2xl space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-300">Echipa</p>
+                <h1 className="text-3xl font-semibold tracking-tight text-white">Colegi</h1>
+                <p className="text-sm text-slate-300">
+                  Monitorizează colegii, statusul conturilor și echipamentele alocate într-un singur loc.
+                </p>
+              </div>
+              <Button
+                onClick={() => setShowAddModal(true)}
+                variant="secondary"
+                className="h-11 rounded-full bg-white px-6 text-sm font-semibold text-slate-900 shadow-lg shadow-slate-900/20 transition-all hover:-translate-y-0.5 hover:bg-white/90"
+              >
+                <UserPlus className="mr-2 h-4 w-4" aria-hidden="true" /> Adaugă coleg
+              </Button>
             </div>
-            <Button onClick={() => setShowAddModal(true)} className="rounded-xl px-4 py-2 shadow-sm">
-              <UserPlus className="mr-2 h-4 w-4" aria-hidden="true" /> Adaugă coleg
-            </Button>
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {highlightCards.map(({ label, value, description, icon: Icon }) => (
+                <div
+                  key={label}
+                  className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5 shadow-inner backdrop-blur-sm transition hover:border-white/20"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">{label}</span>
+                    <Icon
+                      className="h-5 w-5 text-slate-200 transition group-hover:text-white"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <p className="mt-4 text-3xl font-semibold tracking-tight text-white">
+                    {value.toLocaleString('ro-RO')}
+                  </p>
+                  <p className="text-xs text-slate-400">{description}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </Container>
       </header>
 
-      <Container className="mt-6 space-y-6">
+      <Container className="mt-8 space-y-6">
         {hasPendingPV && !isError && (
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200/80 bg-amber-50/80 p-4 text-amber-900 shadow-sm dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200">
-            <div className="flex items-center gap-2">
-              <StatusBadge label={`${Object.keys(pendingPV).length} PV pending`} tone="warning" withDot />
-              <span className="text-sm">Există procese verbale care necesită atenție.</span>
+          <div className="flex flex-col gap-3 rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm ring-1 ring-inset ring-white/70 dark:border-slate-800/70 dark:bg-slate-900/70 dark:ring-0">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <StatusBadge label="Procese verbale în lucru" tone="warning" withDot />
+                <span className="text-sm text-slate-600 dark:text-slate-300">
+                  {pendingPVEmployees.length === 1
+                    ? '1 coleg are procese verbale nefinalizate.'
+                    : `${pendingPVEmployees.length} colegi au procese verbale nefinalizate.`}
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleScrollToPending}
+                className="rounded-full border-slate-200/70 bg-white/80 px-4 text-xs font-semibold shadow-sm hover:border-slate-300 dark:border-slate-700/70 dark:bg-slate-900/70"
+              >
+                Vezi detalii
+              </Button>
             </div>
-            <Button variant="outline" size="sm" onClick={handleScrollToPending} className="rounded-lg border-amber-200/80 bg-white/70 hover:bg-amber-100 dark:border-amber-500/40 dark:bg-transparent dark:hover:bg-amber-500/10">
-              Vezi detalii
-            </Button>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {pendingPVTotal === 1
+                ? '1 echipament în așteptare pentru confirmare.'
+                : `${pendingPVTotal} echipamente în așteptare pentru confirmare.`}
+            </p>
           </div>
         )}
 
         {showToolbar && (
-          <Toolbar>
-            <div className="flex min-w-[220px] flex-1 items-center gap-3">
-              <div className="relative w-full">
-                <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" aria-hidden="true" />
-                <Input
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Cauta dupa nume, rol sau department"
-                  className="h-11 rounded-xl border border-slate-200/80 bg-white/90 pl-9 text-sm shadow-sm transition focus-visible:ring-2 focus-visible:ring-primary dark:border-slate-700/70 dark:bg-slate-900/70"
-                  aria-label="Search employees"
-                />
-              </div>
-            </div>
-
-          <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="h-11 min-w-[200px] rounded-xl border border-slate-200/80 bg-white/90 text-sm shadow-sm transition hover:bg-slate-100 dark:border-slate-700/70 dark:bg-slate-900/70"
-                >
-                  <Filter className="mr-2 h-4 w-4" aria-hidden="true" />
-                  Funcții
-                  {functieFilter.length > 0 && (
-                    <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
-                      {functieFilter.length}
+          <Toolbar className="gap-6">
+            <div className="grid w-full gap-4 lg:grid-cols-[minmax(0,1.6fr)_repeat(3,minmax(0,1fr))] xl:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))]">
+              <div className="space-y-2">
+                <div className="relative">
+                  <Search
+                    className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+                    aria-hidden="true"
+                  />
+                  <Input
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    placeholder="Caută după nume, rol sau departament"
+                    className="h-11 w-full rounded-2xl border border-transparent bg-white/90 pl-10 text-sm shadow-sm ring-1 ring-inset ring-slate-200/80 transition focus-visible:border-transparent focus-visible:ring-2 focus-visible:ring-primary/70 dark:bg-slate-900/70 dark:ring-slate-700/70"
+                    aria-label="Search employees"
+                  />
+                </div>
+                <div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  <span>{filteredSummary}</span>
+                  {hasActiveFilters && (
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                      Filtre active
                     </span>
                   )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-64 rounded-xl">
-                <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
-                  Selectează funcțiile
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {functii.length === 0 && (
-                  <p className="px-2 py-1.5 text-xs text-muted-foreground">Nu există funcții definite.</p>
-                )}
-                {functii.map((functie) => (
-                  <DropdownMenuCheckboxItem
-                    key={functie}
-                    checked={functieFilter.includes(functie)}
-                    onCheckedChange={(checked) => toggleFunction(functie, Boolean(checked))}
-                    className="capitalize"
-                  >
-                    {functie}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </div>
+              </div>
 
-            <div className="min-w-[180px]">
-              <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as EmployeeStatusFilter)}>
-                <SelectTrigger className="h-11 rounded-xl border border-slate-200/80 bg-white/90 text-sm shadow-sm dark:border-slate-700/70 dark:bg-slate-900/70">
-                  <SelectValue placeholder="Status cont" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl">
-                  {EMPLOYEE_STATUS_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+<div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="h-11 w-full justify-between rounded-2xl border border-slate-200/70 bg-white/90 text-sm font-medium shadow-sm transition hover:border-slate-300 dark:border-slate-700/70 dark:bg-slate-900/70"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Filter className="h-4 w-4" aria-hidden="true" />
+                        <span>Funcții</span>
+                      </div>
+                      {functieFilter.length > 0 && (
+                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                          {functieFilter.length}
+                        </span>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-64 rounded-2xl shadow-lg">
+                    <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
+                      Selectează funcțiile
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {functii.length === 0 && (
+                      <p className="px-2 py-1.5 text-xs text-muted-foreground">Nu există funcții definite.</p>
+                    )}
+                    {functii.map((functie) => (
+                      <DropdownMenuCheckboxItem
+                        key={functie}
+                        checked={functieFilter.includes(functie)}
+                        onCheckedChange={(checked) => toggleFunction(functie, Boolean(checked))}
+                        className="capitalize"
+                      >
+                        {functie}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
 
-      <div className="min-w-[180px]">
-              <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as EmployeeSortOption)}>
-                <SelectTrigger className="h-11 rounded-xl border border-slate-200/80 bg-white/90 text-sm shadow-sm dark:border-slate-700/70 dark:bg-slate-900/70">
-                  <SelectValue placeholder="Sortare" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl">
-                  {EMPLOYEE_SORT_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div>
+                <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as EmployeeStatusFilter)}>
+                  <SelectTrigger className="h-11 w-full rounded-2xl border border-slate-200/70 bg-white/90 text-sm font-medium shadow-sm transition hover:border-slate-300 dark:border-slate-700/70 dark:bg-slate-900/70">
+                    <SelectValue placeholder="Status cont" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl shadow-lg">
+                    {EMPLOYEE_STATUS_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as EmployeeSortOption)}>
+                  <SelectTrigger className="h-11 w-full rounded-2xl border border-slate-200/70 bg-white/90 text-sm font-medium shadow-sm transition hover:border-slate-300 dark:border-slate-700/70 dark:bg-slate-900/70">
+                    <SelectValue placeholder="Sortare" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl shadow-lg">
+                    {EMPLOYEE_SORT_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </Toolbar>
         )}
@@ -649,7 +804,7 @@ export default function Colegi() {
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
                 variant="outline"
-                className="rounded-xl"
+                className="rounded-full px-5"
               >
                 {isFetchingNextPage ? 'Se încarcă...' : 'Încarcă mai mulți colegi'}
               </Button>

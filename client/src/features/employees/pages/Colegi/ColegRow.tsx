@@ -141,7 +141,7 @@ export default function ColegRow({
       <article
         ref={rowRef}
         className={cn(
-          'relative flex flex-col gap-4 rounded-3xl border border-slate-200/70 bg-white/90 p-5 shadow-sm transition-all duration-150 ease-out focus-within:ring-2 focus-within:ring-primary/40 focus-within:ring-offset-2 hover:shadow-md dark:border-slate-800/70 dark:bg-slate-900/70',
+          'relative flex flex-col gap-4 rounded-2xl border border-slate-200/70 bg-white/95 p-6 shadow-sm ring-1 ring-inset ring-white/70 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg focus-within:ring-2 focus-within:ring-primary/50 focus-within:ring-offset-2 focus-within:ring-offset-white dark:border-slate-800/70 dark:bg-slate-900/70 dark:ring-0 dark:focus-within:ring-offset-slate-900',
           isHighlighted && 'ring-2 ring-primary/50',
         )}
       >
@@ -162,7 +162,7 @@ export default function ColegRow({
               <button
                 type="button"
                 onClick={handleOpenDetails}
-                className="text-left text-lg font-semibold tracking-tight text-slate-900 transition hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 dark:text-slate-50"
+                className="text-left text-lg font-semibold tracking-tight text-slate-900 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:text-slate-50 dark:focus-visible:ring-offset-slate-900"
               >
                 {coleg.numeComplet}
               </button>
