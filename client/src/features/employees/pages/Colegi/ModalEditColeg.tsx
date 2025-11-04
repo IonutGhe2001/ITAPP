@@ -3,15 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { useUpdateAngajat } from '@/features/employees';
-import { useDepartmentConfigs } from '@/features/employees/departmentConfigService';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 import type { Angajat } from '@/features/equipment/types';
 
@@ -38,7 +30,6 @@ export default function ModalEditColeg({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const updateMutation = useUpdateAngajat();
   const { toast } = useToast();
-  const { data: departments = [] } = useDepartmentConfigs();
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
@@ -88,6 +79,7 @@ export default function ModalEditColeg({
               'cDataUsername',
               'cDataId',
               'cDataNotes',
+              'departmentConfigId',
             ] as const
           ).map((field) => (
             <div key={field}>
@@ -102,6 +94,7 @@ export default function ModalEditColeg({
                       cDataUsername: 'c-data username',
                       cDataId: 'c-data ID',
                       cDataNotes: 'Note/Link c-data',
+                      departmentConfigId: 'Departament',
                     } as Record<string, string>
                   )[field]
                 }
@@ -114,25 +107,6 @@ export default function ModalEditColeg({
               {errors[field] && <p className="mt-1 text-xs text-red-500">{errors[field]}</p>}
             </div>
           ))}
-          <div>
-            <Label htmlFor="departmentConfigId">Departament</Label>
-            <Select
-              value={formData.departmentConfigId}
-              onValueChange={(value) => setFormData({ ...formData, departmentConfigId: value })}
-            >
-              <SelectTrigger id="departmentConfigId">
-                <SelectValue placeholder="Selectează departament" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">Fără departament</SelectItem>
-                {departments.map((dept) => (
-                  <SelectItem key={dept.id} value={dept.id}>
-                    {dept.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
           <div className="flex items-center space-x-2">
             <input
               id="cDataCreated"

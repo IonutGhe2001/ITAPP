@@ -9,6 +9,8 @@ import {
   PrinterIcon,
   ServerIcon,
   WrenchIcon,
+  TvIcon,
+  ProjectorIcon,
 } from 'lucide-react';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -22,6 +24,9 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   mouse: MouseIcon,
   tastatura: KeyboardIcon,
   imprimanta: PrinterIcon,
+  tv: TvIcon,
+  videoproiector: ProjectorIcon,
+  proiector: ProjectorIcon,
 };
 
 export interface EquipmentIconProps {

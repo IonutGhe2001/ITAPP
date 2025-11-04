@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, AlertTriangle, Search, Plus, Laptop2, Package, Wrench } from 'lucide-react';
+import { AlertTriangle, Search, Plus, Laptop2, Package, Wrench } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -102,15 +102,12 @@ export default function Echipamente() {
     isLoading,
     isError,
     error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
   } = useEchipamente({
     search: search.trim(),
     status: status || undefined,
     type: type || undefined,
     sort: requestSort,
-    autoFetchAll: false,
+    autoFetchAll: true,
     pageSize: 30,
     enabled: queryEnabled,
   });
@@ -599,24 +596,6 @@ export default function Echipamente() {
         <div className={containerClasses} ref={!isError ? containerRef : undefined}>
           {!isError && hasData && width === 0 && height === 0 ? renderSkeleton() : content}
         </div>
-
-        {!isError && (
-          <div className="flex flex-col items-center gap-3">
-            {isFetchingNextPage && (
-              <Loader2 className="h-5 w-5 animate-spin text-primary" aria-hidden="true" />
-            )}
-            {hasNextPage && (
-              <Button
-                onClick={() => fetchNextPage()}
-                disabled={isFetchingNextPage}
-                variant="outline"
-                className="rounded-full px-5"
-              >
-                {isFetchingNextPage ? 'Se încarcă...' : 'Încarcă mai multe echipamente'}
-              </Button>
-            )}
-          </div>
-        )}
       </Container>
 
       {selected && (

@@ -21,27 +21,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const SignatureEditor = React.lazy(() => import('@/components/SignatureEditor'));
 
-const kpiMetrics = [
-  { label: 'Active Assets', value: '18' },
-  { label: 'Open Tickets', value: '3' },
-  { label: 'Pending Trainings', value: '2' },
-  { label: 'Approvals', value: '5' },
-];
-
-const recentActivities = [
-  { title: 'Password changed', time: '2 hours ago' },
-  { title: 'New device enrolled', time: 'Yesterday' },
-  { title: 'Security training completed', time: '2 days ago' },
-  { title: 'Logged in from mobile', time: '3 days ago' },
-  { title: 'Approved hardware request', time: 'Last week' },
-];
-
-const activeSessions = [
-  { device: 'MacBook Pro · Chrome', location: 'Bucharest, RO', lastActive: '3 mins ago' },
-  { device: 'iPhone 14 · Safari', location: 'Cluj, RO', lastActive: '1 hour ago' },
-  { device: 'Surface Laptop · Edge', location: 'Remote', lastActive: 'Yesterday' },
-];
-
 export default function ProfilePage() {
   const { user, setUser } = useUser();
   const [isSaving, setIsSaving] = useState(false);
@@ -114,12 +93,12 @@ export default function ProfilePage() {
       value: user?.functie || '-',
     },
     {
-      label: t('profile.meta.location', { defaultValue: 'Location' }),
-      value: 'Bucharest HQ',
+      label: t('profile.meta.email', { defaultValue: 'Email' }),
+      value: user?.email || '-',
     },
     {
-      label: t('profile.meta.lastLogin', { defaultValue: 'Last login' }),
-      value: 'Today, 09:24',
+      label: t('profile.meta.phone', { defaultValue: 'Phone' }),
+      value: user?.telefon || '-',
     },
   ];
 
@@ -223,7 +202,7 @@ export default function ProfilePage() {
           </TabsList>
           <TabsContent value="overview" className="space-y-6">
             <div className="grid gap-6 lg:grid-cols-12">
-              <div className="space-y-6 lg:col-span-8">
+              <div className="space-y-6 lg:col-span-12">
                 <section className="rounded-2xl border border-border/60 bg-card/90 p-6 shadow-sm">
                   <header className="mb-4 flex items-center justify-between">
                     <h2 className="text-lg font-semibold">{t('profile.sections.contact', { defaultValue: 'Contact & Organization' })}</h2>
@@ -290,72 +269,6 @@ export default function ProfilePage() {
                     <PreferenceRow label={t('profile.preferences.timezone', { defaultValue: 'Timezone' })} value="GMT+02:00" />
                     <PreferenceToggle label={t('profile.preferences.theme', { defaultValue: 'Dark theme' })} active />
                     <PreferenceToggle label={t('profile.preferences.notifications', { defaultValue: 'Notifications' })} active />
-                  </div>
-                </section>
-              </div>
-
-              <div className="space-y-6 lg:col-span-4">
-                <section className="rounded-2xl border border-border/60 bg-card/90 p-6 shadow-sm">
-                  <header className="mb-4">
-                    <h2 className="text-lg font-semibold">{t('profile.sections.kpi', { defaultValue: 'Key metrics' })}</h2>
-                  </header>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    {kpiMetrics.map((metric) => (
-                      <div key={metric.label} className="rounded-xl bg-muted/20 p-4">
-                        <p className="text-muted-foreground text-xs uppercase">{metric.label}</p>
-                        <p className="text-foreground mt-2 text-2xl font-semibold">{metric.value}</p>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="rounded-2xl border border-border/60 bg-card/90 p-6 shadow-sm">
-                  <header className="mb-4">
-                    <h2 className="text-lg font-semibold">{t('profile.sections.recentActivity', { defaultValue: 'Recent activity' })}</h2>
-                  </header>
-                  <div className="h-[280px] overflow-y-auto pr-1">
-                    <ul className="space-y-4">
-                      {recentActivities.map((activity) => (
-                        <li key={activity.title} className="rounded-lg border border-border/50 bg-background/60 p-4">
-                          <p className="text-sm font-medium text-foreground">{activity.title}</p>
-                          <p className="text-muted-foreground text-xs">{activity.time}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </section>
-
-                <section className="rounded-2xl border border-border/60 bg-card/90 p-6 shadow-sm">
-                  <header className="mb-4 flex items-center justify-between">
-                    <h2 className="text-lg font-semibold">{t('profile.sections.sessions', { defaultValue: 'Active sessions' })}</h2>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                    >
-                      {t('profile.buttons.signOutOthers', { defaultValue: 'Sign out others' })}
-                    </Button>
-                  </header>
-                  <div className="overflow-hidden rounded-xl border border-border/50">
-                    <table className="min-w-full text-left text-sm">
-                      <thead className="bg-muted/40 text-muted-foreground">
-                        <tr>
-                          <th className="px-4 py-3 font-medium">Device</th>
-                          <th className="px-4 py-3 font-medium">Location</th>
-                          <th className="px-4 py-3 font-medium">Last active</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {activeSessions.map((session) => (
-                          <tr key={session.device} className="border-t border-border/40">
-                            <td className="px-4 py-3">{session.device}</td>
-                            <td className="px-4 py-3 text-muted-foreground">{session.location}</td>
-                            <td className="px-4 py-3 text-muted-foreground">{session.lastActive}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
                   </div>
                 </section>
               </div>
