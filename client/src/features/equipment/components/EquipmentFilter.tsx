@@ -12,8 +12,10 @@ import {
 import type { EquipmentFilterProps, EquipmentSortOption } from '@/features/equipment/types';
 import { EQUIPMENT_STATUS, EQUIPMENT_STATUS_LABELS } from '@/features/equipment/types';
 
+const EMPTY_OPTION_VALUE = 'all';
+
 const STATUS_OPTIONS = [
-  { value: '', label: 'Toate statusurile' },
+  { value: EMPTY_OPTION_VALUE, label: 'Toate statusurile' },
   { value: EQUIPMENT_STATUS.ALOCAT, label: EQUIPMENT_STATUS_LABELS[EQUIPMENT_STATUS.ALOCAT] },
   { value: EQUIPMENT_STATUS.IN_STOC, label: 'Disponibile' },
   { value: EQUIPMENT_STATUS.MENTENANTA, label: 'În service' },
@@ -58,12 +60,12 @@ function EquipmentFilter({
       </div>
 
       <div className="min-w-[180px]">
-        <Select value={type} onValueChange={onTypeChange}>
+        <Select value={type || EMPTY_OPTION_VALUE} onValueChange={(value) => onTypeChange(value === EMPTY_OPTION_VALUE ? '' : value)}>
           <SelectTrigger className="h-11 rounded-xl border border-slate-200/80 bg-white/90 text-sm shadow-sm dark:border-slate-700/70 dark:bg-slate-900/70">
             <SelectValue placeholder="Tip echipament" />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
-            <SelectItem value="">Toate tipurile</SelectItem>
+            <SelectItem value={EMPTY_OPTION_VALUE}>Toate tipurile</SelectItem>
             {types.map((option) => (
               <SelectItem key={option} value={option}>
                 {formatTypeLabel(option)}
@@ -74,7 +76,10 @@ function EquipmentFilter({
       </div>
 
       <div className="min-w-[180px]">
-        <Select value={status} onValueChange={onStatusChange}>
+        <Select
+          value={status || EMPTY_OPTION_VALUE}
+          onValueChange={(value) => onStatusChange(value === EMPTY_OPTION_VALUE ? '' : value)}
+        >
           <SelectTrigger className="h-11 rounded-xl border border-slate-200/80 bg-white/90 text-sm shadow-sm dark:border-slate-700/70 dark:bg-slate-900/70">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
