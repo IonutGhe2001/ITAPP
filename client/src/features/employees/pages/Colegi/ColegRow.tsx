@@ -97,7 +97,7 @@ export default function ColegRow({
 
   useLayoutEffect(() => {
     if (rowRef.current) {
-      setSize(index, rowRef.current.getBoundingClientRect().height + 20);
+      setSize(index, rowRef.current.getBoundingClientRect().height + 28);
     }
   }, [index, coleg, expanded, setSize]);
 
@@ -124,7 +124,7 @@ export default function ColegRow({
   const showPendingPV = pendingPVCount > 0;
 
   return (
-    <div style={style} className="px-1 py-2">
+    <div style={style} className="px-3 py-3">
       <article
         ref={rowRef}
         className={cn(

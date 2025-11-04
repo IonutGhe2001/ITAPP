@@ -142,8 +142,15 @@ export default function Colegi() {
   const handledHighlightRef = useRef<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<List>(null);
-  const [width, setWidth] = useState(0);
-  const [height, setHeight] = useState(0);
+  const getInitialWidth = () =>
+    typeof window !== 'undefined' ? Math.max(window.innerWidth - 64, 320) : 320;
+  const getInitialHeight = () => {
+    if (typeof window === 'undefined') return 360;
+    const viewportHeight = window.innerHeight || 0;
+    return Math.max(viewportHeight - 360, 320);
+  };
+  const [width, setWidth] = useState<number>(getInitialWidth);
+  const [height, setHeight] = useState<number>(getInitialHeight);
   const rowHeights = useRef<number[]>([]);
 
   useEffect(() => {
@@ -271,17 +278,36 @@ export default function Colegi() {
     const node = containerRef.current;
     if (!node) return;
 
-    const updateSize = () => {
-      setWidth(node.offsetWidth);
-      setHeight(node.offsetHeight);
+    const computeHeight = () => {
+      const offsetHeight = node.offsetHeight || node.clientHeight || 0;
+      if (offsetHeight > 0) return offsetHeight;
+      if (typeof window === 'undefined') return getInitialHeight();
+      const rect = node.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || 0;
+      const available = Math.max(viewportHeight - rect.top - 120, 320);
+      return available;
     };
 
-    const observer = new ResizeObserver(updateSize);
-    observer.observe(node);
-    requestAnimationFrame(updateSize);
+    const updateSize = () => {
+      const nextWidth = node.offsetWidth || node.clientWidth || getInitialWidth();
+      const nextHeight = computeHeight();
+      setWidth((prev) => (prev !== nextWidth ? nextWidth : prev));
+      setHeight((prev) => (prev !== nextHeight ? nextHeight : prev));
+    };
+
+    updateSize();
+
+    let observer: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(updateSize);
+      observer.observe(node);
+    }
+
     window.addEventListener('resize', updateSize);
     return () => {
-      observer.disconnect();
+      if (observer) {
+        observer.disconnect();
+      }
       window.removeEventListener('resize', updateSize);
     };
   }, []);
