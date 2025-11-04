@@ -40,7 +40,7 @@ const EQUIPMENT_SORT_OPTIONS: { value: EquipmentSortOption; label: string }[] = 
 ];
 
 const EQUIPMENT_STATUS_OPTIONS = [
-  { value: '', label: 'Toate statusurile' },
+  { value: 'all', label: 'Toate statusurile' }, // changed from '' to 'all'
   { value: 'alocat', label: 'Alocate' },
   { value: 'in_stoc', label: 'În stoc' },
   { value: 'mentenanta', label: 'În mentenanță' },
@@ -398,9 +398,9 @@ export default function Echipamente() {
 
   const hasData = processedEquipment.length > 0;
 
-    let content: React.ReactNode = null;
+  let content: React.ReactNode = null;
 
-    if (isError) {
+  if (isError) {
     content = (
       <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-slate-200 bg-white p-12 text-center">
         <AlertTriangle className="h-10 w-10 text-amber-500" aria-hidden="true" />
@@ -408,7 +408,7 @@ export default function Echipamente() {
           <p className="text-lg font-semibold text-foreground">Nu am putut încărca echipamentele.</p>
           <p className="mx-auto max-w-md text-sm text-muted-foreground">{handleApiError(error)}</p>
         </div>
-      <Button onClick={() => refetch()} variant="default" className="rounded-full px-5">
+        <Button onClick={() => refetch()} variant="default" className="rounded-full px-5">
           Reîncearcă
         </Button>
       </div>
@@ -500,6 +500,9 @@ export default function Echipamente() {
     !isError && (hasData || showSkeleton) ? 'overflow-hidden p-0' : !isError ? 'p-6' : null,
   );
 
+  // Map empty-string status to 'all' for the UI Select to avoid Radix empty value constraint
+  const uiStatusValue = status === '' ? 'all' : status;
+
   return (
     <div className="min-h-screen bg-white pb-12 text-slate-900">
       <header className="border-b border-slate-200 bg-white">
@@ -564,7 +567,10 @@ export default function Echipamente() {
               </div>
 
               <div>
-                <Select value={status} onValueChange={setStatus}>
+                <Select
+                  value={uiStatusValue}
+                  onValueChange={(value) => setStatus(value === 'all' ? '' : value)}
+                >
                   <SelectTrigger className="h-11 w-full rounded-xl border border-slate-300 bg-white text-sm font-medium hover:border-slate-400">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>

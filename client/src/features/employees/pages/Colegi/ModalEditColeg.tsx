@@ -72,6 +72,10 @@ export default function ModalEditColeg({
     }
   };
 
+  // Map empty department to a non-empty sentinel for Radix Select
+  const uiDepartmentValue =
+    formData.departmentConfigId === '' ? 'none' : formData.departmentConfigId;
+
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent>
@@ -117,14 +121,19 @@ export default function ModalEditColeg({
           <div>
             <Label htmlFor="departmentConfigId">Departament</Label>
             <Select
-              value={formData.departmentConfigId}
-              onValueChange={(value) => setFormData({ ...formData, departmentConfigId: value })}
+              value={uiDepartmentValue}
+              onValueChange={(value) =>
+                setFormData({
+                  ...formData,
+                  departmentConfigId: value === 'none' ? '' : value,
+                })
+              }
             >
               <SelectTrigger id="departmentConfigId">
                 <SelectValue placeholder="Selectează departament" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Fără departament</SelectItem>
+                <SelectItem value="none">Fără departament</SelectItem>
                 {departments.map((dept) => (
                   <SelectItem key={dept.id} value={dept.id}>
                     {dept.name}
