@@ -53,7 +53,7 @@ interface ColegRowProps {
 const lifecycleTone = {
   active: 'bg-emerald-500',
   pending: 'bg-amber-500',
-  inactive: 'bg-slate-400',
+  inactive: 'bg-neutral-300',
 } as const;
 
 const getDepartmentName = (coleg: AngajatWithRelations) => {
@@ -141,7 +141,7 @@ export default function ColegRow({
       <article
         ref={rowRef}
         className={cn(
-          'relative flex flex-col gap-4 rounded-2xl border border-slate-200/70 bg-white/95 p-6 shadow-sm ring-1 ring-inset ring-white/70 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg focus-within:ring-2 focus-within:ring-primary/50 focus-within:ring-offset-2 focus-within:ring-offset-white dark:border-slate-800/70 dark:bg-slate-900/70 dark:ring-0 dark:focus-within:ring-offset-slate-900',
+          'relative flex flex-col gap-4 rounded-2xl border border-primary/10 bg-white p-6 shadow-lg shadow-primary/10 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-xl focus-within:ring-2 focus-within:ring-primary/50 focus-within:ring-offset-4 focus-within:ring-offset-white',
           isHighlighted && 'ring-2 ring-primary/50',
         )}
       >
@@ -150,7 +150,7 @@ export default function ColegRow({
             <Avatar name={coleg.numeComplet} className="h-16 w-16" />
             <span
               className={cn(
-                'absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-white shadow dark:border-slate-900',
+                'absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-white shadow',
                 statusIndicatorClass,
               )}
               aria-hidden="true"
@@ -162,7 +162,7 @@ export default function ColegRow({
               <button
                 type="button"
                 onClick={handleOpenDetails}
-                className="text-left text-lg font-semibold tracking-tight text-slate-900 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:text-slate-50 dark:focus-visible:ring-offset-slate-900"
+                className="text-left text-lg font-semibold tracking-tight text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
               >
                 {coleg.numeComplet}
               </button>
@@ -182,7 +182,7 @@ export default function ColegRow({
               </ActionsMenu>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
+            <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
               <span className="inline-flex items-center gap-1 font-medium">
                 <UserRound className="h-4 w-4" aria-hidden="true" />
                 {coleg.functie}
@@ -196,10 +196,10 @@ export default function ColegRow({
               <StatusBadge label={lifecycleStatus === 'active' ? 'Activ' : lifecycleStatus === 'pending' ? 'În așteptare' : 'Inactiv'} tone={lifecycleStatus === 'active' ? 'success' : lifecycleStatus === 'pending' ? 'warning' : 'neutral'} withDot />
             </div>
 
-            <div className="grid gap-2 text-sm text-slate-600 dark:text-slate-300 sm:grid-cols-2">
+            <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
               {coleg.email && (
                 <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-slate-400" aria-hidden="true" />
+                  <Mail className="h-4 w-4 text-primary/70" aria-hidden="true" />
                   <a href={`mailto:${coleg.email}`} className="hover:underline">
                     {coleg.email}
                   </a>
@@ -207,7 +207,7 @@ export default function ColegRow({
               )}
               {coleg.telefon && (
                 <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-slate-400" aria-hidden="true" />
+                  <Phone className="h-4 w-4 text-primary/70" aria-hidden="true" />
                   <a href={`tel:${coleg.telefon}`} className="hover:underline">
                     {coleg.telefon}
                   </a>
@@ -215,19 +215,19 @@ export default function ColegRow({
               )}
               {coleg.cDataUsername && (
                 <div className="flex items-center gap-2">
-                  <Laptop2 className="h-4 w-4 text-slate-400" aria-hidden="true" />
+                  <Laptop2 className="h-4 w-4 text-primary/70" aria-hidden="true" />
                   <span className="truncate">c-data: {coleg.cDataUsername}</span>
                 </div>
               )}
               {coleg.cDataId && (
                 <div className="flex items-center gap-2">
-                  <BadgeCheck className="h-4 w-4 text-slate-400" aria-hidden="true" />
+                  <BadgeCheck className="h-4 w-4 text-primary/70" aria-hidden="true" />
                   <span>ID: {coleg.cDataId}</span>
                 </div>
               )}
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <span>
                 Cont c-data: {coleg.cDataCreated ? 'Creat' : 'Necreat'}
                 {!coleg.cDataCreated && coleg.emailAccountStatus !== 'PENDING' && (
@@ -265,7 +265,7 @@ export default function ColegRow({
         </div>
 
         {expanded && (
-          <div className="rounded-2xl border border-slate-200/70 bg-slate-50/80 p-4 dark:border-slate-800/60 dark:bg-slate-900/40">
+          <div className="rounded-2xl border border-primary/10 bg-primary/5 p-4">
             {coleg.echipamente.length === 0 ? (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <AlertTriangle className="h-4 w-4" aria-hidden="true" />
@@ -276,14 +276,14 @@ export default function ColegRow({
                 {coleg.echipamente.map((echipament) => (
                   <div
                     key={echipament.id}
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/60 bg-white/80 p-3 shadow-sm transition hover:border-primary/30 dark:border-slate-700/60 dark:bg-slate-900/60"
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/10 bg-white p-3 shadow-sm transition hover:border-primary/30 hover:shadow-md"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/5 text-primary">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
                         <EquipmentIcon type={echipament.tip} className="h-5 w-5" />
                       </div>
                       <div className="space-y-1 text-sm">
-                        <p className="font-medium text-slate-900 dark:text-slate-100">{echipament.nume}</p>
+                        <p className="font-medium text-foreground">{echipament.nume}</p>
                         <p className="text-xs text-muted-foreground">Serie: {echipament.serie}</p>
                       </div>
                     </div>
@@ -298,7 +298,7 @@ export default function ColegRow({
                           variant="ghost"
                           size="sm"
                           onClick={() => handleRemoveEquipment(echipament.id, coleg.id)}
-                          className="h-7 rounded-lg px-2 text-xs text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-500/10"
+                          className="h-7 rounded-lg px-2 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
                         >
                           Elimină
                         </Button>
@@ -350,7 +350,7 @@ export default function ColegRow({
               variant="outline"
               size="sm"
               onClick={() => setSelectedAngajatId(coleg.id)}
-              className="rounded-lg border-slate-200/80 bg-white/80 text-sm shadow-sm hover:bg-slate-100 dark:border-slate-700/70 dark:bg-slate-900/70"
+              className="rounded-lg border-primary/20 bg-white text-sm shadow-sm transition hover:border-primary/40 hover:text-primary"
             >
               Asignează echipament
             </Button>

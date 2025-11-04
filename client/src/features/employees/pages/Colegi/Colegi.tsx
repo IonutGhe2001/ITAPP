@@ -509,14 +509,14 @@ export default function Colegi() {
       {Array.from({ length: 4 }).map((_, index) => (
         <div
           key={index}
-          className="animate-pulse rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm ring-1 ring-inset ring-white/60 dark:border-slate-800/70 dark:bg-slate-900/70"
+          className="animate-pulse rounded-2xl border border-primary/10 bg-gradient-to-br from-white to-rose-50/70 p-6 shadow-md shadow-primary/10"
         >
           <div className="flex items-start gap-4">
-            <div className="h-14 w-14 rounded-full bg-slate-200 dark:bg-slate-700" />
+            <div className="h-14 w-14 rounded-full bg-primary/10" />
             <div className="flex-1 space-y-3">
-              <div className="h-3.5 w-1/3 rounded-full bg-slate-200/70 dark:bg-slate-700" />
-              <div className="h-3 w-1/4 rounded-full bg-slate-200/70 dark:bg-slate-700" />
-              <div className="h-3 w-1/5 rounded-full bg-slate-200/70 dark:bg-slate-700" />
+              <div className="h-3.5 w-1/3 rounded-full bg-primary/10" />
+              <div className="h-3 w-1/4 rounded-full bg-primary/10" />
+              <div className="h-3 w-1/5 rounded-full bg-primary/10" />
             </div>
           </div>
         </div>
@@ -528,11 +528,11 @@ export default function Colegi() {
 
   if (isError) {
     content = (
-      <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-slate-200/70 bg-white/95 p-12 text-center shadow-sm ring-1 ring-inset ring-white/70 dark:border-slate-800/70 dark:bg-slate-900/70">
+      <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-primary/10 bg-white p-12 text-center shadow-lg shadow-primary/10">
         <AlertTriangle className="h-10 w-10 text-amber-500" aria-hidden="true" />
         <div className="space-y-1">
-          <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">Nu am putut încărca lista de colegi.</p>
-          <p className="mx-auto max-w-md text-sm text-slate-600 dark:text-slate-300">{handleApiError(error)}</p>
+          <p className="text-lg font-semibold text-foreground">Nu am putut încărca lista de colegi.</p>
+          <p className="mx-auto max-w-md text-sm text-muted-foreground">{handleApiError(error)}</p>
         </div>
         <Button onClick={() => refetch()} variant="default" className="rounded-full px-5">
           Reîncearcă
@@ -575,13 +575,13 @@ export default function Colegi() {
     );
   } else if (!isLoading && !hasData) {
     content = (
-      <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-slate-200/70 bg-gradient-to-br from-white/95 to-slate-100/70 p-12 text-center shadow-sm ring-1 ring-inset ring-white/70 dark:border-slate-800/70 dark:bg-slate-900/70">
+      <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-primary/10 bg-gradient-to-br from-white to-rose-50/80 p-12 text-center shadow-lg shadow-primary/10">
         <svg
           width="96"
           height="96"
           viewBox="0 0 96 96"
           aria-hidden="true"
-          className="text-slate-300 dark:text-slate-700"
+          className="text-primary/20"
         >
           <path
             d="M24 30c0-3.314 2.686-6 6-6h36c3.314 0 6 2.686 6 6v36c0 3.314-2.686 6-6 6H30c-3.314 0-6-2.686-6-6V30z"
@@ -597,8 +597,8 @@ export default function Colegi() {
           />
         </svg>
         <div className="space-y-2">
-          <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">Nu există colegi înregistrați.</p>
-          <p className="text-sm text-slate-600 dark:text-slate-300">Adaugă primul membru al echipei pentru a începe să gestionezi echipamentele.</p>
+          <p className="text-lg font-semibold text-foreground">Nu există colegi înregistrați.</p>
+          <p className="text-sm text-muted-foreground">Adaugă primul membru al echipei pentru a începe să gestionezi echipamentele.</p>
         </div>
         <Button className="mt-4 rounded-full px-5" onClick={() => setShowAddModal(true)}>
           <UserPlus className="mr-2 h-4 w-4" aria-hidden="true" /> Adaugă coleg
@@ -611,49 +611,50 @@ export default function Colegi() {
   const containerClasses = cn(
     'min-h-[320px]',
     !isError
-      ? 'rounded-3xl border border-slate-200/70 bg-white/95 p-4 shadow-sm ring-1 ring-inset ring-white/70 dark:border-slate-800/70 dark:bg-slate-900/70 dark:ring-0'
-      : 'rounded-3xl border border-dashed border-slate-300/70 bg-white/90 p-6 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/60',
+      ? 'rounded-3xl border border-primary/10 bg-white p-4 shadow-lg shadow-primary/10'
+      : 'rounded-3xl border border-dashed border-primary/20 bg-white p-6 text-foreground shadow-lg shadow-primary/10',
     !isError && hasData && 'p-0',
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-12 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <header className="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 text-white">
-        <Container className="py-12">
-          <div className="space-y-8">
+    <div className="min-h-screen bg-gradient-to-b from-white via-rose-50/40 to-white pb-12 text-foreground">
+      <header className="pt-10">
+        <Container>
+          <div className="rounded-3xl border border-primary/15 bg-white p-8 shadow-2xl shadow-primary/10">
             <div className="flex flex-wrap items-start justify-between gap-6">
-              <div className="max-w-2xl space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-300">Echipa</p>
-                <h1 className="text-3xl font-semibold tracking-tight text-white">Colegi</h1>
-                <p className="text-sm text-slate-300">
+              <div className="max-w-2xl space-y-4">
+                <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-primary">
+                  Echipa
+                </span>
+                <h1 className="text-4xl font-bold tracking-tight text-foreground">Colegi</h1>
+                <p className="text-base text-muted-foreground">
                   Monitorizează colegii, statusul conturilor și echipamentele alocate într-un singur loc.
                 </p>
               </div>
               <Button
                 onClick={() => setShowAddModal(true)}
-                variant="secondary"
-                className="h-11 rounded-full bg-white px-6 text-sm font-semibold text-slate-900 shadow-lg shadow-slate-900/20 transition-all hover:-translate-y-0.5 hover:bg-white/90"
+                className="h-11 rounded-full px-6 text-sm font-semibold shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5"
               >
                 <UserPlus className="mr-2 h-4 w-4" aria-hidden="true" /> Adaugă coleg
               </Button>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {highlightCards.map(({ label, value, description, icon: Icon }) => (
                 <div
                   key={label}
-                  className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5 shadow-inner backdrop-blur-sm transition hover:border-white/20"
+                  className="group relative overflow-hidden rounded-2xl border border-primary/10 bg-white p-5 shadow-sm transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">{label}</span>
-                    <Icon
-                      className="h-5 w-5 text-slate-200 transition group-hover:text-white"
-                      aria-hidden="true"
-                    />
+                  <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-primary/80 to-primary/60" aria-hidden="true" />
+                  <div className="flex items-start justify-between">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-primary/80">{label}</span>
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                      <Icon className="h-4 w-4" aria-hidden="true" />
+                    </div>
                   </div>
-                  <p className="mt-4 text-3xl font-semibold tracking-tight text-white">
+                  <p className="mt-6 text-3xl font-semibold tracking-tight text-foreground">
                     {value.toLocaleString('ro-RO')}
                   </p>
-                  <p className="text-xs text-slate-400">{description}</p>
+                  <p className="text-xs text-muted-foreground">{description}</p>
                 </div>
               ))}
             </div>
@@ -661,13 +662,13 @@ export default function Colegi() {
         </Container>
       </header>
 
-      <Container className="mt-8 space-y-6">
+      <Container className="mt-10 space-y-6">
         {hasPendingPV && !isError && (
-          <div className="flex flex-col gap-3 rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm ring-1 ring-inset ring-white/70 dark:border-slate-800/70 dark:bg-slate-900/70 dark:ring-0">
+          <div className="flex flex-col gap-3 rounded-3xl border border-primary/10 bg-white p-5 shadow-lg shadow-primary/10">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-wrap items-center gap-3">
                 <StatusBadge label="Procese verbale în lucru" tone="warning" withDot />
-                <span className="text-sm text-slate-600 dark:text-slate-300">
+                <span className="text-sm text-muted-foreground">
                   {pendingPVEmployees.length === 1
                     ? '1 coleg are procese verbale nefinalizate.'
                     : `${pendingPVEmployees.length} colegi au procese verbale nefinalizate.`}
@@ -677,12 +678,12 @@ export default function Colegi() {
                 variant="outline"
                 size="sm"
                 onClick={handleScrollToPending}
-                className="rounded-full border-slate-200/70 bg-white/80 px-4 text-xs font-semibold shadow-sm hover:border-slate-300 dark:border-slate-700/70 dark:bg-slate-900/70"
+                className="rounded-full border-primary/20 bg-white px-4 text-xs font-semibold text-primary shadow-sm transition hover:border-primary/40 hover:text-primary"
               >
                 Vezi detalii
               </Button>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-muted-foreground">
               {pendingPVTotal === 1
                 ? '1 echipament în așteptare pentru confirmare.'
                 : `${pendingPVTotal} echipamente în așteptare pentru confirmare.`}
@@ -703,11 +704,11 @@ export default function Colegi() {
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
                     placeholder="Caută după nume, rol sau departament"
-                    className="h-11 w-full rounded-2xl border border-transparent bg-white/90 pl-10 text-sm shadow-sm ring-1 ring-inset ring-slate-200/80 transition focus-visible:border-transparent focus-visible:ring-2 focus-visible:ring-primary/70 dark:bg-slate-900/70 dark:ring-slate-700/70"
+                    className="h-11 w-full rounded-2xl border border-primary/10 bg-white pl-10 text-sm shadow-sm transition focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/60"
                     aria-label="Search employees"
                   />
                 </div>
-                <div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                <div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   <span>{filteredSummary}</span>
                   {hasActiveFilters && (
                     <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
@@ -722,7 +723,7 @@ export default function Colegi() {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="h-11 w-full justify-between rounded-2xl border border-slate-200/70 bg-white/90 text-sm font-medium shadow-sm transition hover:border-slate-300 dark:border-slate-700/70 dark:bg-slate-900/70"
+                      className="h-11 w-full justify-between rounded-2xl border border-primary/10 bg-white text-sm font-medium shadow-sm transition hover:border-primary/30 hover:text-primary"
                     >
                       <div className="flex items-center gap-2">
                         <Filter className="h-4 w-4" aria-hidden="true" />
@@ -759,7 +760,7 @@ export default function Colegi() {
 
               <div>
                 <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as EmployeeStatusFilter)}>
-                  <SelectTrigger className="h-11 w-full rounded-2xl border border-slate-200/70 bg-white/90 text-sm font-medium shadow-sm transition hover:border-slate-300 dark:border-slate-700/70 dark:bg-slate-900/70">
+                  <SelectTrigger className="h-11 w-full rounded-2xl border border-primary/10 bg-white text-sm font-medium shadow-sm transition hover:border-primary/30 hover:text-primary">
                     <SelectValue placeholder="Status cont" />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl shadow-lg">
@@ -774,7 +775,7 @@ export default function Colegi() {
 
               <div>
                 <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as EmployeeSortOption)}>
-                  <SelectTrigger className="h-11 w-full rounded-2xl border border-slate-200/70 bg-white/90 text-sm font-medium shadow-sm transition hover:border-slate-300 dark:border-slate-700/70 dark:bg-slate-900/70">
+                  <SelectTrigger className="h-11 w-full rounded-2xl border border-primary/10 bg-white text-sm font-medium shadow-sm transition hover:border-primary/30 hover:text-primary">
                     <SelectValue placeholder="Sortare" />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl shadow-lg">
