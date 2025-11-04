@@ -3,7 +3,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useUpdateAngajat } from '@/features/employees';
+import { useDepartmentConfigs } from '@/features/employees/departmentConfigService';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 import type { Angajat } from '@/features/equipment/types';
 
@@ -25,10 +33,12 @@ export default function ModalEditColeg({
     cDataId: coleg.cDataId || '',
     cDataNotes: coleg.cDataNotes || '',
     cDataCreated: coleg.cDataCreated,
+    departmentConfigId: coleg.departmentConfigId || '',
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const updateMutation = useUpdateAngajat();
   const { toast } = useToast();
+  const { data: departments = [] } = useDepartmentConfigs();
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
@@ -45,7 +55,11 @@ export default function ModalEditColeg({
   const handleSubmit = async () => {
     if (!validate()) return;
     try {
-      await updateMutation.mutateAsync({ id: coleg.id, data: formData });
+      const payload = {
+        ...formData,
+        departmentConfigId: formData.departmentConfigId || undefined,
+      };
+      await updateMutation.mutateAsync({ id: coleg.id, data: payload });
       toast({ title: 'Coleg actualizat', description: 'Modificările au fost salvate.' });
       onSuccess?.();
       onClose();
@@ -100,6 +114,25 @@ export default function ModalEditColeg({
               {errors[field] && <p className="mt-1 text-xs text-red-500">{errors[field]}</p>}
             </div>
           ))}
+          <div>
+            <Label htmlFor="departmentConfigId">Departament</Label>
+            <Select
+              value={formData.departmentConfigId}
+              onValueChange={(value) => setFormData({ ...formData, departmentConfigId: value })}
+            >
+              <SelectTrigger id="departmentConfigId">
+                <SelectValue placeholder="Selectează departament" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Fără departament</SelectItem>
+                {departments.map((dept) => (
+                  <SelectItem key={dept.id} value={dept.id}>
+                    {dept.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="flex items-center space-x-2">
             <input
               id="cDataCreated"

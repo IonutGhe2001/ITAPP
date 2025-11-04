@@ -5,7 +5,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useCreateAngajat } from '@/features/employees';
+import { useDepartmentConfigs } from '@/features/employees/departmentConfigService';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 
 export default function ModalAddColeg({
@@ -21,10 +29,12 @@ export default function ModalAddColeg({
     email: '',
     telefon: '',
     cDataCreated: false,
+    departmentConfigId: '',
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { toast } = useToast();
   const createMutation = useCreateAngajat();
+  const { data: departments = [] } = useDepartmentConfigs();
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
@@ -41,7 +51,11 @@ export default function ModalAddColeg({
   const handleSubmit = async () => {
     if (!validate()) return;
     try {
-      await createMutation.mutateAsync(formData);
+      const payload = {
+        ...formData,
+        departmentConfigId: formData.departmentConfigId || undefined,
+      };
+      await createMutation.mutateAsync(payload);
       toast({ title: 'Coleg adăugat', description: 'Coleg adăugat cu succes.' });
       onClose();
     } catch {
@@ -80,6 +94,25 @@ export default function ModalAddColeg({
               {errors[field] && <p className="mt-1 text-xs text-red-500">{errors[field]}</p>}
             </div>
           ))}
+          <div>
+            <Label htmlFor="departmentConfigId">Departament</Label>
+            <Select
+              value={formData.departmentConfigId}
+              onValueChange={(value) => setFormData({ ...formData, departmentConfigId: value })}
+            >
+              <SelectTrigger id="departmentConfigId">
+                <SelectValue placeholder="Selectează departament" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Fără departament</SelectItem>
+                {departments.map((dept) => (
+                  <SelectItem key={dept.id} value={dept.id}>
+                    {dept.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="flex items-center space-x-2">
             <input
               id="cDataCreated"
