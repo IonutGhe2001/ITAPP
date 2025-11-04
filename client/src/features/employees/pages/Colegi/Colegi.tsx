@@ -1,5 +1,26 @@
-import { useState, useLayoutEffect, useRef, useEffect, useMemo } from 'react';
+import { useState, useLayoutEffect, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { VariableSizeList as List } from 'react-window';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import Toolbar from '@/components/Toolbar';
+import Container from '@/components/Container';
+import StatusBadge from '@/components/StatusBadge';
 import { useAngajati, useDeleteAngajat } from '@/features/employees';
 import type { Angajat } from '@/features/equipment/types';
 import type { AngajatWithRelations } from '@/features/employees/angajatiService';
@@ -9,13 +30,42 @@ import { queueProcesVerbal, getQueue, removeFromQueue } from '@/features/procese
 import { getConfig } from '@/services/configService';
 import ColegRow from './ColegRow';
 import ColegModals from './ColegModals';
-import useColegiFilter from './useColegiFilter';
-import Container from '@/components/Container';
-import { Button } from '@/components/ui/button';
-import { VariableSizeList as List } from 'react-window';
+import useColegiFilter, {
+  type EmployeeSortOption,
+  type EmployeeStatusFilter,
+} from './useColegiFilter';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 import { useAuth } from '@/context/useAuth';
 import { handleApiError } from '@/utils/apiError';
+import { Search, Filter, UserPlus, Loader2, AlertTriangle } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const EMPLOYEE_STATUS_OPTIONS: { value: EmployeeStatusFilter; label: string }[] = [
+  { value: 'all', label: 'All statuses' },
+  { value: 'active', label: 'Active accounts' },
+  { value: 'pending', label: 'Pending setup' },
+  { value: 'inactive', label: 'Inactive' },
+];
+
+const EMPLOYEE_SORT_OPTIONS: { value: EmployeeSortOption; label: string }[] = [
+  { value: 'name-asc', label: 'Name A–Z' },
+  { value: 'name-desc', label: 'Name Z–A' },
+  { value: 'created-desc', label: 'Creation date' },
+];
+
+const parseStatusParam = (value: string | null): EmployeeStatusFilter => {
+  if (!value) return 'all';
+  return EMPLOYEE_STATUS_OPTIONS.some((option) => option.value === value)
+    ? (value as EmployeeStatusFilter)
+    : 'all';
+};
+
+const parseSortParam = (value: string | null): EmployeeSortOption => {
+  if (!value) return 'name-asc';
+  return EMPLOYEE_SORT_OPTIONS.some((option) => option.value === value)
+    ? (value as EmployeeSortOption)
+    : 'name-asc';
+};
 
 export default function Colegi() {
   const { isAuthenticated } = useAuth();
@@ -33,9 +83,26 @@ export default function Colegi() {
   } = useAngajati(undefined, { enabled: queryEnabled });
   const colegi: AngajatWithRelations[] = useMemo(
     () => data?.pages.flatMap((page) => page.data) ?? [],
-    [data]
+    [data],
   );
-  const [searchParams] = useSearchParams();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const highlightedId = searchParams.get('highlight');
+  const initialQuery = searchParams.get('q') ?? '';
+  const initialFunctionsParam = searchParams.get('functions');
+  const initialFunctions = useMemo(
+    () =>
+      initialFunctionsParam
+        ? initialFunctionsParam
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean)
+        : [],
+    [initialFunctionsParam],
+  );
+  const initialStatus = parseStatusParam(searchParams.get('status'));
+  const initialSort = parseSortParam(searchParams.get('sort'));
+
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [selectedAngajatId, setSelectedAngajatId] = useState<string | null>(null);
   const [replaceData, setReplaceData] = useState<{
@@ -46,12 +113,38 @@ export default function Colegi() {
   const [editColeg, setEditColeg] = useState<Angajat | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Angajat | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [detailColeg, setDetailColeg] = useState<AngajatWithRelations | null>(null);
   const deleteMutation = useDeleteAngajat();
   const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
   const [pendingPV, setPendingPV] = useState<
     Record<string, { predate: string[]; primite: string[] }>
   >({});
+
+  const {
+    search,
+    setSearch,
+    functieFilter,
+    setFunctieFilter,
+    statusFilter,
+    setStatusFilter,
+    sortOrder,
+    setSortOrder,
+    functii,
+    filtered,
+  } = useColegiFilter(colegi, {
+    initialSearch: initialQuery,
+    initialFunctions,
+    initialStatus,
+    initialSort,
+  });
+
+  const handledHighlightRef = useRef<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<List>(null);
+  const [width, setWidth] = useState(0);
+  const [height, setHeight] = useState(0);
+  const rowHeights = useRef<number[]>([]);
 
   useEffect(() => {
     const items = getQueue();
@@ -67,7 +160,10 @@ export default function Colegi() {
     setPendingPV(grouped);
   }, []);
 
-  const addPendingPV = (colegId: string, change: { predate?: string[]; primite?: string[] }) => {
+  const addPendingPV = (
+    colegId: string,
+    change: { predate?: string[]; primite?: string[] },
+  ) => {
     setPendingPV((prev) => {
       const current = prev[colegId] || { predate: [], primite: [] };
       return {
@@ -104,37 +200,62 @@ export default function Colegi() {
     }
   };
 
-  const {
-    search,
-    setSearch,
-    functieFilter,
-    setFunctieFilter,
-    sortOrder,
-    setSortOrder,
-    functii,
-    filtered,
-  } = useColegiFilter(colegi);
-
-  const highlightedId = searchParams.get('highlight');
-  const initialQuery = searchParams.get('q') ?? '';
-  const handledHighlightRef = useRef<string | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<List>(null);
-  const [width, setWidth] = useState(0);
-  const [height, setHeight] = useState(0);
-  const rowHeights = useRef<number[]>([]);
-
-  useEffect(() => {
-    const normalized = initialQuery.trim();
-    if (!normalized || search === normalized) return;
-    setSearch(normalized);
-  }, [initialQuery, search, setSearch]);
+  const toggleFunction = useCallback(
+    (functie: string, checked: boolean) => {
+      setFunctieFilter((prev) => {
+        const next = new Set(prev);
+        if (checked) {
+          next.add(functie);
+        } else {
+          next.delete(functie);
+        }
+        return Array.from(next);
+      });
+    },
+    [setFunctieFilter],
+  );
 
   useEffect(() => {
     if (!highlightedId) {
       handledHighlightRef.current = null;
     }
   }, [highlightedId]);
+
+  useEffect(() => {
+    const next = new URLSearchParams(searchParams);
+    const trimmedSearch = search.trim();
+
+    if (trimmedSearch) {
+      next.set('q', trimmedSearch);
+    } else {
+      next.delete('q');
+    }
+
+    if (functieFilter.length > 0) {
+      next.set('functions', functieFilter.join(','));
+    } else {
+      next.delete('functions');
+    }
+
+    if (statusFilter !== 'all') {
+      next.set('status', statusFilter);
+    } else {
+      next.delete('status');
+    }
+
+    if (sortOrder !== 'name-asc') {
+      next.set('sort', sortOrder);
+    } else {
+      next.delete('sort');
+    }
+
+    const current = searchParams.toString();
+    const updated = next.toString();
+
+    if (current !== updated) {
+      setSearchParams(next, { replace: true });
+    }
+  }, [search, functieFilter, statusFilter, sortOrder, searchParams, setSearchParams]);
 
   useEffect(() => {
     if (!highlightedId || handledHighlightRef.current === highlightedId) return;
@@ -144,7 +265,7 @@ export default function Colegi() {
     handledHighlightRef.current = highlightedId;
     setExpanded(new Set([highlightedId]));
     requestAnimationFrame(() => listRef.current?.scrollToItem(index, 'start'));
-  }, [filtered, highlightedId, width, height, setExpanded]);
+  }, [filtered, highlightedId, width, height]);
 
   useLayoutEffect(() => {
     const node = containerRef.current;
@@ -216,10 +337,10 @@ export default function Colegi() {
         window.open(url, '_blank');
       } else {
         queueProcesVerbal(colegId, 'RESTITUIRE', { predate: [eqId] });
-    }
-    addPendingPV(colegId, { predate: [eqId] });
-    toast({ title: 'Echipament eliberat', description: 'Proces verbal în așteptare' });
-    await refetch();
+      }
+      addPendingPV(colegId, { predate: [eqId] });
+      toast({ title: 'Echipament eliberat', description: 'Proces verbal în așteptare' });
+      await refetch();
     } catch {
       toast({
         title: 'Eroare',
@@ -228,26 +349,6 @@ export default function Colegi() {
       });
     }
   };
-
-  if (isLoading && colegi.length === 0) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="border-primary h-10 w-10 animate-spin rounded-full border-4 border-t-transparent"></div>
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <Container className="py-6">
-        <div className="text-muted-foreground flex flex-col items-center justify-center gap-4 py-24 text-center">
-          <p className="text-foreground text-lg font-semibold">Nu am putut încărca lista de colegi.</p>
-          <p className="max-w-md text-sm">{handleApiError(error)}</p>
-          <Button onClick={() => refetch()}>Reîncearcă</Button>
-        </div>
-      </Container>
-    );
-  }
   
   const handleScrollToPending = () => {
     const firstId = Object.keys(pendingPV)[0];
@@ -259,110 +360,256 @@ export default function Colegi() {
     }
   };
 
-  return (
-    <Container className="space-y-6 py-6">
-      {(() => {
-        const pendingCount = Object.keys(pendingPV).length;
-        return (
-          <>
-            {pendingCount > 0 && (
-              <div className="flex items-center justify-between rounded-lg bg-amber-100 p-3 text-amber-900">
-                <span>Există {pendingCount} procese verbale în așteptare</span>
-                <button onClick={handleScrollToPending} className="underline">
-                  Vezi detalii
-                </button>
-              </div>
-            )}
-            <div className="sticky top-0 z-10 space-y-4 pb-4">
-              <div className="flex flex-col gap-4 sm:flex-row">
-                <input
-                  type="text"
-                  placeholder="Caută după nume sau funcție"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 sm:w-1/2"
-                />
-                <select
-                  value={functieFilter}
-                  onChange={(e) => setFunctieFilter(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 sm:w-1/4"
-                >
-                  <option value="">Toate funcțiile</option>
-                  {functii.map((f: string) => (
-                    <option key={f} value={f}>
-                      {f}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  value={sortOrder}
-                  onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 sm:w-1/4"
-                >
-                  <option value="asc">Nume A-Z</option>
-                  <option value="desc">Nume Z-A</option>
-                </select>
-              </div>
-            </div>
-          </>
-        );
-      })()}
+  const hasData = filtered.length > 0;
+  const hasPendingPV = Object.keys(pendingPV).length > 0;
+  const showSkeleton = isLoading && colegi.length === 0;
 
-      <div ref={containerRef} className="h-[60vh] max-h-[600px]">
-        {width > 0 && height > 0 && filtered.length > 0 && (
-          <List
-            ref={listRef}
-            height={height}
-            width={width}
-            itemCount={filtered.length}
-            itemSize={getSize}
-            overscanCount={5}
-          >
-            {({ index, style }) => (
-              <ColegRow
-                coleg={filtered[index]}
-                index={index}
-                style={style}
-                expanded={expanded.has(filtered[index].id)}
-                isHighlighted={filtered[index].id === highlightedId}
-                toggleExpand={toggleExpand}
-                handleRemoveEquipment={handleRemoveEquipment}
-                setEditColeg={setEditColeg}
-                setConfirmDelete={setConfirmDelete}
-                handleDelete={handleDelete}
-                setSelectedAngajatId={setSelectedAngajatId}
-                setReplaceData={setReplaceData}
-                setSize={setSize}
-                pendingPV={pendingPV[filtered[index].id]}
-                onGeneratePV={handleGeneratePV}
-              />
-            )}
-          </List>
-        )}
-        {width > 0 && height > 0 && filtered.length === 0 && (
-          <div className="flex h-full items-center justify-center">
-            <div className="text-muted-foreground text-center text-sm">
-              <p>{search.trim() ? 'Nu s-au găsit colegi.' : 'Nu există colegi înregistrați.'}</p>
-              {search.trim() && (
-                <Button className="mt-2" onClick={() => setShowAddModal(true)}>
-                  Adaugă coleg nou
-                </Button>
-              )}
+  const renderSkeleton = () => (
+    <div className="grid gap-4">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div
+          key={index}
+          className="animate-pulse rounded-3xl border border-slate-200/70 bg-white/70 p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-900/60"
+        >
+          <div className="flex items-start gap-4">
+            <div className="h-14 w-14 rounded-full bg-slate-200 dark:bg-slate-700" />
+            <div className="flex-1 space-y-3">
+              <div className="h-3.5 w-1/3 rounded-full bg-slate-200 dark:bg-slate-700" />
+              <div className="h-3 w-1/4 rounded-full bg-slate-200 dark:bg-slate-700" />
+              <div className="h-3 w-1/5 rounded-full bg-slate-200 dark:bg-slate-700" />
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      ))}
+    </div>
+  );
 
-      <div className="flex flex-col items-center gap-3">
-        {isFetchingNextPage && (
-          <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
-        )}
-        {hasNextPage && (
-          <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} variant="outline">
-            {isFetchingNextPage ? 'Se încarcă...' : 'Încarcă mai mulți colegi'}
-          </Button>
-        )}
+  let content: React.ReactNode = null;
+
+  if (isError) {
+    content = (
+      <div className="text-muted-foreground flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-slate-300/70 bg-white/70 p-12 text-center shadow-sm dark:border-slate-700/70 dark:bg-slate-900/60">
+        <AlertTriangle className="h-10 w-10 text-amber-500" aria-hidden="true" />
+        <div className="space-y-1">
+          <p className="text-foreground text-lg font-semibold">Nu am putut încărca lista de colegi.</p>
+          <p className="mx-auto max-w-md text-sm">{handleApiError(error)}</p>
+        </div>
+        <Button onClick={() => refetch()} variant="default">
+          Reîncearcă
+        </Button>
       </div>
+    );
+  } else if (showSkeleton) {
+    content = renderSkeleton();
+  } else if (hasData && width > 0 && height > 0) {
+    content = (
+      <List
+        ref={listRef}
+        height={height}
+        width={width}
+        itemCount={filtered.length}
+        itemSize={getSize}
+        overscanCount={6}
+      >
+        {({ index, style }) => (
+          <ColegRow
+            coleg={filtered[index]}
+            index={index}
+            style={style}
+            expanded={expanded.has(filtered[index].id)}
+            isHighlighted={filtered[index].id === highlightedId}
+            toggleExpand={toggleExpand}
+            handleRemoveEquipment={handleRemoveEquipment}
+            setEditColeg={setEditColeg}
+            setConfirmDelete={setConfirmDelete}
+            handleDelete={handleDelete}
+            setSelectedAngajatId={setSelectedAngajatId}
+            setReplaceData={setReplaceData}
+            setSize={setSize}
+            pendingPV={pendingPV[filtered[index].id]}
+            onGeneratePV={handleGeneratePV}
+            onOpenDetails={setDetailColeg}
+          />
+        )}
+      </List>
+    );
+  } else if (!isLoading && !hasData) {
+    content = (
+      <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300/70 bg-white/70 p-12 text-center shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+        <svg
+          width="96"
+          height="96"
+          viewBox="0 0 96 96"
+          aria-hidden="true"
+          className="text-slate-300 dark:text-slate-700"
+        >
+          <path
+            d="M24 30c0-3.314 2.686-6 6-6h36c3.314 0 6 2.686 6 6v36c0 3.314-2.686 6-6 6H30c-3.314 0-6-2.686-6-6V30z"
+            fill="currentColor"
+            opacity="0.4"
+          />
+          <path
+            d="M34 40h28M34 50h28M34 60h18"
+            stroke="currentColor"
+            strokeWidth="4"
+            strokeLinecap="round"
+            opacity="0.7"
+          />
+        </svg>
+        <div className="mt-4 space-y-2">
+          <p className="text-foreground text-lg font-semibold">Nu există colegi înregistrați.</p>
+          <p className="text-muted-foreground text-sm">Adaugă primul membru al echipei pentru a începe să gestionezi echipamentele.</p>
+        </div>
+        <Button className="mt-6" onClick={() => setShowAddModal(true)}>
+          <UserPlus className="mr-2 h-4 w-4" aria-hidden="true" /> Adaugă coleg
+        </Button>
+      </div>
+    );
+  }
+
+  const showToolbar = !isError;
+  const containerClasses = cn(
+    'min-h-[320px]',
+    !isError && hasData &&
+      'rounded-3xl border border-slate-200/80 bg-white/80 p-2 shadow-sm dark:border-slate-800/80 dark:bg-slate-900/60',
+  );
+
+  return (
+    <div className="min-h-screen bg-[#F9FAFB] pb-10 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+      <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/90 backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/80">
+        <Container className="py-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight">Employees</h1>
+              <p className="text-muted-foreground text-sm">
+                Monitorizează colegii, statusul conturilor și echipamentele alocate.
+              </p>
+            </div>
+            <Button onClick={() => setShowAddModal(true)} className="rounded-xl px-4 py-2 shadow-sm">
+              <UserPlus className="mr-2 h-4 w-4" aria-hidden="true" /> Adaugă coleg
+            </Button>
+          </div>
+        </Container>
+      </header>
+
+      <Container className="mt-6 space-y-6">
+        {hasPendingPV && !isError && (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200/80 bg-amber-50/80 p-4 text-amber-900 shadow-sm dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200">
+            <div className="flex items-center gap-2">
+              <StatusBadge label={`${Object.keys(pendingPV).length} PV pending`} tone="warning" withDot />
+              <span className="text-sm">Există procese verbale care necesită atenție.</span>
+            </div>
+            <Button variant="outline" size="sm" onClick={handleScrollToPending} className="rounded-lg border-amber-200/80 bg-white/70 hover:bg-amber-100 dark:border-amber-500/40 dark:bg-transparent dark:hover:bg-amber-500/10">
+              Vezi detalii
+            </Button>
+          </div>
+        )}
+
+        {showToolbar && (
+          <Toolbar>
+            <div className="flex min-w-[220px] flex-1 items-center gap-3">
+              <div className="relative w-full">
+                <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" aria-hidden="true" />
+                <Input
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Search name, role, department"
+                  className="h-11 rounded-xl border border-slate-200/80 bg-white/90 pl-9 text-sm shadow-sm transition focus-visible:ring-2 focus-visible:ring-primary dark:border-slate-700/70 dark:bg-slate-900/70"
+                  aria-label="Search employees"
+                />
+              </div>
+            </div>
+
+          <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="h-11 min-w-[200px] rounded-xl border border-slate-200/80 bg-white/90 text-sm shadow-sm transition hover:bg-slate-100 dark:border-slate-700/70 dark:bg-slate-900/70"
+                >
+                  <Filter className="mr-2 h-4 w-4" aria-hidden="true" />
+                  Funcții
+                  {functieFilter.length > 0 && (
+                    <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                      {functieFilter.length}
+                    </span>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-64 rounded-xl">
+                <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Selectează funcțiile
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {functii.length === 0 && (
+                  <p className="px-2 py-1.5 text-xs text-muted-foreground">Nu există funcții definite.</p>
+                )}
+                {functii.map((functie) => (
+                  <DropdownMenuCheckboxItem
+                    key={functie}
+                    checked={functieFilter.includes(functie)}
+                    onCheckedChange={(checked) => toggleFunction(functie, Boolean(checked))}
+                    className="capitalize"
+                  >
+                    {functie}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <div className="min-w-[180px]">
+              <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as EmployeeStatusFilter)}>
+                <SelectTrigger className="h-11 rounded-xl border border-slate-200/80 bg-white/90 text-sm shadow-sm dark:border-slate-700/70 dark:bg-slate-900/70">
+                  <SelectValue placeholder="Status cont" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {EMPLOYEE_STATUS_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+      <div className="min-w-[180px]">
+              <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as EmployeeSortOption)}>
+                <SelectTrigger className="h-11 rounded-xl border border-slate-200/80 bg-white/90 text-sm shadow-sm dark:border-slate-700/70 dark:bg-slate-900/70">
+                  <SelectValue placeholder="Sortare" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {EMPLOYEE_SORT_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </Toolbar>
+        )}
+
+        <div className={containerClasses} ref={!isError ? containerRef : undefined}>
+          {!isError && hasData && width === 0 && height === 0 ? renderSkeleton() : content}
+        </div>
+
+        {!isError && (
+          <div className="flex flex-col items-center gap-3">
+            {isFetchingNextPage && (
+              <Loader2 className="h-5 w-5 animate-spin text-primary" aria-hidden="true" />
+            )}
+            {hasNextPage && (
+              <Button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                variant="outline"
+                className="rounded-xl"
+              >
+                {isFetchingNextPage ? 'Se încarcă...' : 'Încarcă mai mulți colegi'}
+              </Button>
+            )}
+          </div>
+        )}
+      </Container>
 
       <ColegModals
         selectedAngajatId={selectedAngajatId}
@@ -380,7 +627,9 @@ export default function Colegi() {
         setExpanded={setExpanded}
         handleDelete={handleDelete}
         onPVChange={addPendingPV}
+        detailColeg={detailColeg}
+        setDetailColeg={setDetailColeg}
       />
-    </Container>
+    </div>
   );
 }

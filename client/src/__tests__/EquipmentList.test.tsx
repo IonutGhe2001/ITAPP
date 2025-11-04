@@ -1,45 +1,16 @@
 import { render, screen } from '@testing-library/react';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import EquipmentList from '@/features/equipment/components/EquipmentList';
 import type { Echipament } from '@/features/equipment/types';
 import { BrowserRouter } from 'react-router-dom';
 
-// Mock nested equipment exports used by EquipmentCard
 vi.mock('@/features/equipment', () => ({
   EquipmentIcon: () => <span data-testid="icon" />,
   StatusBadge: ({ status }: { status: string }) => <span>{status}</span>,
 }));
 
-// Simplify react-window behavior
-vi.mock('react-window', () => ({
-  FixedSizeList: ({ itemCount, children }: any) => (
-    <div>
-      {Array.from({ length: itemCount }).map((_, index) => (
-        <div key={index}>{children({ index, style: {} })}</div>
-      ))}
-    </div>
-  ),
-}));
-
 describe('EquipmentList', () => {
-  beforeAll(() => {
-    // Ensure layout effects run with dimensions
-    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
-      configurable: true,
-      value: 100,
-    });
-    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
-      configurable: true,
-      value: 100,
-    });
-    // immediate animation frame
-    globalThis.requestAnimationFrame = (cb: FrameRequestCallback): number => {
-      cb(0);
-      return 0;
-    };
-  });
-
-  it('renders equipment items', () => {
+  it('renders equipment items with assignment link', () => {
     const echipamente: Echipament[] = [
       {
         id: '1',
@@ -50,24 +21,25 @@ describe('EquipmentList', () => {
         angajat: { id: 'a1', numeComplet: 'Ion Popescu' },
       },
     ];
+
     render(
       <BrowserRouter>
-        <EquipmentList echipamente={echipamente} onEdit={vi.fn()} onDelete={vi.fn()} />
+        <EquipmentList echipamente={echipamente} onEdit={vi.fn()} onDelete={vi.fn()} onTransfer={vi.fn()} />
       </BrowserRouter>
     );
+
     expect(screen.getByText('Laptop')).toBeInTheDocument();
     expect(screen.getByText('Serie: 123')).toBeInTheDocument();
-    expect(screen.getByText('Predat la: Ion Popescu')).toBeInTheDocument();
-    const link = screen.getByRole('link');
-    expect(link).toHaveAttribute('href', '/echipamente/1');
+    expect(screen.getByText('Ion Popescu')).toHaveAttribute('href', '/colegi?highlight=a1');
   });
 
-  it('shows empty message when no data', () => {
-    render(
+  it('renders nothing when list is empty', () => {
+    const { container } = render(
       <BrowserRouter>
         <EquipmentList echipamente={[]} onEdit={vi.fn()} onDelete={vi.fn()} />
       </BrowserRouter>
     );
-    expect(screen.getByText('Nu există echipamente înregistrate.')).toBeInTheDocument();
+    
+    expect(container.firstChild).toBeNull();
   });
 });

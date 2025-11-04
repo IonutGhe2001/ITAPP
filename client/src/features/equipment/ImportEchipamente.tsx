@@ -1,9 +1,9 @@
 import { useState, memo } from 'react';
 import api from '@/services/api';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardFooter, CardTitle } from '@/components/ui/card';
 import { UploadCloud, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
+import { cn } from '@/lib/utils';
 
 function ImportEchipamente({ onImportSuccess }: { onImportSuccess?: () => void }) {
   const [file, setFile] = useState<File | null>(null);
@@ -13,11 +13,22 @@ function ImportEchipamente({ onImportSuccess }: { onImportSuccess?: () => void }
     erori: { index: number; error: string }[];
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [lastImportedAt, setLastImportedAt] = useState<Date | null>(null);
   const { toast } = useToast();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
       setFile(e.target.files[0]);
+      setResult(null);
+      setError(null);
+    }
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    const droppedFile = event.dataTransfer.files?.[0];
+    if (droppedFile) {
+      setFile(droppedFile);
       setResult(null);
       setError(null);
     }
@@ -39,6 +50,7 @@ function ImportEchipamente({ onImportSuccess }: { onImportSuccess?: () => void }
       });
 
       setResult(res.data);
+      setLastImportedAt(new Date());
 
       if (res.data.importate > 0) {
         onImportSuccess?.();
@@ -49,63 +61,81 @@ function ImportEchipamente({ onImportSuccess }: { onImportSuccess?: () => void }
       }
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { error?: string } } };
-      setError(axiosErr.response?.data?.error || 'Eroare la import');
+      const message = axiosErr.response?.data?.error || 'Eroare la import';
+      setError(message);
+      toast({ title: 'Import eșuat', description: message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center gap-3">
-        <UploadCloud className="text-primary h-6 w-6" />
-        <CardTitle className="text-primary text-lg font-semibold">Import echipamente</CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 space-y-4">
+    <div className="rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-sm dark:border-slate-800/70 dark:bg-slate-900/70">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Import echipamente</h3>
+          <p className="text-xs text-muted-foreground">Încarcă un fișier .xlsx și monitorizează rezultatele.</p>
+        </div>
+        {lastImportedAt && (
+          <span className="text-xs text-muted-foreground">
+            Ultimul import: {lastImportedAt.toLocaleString()}
+          </span>
+        )}
+      </div>
+
+      <label
+        htmlFor="equipment-import"
+        onDragOver={(event) => event.preventDefault()}
+        onDrop={handleDrop}
+        className={cn(
+          'mt-4 flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-300/70 bg-slate-50/80 p-6 text-center transition hover:border-primary/40 hover:bg-primary/5 dark:border-slate-700/70 dark:bg-slate-900/50',
+          file && 'border-primary/60 bg-primary/5',
+        )}
+      >
+        <UploadCloud className="h-8 w-8 text-primary" aria-hidden="true" />
+        <div className="space-y-1 text-sm text-muted-foreground">
+          <p className="font-medium text-slate-700 dark:text-slate-200">Trage fișierul aici sau selectează din calculator</p>
+          <p>Format acceptat: .xlsx</p>
+          {file && <p className="text-primary">Fișier selectat: {file.name}</p>}
+        </div>
+        <input id="equipment-import" type="file" accept=".xlsx" className="hidden" onChange={handleFileChange} />
+      </label>
+
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <a
           href="/template_import_echipamente.xlsx"
           download
-          className="text-primary flex items-center gap-1 text-sm hover:underline"
+          className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
         >
-          <Download className="h-4 w-4" />
-          Descarcă șablon Excel
+          <Download className="h-4 w-4" aria-hidden="true" /> Descarcă șablon Excel
         </a>
+        <Button onClick={handleImport} disabled={!file || loading} className="rounded-xl px-4 py-2">
+          {loading ? 'Se importă...' : 'Importă echipamente'}
+        </Button>
+      </div>
 
-        <p className="text-muted-foreground text-sm">
-          Încarcă un fișier Excel (.xlsx) cu echipamente. Poți specifica și angajatul asignat.
-        </p>
+        {error && <p className="mt-4 text-sm text-red-500">{error}</p>}
 
         {result && (
-          <div className="mt-2 text-sm">
-            <p className="font-medium text-green-600">
-              ✅ {result.importate} echipamente importate
-            </p>
-            {result.erori.length > 0 && (
-              <ul className="mt-1 list-inside list-disc text-red-600">
+        <div className="mt-4 space-y-2 rounded-2xl border border-slate-200/60 bg-white/80 p-4 text-sm shadow-sm dark:border-slate-800/60 dark:bg-slate-900/60">
+          <p className="font-medium text-slate-700 dark:text-slate-200">
+            ✅ {result.importate} echipamente importate cu succes
+          </p>
+          {result.erori.length > 0 && (
+            <div>
+              <p className="text-xs text-muted-foreground">Erori:</p>
+              <ul className="mt-1 list-inside list-disc space-y-1 text-xs text-red-500">
                 {result.erori.map((err, idx) => (
                   <li key={idx}>
                     Rând {err.index + 2}: {err.error}
                   </li>
                 ))}
               </ul>
-            )}
-          </div>
-        )}
-
-        {error && <p className="text-sm text-red-500">{error}</p>}
-      </CardContent>
-      <CardFooter className="flex flex-col flex-wrap gap-3 sm:flex-row sm:items-center">
-        <input
-          type="file"
-          accept=".xlsx"
-          onChange={handleFileChange}
-          className="file:bg-primary min-w-[150px] flex-1 rounded-lg border px-4 py-2 text-sm file:border-0 file:text-white"
-        />
-        <Button onClick={handleImport} disabled={!file || loading} className="w-full sm:w-auto">
-          {loading ? 'Se importă...' : 'Importă'}
-        </Button>
-      </CardFooter>
-    </Card>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 

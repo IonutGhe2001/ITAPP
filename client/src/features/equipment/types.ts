@@ -112,26 +112,35 @@ export interface EquipmentImage {
   createdAt: string;
 }
 
+export type EquipmentSortOption = 'name-asc' | 'name-desc' | 'assigned-date' | 'status';
+
 export interface EquipmentCardProps {
   echipament: Echipament;
   onEdit?: (echipament: Echipament & { __editMode?: boolean }) => void;
   onDelete?: (id: string) => void;
+  onTransfer?: (echipament: Echipament) => void;
+  onViewDetails?: (echipament: Echipament) => void;
   onRefresh?: () => void;
 }
 
 export interface EquipmentFilterProps {
   search: string;
   status: string;
-  sort: string;
+  type: string;
+  sort: EquipmentSortOption;
+  types: string[];
   onSearchChange: (value: string) => void;
   onStatusChange: (value: string) => void;
-  onSortChange: (value: string) => void;
+  onTypeChange: (value: string) => void;
+  onSortChange: (value: EquipmentSortOption) => void;
 }
 
 export interface EquipmentListProps {
   echipamente: Echipament[];
   onEdit?: (echipament: Echipament & { __editMode?: boolean }) => void;
   onDelete?: (id: string) => void;
+  onTransfer?: (echipament: Echipament) => void;
+  onViewDetails?: (echipament: Echipament) => void;
 }
 
 export interface EquipmentTabsProps {
