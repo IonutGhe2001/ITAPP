@@ -64,7 +64,8 @@ const statusOrder: Record<string, number> = {
   in_comanda: 3,
 };
 
-const localeCompare = (a: string, b: string) => a.localeCompare(b, undefined, { sensitivity: 'base' });
+const localeCompare = (a: string, b: string) =>
+  a.localeCompare(b, undefined, { sensitivity: 'base' });
 
 const getAssignedTimestamp = (item: Echipament) => {
   const meta = item.meta as { assignedAt?: string; updatedAt?: string } | undefined;
@@ -92,7 +93,9 @@ export default function Echipamente() {
   const [search, setSearch] = useState(() => searchParams.get('q') ?? '');
   const [status, setStatus] = useState(() => searchParams.get('status') ?? '');
   const [type] = useState(() => searchParams.get('type') ?? '');
-  const [sort, setSort] = useState<EquipmentSortOption>(() => parseSortParam(searchParams.get('sort')));
+  const [sort, setSort] = useState<EquipmentSortOption>(() =>
+    parseSortParam(searchParams.get('sort'))
+  );
 
   const requestSort = sort === 'name-desc' ? 'desc' : 'asc';
 
@@ -140,7 +143,7 @@ export default function Echipamente() {
         allocated: 0,
         inStock: 0,
         maintenance: 0,
-      },
+      }
     );
   }, [echipamente]);
 
@@ -177,7 +180,7 @@ export default function Echipamente() {
         description: string;
         icon: LucideIcon;
       }>,
-    [equipmentMetrics],
+    [equipmentMetrics]
   );
 
   const processedEquipment = useMemo(() => {
@@ -268,8 +271,7 @@ export default function Echipamente() {
       if (borderBoxHeight > 0 && typeof window !== 'undefined') {
         const styles = window.getComputedStyle(node);
         const paddingY = parseSize(styles.paddingTop) + parseSize(styles.paddingBottom);
-        const borderY =
-          parseSize(styles.borderTopWidth) + parseSize(styles.borderBottomWidth);
+        const borderY = parseSize(styles.borderTopWidth) + parseSize(styles.borderBottomWidth);
         const contentHeight = borderBoxHeight - paddingY - borderY;
         if (contentHeight > 0) {
           return contentHeight;
@@ -285,9 +287,7 @@ export default function Echipamente() {
     const updateSize = () => {
       const styles = typeof window !== 'undefined' ? window.getComputedStyle(node) : null;
 
-      const paddingX = styles
-        ? parseSize(styles.paddingLeft) + parseSize(styles.paddingRight)
-        : 0;
+      const paddingX = styles ? parseSize(styles.paddingLeft) + parseSize(styles.paddingRight) : 0;
       const borderX = styles
         ? parseSize(styles.borderLeftWidth) + parseSize(styles.borderRightWidth)
         : 0;
@@ -331,7 +331,11 @@ export default function Echipamente() {
       toast({ title: 'Echipament șters' });
       await refetch();
     } catch (err) {
-      toast({ title: 'Eroare la ștergere', description: handleApiError(err), variant: 'destructive' });
+      toast({
+        title: 'Eroare la ștergere',
+        description: handleApiError(err),
+        variant: 'destructive',
+      });
     }
   };
 
@@ -405,8 +409,10 @@ export default function Echipamente() {
       <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-slate-200 bg-white p-12 text-center">
         <AlertTriangle className="h-10 w-10 text-amber-500" aria-hidden="true" />
         <div className="space-y-1">
-          <p className="text-lg font-semibold text-foreground">Nu am putut încărca echipamentele.</p>
-          <p className="mx-auto max-w-md text-sm text-muted-foreground">{handleApiError(error)}</p>
+          <p className="text-foreground text-lg font-semibold">
+            Nu am putut încărca echipamentele.
+          </p>
+          <p className="text-muted-foreground mx-auto max-w-md text-sm">{handleApiError(error)}</p>
         </div>
         <Button onClick={() => refetch()} variant="default" className="rounded-full px-5">
           Reîncearcă
@@ -477,10 +483,12 @@ export default function Echipamente() {
           />
         </svg>
         <div className="space-y-2">
-          <p className="text-lg font-semibold text-foreground">
-            {hasActiveFilters ? 'Nu s-au găsit echipamente.' : 'Nu există echipamente înregistrate.'}
+          <p className="text-foreground text-lg font-semibold">
+            {hasActiveFilters
+              ? 'Nu s-au găsit echipamente.'
+              : 'Nu există echipamente înregistrate.'}
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {hasActiveFilters
               ? 'Ajustează filtrele pentru a găsi echipamentele dorite.'
               : 'Adaugă primul echipament pentru a începe să gestionezi inventarul.'}
@@ -497,7 +505,7 @@ export default function Echipamente() {
   const containerClasses = cn(
     'min-h-[320px] rounded-2xl border bg-white',
     isError ? 'border-dashed border-slate-300 p-6 text-slate-700' : 'border-slate-200',
-    !isError && (hasData || showSkeleton) ? 'overflow-hidden p-0' : !isError ? 'p-6' : null,
+    !isError && (hasData || showSkeleton) ? 'overflow-hidden p-0' : !isError ? 'p-6' : null
   );
 
   // Map empty-string status to 'all' for the UI Select to avoid Radix empty value constraint
@@ -509,13 +517,18 @@ export default function Echipamente() {
         <Container className="py-10">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="max-w-2xl space-y-3">
-              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Inventar</span>
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Inventar
+              </span>
               <h1 className="text-4xl font-semibold tracking-tight">Echipamente</h1>
               <p className="text-sm text-slate-600">
                 Administrează parcul de echipamente, statusurile și asignările într-un singur loc.
               </p>
             </div>
-            <Button onClick={() => setShowAddModal(true)} className="h-11 rounded-full px-6 text-sm font-semibold">
+            <Button
+              onClick={() => setShowAddModal(true)}
+              className="h-11 rounded-full px-6 text-sm font-semibold"
+            >
               <Plus className="mr-2 h-4 w-4" aria-hidden="true" /> Adaugă echipament
             </Button>
           </div>
@@ -523,7 +536,9 @@ export default function Echipamente() {
             {highlightCards.map(({ label, value, description, icon: Icon }) => (
               <div key={label} className="rounded-xl border border-slate-200 bg-white p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</span>
+                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    {label}
+                  </span>
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600">
                     <Icon className="h-4 w-4" aria-hidden="true" />
                   </div>
@@ -556,10 +571,10 @@ export default function Echipamente() {
                     aria-label="Search equipment"
                   />
                 </div>
-                <div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-wide">
                   <span>{filteredSummary}</span>
                   {hasActiveFilters && (
-                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                    <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-semibold">
                       Filtre active
                     </span>
                   )}
@@ -585,7 +600,10 @@ export default function Echipamente() {
               </div>
 
               <div>
-                <Select value={sort} onValueChange={(value) => setSort(value as EquipmentSortOption)}>
+                <Select
+                  value={sort}
+                  onValueChange={(value) => setSort(value as EquipmentSortOption)}
+                >
                   <SelectTrigger className="h-11 w-full rounded-xl border border-slate-300 bg-white text-sm font-medium hover:border-slate-400">
                     <SelectValue placeholder="Sortare" />
                   </SelectTrigger>
@@ -609,7 +627,7 @@ export default function Echipamente() {
         {!isError && (
           <div className="flex flex-col items-center gap-3">
             {isFetchingNextPage && (
-              <Loader2 className="h-5 w-5 animate-spin text-primary" aria-hidden="true" />
+              <Loader2 className="text-primary h-5 w-5 animate-spin" aria-hidden="true" />
             )}
             {hasNextPage && (
               <Button

@@ -88,69 +88,71 @@ export default function SearchResults() {
       <div className="space-y-4">
         <div>
           <h3 className="mb-2 font-semibold">Echipamente</h3>
-          {isPending
-            ? renderSkeletonItems(3)
-            : data?.echipamente?.length
-              ? (
-                <ul className="space-y-2">
-                  {data.echipamente.map((e) => {
-                    const detailPath = generatePath(ROUTES.EQUIPMENT_DETAIL, { id: e.id });
-                    return (
-                      <li key={e.id}>
-                        <Link
-                          to={detailPath}
-                          className="bg-card border-border block rounded-md border p-3 shadow transition hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                        >
-                          <div className="font-medium">{highlightText(e.nume, q)}</div>
-                          <div className="text-muted-foreground text-sm">
-                            Serie: {highlightText(e.serie ?? '', q)}
-                          </div>
-                          {e.angajat && (
-                            <div className="text-muted-foreground text-xs">
-                              Alocat: {highlightText(e.angajat.numeComplet, q)}
-                            </div>
-                          )}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : (
-                <p className="text-muted-foreground text-sm">Nu s-au găsit echipamente.</p>
-              )}
+          {isPending ? (
+            renderSkeletonItems(3)
+          ) : data?.echipamente?.length ? (
+            <ul className="space-y-2">
+              {data.echipamente.map((e) => {
+                const detailPath = generatePath(ROUTES.EQUIPMENT_DETAIL, { id: e.id });
+                return (
+                  <li key={e.id}>
+                    <Link
+                      to={detailPath}
+                      className="bg-card border-border hover:border-primary focus-visible:ring-primary block rounded-md border p-3 shadow transition focus-visible:outline-none focus-visible:ring-2"
+                    >
+                      <div className="font-medium">{highlightText(e.nume, q)}</div>
+                      <div className="text-muted-foreground text-sm">
+                        Serie: {highlightText(e.serie ?? '', q)}
+                      </div>
+                      {e.angajat && (
+                        <div className="text-muted-foreground text-xs">
+                          Alocat: {highlightText(e.angajat.numeComplet, q)}
+                        </div>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="text-muted-foreground text-sm">Nu s-au găsit echipamente.</p>
+          )}
         </div>
         <div>
           <h3 className="mb-2 font-semibold">Colegi</h3>
-          {isPending
-            ? renderSkeletonItems(3)
-            : data?.angajati?.length
-              ? (
-                <ul className="space-y-2">
-                  {data.angajati.map((c) => {
-                    const colleagueParams = new URLSearchParams({ highlight: c.id });
-                    if (trimmedQuery) {
-                      colleagueParams.set('q', trimmedQuery);
-                    }
-                    const colleagueLink = `${ROUTES.COLEGI}?${colleagueParams.toString()}`;
-                    return (
-                      <li key={c.id}>
-                        <Link
-                          to={colleagueLink}
-                          className="bg-card border-border block rounded-md border p-3 shadow transition hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                        >
-                          <div className="font-medium">{highlightText(c.numeComplet, q)}</div>
-                          <div className="text-muted-foreground text-sm">{highlightText(c.functie ?? '', q)}</div>
-                          {c.email && (
-                            <div className="text-muted-foreground text-xs">{highlightText(c.email, q)}</div>
-                          )}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : (
-                <p className="text-muted-foreground text-sm">Nu s-au găsit colegi.</p>
-              )}
+          {isPending ? (
+            renderSkeletonItems(3)
+          ) : data?.angajati?.length ? (
+            <ul className="space-y-2">
+              {data.angajati.map((c) => {
+                const colleagueParams = new URLSearchParams({ highlight: c.id });
+                if (trimmedQuery) {
+                  colleagueParams.set('q', trimmedQuery);
+                }
+                const colleagueLink = `${ROUTES.COLEGI}?${colleagueParams.toString()}`;
+                return (
+                  <li key={c.id}>
+                    <Link
+                      to={colleagueLink}
+                      className="bg-card border-border hover:border-primary focus-visible:ring-primary block rounded-md border p-3 shadow transition focus-visible:outline-none focus-visible:ring-2"
+                    >
+                      <div className="font-medium">{highlightText(c.numeComplet, q)}</div>
+                      <div className="text-muted-foreground text-sm">
+                        {highlightText(c.functie ?? '', q)}
+                      </div>
+                      {c.email && (
+                        <div className="text-muted-foreground text-xs">
+                          {highlightText(c.email, q)}
+                        </div>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="text-muted-foreground text-sm">Nu s-au găsit colegi.</p>
+          )}
         </div>
       </div>
     </Container>

@@ -13,7 +13,11 @@ const router = express.Router();
 
 router.use(authenticate);
 
-router.get("/", validateRequest(getAngajatiQuerySchema, "query"), controller.getAngajati);
+router.get(
+  "/",
+  validateRequest(getAngajatiQuerySchema, "query"),
+  controller.getAngajati
+);
 router.get("/full", controller.getAllAngajati);
 router.get("/:id", controller.getAngajatById);
 router.post(

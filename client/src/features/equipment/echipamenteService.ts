@@ -91,13 +91,7 @@ export const useEchipamente = (options: UseEchipamenteOptions = {}) => {
     },
   });
 
-  const {
-    data: paginatedData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    ...rest
-  } = query;
+  const { data: paginatedData, fetchNextPage, hasNextPage, isFetchingNextPage, ...rest } = query;
 
   const items = useMemo<Echipament[]>(() => {
     if (paginatedData) {

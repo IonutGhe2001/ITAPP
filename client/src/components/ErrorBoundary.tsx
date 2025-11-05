@@ -34,7 +34,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
           <p>Please try again or contact support if the problem persists.</p>
           <button
             onClick={this.handleRetry}
-            className="rounded bg-primary px-4 py-2 text-primary-foreground hover:opacity-90"
+            className="bg-primary text-primary-foreground rounded px-4 py-2 hover:opacity-90"
           >
             Retry
           </button>

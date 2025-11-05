@@ -29,7 +29,7 @@ axios.defaults.withCredentials = false;
 
 axios.interceptors.request.use((cfg: InternalAxiosRequestConfig) => {
   const tk = getToken();
-  const headers = new AxiosHeaders(cfg.headers);   // normalizează tipul
+  const headers = new AxiosHeaders(cfg.headers); // normalizează tipul
   if (tk) headers.set('Authorization', `Bearer ${tk}`);
   cfg.headers = headers;
   return cfg;

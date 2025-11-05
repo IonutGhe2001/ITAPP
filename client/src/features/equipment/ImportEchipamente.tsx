@@ -73,11 +73,15 @@ function ImportEchipamente({ onImportSuccess }: { onImportSuccess?: () => void }
     <div className="rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-sm dark:border-slate-800/70 dark:bg-slate-900/70">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Import echipamente</h3>
-          <p className="text-xs text-muted-foreground">Încarcă un fișier .xlsx și monitorizează rezultatele.</p>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+            Import echipamente
+          </h3>
+          <p className="text-muted-foreground text-xs">
+            Încarcă un fișier .xlsx și monitorizează rezultatele.
+          </p>
         </div>
         {lastImportedAt && (
-          <span className="text-xs text-muted-foreground">
+          <span className="text-muted-foreground text-xs">
             Ultimul import: {lastImportedAt.toLocaleString()}
           </span>
         )}
@@ -88,24 +92,32 @@ function ImportEchipamente({ onImportSuccess }: { onImportSuccess?: () => void }
         onDragOver={(event) => event.preventDefault()}
         onDrop={handleDrop}
         className={cn(
-          'mt-4 flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-300/70 bg-slate-50/80 p-6 text-center transition hover:border-primary/40 hover:bg-primary/5 dark:border-slate-700/70 dark:bg-slate-900/50',
-          file && 'border-primary/60 bg-primary/5',
+          'hover:border-primary/40 hover:bg-primary/5 mt-4 flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-300/70 bg-slate-50/80 p-6 text-center transition dark:border-slate-700/70 dark:bg-slate-900/50',
+          file && 'border-primary/60 bg-primary/5'
         )}
       >
-        <UploadCloud className="h-8 w-8 text-primary" aria-hidden="true" />
-        <div className="space-y-1 text-sm text-muted-foreground">
-          <p className="font-medium text-slate-700 dark:text-slate-200">Trage fișierul aici sau selectează din calculator</p>
+        <UploadCloud className="text-primary h-8 w-8" aria-hidden="true" />
+        <div className="text-muted-foreground space-y-1 text-sm">
+          <p className="font-medium text-slate-700 dark:text-slate-200">
+            Trage fișierul aici sau selectează din calculator
+          </p>
           <p>Format acceptat: .xlsx</p>
           {file && <p className="text-primary">Fișier selectat: {file.name}</p>}
         </div>
-        <input id="equipment-import" type="file" accept=".xlsx" className="hidden" onChange={handleFileChange} />
+        <input
+          id="equipment-import"
+          type="file"
+          accept=".xlsx"
+          className="hidden"
+          onChange={handleFileChange}
+        />
       </label>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <a
           href="/template_import_echipamente.xlsx"
           download
-          className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+          className="text-primary inline-flex items-center gap-2 text-sm hover:underline"
         >
           <Download className="h-4 w-4" aria-hidden="true" /> Descarcă șablon Excel
         </a>
@@ -123,7 +135,7 @@ function ImportEchipamente({ onImportSuccess }: { onImportSuccess?: () => void }
           </p>
           {result.erori.length > 0 && (
             <div>
-              <p className="text-xs text-muted-foreground">Erori:</p>
+              <p className="text-muted-foreground text-xs">Erori:</p>
               <ul className="mt-1 list-inside list-disc space-y-1 text-xs text-red-500">
                 {result.erori.map((err, idx) => (
                   <li key={idx}>

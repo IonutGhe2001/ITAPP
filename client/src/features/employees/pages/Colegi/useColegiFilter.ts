@@ -24,7 +24,10 @@ const getDepartmentName = (coleg: AngajatWithRelations): string => {
       if (typeof name === 'string') return name;
     }
   }
-  if ('departmentName' in coleg && typeof (coleg as { departmentName?: unknown }).departmentName === 'string') {
+  if (
+    'departmentName' in coleg &&
+    typeof (coleg as { departmentName?: unknown }).departmentName === 'string'
+  ) {
     return (coleg as { departmentName: string }).departmentName;
   }
   return '';
@@ -44,7 +47,7 @@ const getCreatedTimestamp = (coleg: AngajatWithRelations): number => {
 };
 
 export const getEmployeeLifecycleStatus = (
-  coleg: AngajatWithRelations,
+  coleg: AngajatWithRelations
 ): EmployeeLifecycleStatus => {
   if ('status' in coleg) {
     const status = (coleg as unknown as { status?: string }).status?.toLowerCase();
@@ -67,7 +70,7 @@ export default function useColegiFilter(
     initialFunctions = [],
     initialStatus = 'all',
     initialSort = 'name-asc',
-  }: UseColegiFilterOptions = {},
+  }: UseColegiFilterOptions = {}
 ) {
   const [search, setSearch] = useState(initialSearch);
   const [functieFilter, setFunctieFilter] = useState<string[]>(initialFunctions);
@@ -96,10 +99,10 @@ export default function useColegiFilter(
         new Set(
           colegi
             .map((c) => c.functie || '')
-            .filter((functie): functie is string => Boolean(functie?.trim())),
-        ),
+            .filter((functie): functie is string => Boolean(functie?.trim()))
+        )
       ).sort(localeCompare),
-    [colegi],
+    [colegi]
   );
 
   const filtered = useMemo(() => {
@@ -118,13 +121,7 @@ export default function useColegiFilter(
       if (!normalizedQuery) return true;
 
       const department = getDepartmentName(coleg);
-      return [
-        coleg.numeComplet,
-        coleg.functie,
-        department,
-        coleg.email,
-        coleg.telefon,
-      ]
+      return [coleg.numeComplet, coleg.functie, department, coleg.email, coleg.telefon]
         .filter(Boolean)
         .some((value) => value!.toLowerCase().includes(normalizedQuery));
     });

@@ -28,9 +28,7 @@ const parseNumberParam = (value: unknown, defaultValue: number) => {
   return Number.isNaN(parsed) ? defaultValue : parsed;
 };
 
-const parseStatusParam = (
-  value: unknown
-): EmailAccountStatus | undefined => {
+const parseStatusParam = (value: unknown): EmailAccountStatus | undefined => {
   const normalized = normalizeQueryValue(value);
   if (!normalized) {
     return undefined;

@@ -26,9 +26,7 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     BrowserRouter: ({ children }: { children: ReactNode }) => (
-      <actual.MemoryRouter initialEntries={[ROUTES.COLEGI]}>
-        {children}
-      </actual.MemoryRouter>
+      <actual.MemoryRouter initialEntries={[ROUTES.COLEGI]}>{children}</actual.MemoryRouter>
     ),
   };
 });

@@ -99,20 +99,15 @@ export default function EquipmentDetail() {
   const dedicated = {
     cpu: data.cpu ?? (rawCpu as string),
     ram: data.ram ?? (rawRam as string),
-    stocare:
-      data.stocare ?? (rawStocare as string) ?? (rawStorage as string),
+    stocare: data.stocare ?? (rawStocare as string) ?? (rawStorage as string),
     os: data.os ?? (rawOs as string),
     versiuneFirmware:
-      data.versiuneFirmware ??
-      ((rawVersiuneFirmware as string) || (rawFirmwareVersion as string)),
+      data.versiuneFirmware ?? ((rawVersiuneFirmware as string) || (rawFirmwareVersion as string)),
     numarInventar:
-      data.numarInventar ??
-      ((rawNumarInventar as string) || (rawInventoryNumber as string)),
+      data.numarInventar ?? ((rawNumarInventar as string) || (rawInventoryNumber as string)),
     dataAchizitie:
-      data.dataAchizitie ??
-      ((rawDataAchizitie as string) || (rawPurchaseDate as string)),
-    garantie:
-      data.garantie ?? ((rawGarantie as string) || (rawWarranty as string)),
+      data.dataAchizitie ?? ((rawDataAchizitie as string) || (rawPurchaseDate as string)),
+    garantie: data.garantie ?? ((rawGarantie as string) || (rawWarranty as string)),
   };
   
   const dedicatedEntries = [

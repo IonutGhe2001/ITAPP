@@ -50,8 +50,6 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-
-
 const EMPLOYEE_STATUS_OPTIONS: { value: EmployeeStatusFilter; label: string }[] = [
   { value: 'all', label: 'All statuses' },
   { value: 'active', label: 'Active accounts' },
@@ -96,7 +94,7 @@ export default function Colegi() {
   } = useAngajati(undefined, { enabled: queryEnabled });
   const colegi: AngajatWithRelations[] = useMemo(
     () => data?.pages.flatMap((page) => page.data) ?? [],
-    [data],
+    [data]
   );
 
   const employeeMetrics = useMemo(() => {
@@ -109,9 +107,7 @@ export default function Colegi() {
         const status = getEmployeeLifecycleStatus(coleg);
         if (status === 'active') acc.active += 1;
         if (status === 'pending') acc.pending += 1;
-        acc.equipment += Array.isArray(coleg.echipamente)
-          ? coleg.echipamente.length
-          : 0;
+        acc.equipment += Array.isArray(coleg.echipamente) ? coleg.echipamente.length : 0;
         return acc;
       },
       {
@@ -119,7 +115,7 @@ export default function Colegi() {
         active: 0,
         pending: 0,
         equipment: 0,
-      },
+      }
     );
   }, [colegi]);
 
@@ -156,7 +152,7 @@ export default function Colegi() {
         description: string;
         icon: LucideIcon;
       }>,
-    [employeeMetrics],
+    [employeeMetrics]
   );
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -171,7 +167,7 @@ export default function Colegi() {
             .map((item) => item.trim())
             .filter(Boolean)
         : [],
-    [initialFunctionsParam],
+    [initialFunctionsParam]
   );
   const initialStatus = parseStatusParam(searchParams.get('status'));
   const initialSort = parseSortParam(searchParams.get('sort'));
@@ -196,11 +192,10 @@ export default function Colegi() {
   const pendingPVTotal = useMemo(
     () =>
       Object.values(pendingPV).reduce(
-        (total, entry) =>
-          total + (entry?.predate?.length ?? 0) + (entry?.primite?.length ?? 0),
-        0,
+        (total, entry) => total + (entry?.predate?.length ?? 0) + (entry?.primite?.length ?? 0),
+        0
       ),
-    [pendingPV],
+    [pendingPV]
   );
 
   const {
@@ -260,10 +255,7 @@ export default function Colegi() {
     setPendingPV(grouped);
   }, []);
 
-  const addPendingPV = (
-    colegId: string,
-    change: { predate?: string[]; primite?: string[] },
-  ) => {
+  const addPendingPV = (colegId: string, change: { predate?: string[]; primite?: string[] }) => {
     setPendingPV((prev) => {
       const current = prev[colegId] || { predate: [], primite: [] };
       return {
@@ -312,7 +304,7 @@ export default function Colegi() {
         return Array.from(next);
       });
     },
-    [setFunctieFilter],
+    [setFunctieFilter]
   );
 
   useEffect(() => {
@@ -377,8 +369,7 @@ export default function Colegi() {
       if (borderBoxHeight > 0 && typeof window !== 'undefined') {
         const styles = window.getComputedStyle(node);
         const paddingY = parseSize(styles.paddingTop) + parseSize(styles.paddingBottom);
-        const borderY =
-          parseSize(styles.borderTopWidth) + parseSize(styles.borderBottomWidth);
+        const borderY = parseSize(styles.borderTopWidth) + parseSize(styles.borderBottomWidth);
         const contentHeight = borderBoxHeight - paddingY - borderY;
         if (contentHeight > 0) {
           return contentHeight;
@@ -394,9 +385,7 @@ export default function Colegi() {
     const updateSize = () => {
       const styles = typeof window !== 'undefined' ? window.getComputedStyle(node) : null;
 
-      const paddingX = styles
-        ? parseSize(styles.paddingLeft) + parseSize(styles.paddingRight)
-        : 0;
+      const paddingX = styles ? parseSize(styles.paddingLeft) + parseSize(styles.paddingRight) : 0;
       const borderX = styles
         ? parseSize(styles.borderLeftWidth) + parseSize(styles.borderRightWidth)
         : 0;
@@ -495,8 +484,10 @@ export default function Colegi() {
       <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-slate-200 bg-white p-12 text-center">
         <AlertTriangle className="h-10 w-10 text-amber-500" aria-hidden="true" />
         <div className="space-y-1">
-          <p className="text-lg font-semibold text-foreground">Nu am putut încărca lista de colegi.</p>
-          <p className="mx-auto max-w-md text-sm text-muted-foreground">{handleApiError(error)}</p>
+          <p className="text-foreground text-lg font-semibold">
+            Nu am putut încărca lista de colegi.
+          </p>
+          <p className="text-muted-foreground mx-auto max-w-md text-sm">{handleApiError(error)}</p>
         </div>
         <Button onClick={() => refetch()} variant="default" className="rounded-full px-5">
           Reîncearcă
@@ -571,8 +562,10 @@ export default function Colegi() {
           />
         </svg>
         <div className="space-y-2">
-          <p className="text-lg font-semibold text-foreground">Nu există colegi înregistrați.</p>
-          <p className="text-sm text-muted-foreground">Adaugă primul membru al echipei pentru a începe să gestionezi echipamentele.</p>
+          <p className="text-foreground text-lg font-semibold">Nu există colegi înregistrați.</p>
+          <p className="text-muted-foreground text-sm">
+            Adaugă primul membru al echipei pentru a începe să gestionezi echipamentele.
+          </p>
         </div>
         <Button className="mt-4 rounded-full px-5" onClick={() => setShowAddModal(true)}>
           <UserPlus className="mr-2 h-4 w-4" aria-hidden="true" /> Adaugă coleg
@@ -585,7 +578,7 @@ export default function Colegi() {
   const containerClasses = cn(
     'min-h-[320px] rounded-2xl border bg-white',
     isError ? 'border-dashed border-slate-300 p-6 text-slate-700' : 'border-slate-200',
-    !isError && (hasData || showSkeleton) ? 'overflow-hidden p-0' : !isError ? 'p-6' : null,
+    !isError && (hasData || showSkeleton) ? 'overflow-hidden p-0' : !isError ? 'p-6' : null
   );
 
   return (
@@ -594,13 +587,19 @@ export default function Colegi() {
         <Container className="py-10">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="max-w-2xl space-y-3">
-              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Echipa</span>
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Echipa
+              </span>
               <h1 className="text-4xl font-semibold tracking-tight">Colegi</h1>
               <p className="text-sm text-slate-600">
-                Monitorizează colegii, statusul conturilor și echipamentele alocate într-un singur loc.
+                Monitorizează colegii, statusul conturilor și echipamentele alocate într-un singur
+                loc.
               </p>
             </div>
-            <Button onClick={() => setShowAddModal(true)} className="h-11 rounded-full px-6 text-sm font-semibold">
+            <Button
+              onClick={() => setShowAddModal(true)}
+              className="h-11 rounded-full px-6 text-sm font-semibold"
+            >
               <UserPlus className="mr-2 h-4 w-4" aria-hidden="true" /> Adaugă coleg
             </Button>
           </div>
@@ -608,7 +607,9 @@ export default function Colegi() {
             {highlightCards.map(({ label, value, description, icon: Icon }) => (
               <div key={label} className="rounded-xl border border-slate-200 bg-white p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</span>
+                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    {label}
+                  </span>
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600">
                     <Icon className="h-4 w-4" aria-hidden="true" />
                   </div>
@@ -629,7 +630,7 @@ export default function Colegi() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-wrap items-center gap-3">
                 <StatusBadge label="Procese verbale în lucru" tone="warning" withDot />
-                <span className="text-sm text-muted-foreground">
+                <span className="text-muted-foreground text-sm">
                   {pendingPVEmployees.length === 1
                     ? '1 coleg are procese verbale nefinalizate.'
                     : `${pendingPVEmployees.length} colegi au procese verbale nefinalizate.`}
@@ -644,7 +645,7 @@ export default function Colegi() {
                 Vezi detalii
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               {pendingPVTotal === 1
                 ? '1 echipament în așteptare pentru confirmare.'
                 : `${pendingPVTotal} echipamente în așteptare pentru confirmare.`}
@@ -669,17 +670,17 @@ export default function Colegi() {
                     aria-label="Search employees"
                   />
                 </div>
-                <div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-wide">
                   <span>{filteredSummary}</span>
                   {hasActiveFilters && (
-                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                    <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-semibold">
                       Filtre active
                     </span>
                   )}
                 </div>
               </div>
 
-<div>
+              <div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -691,19 +692,24 @@ export default function Colegi() {
                         <span>Funcții</span>
                       </div>
                       {functieFilter.length > 0 && (
-                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                        <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs font-semibold">
                           {functieFilter.length}
                         </span>
                       )}
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-64 rounded-xl border border-slate-200 bg-white">
-                    <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
+                  <DropdownMenuContent
+                    align="start"
+                    className="w-64 rounded-xl border border-slate-200 bg-white"
+                  >
+                    <DropdownMenuLabel className="text-muted-foreground text-xs uppercase tracking-wide">
                       Selectează funcțiile
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {functii.length === 0 && (
-                      <p className="px-2 py-1.5 text-xs text-muted-foreground">Nu există funcții definite.</p>
+                      <p className="text-muted-foreground px-2 py-1.5 text-xs">
+                        Nu există funcții definite.
+                      </p>
                     )}
                     {functii.map((functie) => (
                       <DropdownMenuCheckboxItem
@@ -720,7 +726,10 @@ export default function Colegi() {
               </div>
 
               <div>
-                <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as EmployeeStatusFilter)}>
+                <Select
+                  value={statusFilter}
+                  onValueChange={(value) => setStatusFilter(value as EmployeeStatusFilter)}
+                >
                   <SelectTrigger className="h-11 w-full rounded-xl border border-slate-300 bg-white text-sm font-medium hover:border-slate-400">
                     <SelectValue placeholder="Status cont" />
                   </SelectTrigger>
@@ -735,7 +744,10 @@ export default function Colegi() {
               </div>
 
               <div>
-                <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as EmployeeSortOption)}>
+                <Select
+                  value={sortOrder}
+                  onValueChange={(value) => setSortOrder(value as EmployeeSortOption)}
+                >
                   <SelectTrigger className="h-11 w-full rounded-xl border border-slate-300 bg-white text-sm font-medium hover:border-slate-400">
                     <SelectValue placeholder="Sortare" />
                   </SelectTrigger>
@@ -759,7 +771,7 @@ export default function Colegi() {
         {!isError && (
           <div className="flex flex-col items-center gap-3">
             {isFetchingNextPage && (
-              <Loader2 className="h-5 w-5 animate-spin text-primary" aria-hidden="true" />
+              <Loader2 className="text-primary h-5 w-5 animate-spin" aria-hidden="true" />
             )}
             {hasNextPage && (
               <Button

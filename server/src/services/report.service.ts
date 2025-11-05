@@ -50,7 +50,7 @@ export const getOnboardingReport = async ({
   const onboardings = await prisma.onboarding.findMany({
     where: {
       ...(department ? { department } : {}),
-      ...((startDate || endDate)
+      ...(startDate || endDate
         ? {
             createdAt: {
               ...(startDate ? { gte: new Date(startDate) } : {}),

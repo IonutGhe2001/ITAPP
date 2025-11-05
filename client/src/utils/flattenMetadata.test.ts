@@ -13,8 +13,6 @@ describe('flattenMetadata', () => {
 
   it('handles arrays', () => {
     const data = { arr: [1, { nested: 2 }, 'three'] };
-    expect(flattenMetadata(data)).toEqual([
-      ['arr', '1, {"nested":2}, three'],
-    ]);
+    expect(flattenMetadata(data)).toEqual([['arr', '1, {"nested":2}, three']]);
   });
 });

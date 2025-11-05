@@ -12,8 +12,7 @@ const toneStyles: Record<StatusBadgeTone, string> = {
     'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300 border border-amber-200/70 dark:border-amber-500/30',
   danger:
     'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-300 border border-red-200/70 dark:border-red-500/30',
-  info:
-    'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300 border border-blue-200/70 dark:border-blue-500/30',
+  info: 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300 border border-blue-200/70 dark:border-blue-500/30',
 };
 
 interface StatusBadgeProps extends HTMLAttributes<HTMLSpanElement> {
@@ -35,7 +34,7 @@ export default function StatusBadge({
       className={cn(
         'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium leading-tight shadow-sm transition-colors',
         toneStyles[tone],
-        className,
+        className
       )}
       {...props}
     >
@@ -52,7 +51,7 @@ export default function StatusBadge({
                   ? 'bg-red-500'
                   : tone === 'info'
                     ? 'bg-blue-500'
-                    : 'bg-slate-400',
+                    : 'bg-slate-400'
           )}
         />
       )}

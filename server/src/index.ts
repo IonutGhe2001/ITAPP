@@ -28,6 +28,8 @@ import reportsRoutes from "./routes/reports";
 import purchaseRequestRoutes from "./routes/purchaseRequests";
 import onboardingRoutes from "./routes/onboarding";
 import testLoginRoutes from "./routes/testLogin";
+import dashboardRoutes from "./routes/dashboard";
+import profileRoutes from "./routes/profile";
 
 const app = express();
 const server = http.createServer(app);
@@ -49,14 +51,15 @@ const configuredOrigins = env.CORS_ORIGIN.split(",")
 
 const derivedOrigins = env.FRONTEND_ROOT ? [env.FRONTEND_ROOT] : [];
 
-const defaultOrigins = env.NODE_ENV === "staging"
-  ? []
-  : [
-      "http://localhost:3000",
-      "http://127.0.0.1:3000",
-      "http://localhost:5173",
-      "http://127.0.0.1:5173",
-    ];
+const defaultOrigins =
+  env.NODE_ENV === "staging"
+    ? []
+    : [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+      ];
 
 const allowedOrigins = configuredOrigins.length
   ? Array.from(new Set([...configuredOrigins, ...derivedOrigins]))
@@ -159,6 +162,8 @@ app.use("/config", configRoutes);
 app.use("/api/department-configs", departmentConfigRoutes);
 app.use("/api/reports", reportsRoutes);
 app.use("/api/onboarding", onboardingRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/profile", profileRoutes);
 app.use(testLoginRoutes);
 
 // Error handler middleware (final)

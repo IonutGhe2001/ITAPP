@@ -75,7 +75,10 @@ export default function ColegModals({
         if (typeof name === 'string') return name;
       }
     }
-    if ('departmentName' in detailColeg && typeof (detailColeg as { departmentName?: unknown }).departmentName === 'string') {
+    if (
+      'departmentName' in detailColeg &&
+      typeof (detailColeg as { departmentName?: unknown }).departmentName === 'string'
+    ) {
       return (detailColeg as { departmentName: string }).departmentName;
     }
     return '';
@@ -187,7 +190,11 @@ export default function ColegModals({
             <DialogHeader>
               <DialogTitle>{detailColeg.numeComplet}</DialogTitle>
             </DialogHeader>
-            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'profile' | 'equipment')} className="mt-4">
+            <Tabs
+              value={activeTab}
+              onValueChange={(value) => setActiveTab(value as 'profile' | 'equipment')}
+              className="mt-4"
+            >
               <TabsList className="grid w-full grid-cols-2 rounded-xl">
                 <TabsTrigger value="profile">Profil</TabsTrigger>
                 <TabsTrigger value="equipment">Echipamente</TabsTrigger>
@@ -195,20 +202,18 @@ export default function ColegModals({
               <TabsContent value="profile" className="space-y-4 pt-4">
                 <div className="flex flex-wrap items-center gap-2">
                   <StatusBadge
-                    label={
-                      (() => {
-                        const status = getEmployeeLifecycleStatus(detailColeg);
-                        if (status === 'active') return 'Activ';
-                        if (status === 'pending') return 'În așteptare';
-                        return 'Inactiv';
-                      })()
-                    }
-                    tone={
-                      ((status) =>
-                        status === 'active' ? 'success' : status === 'pending' ? 'warning' : 'neutral')(
-                        getEmployeeLifecycleStatus(detailColeg),
-                      )
-                    }
+                    label={(() => {
+                      const status = getEmployeeLifecycleStatus(detailColeg);
+                      if (status === 'active') return 'Activ';
+                      if (status === 'pending') return 'În așteptare';
+                      return 'Inactiv';
+                    })()}
+                    tone={((status) =>
+                      status === 'active'
+                        ? 'success'
+                        : status === 'pending'
+                          ? 'warning'
+                          : 'neutral')(getEmployeeLifecycleStatus(detailColeg))}
                     withDot
                   />
                   {detailColeg.emailAccountStatus === 'PENDING' && (
@@ -218,7 +223,7 @@ export default function ColegModals({
                     <StatusBadge label="Email activ" tone="success" />
                   )}
                 </div>
-                <div className="grid gap-4 rounded-xl border border-slate-200/70 bg-slate-50/80 p-4 dark:border-slate-800/60 dark:bg-slate-900/40 sm:grid-cols-2">
+                <div className="grid gap-4 rounded-xl border border-slate-200/70 bg-slate-50/80 p-4 sm:grid-cols-2 dark:border-slate-800/60 dark:bg-slate-900/40">
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2">
                       <UserRound className="h-4 w-4 text-slate-400" aria-hidden="true" />
@@ -260,18 +265,18 @@ export default function ColegModals({
                         <span>ID: {detailColeg.cDataId}</span>
                       </div>
                     )}
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-muted-foreground text-xs">
                       Cont c-data: {detailColeg.cDataCreated ? 'Creat' : 'Necreat'}
                     </span>
                     {detailColeg.cDataNotes && (
-                      <p className="text-xs text-muted-foreground">{detailColeg.cDataNotes}</p>
+                      <p className="text-muted-foreground text-xs">{detailColeg.cDataNotes}</p>
                     )}
                   </div>
                 </div>
               </TabsContent>
               <TabsContent value="equipment" className="space-y-4 pt-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     {detailColeg.echipamente.length > 0
                       ? `${detailColeg.echipamente.length} echipamente alocate`
                       : 'Nu există echipamente alocate.'}
@@ -288,12 +293,14 @@ export default function ColegModals({
                         className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/70 bg-white/80 p-3 shadow-sm dark:border-slate-800/60 dark:bg-slate-900/60"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/5 text-primary">
+                          <div className="bg-primary/5 text-primary flex h-10 w-10 items-center justify-center rounded-xl">
                             <EquipmentIcon type={eq.tip} className="h-5 w-5" />
                           </div>
                           <div className="space-y-1 text-sm">
-                            <p className="font-medium text-slate-900 dark:text-slate-100">{eq.nume}</p>
-                            <p className="text-xs text-muted-foreground">Serie: {eq.serie}</p>
+                            <p className="font-medium text-slate-900 dark:text-slate-100">
+                              {eq.nume}
+                            </p>
+                            <p className="text-muted-foreground text-xs">Serie: {eq.serie}</p>
                           </div>
                         </div>
                         <StatusBadge label={eq.tip} tone="info" className="uppercase" />

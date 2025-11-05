@@ -6,7 +6,7 @@ import { resolveApiBaseUrl } from '@/utils/apiBaseUrl';
 const apiBaseUrl = resolveApiBaseUrl();
 
 const api = axios.create({
-  baseURL: apiBaseUrl,   // ex: https://preliminary-find-basin-janet.trycloudflare.com/api
+  baseURL: apiBaseUrl, // ex: https://preliminary-find-basin-janet.trycloudflare.com/api
   withCredentials: false, // fără cookie-uri
 });
 
@@ -36,7 +36,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  },
+  }
 );
 
 export { apiBaseUrl };

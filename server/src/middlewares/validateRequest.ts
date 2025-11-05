@@ -3,10 +3,8 @@ import { ObjectSchema } from "joi";
 
 type RequestProperty = "body" | "query" | "params";
 
-export const validateRequest = (
-  schema: ObjectSchema,
-  property: RequestProperty = "body"
-) =>
+export const validateRequest =
+  (schema: ObjectSchema, property: RequestProperty = "body") =>
   (req: Request, res: Response, next: NextFunction) => {
     const target = (req as any)[property];
     const { error, value } = schema.validate(target, {

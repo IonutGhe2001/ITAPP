@@ -15,7 +15,7 @@ const CalendarMonthCaption = ({ calendarMonth, className, ...divProps }: MonthCa
   const monthLabel = format(calendarMonth.date, 'MMMM yyyy', { locale });
 
   return (
-    <div {...divProps} className={cn('flex items-center gap-2 px-1 text-foreground', className)}>
+    <div {...divProps} className={cn('text-foreground flex items-center gap-2 px-1', className)}>
       <button
         type="button"
         onClick={() => {
@@ -29,7 +29,11 @@ const CalendarMonthCaption = ({ calendarMonth, className, ...divProps }: MonthCa
       >
         <ChevronLeft className="h-4 w-4" aria-hidden />
       </button>
-      <span className="flex-1 text-center text-sm font-semibold capitalize" role="status" aria-live="polite">
+      <span
+        className="flex-1 text-center text-sm font-semibold capitalize"
+        role="status"
+        aria-live="polite"
+      >
         {monthLabel}
       </span>
       <button
@@ -141,7 +145,7 @@ export function EventDatePicker({
         disabled={disabled}
       >
         <span className="line-clamp-1 flex-1 text-sm">{label}</span>
-        <CalendarDays className="h-4 w-4 text-muted-foreground" aria-hidden />
+        <CalendarDays className="text-muted-foreground h-4 w-4" aria-hidden />
       </Button>
       {isOpen ? (
         <div className="border-border bg-popover text-popover-foreground absolute left-0 right-0 z-50 mt-2 rounded-xl border p-3 shadow-lg">

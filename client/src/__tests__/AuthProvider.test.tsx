@@ -70,9 +70,7 @@ describe('AuthProvider', () => {
 
   it('throws if useAuth is used outside provider', () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() => renderHook(() => useAuth())).toThrow(
-      'useAuth must be used within AuthProvider',
-    );
+    expect(() => renderHook(() => useAuth())).toThrow('useAuth must be used within AuthProvider');
     consoleError.mockRestore();
   });
 });

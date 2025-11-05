@@ -2,10 +2,7 @@ import { memo, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/constants/routes';
 import ActionsMenu from '@/components/ActionsMenu';
-import {
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import StatusBadge from '@/components/StatusBadge';
 import { EquipmentIcon, StatusBadge as EquipmentStatusBadge } from '@/features/equipment';
 import type { EquipmentCardProps, Echipament } from '@/features/equipment/types';
@@ -34,7 +31,7 @@ function EquipmentCard({
 }: EquipmentCardProps) {
   const icon = useMemo(
     () => <EquipmentIcon type={echipament.tip} className="h-6 w-6" />,
-    [echipament.tip],
+    [echipament.tip]
   );
 
   const assignedLabel = getAssignedLabel(echipament);
@@ -43,14 +40,16 @@ function EquipmentCard({
      <article className="group flex h-full flex-col gap-4 rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-800/70 dark:bg-slate-900/70">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-2xl">
             {icon}
           </div>
           <div className="space-y-1">
-            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{echipament.nume}</h3>
-            <p className="text-xs text-muted-foreground">Serie: {echipament.serie}</p>
+            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+              {echipament.nume}
+            </h3>
+            <p className="text-muted-foreground text-xs">Serie: {echipament.serie}</p>
             {echipament.numarInventar && (
-              <p className="text-xs text-muted-foreground">Inventar: {echipament.numarInventar}</p>
+              <p className="text-muted-foreground text-xs">Inventar: {echipament.numarInventar}</p>
             )}
           </div>
         </div>
@@ -66,7 +65,9 @@ function EquipmentCard({
           >
             Detalii
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => onEdit?.({ ...echipament, __editMode: true })}>Editează</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => onEdit?.({ ...echipament, __editMode: true })}>
+            Editează
+          </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => onTransfer?.(echipament)}>Transferă</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="text-destructive" onSelect={() => onDelete?.(echipament.id)}>
@@ -75,7 +76,7 @@ function EquipmentCard({
         </ActionsMenu>
       </div>
 
-      <div className="flex flex-col gap-3 text-sm text-muted-foreground">
+      <div className="text-muted-foreground flex flex-col gap-3 text-sm">
         <div className="flex items-center justify-between gap-3">
           <div>
             <span className="font-medium text-slate-600 dark:text-slate-300">Asignat la</span>

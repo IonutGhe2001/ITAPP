@@ -14,5 +14,4 @@ type GlobalWithResizeObserver = typeof globalThis & {
 
 const globalWithResizeObserver = globalThis as GlobalWithResizeObserver;
 
-globalWithResizeObserver.ResizeObserver =
-  globalWithResizeObserver.ResizeObserver ?? ResizeObserver;
+globalWithResizeObserver.ResizeObserver = globalWithResizeObserver.ResizeObserver ?? ResizeObserver;

@@ -39,7 +39,11 @@ const KPI_CONFIG = [
   { key: 'total', label: 'Total echipamente', href: ROUTES.EQUIPMENT },
   { key: 'in_stock', label: 'În stoc', href: `${ROUTES.EQUIPMENT}?status=in-stock` },
   { key: 'allocated', label: 'Alocate', href: `${ROUTES.EQUIPMENT}?status=allocated` },
-  { key: 'repair_retired', label: 'În reparație / retrase', href: `${ROUTES.EQUIPMENT}?status=repair` },
+  {
+    key: 'repair_retired',
+    label: 'În reparație / retrase',
+    href: `${ROUTES.EQUIPMENT}?status=repair`,
+  },
 ] as const;
 
 type KpiKey = (typeof KPI_CONFIG)[number]['key'];
@@ -119,7 +123,11 @@ export default function Dashboard() {
     },
   });
 
-  const updateEventMutation = useMutation<CalendarEvent, Error, { id: string; data: CalendarEventInput }>({
+  const updateEventMutation = useMutation<
+    CalendarEvent,
+    Error,
+    { id: string; data: CalendarEventInput }
+  >({
     mutationFn: ({ id, data }) => updateEvent(id, data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['events'] });
@@ -214,7 +222,9 @@ export default function Dashboard() {
 
   const isInitialEventsLoading = eventsQuery.isLoading && !eventsQuery.data;
   const isSavingEvent = createEventMutation.isPending || updateEventMutation.isPending;
-  const deletingEventId = deleteEventMutation.isPending ? deleteEventMutation.variables ?? null : null;
+  const deletingEventId = deleteEventMutation.isPending
+    ? (deleteEventMutation.variables ?? null)
+    : null;
 
   const handleGeneratePv = (item: PvQueueItem) => {
     console.info('Generează PV pentru', item.employee, 'și', item.equipment);
@@ -233,82 +243,109 @@ export default function Dashboard() {
   };
 
   return (
-    <main className="max-w-screen-2xl mx-auto px-4 lg:px-6 space-y-6 py-6">
+    <main className="mx-auto max-w-screen-2xl space-y-6 px-4 py-6 lg:px-6">
       <header className="space-y-2">
-        <h1 className="text-3xl font-semibold text-foreground sm:text-4xl">Panou echipamente IT APP</h1>
-        <p className="text-sm text-muted-foreground sm:text-base">
-          Monitorizează inventarul, urmărește procesele-verbale și planifică activitățile echipei dintr-o singură interfață.
+        <h1 className="text-foreground text-3xl font-semibold sm:text-4xl">
+          Panou echipamente IT APP
+        </h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
+          Monitorizează inventarul, urmărește procesele-verbale și planifică activitățile echipei
+          dintr-o singură interfață.
         </p>
       </header>
 
       <section className="grid w-full grid-cols-1 items-start gap-4 sm:grid-cols-2 xl:grid-cols-12">
-        {overviewQuery.isLoading
-          ? KPI_SKELETONS.map((_, index) => (
-              <div
-                key={index}
-                className="min-h-[128px] animate-pulse rounded-xl border border-border bg-muted/30 xl:col-span-3"
-                aria-hidden
+        {overviewQuery.isLoading ? (
+          KPI_SKELETONS.map((_, index) => (
+            <div
+              key={index}
+              className="border-border bg-muted/30 min-h-[128px] animate-pulse rounded-xl border xl:col-span-3"
+              aria-hidden
+            />
+          ))
+        ) : formattedKpis.length ? (
+          formattedKpis.map((stat) => (
+            <div key={stat.key} className="xl:col-span-3">
+              <KpiCard
+                title={stat.label}
+                value={stat.value}
+                delta={stat.delta}
+                trend={stat.trend}
+                href={stat.href}
               />
-            ))
-          : formattedKpis.length ? (
-              formattedKpis.map((stat) => (
-                <div key={stat.key} className="xl:col-span-3">
-                  <KpiCard title={stat.label} value={stat.value} delta={stat.delta} trend={stat.trend} href={stat.href} />
-                </div>
-              ))
-            ) : (
-              <div className="col-span-full">
-                <EmptyState
-                  title="Indicatorii nu sunt disponibili"
-                  description="Încarcă datele de inventar pentru a vedea statistici pe ultimele 7 zile."
-                />
-              </div>
-            )}
+            </div>
+          ))
+        ) : (
+          <div className="col-span-full">
+            <EmptyState
+              title="Indicatorii nu sunt disponibili"
+              description="Încarcă datele de inventar pentru a vedea statistici pe ultimele 7 zile."
+            />
+          </div>
+        )}
       </section>
 
       <section className="grid grid-cols-1 items-stretch gap-6 xl:grid-cols-12">
-        <Card className="flex min-h-[520px] flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-8">
-          <CardHeader className="flex flex-col gap-2 border-b border-border/60 p-4 sm:flex-row sm:items-start sm:justify-between">
+        <Card className="border-border/80 bg-card/90 flex min-h-[520px] flex-col border shadow-sm xl:col-span-8">
+          <CardHeader className="border-border/60 flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-1">
-              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
-                <BarChart3 className="h-5 w-5 text-primary" aria-hidden />
+              <CardTitle className="text-foreground flex items-center gap-2 text-lg font-semibold">
+                <BarChart3 className="text-primary h-5 w-5" aria-hidden />
                 Stare echipamente
               </CardTitle>
-              <CardDescription>Analizează distribuția echipamentelor active, alocate și retrase.</CardDescription>
+              <CardDescription>
+                Analizează distribuția echipamentelor active, alocate și retrase.
+              </CardDescription>
             </div>
           </CardHeader>
           <CardContent className="flex min-h-0 flex-1 flex-col p-4">
             {equipmentStatusQuery.isLoading ? (
-              <div className="h-[320px] animate-pulse rounded-lg bg-muted/30" aria-hidden />
+              <div className="bg-muted/30 h-[320px] animate-pulse rounded-lg" aria-hidden />
             ) : equipmentStatusQuery.data?.length ? (
-              <Suspense fallback={<div className="h-[320px] animate-pulse rounded-lg bg-muted/30" aria-hidden />}>
+              <Suspense
+                fallback={
+                  <div className="bg-muted/30 h-[320px] animate-pulse rounded-lg" aria-hidden />
+                }
+              >
                 <EquipmentStatusChart data={equipmentStatusQuery.data} />
               </Suspense>
             ) : (
               <EmptyState
                 title="Nu există date despre inventar"
                 description="Importă stocurile de echipamente pentru a vedea evoluția în timp."
-                action={<Button type="button" size="sm">Importă inventar</Button>}
+                action={
+                  <Button type="button" size="sm">
+                    Importă inventar
+                  </Button>
+                }
               />
             )}
           </CardContent>
         </Card>
 
-        <Card className="flex min-h-[520px] flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-4">
-          <CardHeader className="flex flex-col gap-2 border-b border-border/60 p-4 sm:flex-row sm:items-start sm:justify-between">
+        <Card className="border-border/80 bg-card/90 flex min-h-[520px] flex-col border shadow-sm xl:col-span-4">
+          <CardHeader className="border-border/60 flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-1">
-              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
-                <AlertCircle className="h-5 w-5 text-primary" aria-hidden />
+              <CardTitle className="text-foreground flex items-center gap-2 text-lg font-semibold">
+                <AlertCircle className="text-primary h-5 w-5" aria-hidden />
                 Alerte prioritare
               </CardTitle>
-              <CardDescription>Primești maximum trei alerte critice pentru inventar.</CardDescription>
+              <CardDescription>
+                Primești maximum trei alerte critice pentru inventar.
+              </CardDescription>
             </div>
-            <Button type="button" variant="outline" size="sm">Vezi toate</Button>
+            <Button type="button" variant="outline" size="sm">
+              Vezi toate
+            </Button>
           </CardHeader>
           <CardContent className="flex min-h-0 flex-1 flex-col space-y-3 p-4">
             {alertsQuery.isLoading ? (
               ALERT_SKELETONS.map((_, index) => (
-                <div key={index} className="h-20 animate-pulse rounded-lg border border-border bg-muted/30" aria-hidden />
+                <div
+                  key={index}
+                  className="border-border bg-muted/30 h-20 animate-pulse rounded-lg border"
+                  aria-hidden
+                />
               ))
             ) : alerts.length ? (
               alerts.map((alert) => <AlertItem key={alert.id} alert={alert} />)
@@ -324,21 +361,27 @@ export default function Dashboard() {
 
       <section className="grid grid-cols-1 items-stretch gap-6 xl:grid-cols-12">
         <Card
-          className="flex flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-8"
+          className="border-border/80 bg-card/90 flex flex-col border shadow-sm xl:col-span-8"
           style={
             quickActionsHeight
               ? { height: quickActionsHeight, maxHeight: quickActionsHeight }
               : undefined
           }
         >
-          <CardHeader className="flex flex-col gap-2 border-b border-border/60 p-4 sm:flex-row sm:items-start sm:justify-between">
+          <CardHeader className="border-border/60 flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-1">
-              <CardTitle className="text-lg font-semibold text-foreground">Coada de PV</CardTitle>
-              <CardDescription>Finalizează documentele de predare pentru alocările recente.</CardDescription>
+              <CardTitle className="text-foreground text-lg font-semibold">Coada de PV</CardTitle>
+              <CardDescription>
+                Finalizează documentele de predare pentru alocările recente.
+              </CardDescription>
             </div>
           </CardHeader>
           <CardContent className="flex min-h-0 flex-1 flex-col p-4">
-            <PvQueue items={pvQueueItems} isLoading={pvQueueQuery.isLoading} onGenerate={handleGeneratePv} />
+            <PvQueue
+              items={pvQueueItems}
+              isLoading={pvQueueQuery.isLoading}
+              onGenerate={handleGeneratePv}
+            />
           </CardContent>
         </Card>
 
@@ -366,18 +409,18 @@ export default function Dashboard() {
           />
         </div>
 
-        <Card className="flex h-full min-h-[420px] flex-col border border-border/80 bg-card/90 shadow-sm xl:col-span-6">
-          <CardHeader className="flex flex-col gap-2 border-b border-border/60 p-4 sm:flex-row sm:items-start sm:justify-between">
+        <Card className="border-border/80 bg-card/90 flex h-full min-h-[420px] flex-col border shadow-sm xl:col-span-6">
+          <CardHeader className="border-border/60 flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-1">
-              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
-                <Activity className="h-5 w-5 text-primary" aria-hidden />
+              <CardTitle className="text-foreground flex items-center gap-2 text-lg font-semibold">
+                <Activity className="text-primary h-5 w-5" aria-hidden />
                 Activitate recentă
               </CardTitle>
               <CardDescription>Ultimele actualizări pentru inventar și alocări.</CardDescription>
             </div>
           </CardHeader>
           <CardContent className="flex min-h-0 flex-1 flex-col gap-4 p-4 sm:p-5">
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border/60 bg-background/60 p-4">
+            <div className="border-border/60 bg-background/60 flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border p-4">
               <div className="flex-1 overflow-y-auto pr-1">
                 <ActivityFeed items={recentActivity} isLoading={activityQuery.isLoading} />
               </div>

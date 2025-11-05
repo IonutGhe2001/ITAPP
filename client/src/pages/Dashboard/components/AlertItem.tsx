@@ -3,7 +3,10 @@ import { formatDistanceToNow } from 'date-fns';
 import { ro } from 'date-fns/locale';
 import type { Alert } from '../api';
 
-const severityConfig: Record<Alert['severity'], { label: string; icon: typeof AlertTriangle; className: string }> = {
+const severityConfig: Record<
+  Alert['severity'],
+  { label: string; icon: typeof AlertTriangle; className: string }
+> = {
   critical: {
     label: 'Prioritate critică',
     icon: ShieldAlert,
@@ -34,16 +37,19 @@ export function AlertItem({ alert }: AlertItemProps) {
   });
 
   return (
-    <article className="flex gap-3 rounded-lg border border-border bg-card/60 p-4 shadow-none">
-      <div className={`flex h-10 w-10 items-center justify-center rounded-full ${config.className}`} aria-hidden="true">
+    <article className="border-border bg-card/60 flex gap-3 rounded-lg border p-4 shadow-none">
+      <div
+        className={`flex h-10 w-10 items-center justify-center rounded-full ${config.className}`}
+        aria-hidden="true"
+      >
         <Icon className="h-5 w-5" />
       </div>
       <div className="flex flex-1 flex-col gap-1">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-sm font-semibold text-foreground">{alert.title}</h3>
-          <span className="text-xs text-muted-foreground">{timestampLabel}</span>
+          <h3 className="text-foreground text-sm font-semibold">{alert.title}</h3>
+          <span className="text-muted-foreground text-xs">{timestampLabel}</span>
         </div>
-        <p className="text-sm text-muted-foreground">{alert.description}</p>
+        <p className="text-muted-foreground text-sm">{alert.description}</p>
         <span className="sr-only">{config.label}</span>
       </div>
     </article>

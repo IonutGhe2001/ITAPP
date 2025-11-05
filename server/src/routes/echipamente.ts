@@ -72,7 +72,11 @@ const handleUpload =
     });
   };
 
-router.get("/", validateRequest(listEchipamenteQuerySchema, "query"), controller.getEchipamente);
+router.get(
+  "/",
+  validateRequest(listEchipamenteQuerySchema, "query"),
+  controller.getEchipamente
+);
 router.get("/stats", controller.getStats);
 router.get("/stock", controller.getAvailableStock);
 router.get("/export", controller.exportEchipamente);

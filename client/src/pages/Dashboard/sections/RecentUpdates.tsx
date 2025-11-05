@@ -74,7 +74,10 @@ export default function RecentUpdates() {
 
   return (
     <div className="relative flex-1 overflow-hidden">
-      <div className="absolute left-6 top-6 bottom-6 hidden w-px bg-border/60 lg:block" aria-hidden />
+      <div
+        className="bg-border/60 absolute bottom-6 left-6 top-6 hidden w-px lg:block"
+        aria-hidden
+      />
       <ul className="flex flex-col gap-4 overflow-y-auto pr-1">
         {filteredUpdates.length === 0 && (
           <li className="text-muted-foreground text-sm">Nu există activitate recentă.</li>
@@ -85,13 +88,16 @@ export default function RecentUpdates() {
             <li
               key={update.id}
               className={cn(
-                'group relative flex gap-4 rounded-2xl border border-border/60 bg-background/80 p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg',
+                'border-border/60 bg-background/80 hover:border-primary/40 group relative flex gap-4 rounded-2xl border p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg',
                 isImportant && 'border-primary/50 bg-primary/5'
               )}
             >
-              <span className="from-primary/20 via-primary/0 to-transparent pointer-events-none absolute left-[18px] top-0 hidden h-full w-px bg-gradient-to-b lg:block" />
-              <span className="absolute left-3 top-6 hidden h-3 w-3 rounded-full bg-primary/60 lg:block" aria-hidden />
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted/70 text-primary shadow-inner ring-1 ring-border/50">
+              <span className="from-primary/20 via-primary/0 pointer-events-none absolute left-[18px] top-0 hidden h-full w-px bg-gradient-to-b to-transparent lg:block" />
+              <span
+                className="bg-primary/60 absolute left-3 top-6 hidden h-3 w-3 rounded-full lg:block"
+                aria-hidden
+              />
+              <div className="bg-muted/70 text-primary ring-border/50 flex h-11 w-11 items-center justify-center rounded-xl shadow-inner ring-1">
                 {updateIcons[update.type]}
               </div>
               <div className="flex flex-1 flex-col gap-2">
@@ -108,7 +114,10 @@ export default function RecentUpdates() {
                     </Badge>
                   )}
                   <span className="text-muted-foreground text-xs">
-                    {formatDistanceToNow(new Date(update.timestamp), { addSuffix: true, locale: ro })}
+                    {formatDistanceToNow(new Date(update.timestamp), {
+                      addSuffix: true,
+                      locale: ro,
+                    })}
                   </span>
                 </div>
                 <p className="text-foreground text-sm leading-relaxed">{update.message}</p>

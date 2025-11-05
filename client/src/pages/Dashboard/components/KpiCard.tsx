@@ -21,7 +21,7 @@ export function KpiCard({ title, value, delta, trend, href }: KpiCardProps) {
   const content = (
     <>
       <div className="flex items-center justify-between gap-3">
-        <span className="text-sm font-medium text-muted-foreground">{title}</span>
+        <span className="text-muted-foreground text-sm font-medium">{title}</span>
         <span
           className={cn(
             'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium',
@@ -37,8 +37,8 @@ export function KpiCard({ title, value, delta, trend, href }: KpiCardProps) {
         </span>
       </div>
       <div className="space-y-1">
-        <p className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{value}</p>
-        <p className="text-xs text-muted-foreground">Față de ultimele 7 zile</p>
+        <p className="text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">{value}</p>
+        <p className="text-muted-foreground text-xs">Față de ultimele 7 zile</p>
       </div>
     </>
   );

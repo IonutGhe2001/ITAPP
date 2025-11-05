@@ -54,9 +54,11 @@ const validateEchipamentUpdate = async (
 
 type EchipamentWithAngajat = Awaited<
   ReturnType<typeof prisma.echipament.findMany>
->[number] & { angajat: NonNullable<Awaited<
-      ReturnType<typeof prisma.angajat.findMany>
-    >[number]> | null };
+>[number] & {
+  angajat: NonNullable<
+    Awaited<ReturnType<typeof prisma.angajat.findMany>>[number]
+  > | null;
+};
 
 export type GetEchipamenteParams = {
   page: number;
@@ -74,7 +76,9 @@ export function getEchipamente(
 ): Promise<{ items: EchipamentWithAngajat[]; total: number }>;
 export async function getEchipamente(
   params?: GetEchipamenteParams
-): Promise<EchipamentWithAngajat[] | { items: EchipamentWithAngajat[]; total: number }> {
+): Promise<
+  EchipamentWithAngajat[] | { items: EchipamentWithAngajat[]; total: number }
+> {
   if (!params) {
     return prisma.echipament.findMany({ include: { angajat: true } });
   }

@@ -8,27 +8,15 @@ const http = {
     const res = await api.get<T>(url, config);
     return res.data;
   },
-  post: async <T = unknown, D = unknown>(
-    url: string,
-    data?: D,
-    config?: AxiosRequestConfig
-  ) => {
+  post: async <T = unknown, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig) => {
     const res = await api.post<T>(url, data, config);
     return res.data;
   },
-  put: async <T = unknown, D = unknown>(
-    url: string,
-    data?: D,
-    config?: AxiosRequestConfig
-  ) => {
+  put: async <T = unknown, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig) => {
     const res = await api.put<T>(url, data, config);
     return res.data;
   },
-  patch: async <T = unknown, D = unknown>(
-    url: string,
-    data?: D,
-    config?: AxiosRequestConfig
-  ) => {
+  patch: async <T = unknown, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig) => {
     const res = await api.patch<T>(url, data, config);
     return res.data;
   },
