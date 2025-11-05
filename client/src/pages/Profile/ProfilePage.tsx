@@ -1,5 +1,7 @@
 import React, { Suspense, useId, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { updateCurrentUser } from '@/services/authService';
+import { getUserMetrics, getUserActivity, getUserSessions } from '@/services/profileService';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '@/context/useUser';
 import type { User } from '@/types/user';
@@ -21,27 +23,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const SignatureEditor = React.lazy(() => import('@/components/SignatureEditor'));
 
-const kpiMetrics = [
-  { label: 'Active Assets', value: '18' },
-  { label: 'Open Tickets', value: '3' },
-  { label: 'Pending Trainings', value: '2' },
-  { label: 'Approvals', value: '5' },
-];
-
-const recentActivities = [
-  { title: 'Password changed', time: '2 hours ago' },
-  { title: 'New device enrolled', time: 'Yesterday' },
-  { title: 'Security training completed', time: '2 days ago' },
-  { title: 'Logged in from mobile', time: '3 days ago' },
-  { title: 'Approved hardware request', time: 'Last week' },
-];
-
-const activeSessions = [
-  { device: 'MacBook Pro · Chrome', location: 'Bucharest, RO', lastActive: '3 mins ago' },
-  { device: 'iPhone 14 · Safari', location: 'Cluj, RO', lastActive: '1 hour ago' },
-  { device: 'Surface Laptop · Edge', location: 'Remote', lastActive: 'Yesterday' },
-];
-
 export default function ProfilePage() {
   const { user, setUser } = useUser();
   const [isSaving, setIsSaving] = useState(false);
@@ -53,6 +34,29 @@ export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputId = useId();
   const fullName = [user?.nume, user?.prenume].filter(Boolean).join(' ').trim();
+
+  // Fetch profile data from API
+  const metricsQuery = useQuery({
+    queryKey: ['profile', 'metrics'],
+    queryFn: getUserMetrics,
+    staleTime: 60_000,
+  });
+
+  const activityQuery = useQuery({
+    queryKey: ['profile', 'activity', 5],
+    queryFn: () => getUserActivity(5),
+    staleTime: 30_000,
+  });
+
+  const sessionsQuery = useQuery({
+    queryKey: ['profile', 'sessions'],
+    queryFn: getUserSessions,
+    staleTime: 30_000,
+  });
+
+  const kpiMetrics = metricsQuery.data ?? [];
+  const recentActivities = activityQuery.data ?? [];
+  const activeSessions = sessionsQuery.data ?? [];
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

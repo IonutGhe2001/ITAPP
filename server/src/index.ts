@@ -28,6 +28,8 @@ import reportsRoutes from "./routes/reports";
 import purchaseRequestRoutes from "./routes/purchaseRequests";
 import onboardingRoutes from "./routes/onboarding";
 import testLoginRoutes from "./routes/testLogin";
+import dashboardRoutes from "./routes/dashboard";
+import profileRoutes from "./routes/profile";
 
 const app = express();
 const server = http.createServer(app);
@@ -159,6 +161,8 @@ app.use("/config", configRoutes);
 app.use("/api/department-configs", departmentConfigRoutes);
 app.use("/api/reports", reportsRoutes);
 app.use("/api/onboarding", onboardingRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/profile", profileRoutes);
 app.use(testLoginRoutes);
 
 // Error handler middleware (final)
