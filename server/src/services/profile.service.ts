@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma";
+import type { Echipament, EquipmentChange } from ".prisma/client";
 
 type UserMetric = {
   label: string;
@@ -35,7 +36,7 @@ export const getUserMetrics = async (userId: number): Promise<UserMetric[]> => {
   });
 
   const activeAssets =
-    angajat?.echipamente.filter((eq) => eq.stare === "alocat").length || 0;
+    angajat?.echipamente.filter((eq: Echipament) => eq.stare === "alocat").length || 0;
 
   // Count pending onboarding tasks if any
   const pendingOnboarding = angajat
@@ -95,7 +96,7 @@ export const getUserActivity = async (
     take: limit,
   });
 
-  const activities: UserActivity[] = changes.map((change) => {
+  const activities: UserActivity[] = changes.map((change: EquipmentChange & { echipament: Echipament }) => {
     let title = "";
     const now = new Date();
     const timeDiff = now.getTime() - change.createdAt.getTime();
