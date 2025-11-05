@@ -1,5 +1,6 @@
 import { prisma } from "../lib/prisma";
 import { EQUIPMENT_STATUS } from "@shared/equipmentStatus";
+import type { Echipament, EquipmentChange, Angajat } from ".prisma/client";
 
 type OverviewStats = {
   total: number;
@@ -147,9 +148,15 @@ export const getEquipmentStatusTimeline = async (): Promise<
   });
 
   // Organize data by equipment type
-  const typeMap = new Map<string, Record<string, number>>();
+  type StatusCounts = {
+    in_stock: number;
+    allocated: number;
+    repair: number;
+    retired: number;
+  };
+  const typeMap = new Map<string, StatusCounts>();
 
-  equipmentByType.forEach((item) => {
+  equipmentByType.forEach((item: { tip: string; stare: string; _count: { tip: number } }) => {
     if (!typeMap.has(item.tip)) {
       typeMap.set(item.tip, {
         in_stock: 0,
@@ -168,7 +175,7 @@ export const getEquipmentStatusTimeline = async (): Promise<
   });
 
   // Convert to array format
-  return Array.from(typeMap.entries()).map(([tip, counts]) => ({
+  return Array.from(typeMap.entries()).map(([tip, counts]): EquipmentStatusRecord => ({
     status: tip,
     ...counts,
   }));
@@ -190,7 +197,7 @@ export const getAlerts = async (limit: number): Promise<Alert[]> => {
     orderBy: { garantie: "asc" },
   });
 
-  expiringWarranties.forEach((eq) => {
+  expiringWarranties.forEach((eq: Echipament) => {
     const daysLeft = Math.ceil(
       (new Date(eq.garantie!).getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
     );
@@ -214,7 +221,7 @@ export const getAlerts = async (limit: number): Promise<Alert[]> => {
     orderBy: { createdAt: "asc" },
   });
 
-  unallocatedEquipment.forEach((eq) => {
+  unallocatedEquipment.forEach((eq: Echipament) => {
     const daysUnallocated = Math.floor(
       (now.getTime() - new Date(eq.createdAt).getTime()) / (1000 * 60 * 60 * 24)
     );
@@ -240,7 +247,7 @@ export const getAlerts = async (limit: number): Promise<Alert[]> => {
     orderBy: { createdAt: "asc" },
   });
 
-  missingPvs.forEach((change) => {
+  missingPvs.forEach((change: EquipmentChange & { echipament: Echipament }) => {
     alerts.push({
       id: `missing-pv-${change.id}`,
       title: "PV lipsă după alocare",
@@ -270,7 +277,7 @@ export const getPvQueue = async (limit: number): Promise<PvQueueItem[]> => {
     orderBy: { createdAt: "asc" },
   });
 
-  return changes.map((change) => {
+  return changes.map((change: EquipmentChange & { angajat: Angajat; echipament: Echipament }) => {
     const daysSinceAllocation = Math.floor(
       (now.getTime() - new Date(change.createdAt).getTime()) /
         (1000 * 60 * 60 * 24)
@@ -299,7 +306,7 @@ export const getActivity = async (limit: number): Promise<ActivityItem[]> => {
     orderBy: { createdAt: "desc" },
   });
 
-  return changes.map((change) => {
+  return changes.map((change: EquipmentChange & { angajat: Angajat; echipament: Echipament }) => {
     let action = "";
     let target = "";
 
