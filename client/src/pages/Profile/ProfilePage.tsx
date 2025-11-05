@@ -1,7 +1,7 @@
 import React, { Suspense, useId, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { updateCurrentUser } from '@/services/authService';
-import { getUserMetrics, getUserActivity, getUserSessions } from '@/services/profileService';
+import { getUserMetrics, getUserSessions } from '@/services/profileService';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '@/context/useUser';
 import type { User } from '@/types/user';
@@ -65,12 +65,6 @@ export default function ProfilePage() {
     staleTime: 60_000,
   });
 
-  const activityQuery = useQuery({
-    queryKey: ['profile', 'activity', 5],
-    queryFn: () => getUserActivity(5),
-    staleTime: 30_000,
-  });
-
   const sessionsQuery = useQuery({
     queryKey: ['profile', 'sessions'],
     queryFn: getUserSessions,
@@ -78,7 +72,6 @@ export default function ProfilePage() {
   });
 
   const kpiMetrics = metricsQuery.data ?? [];
-  const recentActivities = activityQuery.data ?? [];
   const activeSessions = sessionsQuery.data ?? [];
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -388,8 +381,6 @@ export default function ProfilePage() {
                     </table>
                   </div>
                 </section>
-              </div>
-            </div>
           </TabsContent>
           <TabsContent value="details">
             <div className="border-border/60 bg-card/90 text-muted-foreground rounded-2xl border p-6 text-sm shadow-sm">
@@ -565,38 +556,6 @@ function DefinitionItem({ label, value }: { label: string; value?: string }) {
     <div className="border-border/40 bg-background/80 rounded-xl border p-4">
       <dt className="text-muted-foreground text-xs uppercase tracking-wide">{label}</dt>
       <dd className="text-foreground mt-1 text-sm font-medium">{value || '-'}</dd>
-    </div>
-  );
-}
-
-function PreferenceRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="border-border/40 bg-background/80 flex items-center justify-between rounded-xl border px-4 py-3">
-      <p className="text-foreground text-sm font-medium">{label}</p>
-      <span className="bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
-        {value}
-      </span>
-    </div>
-  );
-}
-
-function PreferenceToggle({ label, active }: { label: string; active?: boolean }) {
-  return (
-    <div className="border-border/40 bg-background/80 flex items-center justify-between rounded-xl border px-4 py-3">
-      <p className="text-foreground text-sm font-medium">{label}</p>
-      <span
-        className={`relative inline-flex h-6 w-12 items-center rounded-full border transition-colors ${
-          active ? 'border-primary bg-primary/80' : 'border-border bg-muted'
-        }`}
-        role="switch"
-        aria-checked={active}
-      >
-        <span
-          className={`bg-background inline-block h-4 w-4 rounded-full transition-transform duration-200 ${
-            active ? 'translate-x-6' : 'translate-x-2'
-          }`}
-        />
-      </span>
     </div>
   );
 }

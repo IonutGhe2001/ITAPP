@@ -22,34 +22,36 @@ export function QuickActions({ actions }: QuickActionsProps) {
   const [showAddEquipmentModal, setShowAddEquipmentModal] = useState(false);
   const [showPVModal, setShowPVModal] = useState(false);
 
-  const defaultActions: QuickAction[] = [
-    {
-      id: 'add-equipment',
-      label: 'Adaugă echipament',
-      description: 'Înregistrează rapid un activ nou în inventar.',
-      icon: Plus,
-      onSelect: () => setShowAddEquipmentModal(true),
-    },
-    {
-      id: 'generate-pv',
-      label: 'Generează PV',
-      description: 'Pornește procesul de creare a unui nou proces-verbal.',
-      icon: FileText,
-      onSelect: () => setShowPVModal(true),
-    },
-    {
-      id: 'export-csv',
-      label: 'Exportă CSV',
-      description: 'Descarcă lista de echipamente într-un fișier CSV.',
-      icon: Download,
-      onSelect: () => {
-        // Trigger CSV export
-        window.location.href = '/api/echipamente/export/csv';
+  const items = useMemo(() => {
+    const defaultActions: QuickAction[] = [
+      {
+        id: 'add-equipment',
+        label: 'Adaugă echipament',
+        description: 'Înregistrează rapid un activ nou în inventar.',
+        icon: Plus,
+        onSelect: () => setShowAddEquipmentModal(true),
       },
-    },
-  ];
-
-  const items = useMemo(() => actions ?? defaultActions, [actions]);
+      {
+        id: 'generate-pv',
+        label: 'Generează PV',
+        description: 'Pornește procesul de creare a unui nou proces-verbal.',
+        icon: FileText,
+        onSelect: () => setShowPVModal(true),
+      },
+      {
+        id: 'export-csv',
+        label: 'Exportă CSV',
+        description: 'Descarcă lista de echipamente într-un fișier CSV.',
+        icon: Download,
+        onSelect: () => {
+          // Trigger CSV export
+          window.location.href = '/api/echipamente/export/csv';
+        },
+      },
+    ];
+    
+    return actions ?? defaultActions;
+  }, [actions]);
 
   return (
     <>
