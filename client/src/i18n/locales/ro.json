@@ -24,15 +24,63 @@
       "position": "Funcție",
       "phone": "Telefon",
       "fullName": "Nume complet",
-      "email": "Email"
+      "email": "Email",
+      "digitalSignature": "Semnătură digitală"
+    },
+    "meta": {
+      "department": "Departament",
+      "location": "Locație",
+      "lastLogin": "Ultima autentificare"
+    },
+    "sections": {
+      "contact": "Contact și Organizație",
+      "preferences": "Preferințe",
+      "kpi": "Metrici cheie",
+      "recentActivity": "Activitate recentă",
+      "sessions": "Sesiuni active"
+    },
+    "preferences": {
+      "language": "Limbă",
+      "timezone": "Fus orar",
+      "theme": "Temă întunecată",
+      "notifications": "Notificări"
+    },
+    "signature": {
+      "description": "Previzualizarea semnăturii digitale curente.",
+      "empty": "Nu există semnătură în fișier."
+    },
+    "tabs": {
+      "details": "Informațiile detaliate ale profilului vor apărea aici.",
+      "security": "Prezentare generală a setărilor de securitate.",
+      "devices": "Dispozitive conectate și starea înrolării.",
+      "activity": "Jurnal complet de activitate și pistă de audit."
+    },
+    "dialogs": {
+      "changePassword": {
+        "title": "Schimbă parola",
+        "description": "Actualizează parola contului pentru a-ți păstra profilul în siguranță.",
+        "current": "Parola curentă",
+        "new": "Parolă nouă",
+        "confirm": "Confirmă parola"
+      }
+    },
+    "drawer": {
+      "title": "Editează profilul",
+      "description": "Actualizează datele personale și organizaționale."
     },
     "buttons": {
       "save": "Salvează",
       "saving": "Se salvează...",
       "cancel": "Anulează",
-      "edit": "Editează"
+      "edit": "Editează profilul",
+      "uploadPhoto": "Încarcă fotografie",
+      "removePhoto": "Elimină",
+      "changePassword": "Schimbă parola",
+      "replace": "Înlocuiește",
+      "download": "Descarcă",
+      "signOutOthers": "Deconectează-te de pe celelalte"
     }
-    },
+  },
   "employeeForm": {
     "heading": "Adaugă Angajat",
     "labels": {

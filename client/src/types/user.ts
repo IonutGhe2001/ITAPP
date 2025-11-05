@@ -6,4 +6,7 @@ export interface User {
   digitalSignature?: string | null;
   email?: string;
   telefon?: string;
+  locatie?: string | null;
+  departament?: string | null;
+  lastLogin?: string | null;
 }
