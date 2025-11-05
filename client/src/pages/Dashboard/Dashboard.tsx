@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Activity, AlertCircle, BarChart3 } from 'lucide-react';
 import { endOfMonth, format, formatISO, startOfMonth } from 'date-fns';
+import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,15 +35,16 @@ import { CalendarCompact } from './components/CalendarCompact';
 import { QuickActionsCompact } from './components/QuickActionsCompact';
 
 const EquipmentStatusChart = lazy(() => import('./components/EquipmentStatusChart'));
+const ModalProcesVerbal = lazy(() => import('./modals/ModalProcesVerbal'));
 
 const KPI_CONFIG = [
   { key: 'total', label: 'Total echipamente', href: ROUTES.EQUIPMENT },
-  { key: 'in_stock', label: 'În stoc', href: `${ROUTES.EQUIPMENT}?status=in-stock` },
-  { key: 'allocated', label: 'Alocate', href: `${ROUTES.EQUIPMENT}?status=allocated` },
+  { key: 'in_stock', label: 'În stoc', href: `${ROUTES.EQUIPMENT}?status=in_stoc` },
+  { key: 'allocated', label: 'Alocate', href: `${ROUTES.EQUIPMENT}?status=alocat` },
   {
     key: 'repair_retired',
-    label: 'În reparație / retrase',
-    href: `${ROUTES.EQUIPMENT}?status=repair`,
+    label: 'În mentenanță / retrase',
+    href: `${ROUTES.EQUIPMENT}?status=mentenanta`,
   },
 ] as const;
 
@@ -67,6 +69,7 @@ export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const quickActionsRef = useRef<HTMLDivElement | null>(null);
   const [quickActionsHeight, setQuickActionsHeight] = useState<number>();
+  const [showPVModal, setShowPVModal] = useState(false);
   const queryClient = useQueryClient();
 
   const overviewQuery = useQuery<OverviewStatsResponse>({
@@ -228,6 +231,7 @@ export default function Dashboard() {
 
   const handleGeneratePv = (item: PvQueueItem) => {
     console.info('Generează PV pentru', item.employee, 'și', item.equipment);
+    setShowPVModal(true);
   };
 
   const handleCreateEvent = async (input: CalendarEventInput) => {
@@ -334,8 +338,8 @@ export default function Dashboard() {
                 Primești maximum trei alerte critice pentru inventar.
               </CardDescription>
             </div>
-            <Button type="button" variant="outline" size="sm">
-              Vezi toate
+            <Button type="button" variant="outline" size="sm" asChild>
+              <Link to={ROUTES.EQUIPMENT}>Vezi toate</Link>
             </Button>
           </CardHeader>
           <CardContent className="flex min-h-0 flex-1 flex-col space-y-3 p-4">
@@ -428,6 +432,10 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </section>
+
+      <Suspense fallback={null}>
+        {showPVModal && <ModalProcesVerbal onClose={() => setShowPVModal(false)} />}
+      </Suspense>
     </main>
   );
 }

@@ -27,7 +27,7 @@ const colors = {
 const tooltipLabels: Record<keyof typeof colors, string> = {
   in_stock: 'În stoc',
   allocated: 'Alocate',
-  repair: 'În reparație',
+  repair: 'În mentenanță',
   retired: 'Retrase',
 };
 
@@ -105,7 +105,7 @@ export default function EquipmentStatusChart({ data }: EquipmentStatusChartProps
           <Bar
             dataKey="repair"
             stackId="status"
-            name="În reparație"
+            name="În mentenanță"
             fill={colors.repair}
             radius={[4, 4, 0, 0]}
           />
