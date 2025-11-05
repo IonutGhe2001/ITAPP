@@ -70,8 +70,8 @@ export function CalendarCompact({
           Adauga
         </Button>
       </CardHeader>
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-6 p-5 sm:p-6">
-         <div className="border-border/60 bg-background/60 rounded-xl border p-5 shadow-sm">
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-6 p-5 sm:p-6 lg:flex-row">
+        <div className="border-border/60 bg-background/60 rounded-xl border p-5 shadow-sm lg:w-1/2">
           <MiniCalendar
             events={events}
             currentMonth={currentMonth}
@@ -81,7 +81,7 @@ export function CalendarCompact({
             isLoading={isLoading}
           />
         </div>
-        <div className="border-border/60 bg-background/60 flex min-h-0 flex-1 flex-col gap-4 overflow-hidden rounded-xl border p-5 shadow-sm">
+        <div className="border-border/60 bg-background/60 flex min-h-0 flex-1 flex-col gap-4 overflow-hidden rounded-xl border p-5 shadow-sm lg:w-1/2">
           <div className="space-y-2">
             <p className="text-foreground text-sm font-semibold md:text-base">{selectedDayLabel}</p>
             <p className="text-muted-foreground text-xs md:text-sm">

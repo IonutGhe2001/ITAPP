@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Activity, AlertCircle, BarChart3 } from 'lucide-react';
+import { AlertCircle, BarChart3 } from 'lucide-react';
 import { endOfMonth, format, formatISO, startOfMonth } from 'date-fns';
 import { Link } from 'react-router-dom';
 
@@ -11,14 +11,12 @@ import { ROUTES } from '@/constants/routes';
 import {
   createEvent,
   deleteEvent,
-  getActivity,
   getAlerts,
   getEquipmentStatus,
   getEvents,
   getOverviewStats,
   getPvQueue,
   updateEvent,
-  type ActivityItem,
   type Alert,
   type CalendarEvent,
   type CalendarEventInput,
@@ -26,7 +24,6 @@ import {
   type OverviewStatsResponse,
   type PvQueueItem,
 } from './api';
-import { ActivityFeed } from './components/ActivityFeed';
 import { AlertItem } from './components/AlertItem';
 import { EmptyState } from './components/EmptyState';
 import { KpiCard } from './components/KpiCard';
@@ -96,12 +93,6 @@ export default function Dashboard() {
     staleTime: 30_000,
   });
 
-  const activityQuery = useQuery<ActivityItem[]>({
-    queryKey: ['activity', 10],
-    queryFn: () => getActivity(10),
-    staleTime: 30_000,
-  });
-
   const monthRange = useMemo(() => {
     const start = startOfMonth(currentMonth);
     const end = endOfMonth(currentMonth);
@@ -165,7 +156,6 @@ export default function Dashboard() {
 
   const alerts = useMemo(() => alertsQuery.data ?? [], [alertsQuery.data]);
   const pvQueueItems = useMemo(() => pvQueueQuery.data ?? [], [pvQueueQuery.data]);
-  const recentActivity = useMemo(() => activityQuery.data ?? [], [activityQuery.data]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -394,43 +384,22 @@ export default function Dashboard() {
         </div>
       </section>
 
-      <section className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2 xl:grid-cols-12">
-        <div className="flex min-h-0 flex-col xl:col-span-6">
-          <CalendarCompact
-            events={eventsQuery.data ?? []}
-            eventsForSelectedDay={eventsForSelectedDay}
-            currentMonth={currentMonth}
-            selectedDate={selectedDate}
-            onMonthChange={setCurrentMonth}
-            onSelectDate={setSelectedDate}
-            onCreate={handleCreateEvent}
-            onUpdate={handleUpdateEvent}
-            onDelete={handleDeleteEvent}
-            isLoading={isInitialEventsLoading}
-            isSaving={isSavingEvent}
-            deletingId={deletingEventId}
-            className="h-full"
-          />
-        </div>
-
-        <Card className="border-border/80 bg-card/90 flex h-full min-h-[420px] flex-col border shadow-sm xl:col-span-6">
-          <CardHeader className="border-border/60 flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="space-y-1">
-              <CardTitle className="text-foreground flex items-center gap-2 text-lg font-semibold">
-                <Activity className="text-primary h-5 w-5" aria-hidden />
-                Activitate recentă
-              </CardTitle>
-              <CardDescription>Ultimele actualizări pentru inventar și alocări.</CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent className="flex min-h-0 flex-1 flex-col gap-4 p-4 sm:p-5">
-            <div className="border-border/60 bg-background/60 flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border p-4">
-              <div className="flex-1 overflow-y-auto pr-1">
-                <ActivityFeed items={recentActivity} isLoading={activityQuery.isLoading} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <section className="grid grid-cols-1 items-stretch gap-6">
+        <CalendarCompact
+          events={eventsQuery.data ?? []}
+          eventsForSelectedDay={eventsForSelectedDay}
+          currentMonth={currentMonth}
+          selectedDate={selectedDate}
+          onMonthChange={setCurrentMonth}
+          onSelectDate={setSelectedDate}
+          onCreate={handleCreateEvent}
+          onUpdate={handleUpdateEvent}
+          onDelete={handleDeleteEvent}
+          isLoading={isInitialEventsLoading}
+          isSaving={isSavingEvent}
+          deletingId={deletingEventId}
+          className="h-full"
+        />
       </section>
 
       <Suspense fallback={null}>
