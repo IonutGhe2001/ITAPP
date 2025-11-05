@@ -65,7 +65,7 @@ export default function LoginForm() {
     <form
       onSubmit={handleSubmit}
       noValidate
-      className="w-full max-w-xs space-y-6 animate-fade-in-down"
+      className="animate-fade-in-down w-full max-w-xs space-y-6"
     >
       {error && <div className="text-center text-sm text-red-600">{error}</div>}
 

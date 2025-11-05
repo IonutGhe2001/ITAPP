@@ -10,9 +10,7 @@ vi.mock('react-router-dom', () => ({
 
 vi.mock('@/services/searchService', () => ({
   useSearchSuggestions: (query: string) => ({
-    data: query
-      ? { echipamente: [{ nume: 'Laptop' }], angajati: [] }
-      : undefined,
+    data: query ? { echipamente: [{ nume: 'Laptop' }], angajati: [] } : undefined,
   }),
 }));
 

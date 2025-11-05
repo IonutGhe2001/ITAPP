@@ -54,7 +54,8 @@ export default function OnboardingPage() {
     );
   };
 
-  const isLoadingLaptops = isLoadingEchipamente || (isFetchingEchipamente && echipamente.length === 0);
+  const isLoadingLaptops =
+    isLoadingEchipamente || (isFetchingEchipamente && echipamente.length === 0);
   const laptops = echipamente.filter((e) => e.tip.toLowerCase() === 'laptop');
 
   return (
@@ -121,7 +122,7 @@ export default function OnboardingPage() {
         onClick={handleSave}
       >
         {saveMutation.isPending && (
-          <span className="border-white/80 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/80 border-t-transparent" />
         )}
         <span>{saveMutation.isPending ? 'Se salvează...' : 'Salvează'}</span>
       </button>

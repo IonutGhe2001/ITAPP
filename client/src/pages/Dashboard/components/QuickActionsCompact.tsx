@@ -14,10 +14,12 @@ export const QuickActionsCompact = forwardRef<HTMLDivElement, QuickActionsCompac
     return (
       <Card
         ref={ref}
-        className={cn('flex flex-col border border-border/80 bg-card/90 shadow-sm', className)}
+        className={cn('border-border/80 bg-card/90 flex flex-col border shadow-sm', className)}
       >
-        <CardHeader className="flex items-center justify-between gap-3 space-y-0 border-b border-border/60 p-4">
-          <CardTitle className="text-base font-semibold text-foreground sm:text-lg">Acțiuni rapide</CardTitle>
+        <CardHeader className="border-border/60 flex items-center justify-between gap-3 space-y-0 border-b p-4">
+          <CardTitle className="text-foreground text-base font-semibold sm:text-lg">
+            Acțiuni rapide
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 p-4">
           <QuickActions />

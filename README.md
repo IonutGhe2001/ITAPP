@@ -170,7 +170,7 @@ TLS and attaches the correct host headers.
 ```bash
    cd server
    NODE_ENV=staging npm run dev
-   ```
+```
 
 2. Build and serve the client pointing at the staging API:
 
@@ -179,14 +179,14 @@ TLS and attaches the correct host headers.
    npm install
    VITE_API_URL=https://api-staging.<domeniu>.com/api npm run build
    npm run preview -- --host 0.0.0.0 --port 3000
-   ```
+```
 
 3. Launch the tunnel:
 
 ```bash
    cd cloudflared
    cloudflared tunnel run
-   ```
+```
 
 ### Verifying the staging login bypass
 

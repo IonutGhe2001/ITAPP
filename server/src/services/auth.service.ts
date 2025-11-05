@@ -24,7 +24,7 @@ export const authenticateUser = async (
 
   const secret = env.JWT_SECRET;
   const expiresIn = env.JWT_EXPIRES_IN as SignOptions["expiresIn"];
-  
+
   const options: SignOptions = { expiresIn };
   const token = jwt.sign(payload, secret, options);
   return token;

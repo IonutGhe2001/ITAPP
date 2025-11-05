@@ -12,7 +12,8 @@ const shortcuts = [
     label: 'Echipamente',
     route: ROUTES.EQUIPMENT,
     icon: <MonitorIcon className="h-5 w-5" />,
-    color: 'from-violet-500/15 via-violet-500/0 to-transparent text-violet-600 dark:text-violet-400',
+    color:
+      'from-violet-500/15 via-violet-500/0 to-transparent text-violet-600 dark:text-violet-400',
     keybinding: '1',
     description: 'Gestionează inventarul hardware și statusul asignărilor.',
   },
@@ -30,7 +31,8 @@ const shortcuts = [
     label: 'Profil',
     route: ROUTES.PROFILE,
     icon: <UserCircle className="h-5 w-5" />,
-    color: 'from-emerald-500/15 via-emerald-500/0 to-transparent text-emerald-600 dark:text-emerald-400',
+    color:
+      'from-emerald-500/15 via-emerald-500/0 to-transparent text-emerald-600 dark:text-emerald-400',
     keybinding: '3',
     description: 'Actualizează preferințele și setările personale.',
   },
@@ -66,13 +68,13 @@ export default function NavigationShortcuts() {
             role="button"
             tabIndex={0}
             className={cn(
-              'group relative flex h-full cursor-pointer flex-col gap-4 overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br from-muted/70 via-background to-background p-5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30',
+              'border-border/60 from-muted/70 via-background to-background hover:border-primary/40 focus-visible:ring-primary/30 group relative flex h-full cursor-pointer flex-col gap-4 overflow-hidden rounded-2xl border bg-gradient-to-br p-5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg focus:outline-none focus-visible:ring-2',
               shortcut.color,
               isActive && 'border-primary/50 bg-primary/5 shadow-lg'
             )}
           >
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-background/80 text-current shadow-sm ring-1 ring-border/70">
+              <span className="bg-background/80 ring-border/70 flex h-10 w-10 items-center justify-center rounded-xl text-current shadow-sm ring-1">
                 {shortcut.icon}
               </span>
               <div className="flex flex-col">
@@ -81,7 +83,7 @@ export default function NavigationShortcuts() {
               </div>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">{shortcut.description}</p>
-            <ArrowUpRightIcon className="ml-auto h-4 w-4 text-primary transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1" />
+            <ArrowUpRightIcon className="text-primary ml-auto h-4 w-4 transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1" />
           </li>
         );
       })}

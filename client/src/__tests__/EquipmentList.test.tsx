@@ -24,7 +24,12 @@ describe('EquipmentList', () => {
 
     render(
       <BrowserRouter>
-        <EquipmentList echipamente={echipamente} onEdit={vi.fn()} onDelete={vi.fn()} onTransfer={vi.fn()} />
+        <EquipmentList
+          echipamente={echipamente}
+          onEdit={vi.fn()}
+          onDelete={vi.fn()}
+          onTransfer={vi.fn()}
+        />
       </BrowserRouter>
     );
 
@@ -39,7 +44,7 @@ describe('EquipmentList', () => {
         <EquipmentList echipamente={[]} onEdit={vi.fn()} onDelete={vi.fn()} />
       </BrowserRouter>
     );
-    
+
     expect(container.firstChild).toBeNull();
   });
 });

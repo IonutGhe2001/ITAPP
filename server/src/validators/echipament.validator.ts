@@ -14,7 +14,9 @@ export const listEchipamenteQuerySchema = Joi.object({
     .optional(),
   type: Joi.string().trim().max(100).empty("").optional(),
   sort: Joi.string().valid("asc", "desc").default("asc"),
-  sortBy: Joi.string().valid("nume", "createdAt", "tip", "stare").default("nume"),
+  sortBy: Joi.string()
+    .valid("nume", "createdAt", "tip", "stare")
+    .default("nume"),
 });
 
 export const createEchipamentSchema = Joi.object({

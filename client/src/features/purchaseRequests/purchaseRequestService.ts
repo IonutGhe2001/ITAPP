@@ -1,11 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import http from '@/services/http';
-import type {
-  PurchaseRequest,
-  PurchaseRequestInput,
-  PurchaseRequestStatus,
-} from './types';
+import type { PurchaseRequest, PurchaseRequestInput, PurchaseRequestStatus } from './types';
 
 export const useCreatePurchaseRequest = () => {
   const queryClient = useQueryClient();

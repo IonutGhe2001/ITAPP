@@ -91,13 +91,7 @@ export const useEchipamente = (options: UseEchipamenteOptions = {}) => {
     },
   });
 
-  const {
-    data: paginatedData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    ...rest
-  } = query;
+  const { data: paginatedData, fetchNextPage, hasNextPage, isFetchingNextPage, ...rest } = query;
 
   const items = useMemo<Echipament[]>(() => {
     if (paginatedData) {
@@ -113,7 +107,7 @@ export const useEchipamente = (options: UseEchipamenteOptions = {}) => {
     if (!defaultQuery || autoFetchAll === false || items.length === 0) {
       return;
     }
-  setEchipamenteCache(items);
+    setEchipamenteCache(items);
   }, [items, defaultQuery, autoFetchAll]);
 
   useEffect(() => {

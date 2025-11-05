@@ -75,7 +75,7 @@ describe('Header', () => {
     );
     expect(container.querySelector('.bg-destructive')).toBeInTheDocument();
   });
-  
+
   it('renders equipment name on detail page', () => {
     const queryClient = new QueryClient();
     render(

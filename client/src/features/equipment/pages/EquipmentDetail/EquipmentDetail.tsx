@@ -99,22 +99,17 @@ export default function EquipmentDetail() {
   const dedicated = {
     cpu: data.cpu ?? (rawCpu as string),
     ram: data.ram ?? (rawRam as string),
-    stocare:
-      data.stocare ?? (rawStocare as string) ?? (rawStorage as string),
+    stocare: data.stocare ?? (rawStocare as string) ?? (rawStorage as string),
     os: data.os ?? (rawOs as string),
     versiuneFirmware:
-      data.versiuneFirmware ??
-      ((rawVersiuneFirmware as string) || (rawFirmwareVersion as string)),
+      data.versiuneFirmware ?? ((rawVersiuneFirmware as string) || (rawFirmwareVersion as string)),
     numarInventar:
-      data.numarInventar ??
-      ((rawNumarInventar as string) || (rawInventoryNumber as string)),
+      data.numarInventar ?? ((rawNumarInventar as string) || (rawInventoryNumber as string)),
     dataAchizitie:
-      data.dataAchizitie ??
-      ((rawDataAchizitie as string) || (rawPurchaseDate as string)),
-    garantie:
-      data.garantie ?? ((rawGarantie as string) || (rawWarranty as string)),
+      data.dataAchizitie ?? ((rawDataAchizitie as string) || (rawPurchaseDate as string)),
+    garantie: data.garantie ?? ((rawGarantie as string) || (rawWarranty as string)),
   };
-  
+
   const dedicatedEntries = [
     { key: 'CPU', value: dedicated.cpu },
     { key: 'RAM', value: dedicated.ram },
@@ -158,7 +153,7 @@ export default function EquipmentDetail() {
             <Link to={ROUTES.EMPLOYEE_FORM}>Generare fișă</Link>
           </Button>
         </div>
-        
+
         <ImageGallery id={id!} images={data.images || []} refetch={refetch} />
         <Tabs defaultValue="detalii" className="space-y-6">
           <TabsList className="flex flex-wrap gap-2">
@@ -205,7 +200,7 @@ export default function EquipmentDetail() {
             </TabsContent>
           )}
           <TabsContent value="documente">
-             <DocumentSection id={id!} documents={data.documents || []} refetch={refetch} />
+            <DocumentSection id={id!} documents={data.documents || []} refetch={refetch} />
           </TabsContent>
           <TabsContent value="codqr">
             <QRCodeSection id={id!} />

@@ -42,7 +42,7 @@ export default function SignatureEditor({ signature, isEditing, onChange }: Sign
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="bg-primary text-primary-foreground absolute bottom-2 right-2 rounded-full p-2 shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="bg-primary text-primary-foreground focus-visible:ring-primary absolute bottom-2 right-2 rounded-full p-2 shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
           >
             <Pencil size={16} />
           </button>
@@ -50,7 +50,7 @@ export default function SignatureEditor({ signature, isEditing, onChange }: Sign
             <button
               type="button"
               onClick={remove}
-              className="bg-destructive text-destructive-foreground absolute right-2 top-2 rounded-full p-1.5 shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2"
+              className="bg-destructive text-destructive-foreground focus-visible:ring-destructive absolute right-2 top-2 rounded-full p-1.5 shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
             >
               <X size={14} />
             </button>
@@ -65,14 +65,14 @@ export default function SignatureEditor({ signature, isEditing, onChange }: Sign
               type="button"
               variant="ghost"
               onClick={() => padRef.current?.clear()}
-              className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              className="focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2"
             >
               Curăță
             </Button>
             <Button
               type="button"
               onClick={save}
-              className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              className="focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2"
             >
               Salvează
             </Button>

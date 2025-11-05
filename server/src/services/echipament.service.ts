@@ -54,9 +54,11 @@ const validateEchipamentUpdate = async (
 
 type EchipamentWithAngajat = Awaited<
   ReturnType<typeof prisma.echipament.findMany>
->[number] & { angajat: NonNullable<Awaited<
-      ReturnType<typeof prisma.angajat.findMany>
-    >[number]> | null };
+>[number] & {
+  angajat: NonNullable<
+    Awaited<ReturnType<typeof prisma.angajat.findMany>>[number]
+  > | null;
+};
 
 export type GetEchipamenteParams = {
   page: number;
@@ -74,7 +76,9 @@ export function getEchipamente(
 ): Promise<{ items: EchipamentWithAngajat[]; total: number }>;
 export async function getEchipamente(
   params?: GetEchipamenteParams
-): Promise<EchipamentWithAngajat[] | { items: EchipamentWithAngajat[]; total: number }> {
+): Promise<
+  EchipamentWithAngajat[] | { items: EchipamentWithAngajat[]; total: number }
+> {
   if (!params) {
     return prisma.echipament.findMany({ include: { angajat: true } });
   }
@@ -82,8 +86,8 @@ export async function getEchipamente(
   const { page, pageSize, search, status, type, sort, sortBy } = params;
   const normalizedType = type?.trim();
   const searchTerm = search?.trim();
-  
-    const where = {
+
+  const where = {
     ...(status ? { stare: status.toLowerCase() } : {}),
     ...(normalizedType
       ? { tip: { equals: normalizedType, mode: "insensitive" } }
@@ -292,7 +296,7 @@ export const updateEchipament = async (
       ) {
         updateData.defectAt = null;
       }
-      } else if (data.angajatId !== undefined) {
+    } else if (data.angajatId !== undefined) {
       updateData.stare = data.angajatId
         ? EQUIPMENT_STATUS.ALOCAT
         : EQUIPMENT_STATUS.IN_STOC;

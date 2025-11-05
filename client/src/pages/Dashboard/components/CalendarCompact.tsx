@@ -45,19 +45,21 @@ export function CalendarCompact({
   const eventListRef = useRef<EventListHandle>(null);
 
   const selectedDayLabel = useMemo(
-    () => format(selectedDate, "d MMMM yyyy", { locale: ro }),
+    () => format(selectedDate, 'd MMMM yyyy', { locale: ro }),
     [selectedDate]
   );
 
   return (
     <Card
       className={cn(
-        'flex h-full min-h-[420px] w-full flex-col border border-border/80 bg-card/90 shadow-sm',
+        'border-border/80 bg-card/90 flex h-full min-h-[420px] w-full flex-col border shadow-sm',
         className
       )}
     >
-      <CardHeader className="flex items-center justify-between gap-3 space-y-0 border-b border-border/60 p-6">
-        <CardTitle className="text-base font-semibold text-foreground sm:text-lg">Calendar</CardTitle>
+      <CardHeader className="border-border/60 flex items-center justify-between gap-3 space-y-0 border-b p-6">
+        <CardTitle className="text-foreground text-base font-semibold sm:text-lg">
+          Calendar
+        </CardTitle>
         <Button
           type="button"
           size="sm"
@@ -69,7 +71,7 @@ export function CalendarCompact({
         </Button>
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-6 p-5 sm:p-6">
-        <div className="rounded-xl border border-border/60 bg-background/60 p-5 shadow-sm">
+        <div className="border-border/60 bg-background/60 rounded-xl border p-5 shadow-sm">
           <MiniCalendar
             events={events}
             currentMonth={currentMonth}
@@ -79,10 +81,12 @@ export function CalendarCompact({
             isLoading={isLoading}
           />
         </div>
-        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden rounded-xl border border-border/60 bg-background/60 p-5 shadow-sm">
+        <div className="border-border/60 bg-background/60 flex min-h-0 flex-1 flex-col gap-4 overflow-hidden rounded-xl border p-5 shadow-sm">
           <div className="space-y-2">
-            <p className="text-sm font-semibold text-foreground md:text-base">{selectedDayLabel}</p>
-            <p className="text-xs text-muted-foreground md:text-sm">Evenimente planificate pentru această zi.</p>
+            <p className="text-foreground text-sm font-semibold md:text-base">{selectedDayLabel}</p>
+            <p className="text-muted-foreground text-xs md:text-sm">
+              Evenimente planificate pentru această zi.
+            </p>
           </div>
           <div className="min-h-0 flex-1">
             <EventList

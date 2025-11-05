@@ -18,7 +18,7 @@ export const login = async (req: Request, res: Response) => {
         .status(401)
         .json({ message: "Date de autentificare invalide" });
     }
-    
+
     const { email, password } = req.body;
     const token = await authenticateUser(email, password);
 
@@ -58,7 +58,6 @@ export const getMe = async (req: Request, res: Response) => {
       .json({ message: "Eroare la preluarea utilizatorului" });
   }
 };
-
 
 export const updateMe = async (req: Request, res: Response) => {
   const userId = req.user!.id;

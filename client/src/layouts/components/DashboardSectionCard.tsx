@@ -12,15 +12,15 @@ function DashboardSectionCard({ children, className, title, icon }: DashboardSec
   return (
     <section
       className={cn(
-        'group relative overflow-hidden rounded-3xl border border-border/60 bg-background/80 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl',
+        'border-border/60 bg-background/80 group relative overflow-hidden rounded-3xl border shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl',
         className
       )}
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="via-primary/40 pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       {(title || icon) && (
         <div className="flex items-center gap-3 px-6 pb-0 pt-6">
           {icon && (
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <span className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-xl">
               {icon}
             </span>
           )}

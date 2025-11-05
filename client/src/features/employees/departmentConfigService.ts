@@ -12,9 +12,7 @@ export interface DepartmentConfig extends DepartmentConfigInput {
   id: string;
 }
 
-export const getDepartmentConfigs = () =>
-  http.get<DepartmentConfig[]>('/department-configs');
-
+export const getDepartmentConfigs = () => http.get<DepartmentConfig[]>('/department-configs');
 
 export const useDepartmentConfigs = () =>
   useQuery<DepartmentConfig[]>({

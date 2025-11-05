@@ -51,14 +51,15 @@ const configuredOrigins = env.CORS_ORIGIN.split(",")
 
 const derivedOrigins = env.FRONTEND_ROOT ? [env.FRONTEND_ROOT] : [];
 
-const defaultOrigins = env.NODE_ENV === "staging"
-  ? []
-  : [
-      "http://localhost:3000",
-      "http://127.0.0.1:3000",
-      "http://localhost:5173",
-      "http://127.0.0.1:5173",
-    ];
+const defaultOrigins =
+  env.NODE_ENV === "staging"
+    ? []
+    : [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+      ];
 
 const allowedOrigins = configuredOrigins.length
   ? Array.from(new Set([...configuredOrigins, ...derivedOrigins]))

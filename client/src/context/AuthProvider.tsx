@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoggedInViaCookie(false);
       } finally {
         setLoading(false);
-      };
+      }
     };
 
     checkAuth();

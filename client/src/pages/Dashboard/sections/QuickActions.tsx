@@ -105,7 +105,8 @@ export default function QuickActions() {
     {
       id: 'proces-verbal',
       label: 'Generează proces verbal',
-      description: count > 0 ? `${count} documente gata de semnare.` : 'Pregătește documentele oficiale.',
+      description:
+        count > 0 ? `${count} documente gata de semnare.` : 'Pregătește documentele oficiale.',
       icon: <FileTextIcon className="h-5 w-5" />,
       onClick: handleProces,
       accent: 'from-amber-500/15 via-amber-500/0 to-transparent',
@@ -139,26 +140,28 @@ export default function QuickActions() {
             variant="ghost"
             onClick={action.onClick}
             className={cn(
-              'group relative inline-flex h-full min-h-[140px] w-full flex-col items-start gap-4 overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br from-muted/60 via-background to-background p-6 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/30',
+              'border-border/60 from-muted/60 via-background to-background hover:border-primary/40 focus-visible:border-primary/40 focus-visible:ring-primary/30 group relative inline-flex h-full min-h-[140px] w-full flex-col items-start gap-4 overflow-hidden rounded-2xl border bg-gradient-to-br p-6 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg focus-visible:ring-2',
               action.accent
             )}
           >
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-background/80 text-primary shadow-sm ring-1 ring-primary/20">
+            <div className="bg-background/80 text-primary ring-primary/20 flex h-11 w-11 items-center justify-center rounded-xl shadow-sm ring-1">
               {action.icon}
             </div>
             <div className="flex flex-col gap-2">
               <span className="text-foreground text-base font-semibold">{action.label}</span>
-              <span className="text-muted-foreground text-sm leading-relaxed">{action.description}</span>
+              <span className="text-muted-foreground text-sm leading-relaxed">
+                {action.description}
+              </span>
             </div>
-            <div className="mt-auto flex w-full items-center justify-between text-xs text-muted-foreground">
+            <div className="text-muted-foreground mt-auto flex w-full items-center justify-between text-xs">
               {action.shortcut ? (
-                <span className="rounded-full border border-border/60 bg-background/80 px-2 py-1 text-[10px] font-medium uppercase tracking-wider">
+                <span className="border-border/60 bg-background/80 rounded-full border px-2 py-1 text-[10px] font-medium uppercase tracking-wider">
                   {action.shortcut}
                 </span>
               ) : (
                 <span className="h-4" />
               )}
-              <ArrowUpRightIcon className="h-4 w-4 text-primary transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1" />
+              <ArrowUpRightIcon className="text-primary h-4 w-4 transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1" />
             </div>
             {action.badge !== undefined && action.badge > 0 && (
               <Badge variant="destructive" className="absolute right-4 top-4">
@@ -171,7 +174,9 @@ export default function QuickActions() {
 
       <Suspense fallback={null}>
         {showColegModal && <ModalAddColeg onClose={() => setShowColegModal(false)} />}
-        {showEchipamentModal && <ModalAddEchipament onClose={() => setShowEchipamentModal(false)} />}
+        {showEchipamentModal && (
+          <ModalAddEchipament onClose={() => setShowEchipamentModal(false)} />
+        )}
         {showProcesModal && <ModalProcesVerbal onClose={() => setShowProcesModal(false)} />}
         {showCreateUserModal && <ModalCreateUser onClose={() => setShowCreateUserModal(false)} />}
       </Suspense>

@@ -40,7 +40,7 @@ const renderTooltip = ({
   const category = (typedPayload[0].payload as EquipmentStatusRecord).status;
 
   return (
-    <div className="rounded-lg border border-border bg-background px-3 py-2 text-sm shadow-sm">
+    <div className="border-border bg-background rounded-lg border px-3 py-2 text-sm shadow-sm">
       <div className="font-semibold">{category}</div>
       <ul className="mt-2 space-y-1">
         {typedPayload.map((item) => {
@@ -67,19 +67,55 @@ export default function EquipmentStatusChart({ data }: EquipmentStatusChartProps
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData} barGap={10} barSize={28}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis dataKey="status" stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} />
-          <YAxis stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} allowDecimals={false} />
+          <XAxis
+            dataKey="status"
+            stroke="hsl(var(--muted-foreground))"
+            tickLine={false}
+            axisLine={false}
+          />
+          <YAxis
+            stroke="hsl(var(--muted-foreground))"
+            tickLine={false}
+            axisLine={false}
+            allowDecimals={false}
+          />
           <Tooltip cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} content={renderTooltip} />
           <Legend
             verticalAlign="bottom"
             align="center"
-            formatter={(value: string) => tooltipLabels[value as keyof typeof tooltipLabels] ?? value}
+            formatter={(value: string) =>
+              tooltipLabels[value as keyof typeof tooltipLabels] ?? value
+            }
             wrapperStyle={{ paddingTop: 16 }}
           />
-          <Bar dataKey="allocated" stackId="status" name="Alocate" fill={colors.allocated} radius={[4, 4, 0, 0]} />
-          <Bar dataKey="in_stock" stackId="status" name="În stoc" fill={colors.in_stock} radius={[4, 4, 0, 0]} />
-          <Bar dataKey="repair" stackId="status" name="În reparație" fill={colors.repair} radius={[4, 4, 0, 0]} />
-          <Bar dataKey="retired" stackId="status" name="Retrase" fill={colors.retired} radius={[4, 4, 0, 0]} />
+          <Bar
+            dataKey="allocated"
+            stackId="status"
+            name="Alocate"
+            fill={colors.allocated}
+            radius={[4, 4, 0, 0]}
+          />
+          <Bar
+            dataKey="in_stock"
+            stackId="status"
+            name="În stoc"
+            fill={colors.in_stock}
+            radius={[4, 4, 0, 0]}
+          />
+          <Bar
+            dataKey="repair"
+            stackId="status"
+            name="În reparație"
+            fill={colors.repair}
+            radius={[4, 4, 0, 0]}
+          />
+          <Bar
+            dataKey="retired"
+            stackId="status"
+            name="Retrase"
+            fill={colors.retired}
+            radius={[4, 4, 0, 0]}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>

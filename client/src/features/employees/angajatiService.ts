@@ -1,9 +1,4 @@
-import {
-  useInfiniteQuery,
-  useQuery,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import http from '@/services/http';
 import type { Angajat, Echipament } from '@/features/equipment/types';
@@ -70,13 +65,9 @@ export const getAngajati = (params: GetAngajatiParams & { page?: number } = {}) 
     params,
   });
 
-export const getAllAngajati = () =>
-  http.get<AngajatWithRelations[]>(`/angajati/full`);
+export const getAllAngajati = () => http.get<AngajatWithRelations[]>(`/angajati/full`);
 
-export const useAngajati = (
-  params?: GetAngajatiParams,
-  options: UseAngajatiOptions = {}
-) => {
+export const useAngajati = (params?: GetAngajatiParams, options: UseAngajatiOptions = {}) => {
   const queryParams = params ?? DEFAULT_QUERY_PARAMS;
 
   return useInfiniteQuery<PaginatedAngajatiResponse, Error>({

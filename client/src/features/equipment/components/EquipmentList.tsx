@@ -2,7 +2,13 @@ import { memo } from 'react';
 import EquipmentCard from './EquipmentCard';
 import type { EquipmentListProps } from '@/features/equipment/types';
 
-function EquipmentList({ echipamente, onEdit, onDelete, onTransfer, onViewDetails }: EquipmentListProps) {
+function EquipmentList({
+  echipamente,
+  onEdit,
+  onDelete,
+  onTransfer,
+  onViewDetails,
+}: EquipmentListProps) {
   if (echipamente.length === 0) {
     return null;
   }

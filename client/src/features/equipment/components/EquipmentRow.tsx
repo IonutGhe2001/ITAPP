@@ -96,8 +96,8 @@ export default function EquipmentRow({
         ref={rowRef}
         role="row"
         className={cn(
-          'grid min-h-[72px] grid-cols-6 items-center gap-x-4 gap-y-2 rounded-lg border-b border-slate-200/70 bg-white px-2 py-3 text-sm transition-colors hover:bg-slate-50 focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/50 focus-within:ring-offset-2 focus-within:ring-offset-white sm:grid-cols-12 sm:px-4',
-          isHighlighted && 'ring-2 ring-primary/40',
+          'focus-within:ring-primary/50 grid min-h-[72px] grid-cols-6 items-center gap-x-4 gap-y-2 rounded-lg border-b border-slate-200/70 bg-white px-2 py-3 text-sm transition-colors focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-white hover:bg-slate-50 sm:grid-cols-12 sm:px-4',
+          isHighlighted && 'ring-primary/40 ring-2'
         )}
       >
         <div className="order-1 col-span-4 flex items-center gap-3 sm:col-span-4">
@@ -108,7 +108,7 @@ export default function EquipmentRow({
             <button
               type="button"
               onClick={handleViewDetails}
-              className="line-clamp-1 text-left text-base font-semibold text-slate-900 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+              className="hover:text-primary focus-visible:ring-primary/60 line-clamp-1 text-left text-base font-semibold text-slate-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
             >
               {echipament.nume}
             </button>
@@ -135,7 +135,12 @@ export default function EquipmentRow({
           )}
         </div>
         <div className="order-5 col-span-3 flex items-center gap-2 sm:order-4 sm:col-span-2">
-          <StatusBadge label={statusLabel} tone={statusTone} withDot aria-label={`Status: ${statusLabel}`} />
+          <StatusBadge
+            label={statusLabel}
+            tone={statusTone}
+            withDot
+            aria-label={`Status: ${statusLabel}`}
+          />
         </div>
         <div className="order-2 col-span-2 flex justify-end sm:order-5 sm:col-span-1">
           <ActionsMenu srLabel={`Acțiuni pentru ${echipament.nume}`}>

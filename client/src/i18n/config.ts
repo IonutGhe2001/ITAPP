@@ -6,9 +6,7 @@ const fallbackLng = 'ro';
 const supportedLngs = ['ro', 'en'];
 
 const userLanguage =
-  typeof navigator !== 'undefined'
-    ? navigator.language.split('-')[0]
-    : fallbackLng;
+  typeof navigator !== 'undefined' ? navigator.language.split('-')[0] : fallbackLng;
 
 i18n
   .use(resourcesToBackend((lng: string) => import(`./locales/${lng}.json`)))

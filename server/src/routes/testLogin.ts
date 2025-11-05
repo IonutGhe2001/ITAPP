@@ -22,7 +22,8 @@ const isTestLoginEnabled = () =>
   env.NODE_ENV === "staging" || env.AUTH_DISABLED === "true";
 
 router.get("/test-login", limiter, (req: Request, res: Response) => {
-  if (env.AUTH_DISABLED !== "true") return res.status(403).json({ error: "test-login disabled" });
+  if (env.AUTH_DISABLED !== "true")
+    return res.status(403).json({ error: "test-login disabled" });
 
   const providedToken = String(req.query.token || "");
   const expectedToken = env.TEST_LOGIN_SECRET;
@@ -66,7 +67,9 @@ router.post(
 
     if (env.AUTH_DISABLED !== "true") {
       if (!expectedToken) {
-        logger.warn("test-login attempted without TEST_LOGIN_SECRET configured");
+        logger.warn(
+          "test-login attempted without TEST_LOGIN_SECRET configured"
+        );
         return res.status(500).json({ error: "test-login misconfigured" });
       }
 

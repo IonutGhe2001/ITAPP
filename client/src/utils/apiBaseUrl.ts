@@ -27,9 +27,7 @@ export function resolveApiBaseUrl(): string {
 
   if (mode === 'development' || mode === 'test') {
     const fallbackUrl = buildAbsoluteUrlFromPath(DEFAULT_API_BASE_PATH);
-    console.warn(
-      `VITE_API_URL is not defined. Falling back to "${fallbackUrl}" for ${mode} mode.`,
-    );
+    console.warn(`VITE_API_URL is not defined. Falling back to "${fallbackUrl}" for ${mode} mode.`);
     return fallbackUrl;
   }
 

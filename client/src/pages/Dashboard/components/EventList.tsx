@@ -4,10 +4,23 @@ import { ro } from 'date-fns/locale';
 import { CalendarDays, Clock, MapPin, Pencil, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import type { CalendarEvent, CalendarEventInput } from '../api';
 import { EmptyState } from './EmptyState';
@@ -93,7 +106,13 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
 
   const openCreateDialog = () => {
     setMode('create');
-    setForm({ date: format(date, 'yyyy-MM-dd'), title: '', time: '', location: '', description: '' });
+    setForm({
+      date: format(date, 'yyyy-MM-dd'),
+      title: '',
+      time: '',
+      location: '',
+      description: '',
+    });
     setIsDialogOpen(true);
   };
 
@@ -113,7 +132,13 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
   };
 
   const resetForm = () => {
-    setForm({ date: format(date, 'yyyy-MM-dd'), title: '', time: '', location: '', description: '' });
+    setForm({
+      date: format(date, 'yyyy-MM-dd'),
+      title: '',
+      time: '',
+      location: '',
+      description: '',
+    });
   };
 
   const closeDialog = () => {
@@ -158,7 +183,10 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
       {isLoading ? (
         <div className="space-y-3" aria-hidden>
           {skeletonItems.map((_, index) => (
-            <div key={index} className="h-20 animate-pulse rounded-xl border border-border/70 bg-muted/40" />
+            <div
+              key={index}
+              className="border-border/70 bg-muted/40 h-20 animate-pulse rounded-xl border"
+            />
           ))}
         </div>
       ) : events.length ? (
@@ -169,19 +197,21 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
             return (
               <li
                 key={event.id}
-                className="group flex flex-col gap-4 rounded-xl border border-border/70 bg-card/80 p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md"
+                className="border-border/70 bg-card/80 hover:border-primary/40 group flex flex-col gap-4 rounded-xl border p-5 shadow-sm transition hover:shadow-md"
                 aria-busy={isDeleting}
               >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="space-y-3">
                     <div className="flex flex-wrap items-center gap-3">
-                      <p className="text-sm font-semibold text-foreground md:text-base">{event.title}</p>
-                      <span className="inline-flex items-center gap-2 rounded-full bg-muted/60 px-3 py-1 text-xs font-medium text-muted-foreground">
+                      <p className="text-foreground text-sm font-semibold md:text-base">
+                        {event.title}
+                      </p>
+                      <span className="bg-muted/60 text-muted-foreground inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium">
                         <Clock className="size-3.5" aria-hidden />
                         {event.time ?? 'Toată ziua'}
                       </span>
                     </div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground md:text-sm">
+                    <div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-2 text-xs md:text-sm">
                       <span className="inline-flex items-center gap-2">
                         <MapPin className="size-4" aria-hidden />
                         {event.location ?? 'Locație în curs de confirmare'}
@@ -192,7 +222,7 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
                       </span>
                     </div>
                     {event.description ? (
-                      <p className="max-w-prose text-sm leading-relaxed text-muted-foreground/90">
+                      <p className="text-muted-foreground/90 max-w-prose text-sm leading-relaxed">
                         {event.description}
                       </p>
                     ) : null}
@@ -244,7 +274,9 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
       >
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{mode === 'create' ? 'Adaugă eveniment' : 'Editează eveniment'}</DialogTitle>
+            <DialogTitle>
+              {mode === 'create' ? 'Adaugă eveniment' : 'Editează eveniment'}
+            </DialogTitle>
             <DialogDescription>
               Completează detaliile evenimentului. Poți actualiza data, ora și persoanele implicate.
             </DialogDescription>
@@ -297,7 +329,7 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
                 >
                   <SelectTrigger id="event-time" className="h-10 justify-between">
                     <div className="flex w-full items-center gap-2 text-left">
-                      <Clock className="h-4 w-4 text-muted-foreground" aria-hidden />
+                      <Clock className="text-muted-foreground h-4 w-4" aria-hidden />
                       <SelectValue placeholder="Selectează ora" />
                     </div>
                   </SelectTrigger>
@@ -316,7 +348,9 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
                 <Input
                   id="event-location"
                   value={form.location ?? ''}
-                  onChange={(event) => setForm((state) => ({ ...state, location: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((state) => ({ ...state, location: event.target.value }))
+                  }
                   placeholder="Ex. Sala Atlas"
                 />
               </div>
@@ -326,9 +360,11 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
               <textarea
                 id="event-description"
                 value={form.description ?? ''}
-                onChange={(event) => setForm((state) => ({ ...state, description: event.target.value }))}
+                onChange={(event) =>
+                  setForm((state) => ({ ...state, description: event.target.value }))
+                }
                 className={cn(
-                  'min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                  'border-input bg-background focus-visible:ring-primary min-h-[96px] w-full rounded-md border px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2'
                 )}
                 placeholder="Note adiționale pentru echipă"
               />

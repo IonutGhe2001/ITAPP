@@ -14,9 +14,7 @@ export default function flattenMetadata(
         [
           prefixedKey,
           value
-            .map((item) =>
-              item && typeof item === 'object' ? JSON.stringify(item) : String(item)
-            )
+            .map((item) => (item && typeof item === 'object' ? JSON.stringify(item) : String(item)))
             .join(', '),
         ],
       ];

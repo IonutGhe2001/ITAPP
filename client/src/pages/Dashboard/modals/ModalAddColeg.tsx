@@ -70,9 +70,7 @@ export default function ModalAddColeg({
           <DialogTitle>Adaugă coleg</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          {(
-            ['numeComplet', 'functie', 'email', 'telefon'] as const
-          ).map((field) => (
+          {(['numeComplet', 'functie', 'email', 'telefon'] as const).map((field) => (
             <div key={field}>
               <Label htmlFor={field}>
                 {

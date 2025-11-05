@@ -25,10 +25,7 @@ export const createEveniment = (data: EvenimentData): Promise<Eveniment> => {
 };
 
 // 📝 Actualizează un eveniment existent
-export const updateEveniment = (
-  id: number,
-  data: EvenimentData
-): Promise<Eveniment> => {
+export const updateEveniment = (id: number, data: EvenimentData): Promise<Eveniment> => {
   return http.patch<Eveniment>(`/evenimente/${id}`, data);
 };
 
@@ -58,8 +55,7 @@ export const useCreateEveniment = () => {
 export const useUpdateEveniment = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: EvenimentData }) =>
-      updateEveniment(id, data),
+    mutationFn: ({ id, data }: { id: number; data: EvenimentData }) => updateEveniment(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EVENTS });
     },

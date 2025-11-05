@@ -192,8 +192,7 @@ export const getAlerts = async (limit: number): Promise<Alert[]> => {
 
   expiringWarranties.forEach((eq) => {
     const daysLeft = Math.ceil(
-      (new Date(eq.garantie!).getTime() - now.getTime()) /
-        (1000 * 60 * 60 * 24)
+      (new Date(eq.garantie!).getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
     );
     alerts.push({
       id: `warranty-${eq.id}`,
@@ -217,8 +216,7 @@ export const getAlerts = async (limit: number): Promise<Alert[]> => {
 
   unallocatedEquipment.forEach((eq) => {
     const daysUnallocated = Math.floor(
-      (now.getTime() - new Date(eq.createdAt).getTime()) /
-        (1000 * 60 * 60 * 24)
+      (now.getTime() - new Date(eq.createdAt).getTime()) / (1000 * 60 * 60 * 24)
     );
     alerts.push({
       id: `unallocated-${eq.id}`,

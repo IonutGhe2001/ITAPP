@@ -34,9 +34,8 @@ export const getUserMetrics = async (userId: number): Promise<UserMetric[]> => {
     },
   });
 
-  const activeAssets = angajat?.echipamente.filter(
-    (eq) => eq.stare === "alocat"
-  ).length || 0;
+  const activeAssets =
+    angajat?.echipamente.filter((eq) => eq.stare === "alocat").length || 0;
 
   // Count pending onboarding tasks if any
   const pendingOnboarding = angajat

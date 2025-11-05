@@ -28,15 +28,8 @@ export const getEchipamente = async (
   next: NextFunction
 ) => {
   try {
-    const {
-      page,
-      pageSize,
-      search,
-      status,
-      type,
-      sort,
-      sortBy,
-    } = req.query as unknown as ListEchipamenteQuery;
+    const { page, pageSize, search, status, type, sort, sortBy } =
+      req.query as unknown as ListEchipamenteQuery;
 
     const result = await getEchipamenteService({
       page,

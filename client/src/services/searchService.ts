@@ -27,7 +27,6 @@ export interface SuggestionsData {
 export const useSearchSuggestions = (query: string) =>
   useQuery<SuggestionsData>({
     queryKey: [...QUERY_KEYS.SEARCH_SUGGESTIONS, query],
-    queryFn: () =>
-      http.get<SuggestionsData>('/search/suggestions', { params: { q: query } }),
+    queryFn: () => http.get<SuggestionsData>('/search/suggestions', { params: { q: query } }),
     enabled: !!query.trim(),
   });

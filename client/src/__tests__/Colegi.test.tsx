@@ -52,9 +52,7 @@ describe('Colegi', () => {
         <Colegi />
       </MemoryRouter>
     );
-    expect(
-      screen.getByPlaceholderText('Caută după nume, rol sau departament'),
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Caută după nume, rol sau departament')).toBeInTheDocument();
   });
 
   it('does not show mark email button when email is pending', () => {
@@ -81,8 +79,8 @@ describe('Colegi', () => {
         pendingPV={undefined}
         onGeneratePV={vi.fn()}
         onOpenDetails={vi.fn()}
-        />
+      />
     );
     expect(screen.queryByText('Marchează creat')).not.toBeInTheDocument();
   });
-  });
+});

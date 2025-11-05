@@ -13,13 +13,13 @@ import path from "path";
 
 const saveProcesVerbalPDF = async (
   procesVerbalId: number,
-  pdfBuffer: Buffer,
+  pdfBuffer: Buffer
 ) => {
   const fileName = `proces-verbal-${procesVerbalId}.pdf`;
   const filePath = path.join(
     __dirname,
     "../../public/procese-verbale",
-    fileName,
+    fileName
   );
   fs.writeFileSync(filePath, pdfBuffer);
 

@@ -82,12 +82,14 @@ export async function getActivity(limit = 10): Promise<ActivityItem[]> {
 export async function getEvents(params?: { from?: string; to?: string }): Promise<CalendarEvent[]> {
   // Note: The events are stored in a different format in the backend
   // We need to transform them to match the CalendarEvent type
-  const evenimente = await http.get<Array<{
-    id: number;
-    titlu: string;
-    data: string;
-    ora: string;
-  }>>('/evenimente');
+  const evenimente = await http.get<
+    Array<{
+      id: number;
+      titlu: string;
+      data: string;
+      ora: string;
+    }>
+  >('/evenimente');
 
   // Filter by date range if provided
   let filtered = evenimente;

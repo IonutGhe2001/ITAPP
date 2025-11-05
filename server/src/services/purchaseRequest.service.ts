@@ -28,12 +28,15 @@ export const updatePurchaseRequestStatus = (
     });
 
     if (status === "DELIVERED" && request.status !== "DELIVERED") {
-      const equipments = Array.from({ length: request.quantity }, (_, index) => ({
-        nume: request.equipmentType,
-        tip: request.equipmentType,
-        serie: `${request.id}-${index + 1}`,
-        stare: EQUIPMENT_STATUS.IN_STOC,
-      }));
+      const equipments = Array.from(
+        { length: request.quantity },
+        (_, index) => ({
+          nume: request.equipmentType,
+          tip: request.equipmentType,
+          serie: `${request.id}-${index + 1}`,
+          stare: EQUIPMENT_STATUS.IN_STOC,
+        })
+      );
 
       if (equipments.length > 0) {
         await tx.echipament.createMany({ data: equipments });

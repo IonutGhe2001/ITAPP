@@ -21,15 +21,15 @@ export function KpiCard({ title, value, delta, trend, href }: KpiCardProps) {
   const content = (
     <>
       <div className="flex items-center justify-between gap-3">
-        <span className="text-sm font-medium text-muted-foreground">{title}</span>
+        <span className="text-muted-foreground text-sm font-medium">{title}</span>
         <span
           className={cn(
             'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium',
             trend === 'up'
               ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
               : trend === 'down'
-              ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300'
-              : 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-300'
+                ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300'
+                : 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-300'
           )}
         >
           <Icon className="h-3.5 w-3.5" aria-hidden />
@@ -37,8 +37,8 @@ export function KpiCard({ title, value, delta, trend, href }: KpiCardProps) {
         </span>
       </div>
       <div className="space-y-1">
-        <p className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{value}</p>
-        <p className="text-xs text-muted-foreground">Față de ultimele 7 zile</p>
+        <p className="text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">{value}</p>
+        <p className="text-muted-foreground text-xs">Față de ultimele 7 zile</p>
       </div>
     </>
   );

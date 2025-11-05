@@ -127,7 +127,7 @@ export const processImportRows = async (rows: ImportRow[]) => {
       const row = chunk[idx];
       const index = i + idx;
 
-          const nume = row["Nume Echipament"].trim();
+      const nume = row["Nume Echipament"].trim();
       const tip = row.Tip.trim();
       const serie = row.Serie.trim();
       const rawEmail = row["Email Angajat"]?.trim();
@@ -176,11 +176,11 @@ export const processImportRows = async (rows: ImportRow[]) => {
           continue;
         }
 
-          if (!employeeTypeAssignments.has(emailKey)) {
+        if (!employeeTypeAssignments.has(emailKey)) {
           employeeTypeAssignments.set(emailKey, assignedTypes);
         }
 
-          if (!employeeIdMap.has(emailKey) && !chunkNewEmployees.has(emailKey)) {
+        if (!employeeIdMap.has(emailKey) && !chunkNewEmployees.has(emailKey)) {
           const username = rawEmail.split("@")[0] ?? rawEmail;
           const numeComplet = username
             .replace(".", " ")
@@ -208,7 +208,8 @@ export const processImportRows = async (rows: ImportRow[]) => {
       scheduledEquipmentKeys.add(key);
 
       if (emailKey) {
-        const types = employeeTypeAssignments.get(emailKey) ?? new Set<string>();
+        const types =
+          employeeTypeAssignments.get(emailKey) ?? new Set<string>();
         types.add(tip);
         employeeTypeAssignments.set(emailKey, types);
       }
@@ -252,7 +253,7 @@ export const processImportRows = async (rows: ImportRow[]) => {
       }
     }
 
-          const readyEntries: ChunkEntry[] = [];
+    const readyEntries: ChunkEntry[] = [];
     for (const entry of chunkEntries) {
       const { angajatEmail, tip } = entry.data;
       if (angajatEmail) {

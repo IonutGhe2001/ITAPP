@@ -33,13 +33,9 @@ export default function SearchInput({ className, onSelect }: SearchInputProps) {
     });
 
     const employees = suggestionData.angajati.map((a) => {
-      const candidates = [
-        a.numeComplet,
-        a.functie,
-        a.email,
-        a.cDataUsername,
-        a.cDataId,
-      ].filter(Boolean) as string[];
+      const candidates = [a.numeComplet, a.functie, a.email, a.cDataUsername, a.cDataId].filter(
+        Boolean
+      ) as string[];
       let best = { value: candidates[0], score: Infinity };
       candidates.forEach((c) => {
         const s = levenshtein(c.toLowerCase(), q);
@@ -48,9 +44,7 @@ export default function SearchInput({ className, onSelect }: SearchInputProps) {
       return best;
     });
 
-    return [...equipment, ...employees]
-      .sort((a, b) => a.score - b.score)
-      .map((r) => r.value);
+    return [...equipment, ...employees].sort((a, b) => a.score - b.score).map((r) => r.value);
   }, [suggestionData, query]);
 
   const handleSubmit = (e: FormEvent) => {
@@ -78,9 +72,7 @@ export default function SearchInput({ className, onSelect }: SearchInputProps) {
         aria-label="Caută"
         aria-expanded={suggestions.length > 0}
         aria-controls="search-suggestions"
-        aria-activedescendant={
-          activeIndex >= 0 ? `search-suggestion-${activeIndex}` : undefined
-        }
+        aria-activedescendant={activeIndex >= 0 ? `search-suggestion-${activeIndex}` : undefined}
         className="bg-muted text-foreground border-border focus:ring-primary w-full rounded-md border py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2"
         value={query}
         onChange={(e) => {

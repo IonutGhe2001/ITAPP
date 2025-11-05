@@ -100,7 +100,7 @@ export default function ModalAsigneazaEchipament({
         >
           <option value="">Selectează echipament în stoc</option>
           {echipamente
-           .filter(
+            .filter(
               (e: Echipament) =>
                 e.stare === 'in_stoc' &&
                 (!filterTipNormalized || e.tip.trim().toLowerCase() === filterTipNormalized)

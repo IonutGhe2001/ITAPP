@@ -39,6 +39,6 @@ export function EquipmentIcon({
   if (Icon) {
     return <Icon className={className} />;
   }
-  
+
   return <WrenchIcon className={className} />;
 }

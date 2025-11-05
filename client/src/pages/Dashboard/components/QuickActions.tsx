@@ -47,17 +47,20 @@ export function QuickActions({ actions }: QuickActionsProps) {
       {items.map((action) => {
         const Icon = action.icon;
         return (
-          <li key={action.id} className="flex items-start justify-between gap-4 rounded-lg border border-border/70 bg-card/70 p-4">
+          <li
+            key={action.id}
+            className="border-border/70 bg-card/70 flex items-start justify-between gap-4 rounded-lg border p-4"
+          >
             <div className="flex items-start gap-3">
               <span
-                className="inline-flex items-center justify-center size-10 rounded-full bg-primary/10 text-primary"
+                className="bg-primary/10 text-primary inline-flex size-10 items-center justify-center rounded-full"
                 aria-hidden
               >
                 <Icon className="size-5 stroke-[1.5]" />
               </span>
               <div className="space-y-1">
-                <p className="text-sm font-semibold text-foreground">{action.label}</p>
-                <p className="text-sm text-muted-foreground">{action.description}</p>
+                <p className="text-foreground text-sm font-semibold">{action.label}</p>
+                <p className="text-muted-foreground text-sm">{action.description}</p>
               </div>
             </div>
             <Button

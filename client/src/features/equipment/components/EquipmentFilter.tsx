@@ -48,19 +48,25 @@ function EquipmentFilter({
     <Toolbar>
       <div className="flex min-w-[220px] flex-1 items-center gap-3">
         <div className="relative w-full">
-          <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" aria-hidden="true" />
+          <Search
+            className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+            aria-hidden="true"
+          />
           <Input
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder="Caută după nume, serie sau tip"
-            className="h-11 rounded-xl border border-slate-200/80 bg-white/90 pl-9 text-sm shadow-sm transition focus-visible:ring-2 focus-visible:ring-primary dark:border-slate-700/70 dark:bg-slate-900/70"
+            className="focus-visible:ring-primary h-11 rounded-xl border border-slate-200/80 bg-white/90 pl-9 text-sm shadow-sm transition focus-visible:ring-2 dark:border-slate-700/70 dark:bg-slate-900/70"
             aria-label="Caută echipamente"
           />
         </div>
       </div>
 
       <div className="min-w-[180px]">
-        <Select value={type || EMPTY_OPTION_VALUE} onValueChange={(value) => onTypeChange(value === EMPTY_OPTION_VALUE ? '' : value)}>
+        <Select
+          value={type || EMPTY_OPTION_VALUE}
+          onValueChange={(value) => onTypeChange(value === EMPTY_OPTION_VALUE ? '' : value)}
+        >
           <SelectTrigger className="h-11 rounded-xl border border-slate-200/80 bg-white/90 text-sm shadow-sm dark:border-slate-700/70 dark:bg-slate-900/70">
             <SelectValue placeholder="Tip echipament" />
           </SelectTrigger>

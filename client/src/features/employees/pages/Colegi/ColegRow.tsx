@@ -38,7 +38,10 @@ const getDepartmentName = (coleg: AngajatWithRelations) => {
       if (typeof name === 'string') return name;
     }
   }
-  if ('departmentName' in coleg && typeof (coleg as { departmentName?: unknown }).departmentName === 'string') {
+  if (
+    'departmentName' in coleg &&
+    typeof (coleg as { departmentName?: unknown }).departmentName === 'string'
+  ) {
     return (coleg as { departmentName: string }).departmentName;
   }
   return '';
@@ -102,8 +105,8 @@ export default function ColegRow({
         ref={rowRef}
         role="row"
         className={cn(
-          'grid min-h-[72px] grid-cols-6 items-center gap-x-4 gap-y-2 rounded-lg border-b border-slate-200/70 bg-white px-2 py-3 text-sm transition-colors hover:bg-slate-50 focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/50 focus-within:ring-offset-2 focus-within:ring-offset-white sm:grid-cols-11 sm:px-4',
-          isHighlighted && 'ring-2 ring-primary/40',
+          'focus-within:ring-primary/50 grid min-h-[72px] grid-cols-6 items-center gap-x-4 gap-y-2 rounded-lg border-b border-slate-200/70 bg-white px-2 py-3 text-sm transition-colors focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-white hover:bg-slate-50 sm:grid-cols-11 sm:px-4',
+          isHighlighted && 'ring-primary/40 ring-2'
         )}
       >
         <div className="order-1 col-span-4 flex items-center gap-3 sm:col-span-4">
@@ -112,7 +115,7 @@ export default function ColegRow({
             <span
               className={cn(
                 'absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white',
-                statusIndicatorClass,
+                statusIndicatorClass
               )}
               aria-hidden="true"
             />
@@ -121,7 +124,7 @@ export default function ColegRow({
             <button
               type="button"
               onClick={handleOpenDetails}
-              className="line-clamp-1 text-left text-base font-semibold text-slate-900 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+              className="hover:text-primary focus-visible:ring-primary/60 line-clamp-1 text-left text-base font-semibold text-slate-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
             >
               {coleg.numeComplet}
             </button>
@@ -129,13 +132,17 @@ export default function ColegRow({
           </div>
         </div>
         <div className="order-3 col-span-6 text-sm text-slate-600 sm:order-2 sm:col-span-2">
-          {department ? <span className="line-clamp-1">{department}</span> : <span className="text-slate-400">-</span>}
+          {department ? (
+            <span className="line-clamp-1">{department}</span>
+          ) : (
+            <span className="text-slate-400">-</span>
+          )}
         </div>
         <div className="order-4 col-span-6 flex flex-col gap-1 text-sm text-slate-600 sm:order-3 sm:col-span-3">
           {coleg.email ? (
             <a
               href={`mailto:${coleg.email}`}
-              className="inline-flex items-center gap-1 whitespace-pre-wrap text-slate-600 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+              className="hover:text-primary focus-visible:ring-primary/60 inline-flex items-center gap-1 whitespace-pre-wrap text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
             >
               <Mail className="h-4 w-4 text-slate-400" aria-hidden="true" />
               <span className="truncate">{coleg.email}</span>
@@ -146,7 +153,7 @@ export default function ColegRow({
           {coleg.telefon && (
             <a
               href={`tel:${coleg.telefon}`}
-              className="inline-flex items-center gap-1 whitespace-nowrap text-slate-600 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+              className="hover:text-primary focus-visible:ring-primary/60 inline-flex items-center gap-1 whitespace-nowrap text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
             >
               <Phone className="h-4 w-4 text-slate-400" aria-hidden="true" />
               <span>{coleg.telefon}</span>
