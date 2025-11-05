@@ -44,8 +44,13 @@ export function QuickActions({ actions }: QuickActionsProps) {
         description: 'Descarcă lista de echipamente într-un fișier CSV.',
         icon: Download,
         onSelect: () => {
-          // Trigger CSV export
-          window.location.href = '/api/echipamente/export/csv';
+          // Trigger CSV export via hidden link
+          const link = document.createElement('a');
+          link.href = '/api/echipamente/export/csv';
+          link.download = 'echipamente.csv';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
         },
       },
     ];

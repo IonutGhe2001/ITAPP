@@ -50,10 +50,15 @@ export default function ProfilePage() {
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     
-    if (diffMins < 1) return 'Acum';
-    if (diffMins < 60) return `Acum ${diffMins} minute`;
-    if (diffMins < 120) return 'Acum 1 oră';
-    if (diffMins < 1440) return `Acum ${Math.floor(diffMins / 60)} ore`;
+    const ONE_MINUTE = 1;
+    const ONE_HOUR = 60;
+    const TWO_HOURS = 120;
+    const ONE_DAY = 1440;
+    
+    if (diffMins < ONE_MINUTE) return 'Acum';
+    if (diffMins < ONE_HOUR) return `Acum ${diffMins} minute`;
+    if (diffMins < TWO_HOURS) return 'Acum 1 oră';
+    if (diffMins < ONE_DAY) return `Acum ${Math.floor(diffMins / ONE_HOUR)} ore`;
     
     return date.toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });
   };
