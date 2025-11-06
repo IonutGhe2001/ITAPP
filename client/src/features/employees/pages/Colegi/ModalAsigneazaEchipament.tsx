@@ -6,6 +6,8 @@ import { queueProcesVerbal } from '@/features/proceseVerbale/pvQueue';
 import { getConfig } from '@/services/configService';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 import { handleApiError } from '@/utils/apiError';
+import { Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 export default function ModalAsigneazaEchipament({
   angajatId,
@@ -28,6 +30,7 @@ export default function ModalAsigneazaEchipament({
   const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const filterTipNormalized = filterTip?.trim().toLowerCase();
   const isReplacing = Boolean(onReplace && oldEchipamentId);
 
@@ -40,6 +43,17 @@ export default function ModalAsigneazaEchipament({
       ),
     [echipamente, filterTipNormalized]
   );
+
+  const filteredEquipment = useMemo(() => {
+    if (!searchQuery.trim()) return availableEquipment;
+    const query = searchQuery.trim().toLowerCase();
+    return availableEquipment.filter(
+      (e: Echipament) =>
+        e.nume.toLowerCase().includes(query) ||
+        e.serie.toLowerCase().includes(query) ||
+        e.tip.toLowerCase().includes(query)
+    );
+  }, [availableEquipment, searchQuery]);
 
   const handleToggle = (id: string) => {
     setSelectedIds((prev) => {
@@ -133,9 +147,22 @@ export default function ModalAsigneazaEchipament({
             : 'Selectează unul sau mai multe echipamente disponibile pentru a le asigna.'}
         </p>
 
+        <div className="relative">
+          <Search
+            className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+            aria-hidden="true"
+          />
+          <Input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Caută după nume, serie sau tip..."
+            className="pl-10"
+          />
+        </div>
+
         <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
-          {availableEquipment.length ? (
-            availableEquipment.map((e: Echipament) => {
+          {filteredEquipment.length ? (
+            filteredEquipment.map((e: Echipament) => {
               const isSelected = selectedIds.includes(e.id);
               return (
                 <label
@@ -159,7 +186,9 @@ export default function ModalAsigneazaEchipament({
             })
           ) : (
             <div className="text-muted-foreground text-sm">
-              Nu există echipamente disponibile în stoc pentru criteriile selectate.
+              {searchQuery.trim()
+                ? 'Nu există echipamente care să corespundă căutării.'
+                : 'Nu există echipamente disponibile în stoc pentru criteriile selectate.'}
             </div>
           )}
         </div>

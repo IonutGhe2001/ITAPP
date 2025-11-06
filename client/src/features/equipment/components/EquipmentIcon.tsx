@@ -11,6 +11,8 @@ import {
   WrenchIcon,
   ProjectorIcon,
   TvIcon,
+  CableIcon,
+  UsbIcon,
 } from 'lucide-react';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -23,10 +25,23 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   router: NetworkIcon,
   mouse: MouseIcon,
   tastatura: KeyboardIcon,
+  keyboard: KeyboardIcon,
   imprimanta: PrinterIcon,
   videoproiector: ProjectorIcon,
   projector: ProjectorIcon,
   tv: TvIcon,
+  // IT consumables
+  charger: CableIcon,
+  incarcator: CableIcon,
+  cable: CableIcon,
+  cablu: CableIcon,
+  adapter: UsbIcon,
+  adaptor: UsbIcon,
+  headset: WrenchIcon,
+  casti: WrenchIcon,
+  webcam: MonitorIcon,
+  consumabil: WrenchIcon,
+  consumable: WrenchIcon,
 };
 
 export interface EquipmentIconProps {

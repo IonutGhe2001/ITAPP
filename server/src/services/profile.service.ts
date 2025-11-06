@@ -154,45 +154,32 @@ export const getUserActivity = async (
 export const getUserSessions = async (userId: number): Promise<UserSession[]> => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { email: true, locatie: true },
+    select: { 
+      email: true, 
+      locatie: true,
+      lastLogin: true,
+    },
   });
 
   if (!user?.email) {
     return [];
   }
 
-  const angajat = await prisma.angajat.findFirst({
-    where: { email: user.email },
-    include: {
-      departmentConfig: true,
-      echipamente: {
-        where: { stare: EQUIPMENT_STATUS.ALOCAT },
-        include: {
-          changes: {
-            orderBy: { createdAt: "desc" },
-            take: 1,
-          },
-        },
-      },
-    },
-  });
-
-  if (!angajat) {
-    return [];
+  // For now, return a single session representing the current browser session
+  // In a real implementation, you would track actual sessions with device info from user-agent
+  // and location from IP address using a geolocation service
+  
+  const sessions: UserSession[] = [];
+  
+  // Create a session entry for the current login
+  if (user.lastLogin) {
+    sessions.push({
+      deviceName: 'Browser',
+      deviceType: 'Web',
+      locationName: user.locatie || 'Unknown',
+      lastActive: user.lastLogin.toISOString(),
+    });
   }
 
-  const fallbackLocation = user.locatie || undefined;
-  const locationName = angajat.departmentConfig?.name ?? fallbackLocation ?? "Nespecificat";
-
-  return angajat.echipamente.map((echipament: EchipamentWithLatestChange) => {
-    const lastChange = echipament.changes?.[0]?.createdAt;
-    const lastActiveDate = lastChange ?? echipament.createdAt;
-
-    return {
-      deviceName: echipament.nume,
-      deviceType: echipament.tip,
-      locationName,
-      lastActive: lastActiveDate.toISOString(),
-    } satisfies UserSession;
-  });
+  return sessions;
 };

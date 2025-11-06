@@ -35,7 +35,48 @@ export function queueProcesVerbal(
   opts?: { predate?: string[]; primite?: string[] }
 ) {
   const existing = readQueue();
-  existing.push({ angajatId, tip, ...opts });
+  
+  // Find if there's already a queued PV for this employee
+  const existingIndex = existing.findIndex((item) => item.angajatId === angajatId);
+  
+  if (existingIndex !== -1) {
+    // Consolidate the changes into the existing queue item
+    const existingItem = existing[existingIndex];
+    const consolidatedPredate = [
+      ...(existingItem.predate || []),
+      ...(opts?.predate || []),
+    ];
+    const consolidatedPrimite = [
+      ...(existingItem.primite || []),
+      ...(opts?.primite || []),
+    ];
+    
+    // Remove duplicates
+    const uniquePredate = Array.from(new Set(consolidatedPredate));
+    const uniquePrimite = Array.from(new Set(consolidatedPrimite));
+    
+    // Determine the correct tip based on what we have
+    let consolidatedTip: ProcesVerbalTip = 'PREDARE_PRIMIRE';
+    if (uniquePredate.length > 0 && uniquePrimite.length > 0) {
+      consolidatedTip = 'SCHIMB';
+    } else if (uniquePredate.length > 0) {
+      consolidatedTip = 'RESTITUIRE';
+    } else if (uniquePrimite.length > 0) {
+      consolidatedTip = 'PREDARE_PRIMIRE';
+    }
+    
+    // Update the existing item
+    existing[existingIndex] = {
+      angajatId,
+      tip: consolidatedTip,
+      predate: uniquePredate.length > 0 ? uniquePredate : undefined,
+      primite: uniquePrimite.length > 0 ? uniquePrimite : undefined,
+    };
+  } else {
+    // Add new item to queue
+    existing.push({ angajatId, tip, ...opts });
+  }
+  
   writeQueue(existing);
 }
 
