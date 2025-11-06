@@ -11,8 +11,15 @@ import {
   WrenchIcon,
   ProjectorIcon,
   TvIcon,
+  CableIcon,
+  UsbIcon,
+  HeadphonesIcon,
+  PackageIcon,
 } from 'lucide-react';
 
+// Icon mapping for equipment types
+// Includes both Romanian and English terms for flexibility
+// Duplicate entries (e.g., 'tastatura' and 'keyboard') support bilingual usage
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   laptop: LaptopIcon,
   telefon: SmartphoneIcon,
@@ -22,11 +29,24 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   server: ServerIcon,
   router: NetworkIcon,
   mouse: MouseIcon,
+  keyboard: KeyboardIcon, // Duplicate for English support
   tastatura: KeyboardIcon,
   imprimanta: PrinterIcon,
   videoproiector: ProjectorIcon,
   projector: ProjectorIcon,
   tv: TvIcon,
+  // IT consumables
+  charger: CableIcon,
+  incarcator: CableIcon,
+  cable: CableIcon,
+  cablu: CableIcon,
+  adapter: UsbIcon,
+  adaptor: UsbIcon,
+  headset: HeadphonesIcon,
+  casti: HeadphonesIcon,
+  webcam: MonitorIcon,
+  consumabil: PackageIcon,
+  consumable: PackageIcon,
 };
 
 export interface EquipmentIconProps {

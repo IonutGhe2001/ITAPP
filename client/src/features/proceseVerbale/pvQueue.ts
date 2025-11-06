@@ -29,13 +29,63 @@ function writeQueue(items: PvQueueItem[]) {
   }
 }
 
+/**
+ * Determines the appropriate PV type based on equipment being returned and received
+ * @param predate - Array of equipment IDs being returned/handed back
+ * @param primite - Array of equipment IDs being received/assigned
+ * @returns The appropriate ProcesVerbalTip for the transaction
+ */
+function determinePvType(predate: string[], primite: string[]): ProcesVerbalTip {
+  if (predate.length > 0 && primite.length > 0) {
+    return 'SCHIMB';
+  } else if (predate.length > 0) {
+    return 'RESTITUIRE';
+  } else {
+    return 'PREDARE_PRIMIRE';
+  }
+}
+
 export function queueProcesVerbal(
   angajatId: string,
   tip: ProcesVerbalTip,
   opts?: { predate?: string[]; primite?: string[] }
 ) {
   const existing = readQueue();
-  existing.push({ angajatId, tip, ...opts });
+  
+  // Find if there's already a queued PV for this employee
+  const existingIndex = existing.findIndex((item) => item.angajatId === angajatId);
+  
+  if (existingIndex !== -1) {
+    // Consolidate the changes into the existing queue item
+    const existingItem = existing[existingIndex];
+    const consolidatedPredate = [
+      ...(existingItem.predate || []),
+      ...(opts?.predate || []),
+    ];
+    const consolidatedPrimite = [
+      ...(existingItem.primite || []),
+      ...(opts?.primite || []),
+    ];
+    
+    // Remove duplicates
+    const uniquePredate = Array.from(new Set(consolidatedPredate));
+    const uniquePrimite = Array.from(new Set(consolidatedPrimite));
+    
+    // Determine the correct tip based on what we have
+    const consolidatedTip = determinePvType(uniquePredate, uniquePrimite);
+    
+    // Update the existing item
+    existing[existingIndex] = {
+      angajatId,
+      tip: consolidatedTip,
+      predate: uniquePredate.length > 0 ? uniquePredate : undefined,
+      primite: uniquePrimite.length > 0 ? uniquePrimite : undefined,
+    };
+  } else {
+    // Add new item to queue
+    existing.push({ angajatId, tip, ...opts });
+  }
+  
   writeQueue(existing);
 }
 

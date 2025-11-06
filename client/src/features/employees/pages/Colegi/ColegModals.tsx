@@ -281,7 +281,14 @@ export default function ColegModals({
                       ? `${detailColeg.echipamente.length} echipamente alocate`
                       : 'Nu există echipamente alocate.'}
                   </p>
-                  <Button size="sm" onClick={() => setSelectedAngajatId(detailColeg.id)}>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setSelectedAngajatId(detailColeg.id);
+                      setDetailColeg(null);
+                      setActiveTab('profile');
+                    }}
+                  >
                     Asignează echipament
                   </Button>
                 </div>
