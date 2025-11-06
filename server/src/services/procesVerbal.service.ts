@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma";
-import { ProcesVerbalTip } from "@prisma/client";
+import { EquipmentChangeType, ProcesVerbalTip } from "@prisma/client";
 import { genereazaPDFProcesVerbal } from "../utils/pdfGenerator";
 
 export const creeazaProcesVerbalCuEchipamente = async (
@@ -75,51 +75,49 @@ export const creeazaProcesVerbalCuEchipamente = async (
 };
 
 export const creeazaProcesVerbalDinSchimbari = async (angajatId: string) => {
-  interface SchimbareExt {
-    id: string;
-    echipamentId: string;
-    angajatId: string;
-    tip: string;
-    type?: string;
-    finalized?: boolean;
-    echipament?: unknown;
-  }
-
-  const schimbari = (await prisma.equipmentChange.findMany({
+  const schimbari = await prisma.equipmentChange.findMany({
     where: {
       angajatId,
-      finalized: false,
+      includedInPV: false,
     },
     include: { echipament: true },
-  })) as SchimbareExt[];
+  });
 
   if (!schimbari.length) return null;
 
-  // Split changes by type (assuming PREDAT for returned, PRIMIT for received)
   const echipamentePredateIds = schimbari
-    .filter((s) => s.type === "PREDAT")
+    .filter((s) => s.tip === EquipmentChangeType.RETURN)
     .map((s) => s.echipamentId);
 
-  // @ts-ignore
   const echipamentePrimiteIds = schimbari
-    // @ts-ignore
-    .filter((s) => s.type === "PRIMIT")
-    .map((s: any) => s.echipamentId);
+    .filter(
+      (s) =>
+        s.tip === EquipmentChangeType.ASSIGN ||
+        s.tip === EquipmentChangeType.REPLACE
+    )
+    .map((s) => s.echipamentId);
+
+  const hasReplace = schimbari.some((s) => s.tip === EquipmentChangeType.REPLACE);
 
   let tip: ProcesVerbalTip = ProcesVerbalTip.PREDARE_PRIMIRE;
   if (echipamentePredateIds.length && echipamentePrimiteIds.length) {
     tip = ProcesVerbalTip.SCHIMB;
   } else if (echipamentePredateIds.length) {
     tip = ProcesVerbalTip.RESTITUIRE;
+    } else if (hasReplace) {
+    tip = ProcesVerbalTip.SCHIMB;
   }
+
+  const uniquePredateIds = Array.from(new Set(echipamentePredateIds));
+  const uniquePrimiteIds = Array.from(new Set(echipamentePrimiteIds));
 
   const rezultat = await creeazaProcesVerbalCuEchipamente(
     angajatId,
     null,
     tip,
     undefined,
-    echipamentePredateIds,
-    echipamentePrimiteIds
+    uniquePredateIds,
+    uniquePrimiteIds
   );
 
   if (!rezultat) return null;

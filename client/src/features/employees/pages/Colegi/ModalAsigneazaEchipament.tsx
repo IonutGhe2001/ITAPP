@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useEchipamente, useUpdateEchipament } from '@/features/equipment';
 import type { Echipament } from '@/features/equipment/types';
 import { genereazaProcesVerbal, type ProcesVerbalTip } from '@/features/proceseVerbale';
@@ -27,30 +27,62 @@ export default function ModalAsigneazaEchipament({
   const { data: echipamente = [] } = useEchipamente();
   const updateMutation = useUpdateEchipament();
   const { toast } = useToast();
-  const [selectedId, setSelectedId] = useState('');
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const filterTipNormalized = filterTip?.trim().toLowerCase();
+  const isReplacing = Boolean(onReplace && oldEchipamentId);
+
+  const availableEquipment = useMemo(
+    () =>
+      echipamente.filter(
+        (e: Echipament) =>
+          e.stare === 'in_stoc' &&
+          (!filterTipNormalized || e.tip.trim().toLowerCase() === filterTipNormalized)
+      ),
+    [echipamente, filterTipNormalized]
+  );
+
+  const handleToggle = (id: string) => {
+    setSelectedIds((prev) => {
+      if (isReplacing) {
+        return prev.includes(id) && prev.length === 1 ? [] : [id];
+      }
+      return prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
+    });
+  };
 
   const handleAssign = async () => {
-    if (!selectedId) return;
+    if (!selectedIds.length) return;
 
-    const tip: ProcesVerbalTip = onReplace && oldEchipamentId ? 'SCHIMB' : 'PREDARE_PRIMIRE';
+    const tip: ProcesVerbalTip = isReplacing ? 'SCHIMB' : 'PREDARE_PRIMIRE';
+    let payload: { predate?: string[]; primite?: string[] } | undefined;
 
     try {
-      if (onReplace && oldEchipamentId) {
-        await onReplace(oldEchipamentId, selectedId);
-        onPendingPV?.({ predate: [oldEchipamentId], primite: [selectedId] });
+      if (isReplacing && onReplace && oldEchipamentId) {
+        const newId = selectedIds[0];
+        await onReplace(oldEchipamentId, newId);
+        payload = { predate: [oldEchipamentId], primite: [newId] };
+        onPendingPV?.(payload);
         toast({
           title: 'Echipament schimbat',
           description: 'Proces verbal în așteptare',
         });
       } else {
-        await updateMutation.mutateAsync({
-          id: selectedId,
-          data: { angajatId, stare: 'alocat' },
-        });
-        onPendingPV?.({ primite: [selectedId] });
+        const idsToAssign = selectedIds;
+        await Promise.all(
+          idsToAssign.map((id) =>
+            updateMutation.mutateAsync({
+              id,
+              data: { angajatId, stare: 'alocat' },
+            })
+          )
+        );
+        payload = { primite: idsToAssign };
+        onPendingPV?.(payload);
         toast({
-          title: 'Echipament asignat',
+          title:
+            idsToAssign.length > 1
+              ? 'Echipamente asignate'
+              : 'Echipament asignat',
           description: 'Proces verbal în așteptare',
         });
       }
@@ -60,9 +92,7 @@ export default function ModalAsigneazaEchipament({
         const url = await genereazaProcesVerbal(
           angajatId,
           tip,
-          tip === 'SCHIMB' && oldEchipamentId
-            ? { predate: [oldEchipamentId], primite: [selectedId] }
-            : { primite: [selectedId] }
+          payload
         );
         window.open(url, '_blank');
         toast({ title: 'Proces verbal generat' });
@@ -70,9 +100,7 @@ export default function ModalAsigneazaEchipament({
         queueProcesVerbal(
           angajatId,
           tip,
-          tip === 'SCHIMB' && oldEchipamentId
-            ? { predate: [oldEchipamentId], primite: [selectedId] }
-            : { primite: [selectedId] }
+          payload
         );
         toast({ title: 'Proces verbal în așteptare' });
       }
@@ -88,29 +116,53 @@ export default function ModalAsigneazaEchipament({
     }
   };
 
+  const assignButtonLabel = isReplacing
+    ? 'Înlocuiește'
+    : selectedIds.length > 1
+      ? `Asignează ${selectedIds.length} echipamente`
+      : 'Asignează';
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="bg-card relative w-full max-w-md space-y-4 rounded-2xl p-6 shadow-xl">
         <h2 className="text-primary text-lg font-semibold">Asignează echipament</h2>
 
-        <select
-          value={selectedId}
-          onChange={(e) => setSelectedId(e.target.value)}
-          className="border-border bg-background text-foreground w-full rounded-lg border px-4 py-2"
-        >
-          <option value="">Selectează echipament în stoc</option>
-          {echipamente
-           .filter(
-              (e: Echipament) =>
-                e.stare === 'in_stoc' &&
-                (!filterTipNormalized || e.tip.trim().toLowerCase() === filterTipNormalized)
-            )
-            .map((e: Echipament) => (
-              <option key={e.id} value={e.id}>
-                {e.nume} – Serie: {e.serie}
-              </option>
-            ))}
-        </select>
+        <p className="text-muted-foreground text-sm">
+          {isReplacing
+            ? 'Selectează echipamentul care va înlocui dispozitivul existent.'
+            : 'Selectează unul sau mai multe echipamente disponibile pentru a le asigna.'}
+        </p>
+
+        <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
+          {availableEquipment.length ? (
+            availableEquipment.map((e: Echipament) => {
+              const isSelected = selectedIds.includes(e.id);
+              return (
+                <label
+                  key={e.id}
+                  className="border-border flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2 text-sm shadow-sm transition hover:border-primary/60"
+                >
+                  <input
+                    type={isReplacing ? 'radio' : 'checkbox'}
+                    name="equipment-selection"
+                    value={e.id}
+                    checked={isSelected}
+                    onChange={() => handleToggle(e.id)}
+                    className="h-4 w-4"
+                  />
+                  <div className="flex flex-col">
+                    <span className="font-medium text-foreground">{e.nume}</span>
+                    <span className="text-muted-foreground text-xs">Serie: {e.serie}</span>
+                  </div>
+                </label>
+              );
+            })
+          ) : (
+            <div className="text-muted-foreground text-sm">
+              Nu există echipamente disponibile în stoc pentru criteriile selectate.
+            </div>
+          )}
+        </div>
 
         <div className="flex justify-end gap-2 pt-2">
           <button
@@ -122,9 +174,9 @@ export default function ModalAsigneazaEchipament({
           <button
             onClick={handleAssign}
             className="bg-primary text-primary-foreground hover:bg-primary-dark rounded-lg px-4 py-2"
-            disabled={!selectedId}
+            disabled={!selectedIds.length}
           >
-            Asignează
+            {assignButtonLabel}
           </button>
         </div>
       </div>

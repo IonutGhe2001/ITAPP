@@ -63,7 +63,11 @@ export default function EquipmentStatusChart({ data }: EquipmentStatusChartProps
   const chartData = useMemo(() => data, [data]);
 
   return (
-    <div className="h-[320px]" role="img" aria-label="Stare echipamente pe categorii">
+    <div
+      className="h-[320px] min-w-0 w-full"
+      role="img"
+      aria-label="Stare echipamente pe categorii"
+    >
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData} barGap={10} barSize={28}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />

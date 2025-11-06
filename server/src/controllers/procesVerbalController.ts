@@ -104,11 +104,12 @@ export const creareProcesVerbalDinSchimbari = async (
 
     const { pdfBuffer, schimbariIds, procesVerbalId } = result;
 
-    // @ts-ignore - equipmentChange may not be typed yet
-    await prisma.equipmentChange.updateMany({
-      where: { id: { in: schimbariIds } },
-      data: { finalized: true },
-    });
+    if (schimbariIds.length) {
+      await prisma.equipmentChange.updateMany({
+        where: { id: { in: schimbariIds } },
+        data: { includedInPV: true },
+      });
+    }
     const fileName = await saveProcesVerbalPDF(procesVerbalId, pdfBuffer);
 
     res
