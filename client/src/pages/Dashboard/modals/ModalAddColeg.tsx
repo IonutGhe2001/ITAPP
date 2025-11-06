@@ -53,7 +53,10 @@ export default function ModalAddColeg({
     try {
       const payload = {
         ...formData,
-        departmentConfigId: formData.departmentConfigId || undefined,
+        departmentConfigId:
+          formData.departmentConfigId && formData.departmentConfigId !== 'none'
+            ? formData.departmentConfigId
+            : undefined,
       };
       await createMutation.mutateAsync(payload);
       toast({ title: 'Coleg adăugat', description: 'Coleg adăugat cu succes.' });
@@ -102,7 +105,7 @@ export default function ModalAddColeg({
                 <SelectValue placeholder="Selectează departament" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Fără departament</SelectItem>
+                <SelectItem value="none">Fără departament</SelectItem>
                 {departments.map((dept) => (
                   <SelectItem key={dept.id} value={dept.id}>
                     {dept.name}
