@@ -1,6 +1,15 @@
 import { prisma } from "../lib/prisma";
 import { EQUIPMENT_STATUS } from "@shared/equipmentStatus";
-import type { Echipament, EquipmentChange, Angajat } from ".prisma/client";
+import type {
+  Echipament,
+  EquipmentChange,
+  Angajat,
+  DepartmentConfig,
+} from ".prisma/client";
+
+type EmployeeWithDepartment = Angajat & {
+  departmentConfig: DepartmentConfig | null;
+};
 
 type OverviewStats = {
   total: number;
@@ -289,7 +298,10 @@ export const getPvQueue = async (limit: number): Promise<PvQueueItem[]> => {
     orderBy: { createdAt: "asc" },
   });
 
-  return changes.map((change: EquipmentChange & { angajat: Angajat; echipament: Echipament }) => {
+  return changes.map((change: EquipmentChange & {
+    angajat: EmployeeWithDepartment;
+    echipament: Echipament;
+  }) => {
     const daysSinceAllocation = Math.floor(
       (now.getTime() - new Date(change.createdAt).getTime()) /
         (1000 * 60 * 60 * 24)

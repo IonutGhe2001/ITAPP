@@ -19,6 +19,10 @@ type UserSession = {
   lastActive: string;
 };
 
+type EchipamentWithLatestChange = Echipament & {
+  changes?: (EquipmentChange & { createdAt: Date })[];
+};
+
 export const getUserMetrics = async (userId: number): Promise<UserMetric[]> => {
   // Get the user's employee record to find assigned equipment
   const user = await prisma.user.findUnique({
@@ -180,16 +184,13 @@ export const getUserSessions = async (userId: number): Promise<UserSession[]> =>
   const fallbackLocation = user.locatie || undefined;
   const locationName = angajat.departmentConfig?.name ?? fallbackLocation ?? "Nespecificat";
 
-  return angajat.echipamente.map((echipament) => {
-    const eqWithChanges = echipament as Echipament & {
-      changes?: (EquipmentChange & { createdAt: Date })[];
-    };
-    const lastChange = eqWithChanges.changes?.[0]?.createdAt;
-    const lastActiveDate = lastChange ?? eqWithChanges.createdAt;
+  return angajat.echipamente.map((echipament: EchipamentWithLatestChange) => {
+    const lastChange = echipament.changes?.[0]?.createdAt;
+    const lastActiveDate = lastChange ?? echipament.createdAt;
 
     return {
-      deviceName: eqWithChanges.nume,
-      deviceType: eqWithChanges.tip,
+      deviceName: echipament.nume,
+      deviceType: echipament.tip,
       locationName,
       lastActive: lastActiveDate.toISOString(),
     } satisfies UserSession;

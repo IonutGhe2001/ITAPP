@@ -135,7 +135,7 @@ export const getEquipmentTypes = async (): Promise<string[]> => {
 
   const unique = new Map<string, string>();
 
-  rows.forEach(({ tip }) => {
+  rows.forEach(({ tip }: { tip: string | null }) => {
     if (!tip) return;
     const trimmed = tip.trim();
     if (!trimmed) return;
