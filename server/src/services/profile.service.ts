@@ -165,9 +165,12 @@ export const getUserSessions = async (userId: number): Promise<UserSession[]> =>
     return [];
   }
 
-  // For now, return a single session representing the current browser session
-  // In a real implementation, you would track actual sessions with device info from user-agent
-  // and location from IP address using a geolocation service
+  // TODO: Implement proper session tracking with:
+  // - Device information extracted from user-agent
+  // - IP-based geolocation for accurate location
+  // - Session tokens stored in database with lastActive timestamp
+  // - Multiple concurrent session support
+  // For now, return a single session representing the current browser login
   
   const sessions: UserSession[] = [];
   

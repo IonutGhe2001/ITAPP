@@ -29,6 +29,19 @@ function writeQueue(items: PvQueueItem[]) {
   }
 }
 
+/**
+ * Determines the appropriate PV type based on equipment being returned and received
+ */
+function determinePvType(predate: string[], primite: string[]): ProcesVerbalTip {
+  if (predate.length > 0 && primite.length > 0) {
+    return 'SCHIMB';
+  } else if (predate.length > 0) {
+    return 'RESTITUIRE';
+  } else {
+    return 'PREDARE_PRIMIRE';
+  }
+}
+
 export function queueProcesVerbal(
   angajatId: string,
   tip: ProcesVerbalTip,
@@ -56,14 +69,7 @@ export function queueProcesVerbal(
     const uniquePrimite = Array.from(new Set(consolidatedPrimite));
     
     // Determine the correct tip based on what we have
-    let consolidatedTip: ProcesVerbalTip = 'PREDARE_PRIMIRE';
-    if (uniquePredate.length > 0 && uniquePrimite.length > 0) {
-      consolidatedTip = 'SCHIMB';
-    } else if (uniquePredate.length > 0) {
-      consolidatedTip = 'RESTITUIRE';
-    } else if (uniquePrimite.length > 0) {
-      consolidatedTip = 'PREDARE_PRIMIRE';
-    }
+    const consolidatedTip = determinePvType(uniquePredate, uniquePrimite);
     
     // Update the existing item
     existing[existingIndex] = {

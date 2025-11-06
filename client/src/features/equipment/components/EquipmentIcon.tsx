@@ -13,6 +13,8 @@ import {
   TvIcon,
   CableIcon,
   UsbIcon,
+  HeadphonesIcon,
+  PackageIcon,
 } from 'lucide-react';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -37,11 +39,11 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   cablu: CableIcon,
   adapter: UsbIcon,
   adaptor: UsbIcon,
-  headset: WrenchIcon,
-  casti: WrenchIcon,
+  headset: HeadphonesIcon,
+  casti: HeadphonesIcon,
   webcam: MonitorIcon,
-  consumabil: WrenchIcon,
-  consumable: WrenchIcon,
+  consumabil: PackageIcon,
+  consumable: PackageIcon,
 };
 
 export interface EquipmentIconProps {

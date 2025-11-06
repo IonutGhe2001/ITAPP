@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { formatRelativeTime } from '@/utils/romanianPluralization';
 
 const SignatureEditor = React.lazy(() => import('@/components/SignatureEditor'));
 
@@ -51,19 +52,8 @@ export default function ProfilePage() {
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     
-    const ONE_MINUTE = 1;
-    const ONE_HOUR = 60;
-    const TWO_HOURS = 120;
-    const ONE_DAY = 1440;
-    
-    if (diffMins < ONE_MINUTE) return 'Acum';
-    if (diffMins < ONE_HOUR) return `Acum ${diffMins} minut${diffMins === 1 ? '' : 'e'}`;
-    if (diffMins < TWO_HOURS) return 'Acum 1 oră';
-    if (diffMins < ONE_DAY) return `Acum ${Math.floor(diffMins / ONE_HOUR)} ore`;
-    
-    const days = Math.floor(diffMins / ONE_DAY);
-    if (days === 1) return 'Ieri';
-    if (days < 7) return `Acum ${days} zile`;
+    const relativeTime = formatRelativeTime(diffMins);
+    if (relativeTime) return relativeTime;
     
     return date.toLocaleDateString('ro-RO', { 
       day: 'numeric', 
