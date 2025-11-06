@@ -51,13 +51,19 @@ export const getEmployeeLifecycleStatus = (
 ): EmployeeLifecycleStatus => {
   if ('status' in coleg) {
     const status = (coleg as unknown as { status?: string }).status?.toLowerCase();
-    if (status === 'active' || status === 'pending' || status === 'inactive') {
+    if (status === 'active' || status === 'inactive') {
       return status;
+    }
+    // Convert pending to active
+    if (status === 'pending') {
+      return 'active';
     }
   }
 
-  if (coleg.emailAccountStatus === 'PENDING') return 'pending';
-  if (coleg.emailAccountStatus === 'CREATED') return 'active';
+  // All email statuses now considered active (no more pending)
+  if (coleg.emailAccountStatus === 'PENDING' || coleg.emailAccountStatus === 'CREATED') {
+    return 'active';
+  }
   if (coleg.cDataCreated) return 'active';
 
   return 'inactive';

@@ -1,6 +1,7 @@
 import React, { Suspense, useMemo, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 import ModalAsigneazaEchipament from './ModalAsigneazaEchipament';
 import ModalEditColeg from './ModalEditColeg';
 import { useUpdateEchipament } from '@/features/equipment';
@@ -13,7 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import StatusBadge from '@/components/StatusBadge';
 import { EquipmentIcon } from '@/features/equipment';
 import { getEmployeeLifecycleStatus } from './useColegiFilter';
-import { Mail, Phone, UserRound, MapPin, Laptop2, BadgeCheck } from 'lucide-react';
+import { Mail, Phone, UserRound, MapPin, Laptop2, BadgeCheck, RefreshCw } from 'lucide-react';
+import { ROUTES } from '@/constants/routes';
 
 const ModalAddColeg = React.lazy(() => import('@/pages/Dashboard/modals/ModalAddColeg'));
 
@@ -205,23 +207,14 @@ export default function ColegModals({
                     label={(() => {
                       const status = getEmployeeLifecycleStatus(detailColeg);
                       if (status === 'active') return 'Activ';
-                      if (status === 'pending') return 'În așteptare';
                       return 'Inactiv';
                     })()}
                     tone={((status) =>
                       status === 'active'
                         ? 'success'
-                        : status === 'pending'
-                          ? 'warning'
-                          : 'neutral')(getEmployeeLifecycleStatus(detailColeg))}
+                        : 'neutral')(getEmployeeLifecycleStatus(detailColeg))}
                     withDot
                   />
-                  {detailColeg.emailAccountStatus === 'PENDING' && (
-                    <StatusBadge label="Email pending" tone="warning" />
-                  )}
-                  {detailColeg.emailAccountStatus === 'CREATED' && (
-                    <StatusBadge label="Email activ" tone="success" />
-                  )}
                 </div>
                 <div className="grid gap-4 rounded-xl border border-slate-200/70 bg-slate-50/80 p-4 sm:grid-cols-2 dark:border-slate-800/60 dark:bg-slate-900/40">
                   <div className="space-y-2 text-sm">
@@ -299,7 +292,10 @@ export default function ColegModals({
                         key={eq.id}
                         className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/70 bg-white/80 p-3 shadow-sm dark:border-slate-800/60 dark:bg-slate-900/60"
                       >
-                        <div className="flex items-center gap-3">
+                        <Link
+                          to={ROUTES.EQUIPMENT_DETAIL.replace(':id', eq.id)}
+                          className="flex flex-1 items-center gap-3 hover:opacity-80 transition-opacity"
+                        >
                           <div className="bg-primary/5 text-primary flex h-10 w-10 items-center justify-center rounded-xl">
                             <EquipmentIcon type={eq.tip} className="h-5 w-5" />
                           </div>
@@ -309,8 +305,27 @@ export default function ColegModals({
                             </p>
                             <p className="text-muted-foreground text-xs">Serie: {eq.serie}</p>
                           </div>
+                        </Link>
+                        <div className="flex items-center gap-2">
+                          <StatusBadge label={eq.tip} tone="info" className="uppercase" />
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setReplaceData({
+                                colegId: detailColeg.id,
+                                equipmentId: eq.id,
+                                type: eq.tip,
+                              });
+                              setDetailColeg(null);
+                              setActiveTab('profile');
+                            }}
+                            className="gap-1"
+                          >
+                            <RefreshCw className="h-3 w-3" />
+                            Înlocuiește
+                          </Button>
                         </div>
-                        <StatusBadge label={eq.tip} tone="info" className="uppercase" />
                       </div>
                     ))}
                   </div>
