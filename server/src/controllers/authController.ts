@@ -4,8 +4,8 @@ import {
   authenticateUser,
   registerUser,
   getUserById,
-  UserUpdateData,
 } from "../services/auth.service";
+import type { UserUpdateData } from "../services/auth.service";
 import { logger } from "@lib/logger";
 import { env } from "../config";
 import { loginSchema } from "../validators/auth.validator";
@@ -72,30 +72,45 @@ export const updateMe = async (req: Request, res: Response) => {
     profilePicture,
     digitalSignature,
   } = req.body;
-  const updateData: UserUpdateData = {
-    nume,
-    prenume,
-    functie,
-    telefon,
-    departament,
-    locatie,
-    profilePicture,
-    digitalSignature,
+  const updateData: Partial<UserUpdateData> = {};
+
+  const assignIfDefined = <K extends keyof UserUpdateData>(
+    key: K,
+    value: UserUpdateData[K] | undefined
+  ) => {
+    if (value !== undefined) {
+      updateData[key] = value;
+    }
   };
 
-  if (typeof updateData.departament === "string") {
-    const trimmed = updateData.departament.trim();
-    updateData.departament = trimmed ? trimmed : null;
+  assignIfDefined("nume", nume);
+  assignIfDefined("prenume", prenume);
+  assignIfDefined("functie", functie);
+  assignIfDefined("telefon", telefon);
+  assignIfDefined("profilePicture", profilePicture);
+  assignIfDefined("digitalSignature", digitalSignature);
+
+  if (departament !== undefined) {
+    if (typeof departament === "string") {
+      const trimmed = departament.trim();
+      updateData.departament = trimmed ? trimmed : null;
+    } else {
+      updateData.departament = departament;
+    }
   }
 
-  if (typeof updateData.locatie === "string") {
-    const trimmed = updateData.locatie.trim();
-    updateData.locatie = trimmed ? trimmed : null;
+  if (locatie !== undefined) {
+    if (typeof locatie === "string") {
+      const trimmed = locatie.trim();
+      updateData.locatie = trimmed ? trimmed : null;
+    } else {
+      updateData.locatie = locatie;
+    }
   }
-  Object.keys(updateData).forEach((key) => {
-    const typedKey = key as keyof UserUpdateData;
-    if (updateData[typedKey] === undefined || updateData[typedKey] === "") {
-      delete updateData[typedKey];
+
+    Object.entries(updateData).forEach(([key, value]) => {
+    if (value === undefined || value === "") {
+      delete updateData[key as keyof UserUpdateData];
     }
   });
 
