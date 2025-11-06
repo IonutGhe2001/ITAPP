@@ -1,6 +1,22 @@
+import { ProcesVerbalTip } from "@prisma/client";
 import { prisma } from "../lib/prisma";
-import { EquipmentChangeType, ProcesVerbalTip } from "@prisma/client";
 import { genereazaPDFProcesVerbal } from "../utils/pdfGenerator";
+
+const EQUIPMENT_CHANGE_TYPE = {
+  ASSIGN: "ASSIGN",
+  RETURN: "RETURN",
+  REPLACE: "REPLACE",
+} as const;
+
+type EquipmentChangeTypeValue =
+  (typeof EQUIPMENT_CHANGE_TYPE)[keyof typeof EQUIPMENT_CHANGE_TYPE];
+
+type EquipmentChangeWithEchipament = {
+  id: string;
+  echipamentId: string;
+  tip: EquipmentChangeTypeValue;
+  echipament: unknown;
+};
 
 export const creeazaProcesVerbalCuEchipamente = async (
   angajatId: string,
@@ -75,29 +91,32 @@ export const creeazaProcesVerbalCuEchipamente = async (
 };
 
 export const creeazaProcesVerbalDinSchimbari = async (angajatId: string) => {
-  const schimbari = await prisma.equipmentChange.findMany({
-    where: {
-      angajatId,
-      includedInPV: false,
-    },
-    include: { echipament: true },
-  });
+  const schimbari: EquipmentChangeWithEchipament[] =
+    await prisma.equipmentChange.findMany({
+      where: {
+        angajatId,
+        includedInPV: false,
+      },
+      include: { echipament: true },
+    });
 
   if (!schimbari.length) return null;
 
   const echipamentePredateIds = schimbari
-    .filter((s) => s.tip === EquipmentChangeType.RETURN)
-    .map((s) => s.echipamentId);
+    .filter((schimbare) => schimbare.tip === EQUIPMENT_CHANGE_TYPE.RETURN)
+    .map((schimbare) => schimbare.echipamentId);
 
   const echipamentePrimiteIds = schimbari
     .filter(
-      (s) =>
-        s.tip === EquipmentChangeType.ASSIGN ||
-        s.tip === EquipmentChangeType.REPLACE
+      (schimbare) =>
+        schimbare.tip === EQUIPMENT_CHANGE_TYPE.ASSIGN ||
+        schimbare.tip === EQUIPMENT_CHANGE_TYPE.REPLACE
     )
-    .map((s) => s.echipamentId);
+    .map((schimbare) => schimbare.echipamentId);
 
-  const hasReplace = schimbari.some((s) => s.tip === EquipmentChangeType.REPLACE);
+  const hasReplace = schimbari.some(
+    (schimbare) => schimbare.tip === EQUIPMENT_CHANGE_TYPE.REPLACE
+  );
 
   let tip: ProcesVerbalTip = ProcesVerbalTip.PREDARE_PRIMIRE;
   if (echipamentePredateIds.length && echipamentePrimiteIds.length) {
@@ -137,7 +156,7 @@ export const creeazaProcesVerbalDinSchimbari = async (angajatId: string) => {
 
   return {
     pdfBuffer,
-    schimbariIds: schimbari.map((s) => s.id),
+    schimbariIds: schimbari.map((schimbare) => schimbare.id),
     procesVerbalId: procesVerbal.id,
   };
 };
