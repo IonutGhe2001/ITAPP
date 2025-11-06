@@ -17,6 +17,9 @@ import {
   PackageIcon,
 } from 'lucide-react';
 
+// Icon mapping for equipment types
+// Includes both Romanian and English terms for flexibility
+// Duplicate entries (e.g., 'tastatura' and 'keyboard') support bilingual usage
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   laptop: LaptopIcon,
   telefon: SmartphoneIcon,
@@ -27,7 +30,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   router: NetworkIcon,
   mouse: MouseIcon,
   tastatura: KeyboardIcon,
-  keyboard: KeyboardIcon,
+  keyboard: KeyboardIcon, // Duplicate for English support
   imprimanta: PrinterIcon,
   videoproiector: ProjectorIcon,
   projector: ProjectorIcon,

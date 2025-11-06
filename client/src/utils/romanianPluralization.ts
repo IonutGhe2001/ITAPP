@@ -12,7 +12,7 @@ export function romanianPlural(count: number, singular: string, plural: string):
 /**
  * Formats a relative time string in Romanian
  * @param minutes - Number of minutes ago
- * @returns Formatted relative time string
+ * @returns Formatted relative time string, or empty string if time is too far in the past (caller should format as date)
  */
 export function formatRelativeTime(minutes: number): string {
   const ONE_HOUR = 60;
@@ -29,5 +29,5 @@ export function formatRelativeTime(minutes: number): string {
   if (days === 1) return 'Ieri';
   if (days < 7) return `Acum ${days} ${romanianPlural(days, 'zi', 'zile')}`;
   
-  return null; // Caller should format as date
+  return ''; // Return empty string when time is too far in past - caller should format as date
 }

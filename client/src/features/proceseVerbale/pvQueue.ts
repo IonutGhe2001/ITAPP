@@ -31,6 +31,9 @@ function writeQueue(items: PvQueueItem[]) {
 
 /**
  * Determines the appropriate PV type based on equipment being returned and received
+ * @param predate - Array of equipment IDs being returned/handed back
+ * @param primite - Array of equipment IDs being received/assigned
+ * @returns The appropriate ProcesVerbalTip for the transaction
  */
 function determinePvType(predate: string[], primite: string[]): ProcesVerbalTip {
   if (predate.length > 0 && primite.length > 0) {
