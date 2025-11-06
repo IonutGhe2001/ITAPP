@@ -1,7 +1,7 @@
 import React, { Suspense, useId, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { updateCurrentUser } from '@/services/authService';
-import { getUserMetrics, getUserActivity, getUserSessions } from '@/services/profileService';
+import { getUserMetrics, getUserSessions } from '@/services/profileService';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '@/context/useUser';
 import type { User } from '@/types/user';
@@ -35,17 +35,39 @@ export default function ProfilePage() {
   const fileInputId = useId();
   const fullName = [user?.nume, user?.prenume].filter(Boolean).join(' ').trim();
 
+  // Extract city and county from location
+  const extractLocation = (locatie: string | null | undefined): string => {
+    if (!locatie) return '-';
+    // Assuming location format is "City, County" or similar
+    const parts = locatie.split(',').map(part => part.trim());
+    return parts.join(', ');
+  };
+
+  const formatLastLogin = (lastLogin: string | null | undefined): string => {
+    if (!lastLogin) return '-';
+    const date = new Date(lastLogin);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    const ONE_MINUTE = 1;
+    const ONE_HOUR = 60;
+    const TWO_HOURS = 120;
+    const ONE_DAY = 1440;
+    
+    if (diffMins < ONE_MINUTE) return 'Acum';
+    if (diffMins < ONE_HOUR) return `Acum ${diffMins} minute`;
+    if (diffMins < TWO_HOURS) return 'Acum 1 oră';
+    if (diffMins < ONE_DAY) return `Acum ${Math.floor(diffMins / ONE_HOUR)} ore`;
+    
+    return date.toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });
+  };
+
   // Fetch profile data from API
   const metricsQuery = useQuery({
     queryKey: ['profile', 'metrics'],
     queryFn: getUserMetrics,
     staleTime: 60_000,
-  });
-
-  const activityQuery = useQuery({
-    queryKey: ['profile', 'activity', 5],
-    queryFn: () => getUserActivity(5),
-    staleTime: 30_000,
   });
 
   const sessionsQuery = useQuery({
@@ -55,7 +77,6 @@ export default function ProfilePage() {
   });
 
   const kpiMetrics = metricsQuery.data ?? [];
-  const recentActivities = activityQuery.data ?? [];
   const activeSessions = sessionsQuery.data ?? [];
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,16 +135,16 @@ export default function ProfilePage() {
 
   const metaItems = [
     {
-      label: t('profile.meta.department', { defaultValue: 'Department' }),
-      value: user?.functie || '-',
+      label: t('profile.meta.department', { defaultValue: 'Departament' }),
+      value: user?.departament || user?.functie || '-',
     },
     {
-      label: t('profile.meta.location', { defaultValue: 'Location' }),
-      value: 'Bucharest HQ',
+      label: t('profile.meta.location', { defaultValue: 'Locație' }),
+      value: extractLocation(user?.locatie),
     },
     {
-      label: t('profile.meta.lastLogin', { defaultValue: 'Last login' }),
-      value: 'Today, 09:24',
+      label: t('profile.meta.lastLogin', { defaultValue: 'Ultima autentificare' }),
+      value: formatLastLogin(user?.lastLogin),
     },
   ];
 
@@ -217,19 +238,19 @@ export default function ProfilePage() {
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="border-border/60 justify-start gap-2 rounded-none border-b bg-transparent p-0">
             <TabsTrigger value="overview" className="rounded-full px-4 py-2 text-sm">
-              Overview
+              Prezentare generală
             </TabsTrigger>
             <TabsTrigger value="details" className="rounded-full px-4 py-2 text-sm">
-              Details
+              Detalii
             </TabsTrigger>
             <TabsTrigger value="security" className="rounded-full px-4 py-2 text-sm">
-              Security
+              Securitate
             </TabsTrigger>
             <TabsTrigger value="devices" className="rounded-full px-4 py-2 text-sm">
-              Devices
+              Dispozitive
             </TabsTrigger>
             <TabsTrigger value="activity" className="rounded-full px-4 py-2 text-sm">
-              Activity
+              Activitate
             </TabsTrigger>
           </TabsList>
           <TabsContent value="overview" className="space-y-6">
@@ -305,41 +326,13 @@ export default function ProfilePage() {
                     )}
                   </div>
                 </section>
-
-                <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
-                  <header className="mb-4 flex items-center justify-between">
-                    <h2 className="text-lg font-semibold">
-                      {t('profile.sections.preferences', { defaultValue: 'Preferences' })}
-                    </h2>
-                  </header>
-                  <div className="space-y-4">
-                    <PreferenceRow
-                      label={t('profile.preferences.language', { defaultValue: 'Language' })}
-                      value="English (US)"
-                    />
-                    <PreferenceRow
-                      label={t('profile.preferences.timezone', { defaultValue: 'Timezone' })}
-                      value="GMT+02:00"
-                    />
-                    <PreferenceToggle
-                      label={t('profile.preferences.theme', { defaultValue: 'Dark theme' })}
-                      active
-                    />
-                    <PreferenceToggle
-                      label={t('profile.preferences.notifications', {
-                        defaultValue: 'Notifications',
-                      })}
-                      active
-                    />
-                  </div>
-                </section>
               </div>
 
               <div className="space-y-6 lg:col-span-4">
                 <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
                   <header className="mb-4">
                     <h2 className="text-lg font-semibold">
-                      {t('profile.sections.kpi', { defaultValue: 'Key metrics' })}
+                      {t('profile.sections.kpi', { defaultValue: 'Metrici cheie' })}
                     </h2>
                   </header>
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -353,51 +346,32 @@ export default function ProfilePage() {
                     ))}
                   </div>
                 </section>
+                </div>
+            </div>
 
                 <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
-                  <header className="mb-4">
-                    <h2 className="text-lg font-semibold">
-                      {t('profile.sections.recentActivity', { defaultValue: 'Recent activity' })}
-                    </h2>
-                  </header>
-                  <div className="h-[280px] overflow-y-auto pr-1">
-                    <ul className="space-y-4">
-                      {recentActivities.map((activity) => (
-                        <li
-                          key={activity.title}
-                          className="border-border/50 bg-background/60 rounded-lg border p-4"
-                        >
-                          <p className="text-foreground text-sm font-medium">{activity.title}</p>
-                          <p className="text-muted-foreground text-xs">{activity.time}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </section>
-
-                <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
-                  <header className="mb-4 flex items-center justify-between">
-                    <h2 className="text-lg font-semibold">
-                      {t('profile.sections.sessions', { defaultValue: 'Active sessions' })}
-                    </h2>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      className="focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2"
-                    >
-                      {t('profile.buttons.signOutOthers', { defaultValue: 'Sign out others' })}
-                    </Button>
-                  </header>
-                  <div className="border-border/50 overflow-hidden rounded-xl border">
-                    <table className="min-w-full text-left text-sm">
-                      <thead className="bg-muted/40 text-muted-foreground">
-                        <tr>
-                          <th className="px-4 py-3 font-medium">Device</th>
-                          <th className="px-4 py-3 font-medium">Location</th>
-                          <th className="px-4 py-3 font-medium">Last active</th>
-                        </tr>
-                      </thead>
+              <header className="mb-4 flex items-center justify-between">
+                <h2 className="text-lg font-semibold">
+                  {t('profile.sections.sessions', { defaultValue: 'Sesiuni active' })}
+                </h2>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2"
+                >
+                  {t('profile.buttons.signOutOthers', { defaultValue: 'Deconectează-te de pe celelalte' })}
+                </Button>
+              </header>
+              <div className="border-border/50 overflow-hidden rounded-xl border">
+                <table className="min-w-full text-left text-sm">
+                  <thead className="bg-muted/40 text-muted-foreground">
+                    <tr>
+                      <th className="px-4 py-3 font-medium">Dispozitiv</th>
+                      <th className="px-4 py-3 font-medium">Locație</th>
+                      <th className="px-4 py-3 font-medium">Ultima activitate</th>
+                    </tr>
+                  </thead>
                       <tbody>
                         {activeSessions.map((session) => (
                           <tr key={session.device} className="border-border/40 border-t">
@@ -412,8 +386,6 @@ export default function ProfilePage() {
                     </table>
                   </div>
                 </section>
-              </div>
-            </div>
           </TabsContent>
           <TabsContent value="details">
             <div className="border-border/60 bg-card/90 text-muted-foreground rounded-2xl border p-6 text-sm shadow-sm">
@@ -477,6 +449,11 @@ export default function ProfilePage() {
                 value={user?.telefon || ''}
                 onChange={handleChange('telefon')}
               />
+              <ProfileInput
+                label={t('profile.meta.department', { defaultValue: 'Departament' })}
+                value={user?.departament || ''}
+                onChange={handleChange('departament')}
+              />
             </div>
             <div className="border-border/60 bg-card/90 rounded-2xl border p-4 shadow-sm">
               <h3 className="text-sm font-semibold">
@@ -500,29 +477,6 @@ export default function ProfilePage() {
                     }}
                   />
                 </Suspense>
-              </div>
-            </div>
-            <div className="border-border/60 bg-card/90 rounded-2xl border p-4 shadow-sm">
-              <h3 className="text-sm font-semibold">
-                {t('profile.sections.preferences', { defaultValue: 'Preferences' })}
-              </h3>
-              <div className="mt-4 space-y-4">
-                <PreferenceRow
-                  label={t('profile.preferences.language', { defaultValue: 'Language' })}
-                  value="English (US)"
-                />
-                <PreferenceRow
-                  label={t('profile.preferences.timezone', { defaultValue: 'Timezone' })}
-                  value="GMT+02:00"
-                />
-                <PreferenceToggle
-                  label={t('profile.preferences.theme', { defaultValue: 'Dark theme' })}
-                  active
-                />
-                <PreferenceToggle
-                  label={t('profile.preferences.notifications', { defaultValue: 'Notifications' })}
-                  active
-                />
               </div>
             </div>
           </div>
@@ -607,38 +561,6 @@ function DefinitionItem({ label, value }: { label: string; value?: string }) {
     <div className="border-border/40 bg-background/80 rounded-xl border p-4">
       <dt className="text-muted-foreground text-xs uppercase tracking-wide">{label}</dt>
       <dd className="text-foreground mt-1 text-sm font-medium">{value || '-'}</dd>
-    </div>
-  );
-}
-
-function PreferenceRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="border-border/40 bg-background/80 flex items-center justify-between rounded-xl border px-4 py-3">
-      <p className="text-foreground text-sm font-medium">{label}</p>
-      <span className="bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
-        {value}
-      </span>
-    </div>
-  );
-}
-
-function PreferenceToggle({ label, active }: { label: string; active?: boolean }) {
-  return (
-    <div className="border-border/40 bg-background/80 flex items-center justify-between rounded-xl border px-4 py-3">
-      <p className="text-foreground text-sm font-medium">{label}</p>
-      <span
-        className={`relative inline-flex h-6 w-12 items-center rounded-full border transition-colors ${
-          active ? 'border-primary bg-primary/80' : 'border-border bg-muted'
-        }`}
-        role="switch"
-        aria-checked={active}
-      >
-        <span
-          className={`bg-background inline-block h-4 w-4 rounded-full transition-transform duration-200 ${
-            active ? 'translate-x-6' : 'translate-x-2'
-          }`}
-        />
-      </span>
     </div>
   );
 }
