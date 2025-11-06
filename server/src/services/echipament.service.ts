@@ -126,7 +126,7 @@ export async function getEchipamente(
   return { items, total };
 }
 
-export const getEquipmentTypes = async (): Promise<string[]> => {
+export async function getEquipmentTypes(): Promise<string[]> {
   const rows = await prisma.echipament.findMany({
     distinct: ["tip"],
     select: { tip: true },
@@ -136,9 +136,15 @@ export const getEquipmentTypes = async (): Promise<string[]> => {
   const unique = new Map<string, string>();
 
   rows.forEach(({ tip }: { tip: string | null }) => {
-    if (!tip) return;
+    if (!tip) {
+      return;
+    }
+
     const trimmed = tip.trim();
-    if (!trimmed) return;
+    if (!trimmed) {
+      return;
+    }
+
     const key = trimmed.toLowerCase();
     if (!unique.has(key)) {
       unique.set(key, trimmed);
@@ -146,7 +152,7 @@ export const getEquipmentTypes = async (): Promise<string[]> => {
   });
 
   return Array.from(unique.values());
-};
+}
 
 // Fetch a single equipment entry along with its assigned employee
 export const getEchipament = async (id: string) => {
