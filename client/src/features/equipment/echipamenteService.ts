@@ -154,6 +154,14 @@ export const useEchipament = (id: string) => {
   });
 };
 
+export const useEquipmentTypes = (options?: { enabled?: boolean }) =>
+  useQuery<string[]>({
+    queryKey: [...QUERY_KEYS.EQUIPMENT, "types"],
+    queryFn: () => http.get<string[]>("/echipamente/types"),
+    staleTime: 5 * 60_000,
+    enabled: options?.enabled ?? true,
+  });
+
 export const useCreateEchipament = () => {
   const queryClient = useQueryClient();
   return useMutation({

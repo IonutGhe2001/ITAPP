@@ -7,6 +7,8 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ROUTES } from '@/constants/routes';
+import { useToast } from '@/hooks/use-toast/use-toast-hook';
+import { genereazaProcesVerbal } from '@/features/proceseVerbale/proceseVerbaleService';
 
 import {
   createEvent,
@@ -32,7 +34,8 @@ import { CalendarCompact } from './components/CalendarCompact';
 import { QuickActionsCompact } from './components/QuickActionsCompact';
 
 const EquipmentStatusChart = lazy(() => import('./components/EquipmentStatusChart'));
-const ModalProcesVerbal = lazy(() => import('./modals/ModalProcesVerbal'));
+
+const READ_ALERTS_STORAGE_KEY = 'dashboard.readAlerts';
 
 const KPI_CONFIG = [
   { key: 'total', label: 'Total echipamente', href: ROUTES.EQUIPMENT },
@@ -62,11 +65,25 @@ const KPI_SKELETONS = Array.from({ length: 4 });
 const ALERT_SKELETONS = Array.from({ length: 3 });
 
 export default function Dashboard() {
+  const { toast } = useToast();
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const quickActionsRef = useRef<HTMLDivElement | null>(null);
   const [quickActionsHeight, setQuickActionsHeight] = useState<number>();
-  const [showPVModal, setShowPVModal] = useState(false);
+  const [generatingPvId, setGeneratingPvId] = useState<string | null>(null);
+  const [isGeneratingAll, setIsGeneratingAll] = useState(false);
+  const [readAlertIds, setReadAlertIds] = useState<Set<string>>(() => {
+    if (typeof window === 'undefined') return new Set<string>();
+    try {
+      const raw = window.localStorage.getItem(READ_ALERTS_STORAGE_KEY);
+      if (!raw) return new Set<string>();
+      const parsed = JSON.parse(raw) as string[];
+      return new Set(parsed.filter((value) => typeof value === 'string'));
+    } catch (error) {
+      console.warn('Nu am putut citi alertele citite din localStorage.', error);
+      return new Set<string>();
+    }
+  });
   const queryClient = useQueryClient();
 
   const overviewQuery = useQuery<OverviewStatsResponse>({
@@ -92,6 +109,14 @@ export default function Dashboard() {
     queryFn: () => getPvQueue(10),
     staleTime: 30_000,
   });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(
+      READ_ALERTS_STORAGE_KEY,
+      JSON.stringify(Array.from(readAlertIds))
+    );
+  }, [readAlertIds]);
 
   const monthRange = useMemo(() => {
     const start = startOfMonth(currentMonth);
@@ -154,8 +179,22 @@ export default function Dashboard() {
     });
   }, [overviewQuery.data]);
 
-  const alerts = useMemo(() => alertsQuery.data ?? [], [alertsQuery.data]);
+  const alerts = useMemo(() => {
+    const list = alertsQuery.data ?? [];
+    if (!list.length) return [] as Alert[];
+    return list.filter((alert) => !readAlertIds.has(alert.id));
+  }, [alertsQuery.data, readAlertIds]);
   const pvQueueItems = useMemo(() => pvQueueQuery.data ?? [], [pvQueueQuery.data]);
+
+  const handleReadAllAlerts = () => {
+    const current = alertsQuery.data ?? [];
+    if (!current.length) return;
+    setReadAlertIds((prev) => {
+      const next = new Set(prev);
+      current.forEach((alert) => next.add(alert.id));
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -219,9 +258,83 @@ export default function Dashboard() {
     ? (deleteEventMutation.variables ?? null)
     : null;
 
-  const handleGeneratePv = (item: PvQueueItem) => {
-    console.info('Generează PV pentru', item.employee, 'și', item.equipment);
-    setShowPVModal(true);
+  const sanitizeFileName = (value: string) =>
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/gi, '-')
+      .replace(/^-+|-+$/g, '') || 'proces-verbal';
+
+  const downloadPdf = (objectUrl: string, fileName: string) => {
+    if (typeof window === 'undefined') {
+      URL.revokeObjectURL(objectUrl);
+      return;
+    }
+
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.setTimeout(() => {
+      URL.revokeObjectURL(objectUrl);
+    }, 2000);
+  };
+
+  const handleGeneratePv = async (item: PvQueueItem) => {
+    try {
+      setGeneratingPvId(item.id);
+      const objectUrl = await genereazaProcesVerbal(item.employeeId, 'PREDARE_PRIMIRE', {
+        fromChanges: true,
+      });
+      const fileName = `pv-${sanitizeFileName(item.employee)}.pdf`;
+      downloadPdf(objectUrl, fileName);
+      toast({
+        title: 'Proces verbal generat',
+        description: `Documentul pentru ${item.employee} a fost descărcat.`,
+      });
+    } catch (error) {
+      console.error('Eroare la generarea procesului verbal', error);
+      toast({
+        title: 'Eroare la generare',
+        description: 'Nu am putut genera procesul verbal. Încearcă din nou.',
+        variant: 'destructive',
+      });
+    } finally {
+      setGeneratingPvId(null);
+      void queryClient.invalidateQueries({ queryKey: ['pv', 'queue'] });
+    }
+  };
+
+  const handleGenerateAllPv = async (queueItems: PvQueueItem[]) => {
+    if (!queueItems.length) return;
+    setIsGeneratingAll(true);
+    try {
+      for (const [index, item] of queueItems.entries()) {
+        setGeneratingPvId(item.id);
+        const objectUrl = await genereazaProcesVerbal(item.employeeId, 'PREDARE_PRIMIRE', {
+          fromChanges: true,
+        });
+        const fileName = `pv-${sanitizeFileName(item.employee)}-${index + 1}.pdf`;
+        downloadPdf(objectUrl, fileName);
+      }
+      toast({
+        title: 'Procese verbale generate',
+        description: `${queueItems.length} documente au fost descărcate.`,
+      });
+    } catch (error) {
+      console.error('Eroare la generarea proceselor verbale', error);
+      toast({
+        title: 'Eroare la generare',
+        description:
+          'Nu am putut genera toate procesele verbale din coadă. Verifică situația și încearcă din nou.',
+        variant: 'destructive',
+      });
+    } finally {
+      setGeneratingPvId(null);
+      setIsGeneratingAll(false);
+      void queryClient.invalidateQueries({ queryKey: ['pv', 'queue'] });
+    }
   };
 
   const handleCreateEvent = async (input: CalendarEventInput) => {
@@ -328,9 +441,20 @@ export default function Dashboard() {
                 Primești maximum trei alerte critice pentru inventar.
               </CardDescription>
             </div>
-            <Button type="button" variant="outline" size="sm" asChild>
-              <Link to={ROUTES.EQUIPMENT}>Vezi toate</Link>
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleReadAllAlerts}
+                disabled={alertsQuery.isLoading || alerts.length === 0}
+              >
+                Marchează toate ca citite
+              </Button>
+              <Button type="button" variant="outline" size="sm" asChild>
+                <Link to={ROUTES.EQUIPMENT}>Vezi toate</Link>
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="flex min-h-0 flex-1 flex-col space-y-3 p-4">
             {alertsQuery.isLoading ? (
@@ -375,6 +499,9 @@ export default function Dashboard() {
               items={pvQueueItems}
               isLoading={pvQueueQuery.isLoading}
               onGenerate={handleGeneratePv}
+              onGenerateAll={handleGenerateAllPv}
+              generatingId={generatingPvId}
+              isBulkGenerating={isGeneratingAll}
             />
           </CardContent>
         </Card>
@@ -401,10 +528,6 @@ export default function Dashboard() {
           className="h-full"
         />
       </section>
-
-       <Suspense fallback={null}>
-        {showPVModal && <ModalProcesVerbal onClose={() => setShowPVModal(false)} />}
-      </Suspense>
     </main>
   );
 }

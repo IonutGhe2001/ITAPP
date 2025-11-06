@@ -33,8 +33,21 @@ type Alert = {
   timestamp: string;
 };
 
+const STATUS_CATEGORY_MAP: Record<
+  string,
+  keyof Omit<EquipmentStatusRecord, "status">
+> = {
+  [EQUIPMENT_STATUS.IN_STOC]: "in_stock",
+  [EQUIPMENT_STATUS.ALOCAT]: "allocated",
+  [EQUIPMENT_STATUS.MENTENANTA]: "repair",
+  [EQUIPMENT_STATUS.IN_COMANDA]: "retired",
+  in_reparatie: "repair",
+  retras: "retired",
+};
+
 type PvQueueItem = {
   id: string;
+  employeeId: string;
   employee: string;
   equipment: string;
   allocationDate: string;
@@ -95,19 +108,19 @@ export const getOverviewStats = async (): Promise<OverviewStats> => {
 
   currentGrouped.forEach(
     ({ stare, _count }: { stare: string; _count: { stare: number } }) => {
-      if (stare === "in_stoc") currentCounts.in_stock = _count.stare;
-      else if (stare === "alocat") currentCounts.allocated = _count.stare;
-      else if (stare === "in_reparatie") currentCounts.repair = _count.stare;
-      else if (stare === "retras") currentCounts.retired = _count.stare;
+      const category = STATUS_CATEGORY_MAP[stare];
+      if (category) {
+        currentCounts[category] = _count.stare;
+      }
     }
   );
 
   previousGrouped.forEach(
     ({ stare, _count }: { stare: string; _count: { stare: number } }) => {
-      if (stare === "in_stoc") previousCounts.in_stock = _count.stare;
-      else if (stare === "alocat") previousCounts.allocated = _count.stare;
-      else if (stare === "in_reparatie") previousCounts.repair = _count.stare;
-      else if (stare === "retras") previousCounts.retired = _count.stare;
+      const category = STATUS_CATEGORY_MAP[stare];
+      if (category) {
+        previousCounts[category] = _count.stare;
+      }
     }
   );
 
@@ -167,11 +180,10 @@ export const getEquipmentStatusTimeline = async (): Promise<
     }
 
     const counts = typeMap.get(item.tip)!;
-
-    if (item.stare === "in_stoc") counts.in_stock = item._count.tip;
-    else if (item.stare === "alocat") counts.allocated = item._count.tip;
-    else if (item.stare === "in_reparatie") counts.repair = item._count.tip;
-    else if (item.stare === "retras") counts.retired = item._count.tip;
+    const category = STATUS_CATEGORY_MAP[item.stare];
+    if (category) {
+      counts[category] = item._count.tip;
+    }
   });
 
   // Convert to array format
@@ -270,7 +282,7 @@ export const getPvQueue = async (limit: number): Promise<PvQueueItem[]> => {
       tip: "ASSIGN",
     },
     include: {
-      angajat: true,
+      angajat: { include: { departmentConfig: true } },
       echipament: true,
     },
     take: limit,
@@ -286,10 +298,11 @@ export const getPvQueue = async (limit: number): Promise<PvQueueItem[]> => {
 
     return {
       id: change.id,
+      employeeId: change.angajatId,
       employee: change.angajat.numeComplet,
       equipment: `${change.echipament.nume} ${change.echipament.serie}`,
       allocationDate: change.createdAt.toISOString(),
-      location: "București - Sediu Central", // Could be enhanced with real location data
+      location: change.angajat.departmentConfig?.name ?? "București - Sediu Central",
       status: isOverdue ? ("overdue" as const) : ("pending" as const),
     };
   });

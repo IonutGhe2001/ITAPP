@@ -1,5 +1,6 @@
 import { prisma } from "../lib/prisma";
 import type { Echipament, EquipmentChange } from ".prisma/client";
+import { EQUIPMENT_STATUS } from "@shared/equipmentStatus";
 
 type UserMetric = {
   label: string;
@@ -12,8 +13,9 @@ type UserActivity = {
 };
 
 type UserSession = {
-  device: string;
-  location: string;
+  deviceName: string;
+  deviceType: string;
+  locationName: string;
   lastActive: string;
 };
 
@@ -145,16 +147,51 @@ export const getUserActivity = async (
   return activities;
 };
 
-export const getUserSessions = async (
-  _userId: number
-): Promise<UserSession[]> => {
-  // Note: This is a placeholder as we don't currently track user sessions in the database
-  // In a real implementation, you would store session data with device info, location, etc.
-  return [
-    {
-      device: "Current session",
-      location: "Current location",
-      lastActive: "Now",
+export const getUserSessions = async (userId: number): Promise<UserSession[]> => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true, locatie: true },
+  });
+
+  if (!user?.email) {
+    return [];
+  }
+
+  const angajat = await prisma.angajat.findFirst({
+    where: { email: user.email },
+    include: {
+      departmentConfig: true,
+      echipamente: {
+        where: { stare: EQUIPMENT_STATUS.ALOCAT },
+        include: {
+          changes: {
+            orderBy: { createdAt: "desc" },
+            take: 1,
+          },
+        },
+      },
     },
-  ];
+  });
+
+  if (!angajat) {
+    return [];
+  }
+
+  const fallbackLocation = user.locatie || undefined;
+  const locationName = angajat.departmentConfig?.name ?? fallbackLocation ?? "Nespecificat";
+
+  return angajat.echipamente.map((echipament) => {
+    const eqWithChanges = echipament as Echipament & {
+      changes?: (EquipmentChange & { createdAt: Date })[];
+    };
+    const lastChange = eqWithChanges.changes?.[0]?.createdAt;
+    const lastActiveDate = lastChange ?? eqWithChanges.createdAt;
+
+    return {
+      deviceName: eqWithChanges.nume,
+      deviceType: eqWithChanges.tip,
+      locationName,
+      lastActive: lastActiveDate.toISOString(),
+    } satisfies UserSession;
+  });
 };

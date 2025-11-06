@@ -70,7 +70,7 @@ export function QuickActions({ actions }: QuickActionsProps) {
             >
               <div className="flex items-start gap-3">
                 <span
-                  className="bg-primary/10 text-primary inline-flex size-10 items-center justify-center rounded-full"
+                  className="bg-primary/10 text-primary flex size-12 flex-shrink-0 items-center justify-center rounded-full"
                   aria-hidden
                 >
                   <Icon className="size-5 stroke-[1.5]" />

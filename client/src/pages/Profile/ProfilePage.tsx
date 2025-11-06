@@ -1,7 +1,7 @@
 import React, { Suspense, useId, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { updateCurrentUser } from '@/services/authService';
-import { getUserMetrics, getUserSessions } from '@/services/profileService';
+import { getUserSessions } from '@/services/profileService';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '@/context/useUser';
 import type { User } from '@/types/user';
@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const SignatureEditor = React.lazy(() => import('@/components/SignatureEditor'));
 
@@ -63,12 +62,18 @@ export default function ProfilePage() {
     return date.toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
-  // Fetch profile data from API
-  const metricsQuery = useQuery({
-    queryKey: ['profile', 'metrics'],
-    queryFn: getUserMetrics,
-    staleTime: 60_000,
-  });
+  const formatSessionLastActive = (value: string | null | undefined): string => {
+    if (!value) return '-';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return date.toLocaleString('ro-RO', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
   const sessionsQuery = useQuery({
     queryKey: ['profile', 'sessions'],
@@ -76,8 +81,8 @@ export default function ProfilePage() {
     staleTime: 30_000,
   });
 
-  const kpiMetrics = metricsQuery.data ?? [];
   const activeSessions = sessionsQuery.data ?? [];
+  const isLoadingSessions = sessionsQuery.isLoading;
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -235,122 +240,83 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="border-border/60 justify-start gap-2 rounded-none border-b bg-transparent p-0">
-            <TabsTrigger value="overview" className="rounded-full px-4 py-2 text-sm">
-              Prezentare generală
-            </TabsTrigger>
-            <TabsTrigger value="details" className="rounded-full px-4 py-2 text-sm">
-              Detalii
-            </TabsTrigger>
-            <TabsTrigger value="security" className="rounded-full px-4 py-2 text-sm">
-              Securitate
-            </TabsTrigger>
-            <TabsTrigger value="devices" className="rounded-full px-4 py-2 text-sm">
-              Dispozitive
-            </TabsTrigger>
-            <TabsTrigger value="activity" className="rounded-full px-4 py-2 text-sm">
-              Activitate
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid gap-6 lg:grid-cols-12">
-              <div className="space-y-6 lg:col-span-8">
-                <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
-                  <header className="mb-4 flex items-center justify-between">
-                    <h2 className="text-lg font-semibold">
-                      {t('profile.sections.contact', { defaultValue: 'Contact & Organization' })}
-                    </h2>
-                  </header>
-                  <dl className="grid gap-4 sm:grid-cols-2">
-                    <DefinitionItem label={t('profile.labels.fullName')} value={fullName || '-'} />
-                    <DefinitionItem
-                      label={t('profile.labels.position')}
-                      value={user?.functie || '-'}
-                    />
-                    <DefinitionItem label={t('profile.labels.email')} value={user?.email || '-'} />
-                    <DefinitionItem
-                      label={t('profile.labels.phone')}
-                      value={user?.telefon || '-'}
-                    />
-                  </dl>
-                </section>
-
-                <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
-                  <header className="mb-4 flex items-center justify-between">
-                    <div>
-                      <h2 className="text-lg font-semibold">
-                        {t('profile.labels.digitalSignature', {
-                          defaultValue: 'Digital signature',
-                        })}
-                      </h2>
-                      <p className="text-muted-foreground text-sm">
-                        {t('profile.signature.description', {
-                          defaultValue: 'Preview of your current digital signature.',
-                        })}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setIsEditing(true)}
-                        className="focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2"
-                      >
-                        {t('profile.buttons.replace', { defaultValue: 'Replace' })}
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2"
-                      >
-                        {t('profile.buttons.download', { defaultValue: 'Download' })}
-                      </Button>
-                    </div>
-                  </header>
-                  <div className="border-border/60 bg-muted/20 flex h-48 items-center justify-center rounded-xl border border-dashed">
-                    {user?.digitalSignature ? (
-                      <img
-                        src={user.digitalSignature}
-                        alt={t('profile.labels.digitalSignature', {
-                          defaultValue: 'Digital signature',
-                        })}
-                        className="max-h-32 object-contain"
-                      />
-                    ) : (
-                      <p className="text-muted-foreground text-sm">
-                        {t('profile.signature.empty', { defaultValue: 'No signature on file.' })}
-                      </p>
-                    )}
-                  </div>
-                </section>
-              </div>
-
-              <div className="space-y-6 lg:col-span-4">
-                <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
-                  <header className="mb-4">
-                    <h2 className="text-lg font-semibold">
-                      {t('profile.sections.kpi', { defaultValue: 'Metrici cheie' })}
-                    </h2>
-                  </header>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    {kpiMetrics.map((metric) => (
-                      <div key={metric.label} className="bg-muted/20 rounded-xl p-4">
-                        <p className="text-muted-foreground text-xs uppercase">{metric.label}</p>
-                        <p className="text-foreground mt-2 text-2xl font-semibold">
-                          {metric.value}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-                </div>
-            </div>
-
-                <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
+        <div className="grid gap-6 lg:grid-cols-12">
+          <div className="space-y-6 lg:col-span-7 xl:col-span-8">
+            <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
               <header className="mb-4 flex items-center justify-between">
+                <h2 className="text-lg font-semibold">
+                  {t('profile.sections.contact', { defaultValue: 'Contact & Organization' })}
+                </h2>
+              </header>
+              <dl className="grid gap-4 sm:grid-cols-2">
+                <DefinitionItem label={t('profile.labels.fullName')} value={fullName || '-'} />
+                <DefinitionItem
+                  label={t('profile.labels.position')}
+                  value={user?.functie || '-'}
+                />
+                <DefinitionItem label={t('profile.labels.email')} value={user?.email || '-'} />
+                <DefinitionItem
+                  label={t('profile.labels.phone')}
+                  value={user?.telefon || '-'}
+                />
+              </dl>
+            </section>
+
+              <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
+              <header className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold">
+                    {t('profile.labels.digitalSignature', {
+                      defaultValue: 'Digital signature',
+                    })}
+                  </h2>
+                  <p className="text-muted-foreground text-sm">
+                    {t('profile.signature.description', {
+                      defaultValue: 'Preview of your current digital signature.',
+                    })}
+                  </p>
+                </div>
+            <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsEditing(true)}
+                    className="focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2"
+                  >
+                    {t('profile.buttons.replace', { defaultValue: 'Replace' })}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2"
+                  >
+                    {t('profile.buttons.download', { defaultValue: 'Download' })}
+                  </Button>
+                </div>
+              </header>
+              <div className="border-border/60 bg-muted/20 flex h-48 items-center justify-center rounded-xl border border-dashed">
+                {user?.digitalSignature ? (
+                  <img
+                    src={user.digitalSignature}
+                    alt={t('profile.labels.digitalSignature', {
+                      defaultValue: 'Digital signature',
+                    })}
+                    className="max-h-32 object-contain"
+                  />
+                ) : (
+                  <p className="text-muted-foreground text-sm">
+                    {t('profile.signature.empty', { defaultValue: 'No signature on file.' })}
+                  </p>
+                )}
+              </div>
+            </section>
+          </div>
+
+                <div className="space-y-6 lg:col-span-5 xl:col-span-4">
+            <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
+              <header className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-lg font-semibold">
                   {t('profile.sections.sessions', { defaultValue: 'Sesiuni active' })}
                 </h2>
@@ -364,54 +330,47 @@ export default function ProfilePage() {
                 </Button>
               </header>
               <div className="border-border/50 overflow-hidden rounded-xl border">
-                <table className="min-w-full text-left text-sm">
-                  <thead className="bg-muted/40 text-muted-foreground">
-                    <tr>
-                      <th className="px-4 py-3 font-medium">Dispozitiv</th>
-                      <th className="px-4 py-3 font-medium">Locație</th>
-                      <th className="px-4 py-3 font-medium">Ultima activitate</th>
-                    </tr>
-                  </thead>
-                      <tbody>
-                        {activeSessions.map((session) => (
-                          <tr key={session.device} className="border-border/40 border-t">
-                            <td className="px-4 py-3">{session.device}</td>
-                            <td className="text-muted-foreground px-4 py-3">{session.location}</td>
-                            <td className="text-muted-foreground px-4 py-3">
-                              {session.lastActive}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                {isLoadingSessions ? (
+                  <div className="space-y-2 p-4" aria-hidden>
+                    {Array.from({ length: 3 }).map((_, index) => (
+                      <div key={index} className="bg-muted/30 h-10 animate-pulse rounded-md" />
+                    ))}
                   </div>
-                </section>
-          </TabsContent>
-          <TabsContent value="details">
-            <div className="border-border/60 bg-card/90 text-muted-foreground rounded-2xl border p-6 text-sm shadow-sm">
-              {t('profile.tabs.details', {
-                defaultValue: 'Detailed profile information will appear here.',
-              })}
-            </div>
-          </TabsContent>
-          <TabsContent value="security">
-            <div className="border-border/60 bg-card/90 text-muted-foreground rounded-2xl border p-6 text-sm shadow-sm">
-              {t('profile.tabs.security', { defaultValue: 'Security settings overview.' })}
-            </div>
-          </TabsContent>
-          <TabsContent value="devices">
-            <div className="border-border/60 bg-card/90 text-muted-foreground rounded-2xl border p-6 text-sm shadow-sm">
-              {t('profile.tabs.devices', {
-                defaultValue: 'Connected devices and enrollment status.',
-              })}
-            </div>
-          </TabsContent>
-          <TabsContent value="activity">
-            <div className="border-border/60 bg-card/90 text-muted-foreground rounded-2xl border p-6 text-sm shadow-sm">
-              {t('profile.tabs.activity', { defaultValue: 'Full activity log and audit trail.' })}
-            </div>
-          </TabsContent>
-        </Tabs>
+                ) : activeSessions.length ? (
+                  <table className="min-w-full text-left text-sm">
+                    <thead className="bg-muted/40 text-muted-foreground">
+                      <tr>
+                        <th className="px-4 py-3 font-medium">Dispozitiv</th>
+                        <th className="px-4 py-3 font-medium">Tip</th>
+                        <th className="px-4 py-3 font-medium">Locație</th>
+                        <th className="px-4 py-3 font-medium">Ultima activitate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {activeSessions.map((session) => (
+                        <tr
+                          key={`${session.deviceName}-${session.lastActive}`}
+                          className="border-border/40 border-t"
+                        >
+                          <td className="px-4 py-3 font-medium">{session.deviceName}</td>
+                          <td className="text-muted-foreground px-4 py-3">{session.deviceType}</td>
+                          <td className="text-muted-foreground px-4 py-3">{session.locationName}</td>
+                          <td className="text-muted-foreground px-4 py-3">
+                            {formatSessionLastActive(session.lastActive)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <p className="text-muted-foreground px-4 py-6 text-sm">
+                    {t('profile.sessions.empty', { defaultValue: 'Nu există sesiuni active înregistrate.' })}
+                  </p>
+                )}
+              </div>
+            </section>
+          </div>
+        </div>
       </div>
 
       <Dialog
@@ -453,6 +412,11 @@ export default function ProfilePage() {
                 label={t('profile.meta.department', { defaultValue: 'Departament' })}
                 value={user?.departament || ''}
                 onChange={handleChange('departament')}
+              />
+              <ProfileInput
+                label={t('profile.meta.location', { defaultValue: 'Locație' })}
+                value={user?.locatie || ''}
+                onChange={handleChange('locatie')}
               />
             </div>
             <div className="border-border/60 bg-card/90 rounded-2xl border p-4 shadow-sm">

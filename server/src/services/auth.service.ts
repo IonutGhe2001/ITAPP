@@ -66,6 +66,8 @@ export interface UserUpdateData {
   prenume?: string;
   functie?: string;
   telefon?: string;
+  departament?: string | null;
+  locatie?: string | null;
   profilePicture?: string | null;
   digitalSignature?: string | null;
 }
@@ -88,8 +90,11 @@ export const getUserById = (id: number) => {
       prenume: true,
       functie: true,
       telefon: true,
+      departament: true,
+      locatie: true,
       profilePicture: true,
       digitalSignature: true,
+      lastLogin: true,
     },
   });
 };

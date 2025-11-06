@@ -6,6 +6,7 @@ import {
   useEchipamente,
   useDeleteEchipament,
   useUpdateEchipament,
+  useEquipmentTypes,
   ModalEditEchipament,
   ModalPredaEchipament,
 } from '@/features/equipment';
@@ -46,6 +47,14 @@ const EQUIPMENT_STATUS_OPTIONS = [
   { value: 'mentenanta', label: 'În mentenanță' },
   { value: 'in_comanda', label: 'În comandă' },
 ];
+
+const TYPE_EMPTY_VALUE = 'all';
+
+const formatTypeLabel = (value: string) => {
+  const trimmed = value.trim();
+  if (!trimmed) return 'Necunoscut';
+  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+};
 
 const DEFAULT_ROW_HEIGHT = 72;
 const TABLE_HEADER_HEIGHT = 56;
@@ -92,7 +101,7 @@ export default function Echipamente() {
 
   const [search, setSearch] = useState(() => searchParams.get('q') ?? '');
   const [status, setStatus] = useState(() => searchParams.get('status') ?? '');
-  const [type] = useState(() => searchParams.get('type') ?? '');
+  const [type, setType] = useState(() => searchParams.get('type') ?? '');
   const [sort, setSort] = useState<EquipmentSortOption>(() =>
     parseSortParam(searchParams.get('sort'))
   );
@@ -114,6 +123,38 @@ export default function Echipamente() {
     pageSize: 30,
     enabled: queryEnabled,
   });
+
+  const {
+    data: fetchedTypes = [],
+    isLoading: isLoadingTypes,
+  } = useEquipmentTypes({ enabled: queryEnabled });
+
+  const availableTypes = useMemo(() => {
+    const values = new Map<string, string>();
+    fetchedTypes.forEach((item) => {
+      if (!item) return;
+      const trimmed = item.trim();
+      if (!trimmed) return;
+      const key = trimmed.toLowerCase();
+      if (!values.has(key)) {
+        values.set(key, trimmed);
+      }
+    });
+
+    if (type) {
+      const trimmed = type.trim();
+      if (trimmed) {
+        const key = trimmed.toLowerCase();
+        if (!values.has(key)) {
+          values.set(key, trimmed);
+        }
+      }
+    }
+
+    return Array.from(values.values()).sort((a, b) =>
+      a.localeCompare(b, 'ro-RO', { sensitivity: 'base' })
+    );
+  }, [fetchedTypes, type]);
 
   const [selected, setSelected] = useState<(Echipament & { __editMode?: boolean }) | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -576,6 +617,31 @@ export default function Echipamente() {
                     </span>
                   )}
                 </div>
+                </div>
+
+              <div>
+                <Select
+                  value={type ? type : TYPE_EMPTY_VALUE}
+                  onValueChange={(value) => setType(value === TYPE_EMPTY_VALUE ? '' : value)}
+                  disabled={isLoadingTypes && availableTypes.length === 0}
+                >
+                  <SelectTrigger className="h-11 w-full rounded-xl border border-slate-300 bg-white text-sm font-medium hover:border-slate-400">
+                    <SelectValue placeholder="Tip echipament" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border border-slate-200 bg-white">
+                    <SelectItem value={TYPE_EMPTY_VALUE}>Toate tipurile</SelectItem>
+                    {availableTypes.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {formatTypeLabel(option)}
+                      </SelectItem>
+                    ))}
+                    {!isLoadingTypes && availableTypes.length === 0 ? (
+                      <SelectItem value="__empty" disabled>
+                        Nicio categorie disponibilă
+                      </SelectItem>
+                    ) : null}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>

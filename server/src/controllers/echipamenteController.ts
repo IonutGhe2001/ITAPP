@@ -8,6 +8,7 @@ import {
   getStats as getStatsService,
   getAvailableStock as getAvailableStockService,
   orderEchipament as orderEchipamentService,
+  getEquipmentTypes as getEquipmentTypesService,
   type GetEchipamenteParams,
 } from "../services/echipament.service";
 import { emitUpdate } from "../lib/websocket";
@@ -173,6 +174,19 @@ export const getAvailableStock = async (
   try {
     const stock = await getAvailableStockService();
     res.json(stock);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getEquipmentTypes = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const types = await getEquipmentTypesService();
+    res.json(types);
   } catch (err) {
     next(err);
   }

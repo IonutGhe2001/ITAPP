@@ -11,8 +11,9 @@ export type UserActivity = {
 };
 
 export type UserSession = {
-  device: string;
-  location: string;
+  deviceName: string;
+  deviceType: string;
+  locationName: string;
   lastActive: string;
 };
 

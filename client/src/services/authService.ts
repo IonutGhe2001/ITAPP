@@ -19,6 +19,8 @@ export const updateCurrentUser = async (
     prenume: string;
     functie: string;
     telefon?: string;
+    departament?: string | null;
+    locatie?: string | null;
     profilePicture?: string | null;
     digitalSignature?: string | null;
   }>

@@ -62,16 +62,36 @@ export const getMe = async (req: Request, res: Response) => {
 
 export const updateMe = async (req: Request, res: Response) => {
   const userId = req.user!.id;
-  const { nume, prenume, functie, telefon, profilePicture, digitalSignature } =
-    req.body;
+  const {
+    nume,
+    prenume,
+    functie,
+    telefon,
+    departament,
+    locatie,
+    profilePicture,
+    digitalSignature,
+  } = req.body;
   const updateData: UserUpdateData = {
     nume,
     prenume,
     functie,
     telefon,
+    departament,
+    locatie,
     profilePicture,
     digitalSignature,
   };
+
+  if (typeof updateData.departament === "string") {
+    const trimmed = updateData.departament.trim();
+    updateData.departament = trimmed ? trimmed : null;
+  }
+
+  if (typeof updateData.locatie === "string") {
+    const trimmed = updateData.locatie.trim();
+    updateData.locatie = trimmed ? trimmed : null;
+  }
   Object.keys(updateData).forEach((key) => {
     const typedKey = key as keyof UserUpdateData;
     if (updateData[typedKey] === undefined || updateData[typedKey] === "") {

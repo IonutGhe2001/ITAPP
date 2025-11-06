@@ -79,6 +79,7 @@ router.get(
 );
 router.get("/stats", controller.getStats);
 router.get("/stock", controller.getAvailableStock);
+router.get("/types", controller.getEquipmentTypes);
 router.get("/export", controller.exportEchipamente);
 router.post("/order", authorizeRoles("admin"), controller.orderEchipament);
 router.get("/documents/:docId", docController.downloadDocument);

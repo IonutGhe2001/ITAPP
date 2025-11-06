@@ -33,6 +33,7 @@ export type Alert = {
 
 export type PvQueueItem = {
   id: string;
+  employeeId: string;
   employee: string;
   equipment: string;
   allocationDate: string;

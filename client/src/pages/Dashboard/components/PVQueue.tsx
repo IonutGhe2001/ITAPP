@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { ro } from 'date-fns/locale';
-import { AlertTriangle, FileText } from 'lucide-react';
+import { AlertTriangle, FileText, Loader2 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,9 @@ interface PvQueueProps {
   items: PvQueueItem[];
   isLoading?: boolean;
   onGenerate: (item: PvQueueItem) => void;
+  onGenerateAll?: (items: PvQueueItem[]) => void;
+  generatingId?: string | null;
+  isBulkGenerating?: boolean;
   className?: string;
 }
 
@@ -28,7 +31,15 @@ const statusConfig: Record<
   overdue: { label: 'Întârziat', variant: 'default', icon: AlertTriangle },
 };
 
-export function PvQueue({ items, isLoading, onGenerate, className }: PvQueueProps) {
+export function PvQueue({
+  items,
+  isLoading,
+  onGenerate,
+  onGenerateAll,
+  generatingId,
+  isBulkGenerating,
+  className,
+}: PvQueueProps) {
   const [search, setSearch] = useState('');
 
   const filteredItems = useMemo(() => {
@@ -50,13 +61,32 @@ export function PvQueue({ items, isLoading, onGenerate, className }: PvQueueProp
             Gestionează rapid documentele de predare pentru echipamentele recent alocate.
           </p>
         </div>
-        <SearchInput
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Caută după coleg sau echipament"
-          aria-label="Caută în lista de PV"
-          className="w-full sm:w-64"
-        />
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
+          <SearchInput
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Caută după coleg sau echipament"
+            aria-label="Caută în lista de PV"
+            className="w-full sm:w-64"
+          />
+          {onGenerateAll ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => (onGenerateAll ? void onGenerateAll(filteredItems) : undefined)}
+              disabled={isBulkGenerating || filteredItems.length === 0}
+              className="whitespace-nowrap"
+            >
+              {isBulkGenerating ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
+              ) : (
+                <FileText className="mr-2 h-4 w-4" aria-hidden />
+              )}
+              Generează toate
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       {isLoading ? (
@@ -98,11 +128,16 @@ export function PvQueue({ items, isLoading, onGenerate, className }: PvQueueProp
                   <Button
                     type="button"
                     className="gap-2 self-start sm:self-auto"
-                    onClick={() => onGenerate(item)}
+                    onClick={() => void onGenerate(item)}
                     aria-label={`Generează PV pentru ${item.employee}`}
+                    disabled={isBulkGenerating || generatingId === item.id}
                   >
-                    <FileText className="h-4 w-4" aria-hidden />
-                    Generează PV
+                    {generatingId === item.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                    ) : (
+                      <FileText className="h-4 w-4" aria-hidden />
+                    )}
+                    {generatingId === item.id ? 'Se generează…' : 'Generează PV'}
                   </Button>
                 </li>
               );
