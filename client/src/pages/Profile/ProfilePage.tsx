@@ -315,30 +315,30 @@ export default function ProfilePage() {
             </section>
           </div>
 
-                <div className="space-y-6 lg:col-span-5 xl:col-span-4">
-            <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
-              <header className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <h2 className="text-lg font-semibold">
-                  {t('profile.sections.sessions', { defaultValue: 'Sesiuni active' })}
-                </h2>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  className="focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2"
-                >
-                  {t('profile.buttons.signOutOthers', { defaultValue: 'Deconectează-te de pe celelalte' })}
-                </Button>
-              </header>
-              <div className="border-border/50 overflow-hidden rounded-xl border">
-                {isLoadingSessions ? (
-                  <div className="space-y-2 p-4" aria-hidden>
-                    {Array.from({ length: 3 }).map((_, index) => (
-                      <div key={index} className="bg-muted/30 h-10 animate-pulse rounded-md" />
-                    ))}
-                  </div>
-                ) : activeSessions.length ? (
-                  <table className="min-w-full text-left text-sm">
+               <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm lg:col-span-12 xl:col-span-8 2xl:col-span-7">
+            <header className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <h2 className="text-lg font-semibold">
+                {t('profile.sections.sessions', { defaultValue: 'Sesiuni active' })}
+              </h2>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2"
+              >
+                {t('profile.buttons.signOutOthers', { defaultValue: 'Deconectează-te de pe celelalte' })}
+              </Button>
+            </header>
+            <div className="border-border/50 overflow-hidden rounded-xl border">
+              {isLoadingSessions ? (
+                <div className="space-y-2 p-4" aria-hidden>
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index} className="bg-muted/30 h-10 animate-pulse rounded-md" />
+                  ))}
+                </div>
+              ) : activeSessions.length ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[720px] text-left text-sm">
                     <thead className="bg-muted/40 text-muted-foreground">
                       <tr>
                         <th className="px-4 py-3 font-medium">Dispozitiv</th>
@@ -349,51 +349,56 @@ export default function ProfilePage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {activeSessions.map((session) => (
-                        <tr
-                          key={session.id}
-                          className="border-border/40 border-t"
-                        >
-                          <td className="px-4 py-3">
-                            <div className="flex flex-col gap-1">
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium">{session.deviceName}</span>
-                                {session.current ? (
-                                  <Badge variant="outline" className="border-primary/50 text-primary text-xs">
-                                    Curent
-                                  </Badge>
-                                ) : null}
+                      {activeSessions.map((session) => {
+                        const deviceName = session.deviceName || 'Dispozitiv necunoscut';
+                        const deviceType = session.deviceType || 'Tip necunoscut';
+                        const browser = session.browserName || 'Browser necunoscut';
+                        const osName = session.osName || 'Sistem necunoscut';
+                        const location = session.locationName || 'Necunoscut';
+                        const ip = session.ipAddress || 'Nedisponibil';
+
+                        return (
+                          <tr
+                            key={session.id}
+                            className={`border-border/40 border-t ${session.current ? 'bg-red-50/60' : ''}`}
+                          >
+                            <td className="px-4 py-3">
+                              <div className="flex flex-col gap-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium">{deviceName}</span>
+                                  {session.current ? (
+                                    <Badge variant="outline" className="border-primary/60 bg-primary/10 text-primary text-xs">
+                                      Curent
+                                    </Badge>
+                                  ) : null}
+                                </div>
+                                <span className="text-muted-foreground text-xs">{deviceType}</span>
                               </div>
-                              <span className="text-muted-foreground text-xs">{session.deviceType}</span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="space-y-1">
-                              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                                {session.browserName || 'Browser necunoscut'}
-                              </span>
-                              <span className="text-muted-foreground block text-xs">
-                                {session.osName || 'Sistem necunoscut'}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="text-muted-foreground px-4 py-3">{session.locationName}</td>
-                          <td className="text-muted-foreground px-4 py-3">{session.ipAddress ?? 'Nedisponibil'}</td>
-                          <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">
-                            {formatSessionLastActive(session.lastActive)}
-                          </td>
-                        </tr>
-                      ))}
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="space-y-1">
+                                <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{browser}</span>
+                                <span className="text-muted-foreground block text-xs">{osName}</span>
+                              </div>
+                              </td>
+                            <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">{location}</td>
+                            <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">{ip}</td>
+                            <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">
+                              {formatSessionLastActive(session.lastActive)}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
-                ) : (
-                  <p className="text-muted-foreground px-4 py-6 text-sm">
-                    {t('profile.sessions.empty', { defaultValue: 'Nu există sesiuni active înregistrate.' })}
-                  </p>
-                )}
-              </div>
-            </section>
-          </div>
+                </div>
+              ) : (
+                <p className="text-muted-foreground px-4 py-6 text-sm">
+                  {t('profile.sessions.empty', { defaultValue: 'Nu există sesiuni active înregistrate.' })}
+                </p>
+              )}
+            </div>
+          </section>
         </div>
       </div>
 

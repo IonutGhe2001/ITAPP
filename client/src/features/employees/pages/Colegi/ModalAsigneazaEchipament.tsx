@@ -14,7 +14,7 @@ export default function ModalAsigneazaEchipament({
   onClose,
   onSuccess,
   filterTip,
-  oldEchipamentId,
+  oldEchipamentIds,
   onReplace,
   onPendingPV,
 }: {
@@ -22,8 +22,8 @@ export default function ModalAsigneazaEchipament({
   onClose: () => void;
   onSuccess?: () => void;
   filterTip?: string;
-  oldEchipamentId?: string;
-  onReplace?: (oldId: string, newId: string) => Promise<void> | void;
+  oldEchipamentIds?: string[];
+  onReplace?: (oldIds: string[], newIds: string[]) => Promise<void> | void;
   onPendingPV?: (data: { predate?: string[]; primite?: string[] }) => void;
 }) {
   const { data: echipamente = [] } = useEchipamente();
@@ -32,7 +32,9 @@ export default function ModalAsigneazaEchipament({
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const filterTipNormalized = filterTip?.trim().toLowerCase();
-  const isReplacing = Boolean(onReplace && oldEchipamentId);
+  const replaceIds = (oldEchipamentIds ?? []).filter((id): id is string => Boolean(id));
+  const replaceLimit = replaceIds.length;
+  const isReplacing = Boolean(onReplace && replaceLimit > 0);
 
   const availableEquipment = useMemo(
     () =>
@@ -58,7 +60,13 @@ export default function ModalAsigneazaEchipament({
   const handleToggle = (id: string) => {
     setSelectedIds((prev) => {
       if (isReplacing) {
-        return prev.includes(id) && prev.length === 1 ? [] : [id];
+        if (prev.includes(id)) {
+          return prev.filter((item) => item !== id);
+        }
+        if (replaceLimit > 0 && prev.length >= replaceLimit) {
+          return prev;
+        }
+        return [...prev, id];
       }
       return prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
     });
@@ -67,19 +75,18 @@ export default function ModalAsigneazaEchipament({
   const handleAssign = async () => {
     if (!selectedIds.length) return;
 
+    if (isReplacing && replaceLimit > 0 && selectedIds.length !== replaceLimit) {
+      return;
+    }
+
     const tip: ProcesVerbalTip = isReplacing ? 'SCHIMB' : 'PREDARE_PRIMIRE';
     let payload: { predate?: string[]; primite?: string[] } | undefined;
 
     try {
-      if (isReplacing && onReplace && oldEchipamentId) {
-        const newId = selectedIds[0];
-        await onReplace(oldEchipamentId, newId);
-        payload = { predate: [oldEchipamentId], primite: [newId] };
+      if (isReplacing && onReplace) {
+        await onReplace(replaceIds, selectedIds);
+        payload = { predate: replaceIds, primite: selectedIds };
         onPendingPV?.(payload);
-        toast({
-          title: 'Echipament schimbat',
-          description: 'Proces verbal în așteptare',
-        });
       } else {
         const idsToAssign = selectedIds;
         await Promise.all(
@@ -92,13 +99,6 @@ export default function ModalAsigneazaEchipament({
         );
         payload = { primite: idsToAssign };
         onPendingPV?.(payload);
-        toast({
-          title:
-            idsToAssign.length > 1
-              ? 'Echipamente asignate'
-              : 'Echipament asignat',
-          description: 'Proces verbal în așteptare',
-        });
       }
 
       const { pvGenerationMode } = await getConfig();
@@ -108,17 +108,16 @@ export default function ModalAsigneazaEchipament({
           tip,
           payload
         );
-        window.open(url, '_blank');
-        toast({ title: 'Proces verbal generat' });
+        window.open(url, '_blank', 'noopener');
       } else {
         queueProcesVerbal(
           angajatId,
           tip,
           payload
         );
-        toast({ title: 'Proces verbal în așteptare' });
       }
-
+      
+      setSelectedIds([]);
       onClose();
       onSuccess?.();
     } catch (err) {
@@ -131,10 +130,19 @@ export default function ModalAsigneazaEchipament({
   };
 
   const assignButtonLabel = isReplacing
-    ? 'Înlocuiește'
+    ? replaceLimit > 1
+      ? `Înlocuiește ${replaceLimit} echipamente`
+      : 'Înlocuiește'
     : selectedIds.length > 1
       ? `Asignează ${selectedIds.length} echipamente`
       : 'Asignează';
+
+      const canSubmit = isReplacing
+    ? replaceLimit === 0 || selectedIds.length === replaceLimit
+    : selectedIds.length > 0;
+
+  const selectionType = isReplacing && replaceLimit === 1 ? 'radio' : 'checkbox';
+  const reachedReplaceLimit = isReplacing && replaceLimit > 0 && selectedIds.length >= replaceLimit;
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -143,7 +151,9 @@ export default function ModalAsigneazaEchipament({
 
         <p className="text-muted-foreground text-sm">
           {isReplacing
-            ? 'Selectează echipamentul care va înlocui dispozitivul existent.'
+            ? replaceLimit > 1
+              ? `Selectează ${replaceLimit} echipamente din stoc pentru înlocuire.`
+              : 'Selectează echipamentul care va înlocui dispozitivul existent.'
             : 'Selectează unul sau mai multe echipamente disponibile pentru a le asigna.'}
         </p>
 
@@ -170,12 +180,13 @@ export default function ModalAsigneazaEchipament({
                   className="border-border flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2 text-sm shadow-sm transition hover:border-primary/60"
                 >
                   <input
-                    type={isReplacing ? 'radio' : 'checkbox'}
+                    type={selectionType}
                     name="equipment-selection"
                     value={e.id}
                     checked={isSelected}
                     onChange={() => handleToggle(e.id)}
                     className="h-4 w-4"
+                    disabled={isReplacing && reachedReplaceLimit && !isSelected}
                   />
                   <div className="flex flex-col">
                     <span className="font-medium text-foreground">{e.nume}</span>
@@ -203,7 +214,7 @@ export default function ModalAsigneazaEchipament({
           <button
             onClick={handleAssign}
             className="bg-primary text-primary-foreground hover:bg-primary-dark rounded-lg px-4 py-2"
-            disabled={!selectedIds.length}
+            disabled={!canSubmit}
           >
             {assignButtonLabel}
           </button>

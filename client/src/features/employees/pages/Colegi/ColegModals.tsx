@@ -8,14 +8,13 @@ import { useUpdateEchipament } from '@/features/equipment';
 import { genereazaProcesVerbal } from '@/features/proceseVerbale';
 import { queueProcesVerbal } from '@/features/proceseVerbale/pvQueue';
 import { getConfig } from '@/services/configService';
-import type { Angajat, Echipament } from '@/features/equipment/types';
+import type { Angajat } from '@/features/equipment/types';
 import type { AngajatWithRelations } from '@/features/employees/angajatiService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import StatusBadge from '@/components/StatusBadge';
 import { EquipmentIcon } from '@/features/equipment';
 import { getEmployeeLifecycleStatus } from './useColegiFilter';
 import { Mail, Phone, UserRound, MapPin, Laptop2, BadgeCheck } from 'lucide-react';
-import ConfirmDialog from '@/components/ConfirmDialog';
 import { ROUTES } from '@/constants/routes';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 import { handleApiError } from '@/utils/apiError';
@@ -69,35 +68,38 @@ export default function ColegModals({
 }: ColegModalsProps) {
   const updateMutation = useUpdateEchipament();
   const [activeTab, setActiveTab] = useState<'profile' | 'equipment'>('profile');
-  const [equipmentToReturn, setEquipmentToReturn] = useState<Echipament | null>(null);
-  const [isReturning, setIsReturning] = useState(false);
+  const [selectedEquipmentIds, setSelectedEquipmentIds] = useState<string[]>([]);
+  const [bulkReplaceIds, setBulkReplaceIds] = useState<string[] | null>(null);
+  const [isProcessingEquipment, setIsProcessingEquipment] = useState(false);
   const { toast } = useToast();
 
-  const handleConfirmReturn = async () => {
-    if (!detailColeg || !equipmentToReturn) return;
-    setIsReturning(true);
+  const handleBulkReturn = async (ids?: string[]) => {
+    if (!detailColeg) return;
+    const equipmentIds = ids ?? selectedEquipmentIds;
+    if (!equipmentIds.length) return;
+    setIsProcessingEquipment(true);
     try {
-      await updateMutation.mutateAsync({
-        id: equipmentToReturn.id,
-        data: { angajatId: null, stare: 'in_stoc' },
-      });
+      await Promise.all(
+        equipmentIds.map((equipmentId) =>
+          updateMutation.mutateAsync({
+            id: equipmentId,
+            data: { angajatId: null, stare: 'in_stoc' },
+          })
+        )
+      );
 
-      onPVChange(detailColeg.id, { predate: [equipmentToReturn.id] });
+      const payload = { predate: equipmentIds };
+      onPVChange(detailColeg.id, payload);
 
       const { pvGenerationMode } = await getConfig();
       if (pvGenerationMode === 'auto') {
         const url = await genereazaProcesVerbal(detailColeg.id, 'RESTITUIRE', {
-          predate: [equipmentToReturn.id],
+          predate: equipmentIds,
         });
         window.open(url, '_blank', 'noopener');
-        toast({ title: 'Echipament returnat', description: 'Procesul verbal a fost generat.' });
       } else {
         queueProcesVerbal(detailColeg.id, 'RESTITUIRE', {
-          predate: [equipmentToReturn.id],
-        });
-        toast({
-          title: 'Echipament returnat',
-          description: 'Procesul verbal a fost adăugat în coada de generare.',
+          predate: equipmentIds,
         });
       }
 
@@ -106,20 +108,27 @@ export default function ColegModals({
         prev
           ? {
               ...prev,
-              echipamente: prev.echipamente.filter((item) => item.id !== equipmentToReturn.id),
+              echipamente: prev.echipamente.filter((item) => !equipmentIds.includes(item.id)),
             }
           : prev
       );
     } catch (err) {
       toast({
         title: 'Eroare la returnare',
-        description: handleApiError(err, 'Nu am putut returna echipamentul.'),
+        description: handleApiError(err, 'Nu am putut returna echipamentele.'),
         variant: 'destructive',
       });
     } finally {
-      setIsReturning(false);
-      setEquipmentToReturn(null);
+      setIsProcessingEquipment(false);
+      setSelectedEquipmentIds((prev) => prev.filter((id) => !equipmentIds.includes(id)));
     }
+  };
+
+  const handleStartBulkReplace = (ids?: string[]) => {
+    if (!detailColeg) return;
+    const equipmentIds = ids ?? selectedEquipmentIds;
+    if (!equipmentIds.length) return;
+    setBulkReplaceIds(equipmentIds);
   };
 
   const departmentName = useMemo(() => {
@@ -159,8 +168,10 @@ export default function ColegModals({
         <ModalAsigneazaEchipament
           angajatId={replaceData.colegId}
           filterTip={replaceData.type}
-          oldEchipamentId={replaceData.equipmentId}
-          onReplace={async (oldId, newId) => {
+          oldEchipamentIds={[replaceData.equipmentId]}
+          onReplace={async (oldIds, newIds) => {
+            const [oldId] = oldIds;
+            const [newId] = newIds;
             await updateMutation.mutateAsync({
               id: oldId,
               data: { angajatId: null, stare: 'in_stoc' },
@@ -169,18 +180,14 @@ export default function ColegModals({
               id: newId,
               data: { angajatId: replaceData.colegId, stare: 'alocat' },
             });
+            const payload = { predate: oldIds, primite: newIds };
+            onPVChange(replaceData.colegId, payload);
             const { pvGenerationMode } = await getConfig();
             if (pvGenerationMode === 'auto') {
-              const url = await genereazaProcesVerbal(replaceData.colegId, 'SCHIMB', {
-                predate: [oldId],
-                primite: [newId],
-              });
-              window.open(url, '_blank');
+              const url = await genereazaProcesVerbal(replaceData.colegId, 'SCHIMB', payload);
+              window.open(url, '_blank', 'noopener');
             } else {
-              queueProcesVerbal(replaceData.colegId, 'SCHIMB', {
-                predate: [oldId],
-                primite: [newId],
-              });
+              queueProcesVerbal(replaceData.colegId, 'SCHIMB', payload);
             }
           }}
           onPendingPV={(change) => onPVChange(replaceData.colegId, change)}
@@ -189,6 +196,57 @@ export default function ColegModals({
             void refetch();
             setExpanded(new Set());
             setReplaceData(null);
+          }}
+        />
+      )}
+      {bulkReplaceIds && detailColeg && (
+        <ModalAsigneazaEchipament
+          angajatId={detailColeg.id}
+          oldEchipamentIds={bulkReplaceIds}
+          onReplace={async (oldIds, newIds) => {
+            await Promise.all(
+              oldIds.map((oldId) =>
+                updateMutation.mutateAsync({
+                  id: oldId,
+                  data: { angajatId: null, stare: 'in_stoc' },
+                })
+              )
+            );
+            const assignedEquipment = await Promise.all(
+              newIds.map((newId) =>
+                updateMutation.mutateAsync({
+                  id: newId,
+                  data: { angajatId: detailColeg.id, stare: 'alocat' },
+                })
+              )
+            );
+            const payload = { predate: oldIds, primite: newIds };
+            onPVChange(detailColeg.id, payload);
+            const { pvGenerationMode } = await getConfig();
+            if (pvGenerationMode === 'auto') {
+              const url = await genereazaProcesVerbal(detailColeg.id, 'SCHIMB', payload);
+              window.open(url, '_blank', 'noopener');
+            } else {
+              queueProcesVerbal(detailColeg.id, 'SCHIMB', payload);
+            }
+            setDetailColeg((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    echipamente: [
+                      ...prev.echipamente.filter((item) => !oldIds.includes(item.id)),
+                      ...assignedEquipment,
+                    ],
+                  }
+                : prev
+            );
+            await refetch();
+          }}
+          onPendingPV={(change) => onPVChange(detailColeg.id, change)}
+          onClose={() => setBulkReplaceIds(null)}
+          onSuccess={() => {
+            setBulkReplaceIds(null);
+            setSelectedEquipmentIds([]);
           }}
         />
       )}
@@ -240,6 +298,8 @@ export default function ColegModals({
             if (!open) {
               setDetailColeg(null);
               setActiveTab('profile');
+              setSelectedEquipmentIds([]);
+              setBulkReplaceIds(null);
             }
           }}
         >
@@ -349,39 +409,104 @@ export default function ColegModals({
                     Asignează echipament
                   </Button>
                 </div>
+                {selectedEquipmentIds.length > 0 && (
+                  <div className="border-red-100/70 bg-red-50/70 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3">
+                    <p className="text-sm font-semibold text-red-700">
+                      {selectedEquipmentIds.length === 1
+                        ? '1 echipament selectat'
+                        : `${selectedEquipmentIds.length} echipamente selectate`}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => {
+                          void handleBulkReturn();
+                        }}
+                        disabled={isProcessingEquipment}
+                      >
+                        Returnează
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => handleStartBulkReplace()}
+                        disabled={isProcessingEquipment}
+                      >
+                        Înlocuiește
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setSelectedEquipmentIds([])}
+                        disabled={isProcessingEquipment}
+                      >
+                        Anulează
+                      </Button>
+                    </div>
+                  </div>
+                )}
                 {detailColeg.echipamente.length > 0 && (
                   <div className="grid gap-3">
-                    {detailColeg.echipamente.map((eq) => (
-                      <div
-                        key={eq.id}
-                        className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/70 bg-white/80 p-3 shadow-sm dark:border-slate-800/60 dark:bg-slate-900/60"
-                      >
-                        <div className="flex flex-1 items-center gap-3">
-                          <div className="bg-primary/5 text-primary flex h-10 w-10 items-center justify-center rounded-xl">
-                            <EquipmentIcon type={eq.tip} className="h-5 w-5" />
+                    {detailColeg.echipamente.map((eq) => {
+                      const isSelected = selectedEquipmentIds.includes(eq.id);
+                      return (
+                        <div
+                          key={eq.id}
+                          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/70 bg-white/80 p-3 shadow-sm dark:border-slate-800/60 dark:bg-slate-900/60"
+                        >
+                          <div className="flex flex-1 items-center gap-3">
+                            <label className="flex items-center gap-3">
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => {
+                                  setSelectedEquipmentIds((prev) =>
+                                    prev.includes(eq.id)
+                                      ? prev.filter((item) => item !== eq.id)
+                                      : [...prev, eq.id]
+                                  );
+                                })
+                                disabled={isProcessingEquipment}
+                                className="h-4 w-4 rounded border-slate-300 text-red-600 focus:ring-red-500"
+                                aria-label={`Selectează ${eq.nume}`}
+                              />
+                              <div className="bg-primary/5 text-primary flex h-10 w-10 items-center justify-center rounded-xl">
+                                <EquipmentIcon type={eq.tip} className="h-5 w-5" />
+                              </div>
+                            </label>
+                            <div className="space-y-1 text-sm">
+                              <Link
+                                to={ROUTES.EQUIPMENT_DETAIL.replace(':id', eq.id)}
+                                className="font-medium text-slate-900 hover:text-primary hover:underline dark:text-slate-100"
+                              >
+                                {eq.nume}
+                              </Link>
+                              <p className="text-muted-foreground text-xs">Serie: {eq.serie}</p>
+                            </div>
                           </div>
-                          <div className="space-y-1 text-sm">
-                            <Link
-                              to={ROUTES.EQUIPMENT_DETAIL.replace(':id', eq.id)}
-                              className="font-medium text-slate-900 hover:text-primary hover:underline dark:text-slate-100"
+                          <div className="flex flex-wrap items-center gap-2">
+                            <StatusBadge label={eq.tip} tone="info" className="uppercase" />
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                void handleBulkReturn([eq.id]);
+                              }}
+                              disabled={isProcessingEquipment}
                             >
-                              {eq.nume}
-                            </Link>
-                            <p className="text-muted-foreground text-xs">Serie: {eq.serie}</p>
+                              Returnează
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => handleStartBulkReplace([eq.id])}
+                              disabled={isProcessingEquipment}
+                            >
+                              Înlocuiește
+                            </Button>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <StatusBadge label={eq.tip} tone="info" className="uppercase" />
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setEquipmentToReturn(eq)}
-                          >
-                            Returnează
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
+                        );
+                    })}
                   </div>
                 )}
               </TabsContent>
@@ -389,24 +514,6 @@ export default function ColegModals({
           </DialogContent>
         </Dialog>
       )}
-      <ConfirmDialog
-        open={Boolean(equipmentToReturn)}
-        message={
-          equipmentToReturn
-            ? `Confirmi returnarea echipamentului ${equipmentToReturn.nume}?`
-            : 'Confirmă returnarea echipamentului'
-        }
-        onCancel={() => {
-          if (!isReturning) {
-            setEquipmentToReturn(null);
-          }
-        }}
-        onConfirm={() => {
-          if (!isReturning) {
-            void handleConfirmReturn();
-          }
-        }}
-      />
     </>
   );
 }

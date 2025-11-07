@@ -162,53 +162,51 @@ export default function EquipmentDetail() {
 
   return (
     <>
-      <div className="relative isolate overflow-hidden bg-slate-900 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(255,255,255,0.35),_transparent_55%)] opacity-60" />
-        <Container className="relative py-10">
+      <div className="bg-gradient-to-br from-red-600 via-red-600 to-red-700">
+        <Container className="py-10">
           <Link
             to={ROUTES.EQUIPMENT}
-            className="flex items-center gap-2 text-sm text-white/80 transition hover:text-white hover:underline"
+            className="flex items-center gap-2 text-sm font-medium text-white/80 transition hover:text-white hover:underline"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden />
             <span>Înapoi la echipamente</span>
           </Link>
-          <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-wide text-white/70">
-                <span className="rounded-full border border-white/30 px-3 py-1">
+          <Card className="mt-6 overflow-hidden border-none bg-white text-slate-900 shadow-2xl">
+            <div className="border-b border-red-100/80 bg-red-600/10 px-6 py-4 sm:px-8">
+              <div className="flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-wide text-red-700">
+                <span className="rounded-full border border-red-200/70 bg-white px-3 py-1 text-red-700 shadow-sm">
                   {data.tip}
                 </span>
-                <StatusBadge
-                  label={statusLabel}
-                  tone={statusTone}
-                  withDot
-                  className="border-white/40 bg-white/15 text-white backdrop-blur"
-                />
+                <StatusBadge label={statusLabel} tone={statusTone} withDot />
               </div>
-              <div className="space-y-1">
-                <h1 className="text-3xl font-semibold leading-tight">{data.nume}</h1>
-                <p className="text-white/70 text-sm">Serie: {data.serie}</p>
               </div>
-              {assignedEmployeeName ? (
-                <p className="text-white/80 text-sm">
-                  Predat către{' '}
-                  {assignedEmployeeLink ? (
-                    <Link to={assignedEmployeeLink} className="font-medium text-white hover:underline">
-                      {assignedEmployeeName}
-                    </Link>
+            <div className="px-6 py-6 sm:px-8 sm:py-8">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="space-y-2">
+                  <h1 className="text-3xl font-semibold leading-tight text-slate-900">{data.nume}</h1>
+                  <p className="text-muted-foreground text-sm">Serie: {data.serie}</p>
+                  {assignedEmployeeName ? (
+                    <p className="text-muted-foreground text-sm">
+                      Predat către{' '}
+                      {assignedEmployeeLink ? (
+                        <Link to={assignedEmployeeLink} className="font-medium text-red-700 hover:text-red-600 hover:underline">
+                          {assignedEmployeeName}
+                        </Link>
+                      ) : (
+                        <span className="font-medium text-slate-900">{assignedEmployeeName}</span>
+                      )}
+                    </p>
                   ) : (
-                    <span className="font-medium">{assignedEmployeeName}</span>
+                    <p className="text-muted-foreground text-sm">Echipament neasignat</p>
                   )}
-                </p>
-              ) : (
-                <p className="text-white/70 text-sm">Echipament neasignat</p>
-              )}
+                </div>
+              </div>
             </div>
-          </div>
+          </Card>
         </Container>
       </div>
 
-      <Container className="-mt-12 space-y-8 pb-12">
+      <Container className="space-y-8 pb-12 pt-12">
         <div className="grid gap-6 lg:grid-cols-12">
           <div className="space-y-6 lg:col-span-8">
             <Card className="p-6">
