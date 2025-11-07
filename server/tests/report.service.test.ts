@@ -102,9 +102,19 @@ const mockQueryRaw = jest.fn<
   (query: any) => Promise<Array<{ status: string; count: number }>>
 >();
 
+const mockFindMany = jest.fn<
+  (args: {
+    where?: {
+      department?: string;
+      createdAt?: { gte?: Date; lte?: Date };
+    };
+  }) => Promise<Array<{ tasks: Task[] }>>
+>();
+
 jest.mock('../src/lib/prisma', () => ({
   prisma: {
     $queryRaw: (query: unknown) => mockQueryRaw(query),
+    onboarding: { findMany: (args: unknown) => mockFindMany(args as any) },
   },
 }));
 
@@ -117,6 +127,28 @@ beforeEach(() => {
     const filters = extractFilters(query);
     return computeCounts(filters);
   });
+
+  mockFindMany.mockReset();
+  mockFindMany.mockImplementation(async ({ where } = {}) => {
+    const department = where?.department;
+    const gte = where?.createdAt?.gte;
+    const lte = where?.createdAt?.lte;
+
+    return onboardingRecords
+      .filter((record) => {
+        if (department && record.department !== department) {
+          return false;
+        }
+        if (gte && record.createdAt < gte) {
+          return false;
+        }
+        if (lte && record.createdAt > lte) {
+          return false;
+        }
+        return true;
+      })
+      .map((record) => ({ tasks: record.tasks }));
+  });
 });
 
 describe('getOnboardingReport', () => {
@@ -125,11 +157,10 @@ describe('getOnboardingReport', () => {
     const expected = computeCounts({ department: 'Engineering' });
 
     expect(sortByStatus(result)).toEqual(sortByStatus(expected));
-    expect(mockQueryRaw).toHaveBeenCalledTimes(1);
-
-    const query = mockQueryRaw.mock.calls[0][0];
-    expect(Array.isArray(query.strings)).toBe(true);
-    expect(query.strings.join(' ')).toContain('jsonb_array_elements');
+    expect(mockFindMany).toHaveBeenCalledTimes(1);
+    expect(mockFindMany.mock.calls[0][0]).toMatchObject({
+      where: { department: 'Engineering' },
+    });
   });
 
   it('filters completed onboarding counts', async () => {

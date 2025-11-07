@@ -45,7 +45,12 @@ function EquipmentCard({
           </div>
           <div className="space-y-1">
             <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-              {echipament.nume}
+              <Link
+                to={ROUTES.EQUIPMENT_DETAIL.replace(':id', echipament.id)}
+                className="hover:text-primary focus-visible:ring-primary/50 rounded-sm outline-none transition focus-visible:ring-2 focus-visible:ring-offset-2"
+              >
+                {echipament.nume}
+              </Link>
             </h3>
             <p className="text-muted-foreground text-xs">Serie: {echipament.serie}</p>
             {echipament.numarInventar && (

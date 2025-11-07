@@ -22,6 +22,7 @@ model User {
   departament      String?
   lastLogin        DateTime?
   createdAt        DateTime  @default(now())
+  sessions         Session[]
 }
 
 model DepartmentConfig {
@@ -149,6 +150,25 @@ model EquipmentImage {
   echipament   Echipament @relation(fields: [echipamentId], references: [id])
   url          String
   createdAt    DateTime   @default(now())
+}
+
+model Session {
+  id              String   @id @default(uuid())
+  userId          Int
+  tokenHash       String   @unique
+  userAgent       String?
+  deviceName      String?
+  deviceType      String?
+  osName          String?
+  browserName     String?
+  ipAddress       String?
+  locationCity    String?
+  locationCountry String?
+  createdAt       DateTime @default(now())
+  lastActive      DateTime @default(now())
+  expiresAt       DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model PurchaseRequest {

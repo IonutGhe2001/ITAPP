@@ -1,4 +1,5 @@
 import React, { Suspense, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import ModalAsigneazaEchipament from './ModalAsigneazaEchipament';
@@ -7,13 +8,17 @@ import { useUpdateEchipament } from '@/features/equipment';
 import { genereazaProcesVerbal } from '@/features/proceseVerbale';
 import { queueProcesVerbal } from '@/features/proceseVerbale/pvQueue';
 import { getConfig } from '@/services/configService';
-import type { Angajat } from '@/features/equipment/types';
+import type { Angajat, Echipament } from '@/features/equipment/types';
 import type { AngajatWithRelations } from '@/features/employees/angajatiService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import StatusBadge from '@/components/StatusBadge';
 import { EquipmentIcon } from '@/features/equipment';
 import { getEmployeeLifecycleStatus } from './useColegiFilter';
 import { Mail, Phone, UserRound, MapPin, Laptop2, BadgeCheck } from 'lucide-react';
+import ConfirmDialog from '@/components/ConfirmDialog';
+import { ROUTES } from '@/constants/routes';
+import { useToast } from '@/hooks/use-toast/use-toast-hook';
+import { handleApiError } from '@/utils/apiError';
 
 const ModalAddColeg = React.lazy(() => import('@/pages/Dashboard/modals/ModalAddColeg'));
 
@@ -64,6 +69,58 @@ export default function ColegModals({
 }: ColegModalsProps) {
   const updateMutation = useUpdateEchipament();
   const [activeTab, setActiveTab] = useState<'profile' | 'equipment'>('profile');
+  const [equipmentToReturn, setEquipmentToReturn] = useState<Echipament | null>(null);
+  const [isReturning, setIsReturning] = useState(false);
+  const { toast } = useToast();
+
+  const handleConfirmReturn = async () => {
+    if (!detailColeg || !equipmentToReturn) return;
+    setIsReturning(true);
+    try {
+      await updateMutation.mutateAsync({
+        id: equipmentToReturn.id,
+        data: { angajatId: null, stare: 'in_stoc' },
+      });
+
+      onPVChange(detailColeg.id, { predate: [equipmentToReturn.id] });
+
+      const { pvGenerationMode } = await getConfig();
+      if (pvGenerationMode === 'auto') {
+        const url = await genereazaProcesVerbal(detailColeg.id, 'RESTITUIRE', {
+          predate: [equipmentToReturn.id],
+        });
+        window.open(url, '_blank', 'noopener');
+        toast({ title: 'Echipament returnat', description: 'Procesul verbal a fost generat.' });
+      } else {
+        queueProcesVerbal(detailColeg.id, 'RESTITUIRE', {
+          predate: [equipmentToReturn.id],
+        });
+        toast({
+          title: 'Echipament returnat',
+          description: 'Procesul verbal a fost adăugat în coada de generare.',
+        });
+      }
+
+      await refetch();
+      setDetailColeg((prev) =>
+        prev
+          ? {
+              ...prev,
+              echipamente: prev.echipamente.filter((item) => item.id !== equipmentToReturn.id),
+            }
+          : prev
+      );
+    } catch (err) {
+      toast({
+        title: 'Eroare la returnare',
+        description: handleApiError(err, 'Nu am putut returna echipamentul.'),
+        variant: 'destructive',
+      });
+    } finally {
+      setIsReturning(false);
+      setEquipmentToReturn(null);
+    }
+  };
 
   const departmentName = useMemo(() => {
     if (!detailColeg) return '';
@@ -299,18 +356,30 @@ export default function ColegModals({
                         key={eq.id}
                         className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/70 bg-white/80 p-3 shadow-sm dark:border-slate-800/60 dark:bg-slate-900/60"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-1 items-center gap-3">
                           <div className="bg-primary/5 text-primary flex h-10 w-10 items-center justify-center rounded-xl">
                             <EquipmentIcon type={eq.tip} className="h-5 w-5" />
                           </div>
                           <div className="space-y-1 text-sm">
-                            <p className="font-medium text-slate-900 dark:text-slate-100">
+                            <Link
+                              to={ROUTES.EQUIPMENT_DETAIL.replace(':id', eq.id)}
+                              className="font-medium text-slate-900 hover:text-primary hover:underline dark:text-slate-100"
+                            >
                               {eq.nume}
-                            </p>
+                            </Link>
                             <p className="text-muted-foreground text-xs">Serie: {eq.serie}</p>
                           </div>
                         </div>
-                        <StatusBadge label={eq.tip} tone="info" className="uppercase" />
+                        <div className="flex items-center gap-2">
+                          <StatusBadge label={eq.tip} tone="info" className="uppercase" />
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setEquipmentToReturn(eq)}
+                          >
+                            Returnează
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -320,6 +389,24 @@ export default function ColegModals({
           </DialogContent>
         </Dialog>
       )}
+      <ConfirmDialog
+        open={Boolean(equipmentToReturn)}
+        message={
+          equipmentToReturn
+            ? `Confirmi returnarea echipamentului ${equipmentToReturn.nume}?`
+            : 'Confirmă returnarea echipamentului'
+        }
+        onCancel={() => {
+          if (!isReturning) {
+            setEquipmentToReturn(null);
+          }
+        }}
+        onConfirm={() => {
+          if (!isReturning) {
+            void handleConfirmReturn();
+          }
+        }}
+      />
     </>
   );
 }

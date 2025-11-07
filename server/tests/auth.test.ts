@@ -24,16 +24,29 @@ afterEach(() => {
 
 describe('Auth Routes', () => {
   it('login success', async () => {
-    (authService.authenticateUser as jest.MockedFunction<typeof authService.authenticateUser>).mockResolvedValue('token123');
+    (authService.authenticateUser as jest.MockedFunction<typeof authService.authenticateUser>).mockResolvedValue({
+      token: 'token123',
+      sessionId: 'session123',
+      expiresAt: null,
+    });
 
     const res = await request(app)
       .post('/api/auth/login')
       .send({ email: 'test@example.com', password: 'pass' });
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ success: true, token: 'token123' });
+    expect(res.body).toEqual({
+      success: true,
+      token: 'token123',
+      sessionId: 'session123',
+      expiresAt: null,
+    });
     expect(res.headers['set-cookie']).toBeDefined();
-    expect(authService.authenticateUser).toHaveBeenCalledWith('test@example.com', 'pass');
+    expect(authService.authenticateUser).toHaveBeenCalledWith(
+      'test@example.com',
+      'pass',
+      expect.any(Object)
+    );
   });
 
   it('login failure', async () => {

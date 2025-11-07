@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast/use-toast-hook';
 import Avatar from '@/components/Avatar';
 import ProfileInput from '@/components/ProfileInput';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -341,21 +342,44 @@ export default function ProfilePage() {
                     <thead className="bg-muted/40 text-muted-foreground">
                       <tr>
                         <th className="px-4 py-3 font-medium">Dispozitiv</th>
-                        <th className="px-4 py-3 font-medium">Tip</th>
+                        <th className="px-4 py-3 font-medium">Detalii</th>
                         <th className="px-4 py-3 font-medium">Locație</th>
+                        <th className="px-4 py-3 font-medium">Adresă IP</th>
                         <th className="px-4 py-3 font-medium">Ultima activitate</th>
                       </tr>
                     </thead>
                     <tbody>
                       {activeSessions.map((session) => (
                         <tr
-                          key={`${session.deviceName}-${session.lastActive}`}
+                          key={session.id}
                           className="border-border/40 border-t"
                         >
-                          <td className="px-4 py-3 font-medium">{session.deviceName}</td>
-                          <td className="text-muted-foreground px-4 py-3">{session.deviceType}</td>
+                          <td className="px-4 py-3">
+                            <div className="flex flex-col gap-1">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">{session.deviceName}</span>
+                                {session.current ? (
+                                  <Badge variant="outline" className="border-primary/50 text-primary text-xs">
+                                    Curent
+                                  </Badge>
+                                ) : null}
+                              </div>
+                              <span className="text-muted-foreground text-xs">{session.deviceType}</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="space-y-1">
+                              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                                {session.browserName || 'Browser necunoscut'}
+                              </span>
+                              <span className="text-muted-foreground block text-xs">
+                                {session.osName || 'Sistem necunoscut'}
+                              </span>
+                            </div>
+                          </td>
                           <td className="text-muted-foreground px-4 py-3">{session.locationName}</td>
-                          <td className="text-muted-foreground px-4 py-3">
+                          <td className="text-muted-foreground px-4 py-3">{session.ipAddress ?? 'Nedisponibil'}</td>
+                          <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">
                             {formatSessionLastActive(session.lastActive)}
                           </td>
                         </tr>

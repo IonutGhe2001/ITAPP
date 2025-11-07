@@ -1,33 +1,46 @@
 import bcrypt from "bcrypt";
-import jwt, { SignOptions } from "jsonwebtoken";
 import { prisma } from "../lib/prisma";
-import { env } from "../config";
+import {
+  createSessionForUser,
+  deleteSessionById,
+  type SessionContext,
+} from "./session.service";
+
+export interface AuthResult {
+  token: string;
+  sessionId: string;
+  expiresAt: Date | null;
+}
 
 export const authenticateUser = async (
   email: string,
-  password: string
-): Promise<string | null> => {
+  password: string,
+  context: SessionContext = {}
+): Promise<AuthResult | null> => {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return null;
 
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) return null;
 
-  const payload = {
-    id: user.id,
-    email: user.email,
-    role: user.role,
-    nume: user.nume,
-    prenume: user.prenume,
-    functie: user.functie,
-  };
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { lastLogin: new Date() },
+  });
 
-  const secret = env.JWT_SECRET;
-  const expiresIn = env.JWT_EXPIRES_IN as SignOptions["expiresIn"];
-  
-  const options: SignOptions = { expiresIn };
-  const token = jwt.sign(payload, secret, options);
-  return token;
+  const session = await createSessionForUser(
+    {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      nume: user.nume,
+      prenume: user.prenume,
+      functie: user.functie,
+    },
+    context
+  );
+
+  return session;
 };
 
 export const registerUser = async (input: {
@@ -97,4 +110,8 @@ export const getUserById = (id: number) => {
       lastLogin: true,
     },
   });
+};
+
+export const revokeSession = async (sessionId: string) => {
+  await deleteSessionById(sessionId);
 };

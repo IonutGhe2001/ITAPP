@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useMemo, useState, useLayoutEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { VariableSizeList as List } from 'react-window';
 import type { Echipament, EquipmentSortOption } from '@/features/equipment/types';
 import {
@@ -18,6 +18,7 @@ import Container from '@/components/Container';
 import Toolbar from '@/components/Toolbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ROUTES } from '@/constants/routes';
 import {
   Select,
   SelectContent,
@@ -98,6 +99,7 @@ export default function Echipamente() {
   const queryEnabled = isAuthenticated;
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const [search, setSearch] = useState(() => searchParams.get('q') ?? '');
   const [status, setStatus] = useState(() => searchParams.get('status') ?? '');
@@ -490,7 +492,9 @@ export default function Echipamente() {
               onEdit={handleEdit}
               onDelete={handleDelete}
               onTransfer={handleTransfer}
-              onViewDetails={(eq) => handleEdit({ ...eq, __editMode: true })}
+              onViewDetails={(eq) =>
+                navigate(ROUTES.EQUIPMENT_DETAIL.replace(':id', eq.id))
+              }
               setSize={setSize}
             />
           )}

@@ -1,6 +1,7 @@
 import { prisma } from "../lib/prisma";
 import type { Echipament, EquipmentChange } from ".prisma/client";
 import { EQUIPMENT_STATUS } from "@shared/equipmentStatus";
+import { getSessionsForUser } from "./session.service";
 
 type UserMetric = {
   label: string;
@@ -13,10 +14,16 @@ type UserActivity = {
 };
 
 type UserSession = {
+  id: string;
   deviceName: string;
   deviceType: string;
+  osName?: string;
+  browserName?: string;
   locationName: string;
+  ipAddress?: string;
+  createdAt: string;
   lastActive: string;
+  current: boolean;
 };
 
 type EchipamentWithLatestChange = Echipament & {
@@ -151,38 +158,58 @@ export const getUserActivity = async (
   return activities;
 };
 
-export const getUserSessions = async (userId: number): Promise<UserSession[]> => {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { 
-      email: true, 
-      locatie: true,
-      lastLogin: true,
-    },
-  });
+export const getUserSessions = async (
+  userId: number,
+  currentSessionId?: string
+): Promise<UserSession[]> => {
+  const [user, sessions] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        locatie: true,
+        lastLogin: true,
+      },
+    }),
+    getSessionsForUser(userId),
+  ]);
 
-  if (!user?.email) {
+  if (!sessions.length) {
+    if (user?.lastLogin) {
+      return [
+        {
+          id: "fallback",
+          deviceName: "Browser",
+          deviceType: "Web",
+          locationName: user.locatie || "Necunoscut",
+          createdAt: user.lastLogin.toISOString(),
+          lastActive: user.lastLogin.toISOString(),
+          current: true,
+        },
+      ];
+    }
     return [];
   }
 
-  // TODO: Implement proper session tracking with:
-  // - Device information extracted from user-agent
-  // - IP-based geolocation for accurate location
-  // - Session tokens stored in database with lastActive timestamp
-  // - Multiple concurrent session support
-  // For now, return a single session representing the current browser login
-  
-  const sessions: UserSession[] = [];
-  
-  // Create a session entry for the current login
-  if (user.lastLogin) {
-    sessions.push({
-      deviceName: 'Browser',
-      deviceType: 'Web',
-      locationName: user.locatie || 'Unknown',
-      lastActive: user.lastLogin.toISOString(),
-    });
-  }
+  return sessions.map((session) => {
+    const locationParts = [session.locationCity, session.locationCountry]
+      .filter((part) => Boolean(part?.trim()))
+      .map((part) => part!.trim());
 
-  return sessions;
+  const locationName = locationParts.length
+      ? locationParts.join(", ")
+      : user?.locatie || "Necunoscut";
+
+    return {
+      id: session.id,
+      deviceName: session.deviceName || session.browserName || "Browser",
+      deviceType: session.deviceType || "Web",
+      osName: session.osName || undefined,
+      browserName: session.browserName || undefined,
+      locationName,
+      ipAddress: session.ipAddress || undefined,
+      createdAt: session.createdAt.toISOString(),
+      lastActive: session.lastActive.toISOString(),
+      current: currentSessionId ? session.id === currentSessionId : false,
+    } satisfies UserSession;
+  });
 };

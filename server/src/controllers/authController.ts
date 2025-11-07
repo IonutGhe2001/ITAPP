@@ -4,8 +4,10 @@ import {
   authenticateUser,
   registerUser,
   getUserById,
+  revokeSession,
 } from "../services/auth.service";
 import type { UserUpdateData } from "../services/auth.service";
+import type { SessionContext } from "../services/session.service";
 import { logger } from "@lib/logger";
 import { env } from "../config";
 import { loginSchema } from "../validators/auth.validator";
@@ -20,21 +22,32 @@ export const login = async (req: Request, res: Response) => {
     }
     
     const { email, password } = req.body;
-    const token = await authenticateUser(email, password);
+    const sessionContext: SessionContext = {
+      userAgent: req.get("user-agent") ?? undefined,
+      ipAddress: req.ip,
+      forwardedFor: req.headers["x-forwarded-for"],
+    };
 
-    if (!token) {
+    const authResult = await authenticateUser(email, password, sessionContext);
+
+    if (!authResult) {
       return res
         .status(401)
         .json({ message: "Date de autentificare invalide" });
     }
 
-    res.cookie("token", token, {
+    res.cookie("token", authResult.token, {
       httpOnly: true,
       secure: env.NODE_ENV === "production",
       sameSite: "strict",
     });
 
-    return res.json({ success: true, token });
+    return res.json({
+      success: true,
+      token: authResult.token,
+      sessionId: authResult.sessionId,
+      expiresAt: authResult.expiresAt,
+    });
   } catch (err) {
     return res.status(500).json({ message: "Eroare internă" });
   }
@@ -140,7 +153,11 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
-export const logout = (_req: Request, res: Response) => {
+export const logout = async (req: Request, res: Response) => {
+  const sessionId = req.user?.sessionId;
+  if (sessionId) {
+    await revokeSession(sessionId).catch(() => undefined);
+  }
   res.clearCookie("token");
   return res.json({ success: true });
 };

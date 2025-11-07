@@ -11,10 +11,16 @@ export type UserActivity = {
 };
 
 export type UserSession = {
+  id: string;
   deviceName: string;
   deviceType: string;
+  osName?: string;
+  browserName?: string;
   locationName: string;
+  ipAddress?: string;
+  createdAt: string;
   lastActive: string;
+  current: boolean;
 };
 
 export async function getUserMetrics(): Promise<UserMetric[]> {
