@@ -45,64 +45,78 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-background border-border sticky top-0 z-40 flex items-center justify-between border-b px-6 py-4 shadow-sm">
-        <div className="flex items-center gap-2">
-          <button
-            className="text-muted-foreground md:hidden"
-            onClick={() => setMobileMenuOpen(true)}
-          >
-            <Menu className="h-6 w-6" />
-            <span className="sr-only">Deschide meniul</span>
-          </button>
-          <div className="flex flex-col">
-            <h1 className="text-muted-foreground text-sm uppercase tracking-wide">{title}</h1>
+      <header className="bg-background/80 border-border/80 sticky top-0 z-40 border-b px-6 py-3 shadow-[0_15px_40px_-30px_rgba(15,23,42,0.65)] backdrop-blur supports-[backdrop-filter]:backdrop-blur">
+        <div className="flex items-center justify-between gap-6">
+          <div className="flex items-center gap-3">
+            <button
+              className="text-muted-foreground/80 hover:text-foreground border-border/80 bg-background/60 inline-flex h-10 w-10 items-center justify-center rounded-full border transition md:hidden"
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              <Menu className="h-5 w-5" />
+              <span className="sr-only">Deschide meniul</span>
+            </button>
+            <div className="flex flex-col">
+              <span className="text-muted-foreground/70 text-[10px] font-semibold uppercase tracking-[0.5em]">
+                Monitorizare
+              </span>
+              <h1 className="text-foreground text-lg font-semibold tracking-tight md:text-xl">
+                {title}
+              </h1>
+            </div>
           </div>
-        </div>
 
-        <div className="flex items-center gap-4">
-          <button
-            className="text-muted-foreground md:hidden"
-            onClick={() => setMobileSearchOpen(true)}
-          >
-            <Search className="h-5 w-5" />
-            <span className="sr-only">Deschide căutarea</span>
-          </button>
+        <div className="flex items-center gap-3">
+            <button
+              className="text-muted-foreground/80 hover:text-foreground border-border/80 bg-background/60 inline-flex h-10 w-10 items-center justify-center rounded-full border transition md:hidden"
+              onClick={() => setMobileSearchOpen(true)}
+            >
+              <Search className="h-4 w-4" />
+              <span className="sr-only">Deschide căutarea</span>
+            </button>
 
-          <SearchInput className="hidden md:block" />
+            <SearchInput className="hidden md:block md:w-72 lg:w-80" />
+
+            <div className="bg-border/70 hidden h-8 w-px md:block" aria-hidden="true" />
 
           <NotificationsMenu />
 
+            <div className="bg-border/70 hidden h-8 w-px md:block" aria-hidden="true" />
+
           <ThemeToggle />
 
-          {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="hover:bg-muted flex items-center gap-2 px-2">
-                  <Avatar
-                    src={user.profilePicture ?? undefined}
-                    name={`${user.nume} ${user.prenume}`}
-                    className="border-border h-8 w-8 border"
-                  />
-                  <div className="hidden flex-col text-left md:flex">
-                    <span className="text-sm font-semibold">
-                      {user.nume} {user.prenume?.charAt(0)}.
-                    </span>
-                    <span className="text-muted-foreground text-xs">{user.functie}</span>
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {loading ? (
-                  <DropdownMenuItem disabled>Se încarcă...</DropdownMenuItem>
-                ) : (
-                  <>
-                    <DropdownMenuItem onClick={handleProfile}>Profil</DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+            {user && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="hover:bg-muted/60 focus-visible:ring-primary/40 flex items-center gap-3 rounded-full px-2 pr-3"
+                  >
+                    <Avatar
+                      src={user.profilePicture ?? undefined}
+                      name={`${user.nume} ${user.prenume}`}
+                      className="border-border h-9 w-9 border"
+                    />
+                    <div className="hidden flex-col text-left md:flex">
+                      <span className="text-sm font-semibold leading-none">
+                        {user.nume} {user.prenume?.charAt(0)}.
+                      </span>
+                      <span className="text-muted-foreground text-xs">{user.functie}</span>
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="min-w-[10rem]">
+                  {loading ? (
+                    <DropdownMenuItem disabled>Se încarcă...</DropdownMenuItem>
+                  ) : (
+                    <>
+                      <DropdownMenuItem onClick={handleProfile}>Profil</DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
       </header>
       <MobileSidebar open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} />

@@ -465,7 +465,7 @@ export default function ColegModals({
                                       ? prev.filter((item) => item !== eq.id)
                                       : [...prev, eq.id]
                                   );
-                                })
+                                }}
                                 disabled={isProcessingEquipment}
                                 className="h-4 w-4 rounded border-slate-300 text-red-600 focus:ring-red-500"
                                 aria-label={`Selectează ${eq.nume}`}
