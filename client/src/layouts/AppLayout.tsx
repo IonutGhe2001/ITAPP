@@ -7,7 +7,7 @@ export default function AppLayout() {
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-100">
       <Sidebar />
-      <div className="flex flex-1 flex-col md:ml-60">
+      <div className="flex flex-1 flex-col md:ml-72">
         <Header />
         <main className="flex-1 overflow-y-auto">
           <Container className="py-4">

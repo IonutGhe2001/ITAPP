@@ -47,7 +47,7 @@ export default function Header() {
     <>
       <header className="bg-background/80 border-border/80 sticky top-0 z-40 border-b px-6 py-3 shadow-[0_15px_40px_-30px_rgba(15,23,42,0.65)] backdrop-blur supports-[backdrop-filter]:backdrop-blur">
         <div className="flex items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
             <button
               className="text-muted-foreground/80 hover:text-foreground border-border/80 bg-background/60 inline-flex h-10 w-10 items-center justify-center rounded-full border transition md:hidden"
               onClick={() => setMobileMenuOpen(true)}
@@ -55,17 +55,17 @@ export default function Header() {
               <Menu className="h-5 w-5" />
               <span className="sr-only">Deschide meniul</span>
             </button>
-            <div className="flex flex-col">
+            <div className="flex min-w-0 flex-col">
               <span className="text-muted-foreground/70 text-[10px] font-semibold uppercase tracking-[0.5em]">
                 Monitorizare
               </span>
-              <h1 className="text-foreground text-lg font-semibold tracking-tight md:text-xl">
+              <h1 className="text-foreground truncate text-lg font-semibold tracking-tight md:text-xl">
                 {title}
               </h1>
             </div>
           </div>
 
-        <div className="flex items-center gap-3">
+          <div className="flex flex-shrink-0 items-center gap-3">
             <button
               className="text-muted-foreground/80 hover:text-foreground border-border/80 bg-background/60 inline-flex h-10 w-10 items-center justify-center rounded-full border transition md:hidden"
               onClick={() => setMobileSearchOpen(true)}

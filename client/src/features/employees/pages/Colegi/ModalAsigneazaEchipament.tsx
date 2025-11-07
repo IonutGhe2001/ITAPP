@@ -88,15 +88,13 @@ export default function ModalAsigneazaEchipament({
         payload = { predate: replaceIds, primite: selectedIds };
         onPendingPV?.(payload);
       } else {
-        const idsToAssign = selectedIds;
-        await Promise.all(
-          idsToAssign.map((id) =>
-            updateMutation.mutateAsync({
-              id,
-              data: { angajatId, stare: 'alocat' },
-            })
-          )
-        );
+        const idsToAssign = [...selectedIds];
+        for (const id of idsToAssign) {
+          await updateMutation.mutateAsync({
+            id,
+            data: { angajatId, stare: 'alocat' },
+          });
+        }
         payload = { primite: idsToAssign };
         onPendingPV?.(payload);
       }

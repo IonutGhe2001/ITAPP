@@ -8,7 +8,7 @@ import { useUpdateEchipament } from '@/features/equipment';
 import { genereazaProcesVerbal } from '@/features/proceseVerbale';
 import { queueProcesVerbal } from '@/features/proceseVerbale/pvQueue';
 import { getConfig } from '@/services/configService';
-import type { Angajat } from '@/features/equipment/types';
+import type { Angajat, Echipament } from '@/features/equipment/types';
 import type { AngajatWithRelations } from '@/features/employees/angajatiService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import StatusBadge from '@/components/StatusBadge';
@@ -204,22 +204,20 @@ export default function ColegModals({
           angajatId={detailColeg.id}
           oldEchipamentIds={bulkReplaceIds}
           onReplace={async (oldIds, newIds) => {
-            await Promise.all(
-              oldIds.map((oldId) =>
-                updateMutation.mutateAsync({
-                  id: oldId,
-                  data: { angajatId: null, stare: 'in_stoc' },
-                })
-              )
-            );
-            const assignedEquipment = await Promise.all(
-              newIds.map((newId) =>
-                updateMutation.mutateAsync({
-                  id: newId,
-                  data: { angajatId: detailColeg.id, stare: 'alocat' },
-                })
-              )
-            );
+            for (const oldId of oldIds) {
+              await updateMutation.mutateAsync({
+                id: oldId,
+                data: { angajatId: null, stare: 'in_stoc' },
+              });
+            }
+            const assignedEquipment: Echipament[] = [];
+            for (const newId of newIds) {
+              const updated = await updateMutation.mutateAsync({
+                id: newId,
+                data: { angajatId: detailColeg.id, stare: 'alocat' },
+              });
+              assignedEquipment.push(updated);
+            }
             const payload = { predate: oldIds, primite: newIds };
             onPVChange(detailColeg.id, payload);
             const { pvGenerationMode } = await getConfig();
