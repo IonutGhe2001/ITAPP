@@ -7,6 +7,7 @@ export const QUERY_KEYS = {
   GLOBAL_SEARCH: ['global-search'] as const,
   SEARCH_SUGGESTIONS: ['search-suggestions'] as const,
   OVERVIEW_STATS: ['overview-stats'] as const,
+  ONBOARDING_PACKAGES: ['onboarding', 'packages'] as const,
 } as const;
 
 export type QueryKeys = typeof QUERY_KEYS;

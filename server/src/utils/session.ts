@@ -1,4 +1,4 @@
-import { UAParser } from "ua-parser-js";
+import UAParser from "ua-parser-js";
 import geoip from "geoip-lite";
 
 export interface ParsedUserAgent {
@@ -46,7 +46,7 @@ export const parseUserAgentInfo = (userAgent?: string): ParsedUserAgent => {
 
   const typeKey = device.type?.toLowerCase();
   const deviceType = typeKey
-    ? DEVICE_TYPE_LABELS[typeKey] ?? typeKey.replace(/^./, (c) => c.toUpperCase())
+    ? DEVICE_TYPE_LABELS[typeKey] ?? typeKey.replace(/^./, (c: string) => c.toUpperCase())
     : "Web";
 
   return {

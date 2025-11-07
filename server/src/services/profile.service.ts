@@ -158,6 +158,8 @@ export const getUserActivity = async (
   return activities;
 };
 
+type PrismaSession = Awaited<ReturnType<typeof getSessionsForUser>>[number];
+
 export const getUserSessions = async (
   userId: number,
   currentSessionId?: string
@@ -190,7 +192,7 @@ export const getUserSessions = async (
     return [];
   }
 
-  return sessions.map((session) => {
+  return sessions.map((session: PrismaSession) => {
     const locationParts = [session.locationCity, session.locationCountry]
       .filter((part) => Boolean(part?.trim()))
       .map((part) => part!.trim());

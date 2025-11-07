@@ -45,7 +45,7 @@ interface ColegModalsProps {
   handleDelete: (id: string) => void;
   onPVChange: (colegId: string, change: { predate?: string[]; primite?: string[] }) => void;
   detailColeg: AngajatWithRelations | null;
-  setDetailColeg: (value: AngajatWithRelations | null) => void;
+  setDetailColeg: React.Dispatch<React.SetStateAction<AngajatWithRelations | null>>;
 }
 
 export default function ColegModals({
