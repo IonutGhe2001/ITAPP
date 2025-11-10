@@ -4,6 +4,7 @@ import { EQUIPMENT_STATUS } from "@shared/equipmentStatus";
 import type { PrismaClient } from "@prisma/client";
 import fs from "fs";
 import path from "path";
+import { allowsMultipleAssignments } from "../utils/equipmentType";
 
 type TransactionClient = Pick<
   PrismaClient,
@@ -38,7 +39,7 @@ const validateEchipamentUpdate = async (
     }
   }
 
-  if (data.angajatId) {
+  if (data.angajatId && !allowsMultipleAssignments(newTip)) {
     const eqSameType = await tx.echipament.findFirst({
       where: { angajatId: data.angajatId, tip: newTip, NOT: { id } },
     });
@@ -230,7 +231,7 @@ export const createEchipament = (data: {
       throw error;
     }
 
-    if (data.angajatId) {
+    if (data.angajatId && !allowsMultipleAssignments(data.tip)) {
       const eqSameType = await tx.echipament.findFirst({
         where: { angajatId: data.angajatId, tip: data.tip },
       });

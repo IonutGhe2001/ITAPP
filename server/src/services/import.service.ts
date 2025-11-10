@@ -1,6 +1,7 @@
 import { prisma } from "../lib/prisma";
 import { env } from "../config";
 import { logger } from "@lib/logger";
+import { allowsMultipleAssignments } from "../utils/equipmentType";
 
 export type ImportRow = {
   "Nume Echipament": string;
@@ -107,7 +108,9 @@ export const processImportRows = async (rows: ImportRow[]) => {
       employeeIdMap.set(emailKey, employee.id);
       const equipmentTypes = new Set<string>();
       for (const equipment of employee.echipamente) {
-        equipmentTypes.add(equipment.tip);
+        if (!allowsMultipleAssignments(equipment.tip)) {
+          equipmentTypes.add(equipment.tip);
+        }
       }
       employeeTypeAssignments.set(emailKey, equipmentTypes);
     }
@@ -166,7 +169,7 @@ export const processImportRows = async (rows: ImportRow[]) => {
         emailKey = toEmailKey(rawEmail);
         const assignedTypes =
           employeeTypeAssignments.get(emailKey) ?? new Set<string>();
-        if (assignedTypes.has(tip)) {
+        if (!allowsMultipleAssignments(tip) && assignedTypes.has(tip)) {
           metrics.duplicateAssignments += 1;
           metrics.totalErrors += 1;
           errors.push({
@@ -207,7 +210,7 @@ export const processImportRows = async (rows: ImportRow[]) => {
 
       scheduledEquipmentKeys.add(key);
 
-      if (emailKey) {
+      if (emailKey && !allowsMultipleAssignments(tip)) {
         const types = employeeTypeAssignments.get(emailKey) ?? new Set<string>();
         types.add(tip);
         employeeTypeAssignments.set(emailKey, types);

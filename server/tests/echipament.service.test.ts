@@ -93,6 +93,28 @@ describe('updateEchipament', () => {
     expect(res).toEqual({ id: 'e1', angajatId: 'a2', stare: 'alocat' });
   });
 
+  it('allows assigning multiple consumables to the same employee', async () => {
+    tx.echipament.findUnique.mockResolvedValue({
+      id: 'e1',
+      tip: 'Consumabile IT',
+      serie: 'S',
+      angajatId: null,
+      stare: 'in_stoc',
+    });
+    tx.echipament.findFirst.mockResolvedValueOnce(null);
+    tx.echipament.update.mockResolvedValue({ id: 'e1', angajatId: 'a1', stare: 'alocat' });
+
+    const res = await updateEchipament('e1', { angajatId: 'a1' });
+
+    expect(tx.echipament.findFirst).not.toHaveBeenCalled();
+    expect(tx.echipament.update).toHaveBeenCalledWith({
+      where: { id: 'e1' },
+      data: expect.objectContaining({ angajatId: 'a1', stare: 'alocat' }),
+      include: { angajat: true },
+    });
+    expect(res).toEqual({ id: 'e1', angajatId: 'a1', stare: 'alocat' });
+  });
+
   it('updates technical details', async () => {
     tx.echipament.findUnique.mockResolvedValue({
       id: 'e1',
