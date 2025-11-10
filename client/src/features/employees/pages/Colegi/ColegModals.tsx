@@ -1,4 +1,4 @@
-import React, { Suspense, useMemo, useState } from 'react';
+import React, { Suspense, useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -73,11 +73,65 @@ export default function ColegModals({
   const [selectedEquipmentIds, setSelectedEquipmentIds] = useState<string[]>([]);
   const [bulkReplaceIds, setBulkReplaceIds] = useState<string[] | null>(null);
   const [isProcessingEquipment, setIsProcessingEquipment] = useState(false);
+  const [detailToRestore, setDetailToRestore] = useState<AngajatWithRelations | null>(null);
   const { toast } = useToast();
   const pendingForDetailColeg = detailColeg ? pendingPV[detailColeg.id] : undefined;
   const pendingForDetailColegCount =
     (pendingForDetailColeg?.predate.length ?? 0) +
     (pendingForDetailColeg?.primite.length ?? 0);
+
+    const restoreDetailProfile = useCallback(
+    (transform?: (detail: AngajatWithRelations) => AngajatWithRelations) => {
+      let restored = false;
+      setDetailColeg((current) => {
+        const base = current ?? detailToRestore;
+        if (!base) return current;
+        restored = true;
+        const updated = transform ? transform(base) : base;
+        return {
+          ...updated,
+          echipamente: Array.isArray(updated.echipamente)
+            ? [...updated.echipamente]
+            : updated.echipamente,
+        };
+      });
+      if (restored) {
+        setActiveTab('profile');
+        setSelectedEquipmentIds([]);
+        setBulkReplaceIds(null);
+        setDetailToRestore(null);
+      }
+    },
+    [detailToRestore, setDetailColeg, setActiveTab, setSelectedEquipmentIds, setBulkReplaceIds, setDetailToRestore]
+  );
+
+  const handleAssignModalClose = useCallback(() => {
+    setSelectedAngajatId(null);
+    restoreDetailProfile();
+  }, [restoreDetailProfile, setSelectedAngajatId]);
+
+  const handleAssignModalSuccess = useCallback(
+    (result?: { assignedEquipment?: Echipament[] }) => {
+      if (result?.assignedEquipment?.length) {
+        restoreDetailProfile((detail) => {
+          const existing = Array.isArray(detail.echipamente) ? detail.echipamente : [];
+          const existingIds = new Set(existing.map((item) => item.id));
+          const additions = result.assignedEquipment?.filter((item) => !existingIds.has(item.id)) ?? [];
+          return {
+            ...detail,
+            echipamente: [...existing, ...additions],
+          };
+        });
+      } else {
+        restoreDetailProfile();
+      }
+
+      void refetch();
+      setExpanded(new Set());
+      setSelectedAngajatId(null);
+    },
+    [refetch, restoreDetailProfile, setExpanded, setSelectedAngajatId]
+  );
 
   const handleBulkReturn = async (ids?: string[]) => {
     if (!detailColeg) return;
@@ -110,6 +164,7 @@ export default function ColegModals({
             }
           : prev
       );
+      setActiveTab('profile');
     } catch (err) {
       toast({
         title: 'Eroare la returnare',
@@ -153,13 +208,9 @@ export default function ColegModals({
       {selectedAngajatId && (
         <ModalAsigneazaEchipament
           angajatId={selectedAngajatId}
-          onClose={() => setSelectedAngajatId(null)}
+          onClose={handleAssignModalClose}
           onPendingPV={(change) => onPVChange(selectedAngajatId, change)}
-          onSuccess={() => {
-            void refetch();
-            setExpanded(new Set());
-            setSelectedAngajatId(null);
-          }}
+          onSuccess={handleAssignModalSuccess}
         />
       )}
       {replaceData && (
@@ -187,6 +238,7 @@ export default function ColegModals({
             void refetch();
             setExpanded(new Set());
             setReplaceData(null);
+            setActiveTab('profile');
           }}
         />
       )}
@@ -223,12 +275,14 @@ export default function ColegModals({
                 : prev
             );
             await refetch();
+            setActiveTab('profile');
           }}
           onPendingPV={(change) => onPVChange(detailColeg.id, change)}
           onClose={() => setBulkReplaceIds(null)}
           onSuccess={() => {
             setBulkReplaceIds(null);
             setSelectedEquipmentIds([]);
+            setActiveTab('profile');
           }}
         />
       )}
@@ -282,6 +336,7 @@ export default function ColegModals({
               setActiveTab('profile');
               setSelectedEquipmentIds([]);
               setBulkReplaceIds(null);
+              setDetailToRestore(null);
             }
           }}
         >
@@ -393,6 +448,12 @@ export default function ColegModals({
                     <Button
                       size="sm"
                       onClick={() => {
+                        setDetailToRestore({
+                          ...detailColeg,
+                          echipamente: Array.isArray(detailColeg.echipamente)
+                            ? [...detailColeg.echipamente]
+                            : [],
+                        });
                         setSelectedAngajatId(detailColeg.id);
                         setDetailColeg(null);
                         setActiveTab('profile');

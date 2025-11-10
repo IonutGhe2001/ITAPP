@@ -19,7 +19,10 @@ export default function ModalAsigneazaEchipament({
 }: {
   angajatId: string;
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess?: (result: {
+    assignedEquipment?: Echipament[];
+    payload?: { predate?: string[]; primite?: string[] };
+  }) => void;
   filterTip?: string;
   oldEchipamentIds?: string[];
   onReplace?: (oldIds: string[], newIds: string[]) => Promise<void> | void;
@@ -80,14 +83,15 @@ export default function ModalAsigneazaEchipament({
 
     const tip: ProcesVerbalTip = isReplacing ? 'SCHIMB' : 'PREDARE_PRIMIRE';
     let payload: { predate?: string[]; primite?: string[] } | undefined;
+    const selectedSnapshot = [...selectedIds];
 
     try {
       if (isReplacing && onReplace) {
-        await onReplace(replaceIds, selectedIds);
-        payload = { predate: replaceIds, primite: selectedIds };
+        await onReplace(replaceIds, selectedSnapshot);
+        payload = { predate: replaceIds, primite: selectedSnapshot };
         onPendingPV?.(payload);
       } else {
-        const idsToAssign = [...selectedIds];
+        const idsToAssign = [...selectedSnapshot];
         for (const id of idsToAssign) {
           await updateMutation.mutateAsync({
             id,
@@ -104,9 +108,22 @@ export default function ModalAsigneazaEchipament({
         payload
       );
       
+      const assignedEquipment = selectedSnapshot
+        .map((id) => echipamente.find((e: Echipament) => e.id === id))
+        .filter((item): item is Echipament => Boolean(item))
+        .map((item) => ({
+          ...item,
+          angajatId,
+          stare: 'alocat' as const,
+        }));
+
+      onSuccess?.({
+        assignedEquipment,
+        payload,
+      });
+
       setSelectedIds([]);
       onClose();
-      onSuccess?.();
     } catch (err) {
       toast({
         title: 'Eroare la asignare',
