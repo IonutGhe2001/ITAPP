@@ -248,8 +248,8 @@ export default function Colegi() {
     for (const item of items) {
       const current = grouped[item.angajatId] || { predate: [], primite: [] };
       grouped[item.angajatId] = {
-        predate: [...current.predate, ...(item.predate || [])],
-        primite: [...current.primite, ...(item.primite || [])],
+        predate: Array.from(new Set([...current.predate, ...(item.predate || [])])),
+        primite: Array.from(new Set([...current.primite, ...(item.primite || [])])),
       };
     }
     setPendingPV(grouped);
@@ -261,8 +261,8 @@ export default function Colegi() {
       return {
         ...prev,
         [colegId]: {
-          predate: [...current.predate, ...(change.predate || [])],
-          primite: [...current.primite, ...(change.primite || [])],
+          predate: Array.from(new Set([...current.predate, ...(change.predate || [])])),
+          primite: Array.from(new Set([...current.primite, ...(change.primite || [])])),
         },
       };
     });
@@ -805,6 +805,8 @@ export default function Colegi() {
         onPVChange={addPendingPV}
         detailColeg={detailColeg}
         setDetailColeg={setDetailColeg}
+        pendingPV={pendingPV}
+        onGeneratePV={handleGeneratePV}
       />
     </div>
   );

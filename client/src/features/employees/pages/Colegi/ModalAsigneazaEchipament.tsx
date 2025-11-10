@@ -1,9 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useEchipamente, useUpdateEchipament } from '@/features/equipment';
 import type { Echipament } from '@/features/equipment/types';
-import { genereazaProcesVerbal, type ProcesVerbalTip } from '@/features/proceseVerbale';
+import { type ProcesVerbalTip } from '@/features/proceseVerbale';
 import { queueProcesVerbal } from '@/features/proceseVerbale/pvQueue';
-import { getConfig } from '@/services/configService';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 import { handleApiError } from '@/utils/apiError';
 import { Search } from 'lucide-react';
@@ -99,21 +98,11 @@ export default function ModalAsigneazaEchipament({
         onPendingPV?.(payload);
       }
 
-      const { pvGenerationMode } = await getConfig();
-      if (pvGenerationMode === 'auto') {
-        const url = await genereazaProcesVerbal(
-          angajatId,
-          tip,
-          payload
-        );
-        window.open(url, '_blank', 'noopener');
-      } else {
-        queueProcesVerbal(
-          angajatId,
-          tip,
-          payload
-        );
-      }
+      queueProcesVerbal(
+        angajatId,
+        tip,
+        payload
+      );
       
       setSelectedIds([]);
       onClose();

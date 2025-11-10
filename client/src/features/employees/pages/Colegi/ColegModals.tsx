@@ -5,9 +5,7 @@ import { Button } from '@/components/ui/button';
 import ModalAsigneazaEchipament from './ModalAsigneazaEchipament';
 import ModalEditColeg from './ModalEditColeg';
 import { useUpdateEchipament } from '@/features/equipment';
-import { genereazaProcesVerbal } from '@/features/proceseVerbale';
 import { queueProcesVerbal } from '@/features/proceseVerbale/pvQueue';
-import { getConfig } from '@/services/configService';
 import type { Angajat, Echipament } from '@/features/equipment/types';
 import type { AngajatWithRelations } from '@/features/employees/angajatiService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -45,6 +43,8 @@ interface ColegModalsProps {
   onPVChange: (colegId: string, change: { predate?: string[]; primite?: string[] }) => void;
   detailColeg: AngajatWithRelations | null;
   setDetailColeg: React.Dispatch<React.SetStateAction<AngajatWithRelations | null>>;
+  pendingPV: Record<string, { predate: string[]; primite: string[] }>;
+  onGeneratePV: (colegId: string) => Promise<void> | void;
 }
 
 export default function ColegModals({
@@ -65,6 +65,8 @@ export default function ColegModals({
   onPVChange,
   detailColeg,
   setDetailColeg,
+  pendingPV,
+  onGeneratePV,
 }: ColegModalsProps) {
   const updateMutation = useUpdateEchipament();
   const [activeTab, setActiveTab] = useState<'profile' | 'equipment'>('profile');
@@ -72,6 +74,10 @@ export default function ColegModals({
   const [bulkReplaceIds, setBulkReplaceIds] = useState<string[] | null>(null);
   const [isProcessingEquipment, setIsProcessingEquipment] = useState(false);
   const { toast } = useToast();
+  const pendingForDetailColeg = detailColeg ? pendingPV[detailColeg.id] : undefined;
+  const pendingForDetailColegCount =
+    (pendingForDetailColeg?.predate.length ?? 0) +
+    (pendingForDetailColeg?.primite.length ?? 0);
 
   const handleBulkReturn = async (ids?: string[]) => {
     if (!detailColeg) return;
@@ -91,17 +97,9 @@ export default function ColegModals({
       const payload = { predate: equipmentIds };
       onPVChange(detailColeg.id, payload);
 
-      const { pvGenerationMode } = await getConfig();
-      if (pvGenerationMode === 'auto') {
-        const url = await genereazaProcesVerbal(detailColeg.id, 'RESTITUIRE', {
-          predate: equipmentIds,
-        });
-        window.open(url, '_blank', 'noopener');
-      } else {
-        queueProcesVerbal(detailColeg.id, 'RESTITUIRE', {
-          predate: equipmentIds,
-        });
-      }
+      queueProcesVerbal(detailColeg.id, 'RESTITUIRE', {
+        predate: equipmentIds,
+      });
 
       await refetch();
       setDetailColeg((prev) =>
@@ -182,13 +180,6 @@ export default function ColegModals({
             });
             const payload = { predate: oldIds, primite: newIds };
             onPVChange(replaceData.colegId, payload);
-            const { pvGenerationMode } = await getConfig();
-            if (pvGenerationMode === 'auto') {
-              const url = await genereazaProcesVerbal(replaceData.colegId, 'SCHIMB', payload);
-              window.open(url, '_blank', 'noopener');
-            } else {
-              queueProcesVerbal(replaceData.colegId, 'SCHIMB', payload);
-            }
           }}
           onPendingPV={(change) => onPVChange(replaceData.colegId, change)}
           onClose={() => setReplaceData(null)}
@@ -220,13 +211,6 @@ export default function ColegModals({
             }
             const payload = { predate: oldIds, primite: newIds };
             onPVChange(detailColeg.id, payload);
-            const { pvGenerationMode } = await getConfig();
-            if (pvGenerationMode === 'auto') {
-              const url = await genereazaProcesVerbal(detailColeg.id, 'SCHIMB', payload);
-              window.open(url, '_blank', 'noopener');
-            } else {
-              queueProcesVerbal(detailColeg.id, 'SCHIMB', payload);
-            }
             setDetailColeg((prev) =>
               prev
                 ? {
@@ -390,22 +374,33 @@ export default function ColegModals({
                 </div>
               </TabsContent>
               <TabsContent value="equipment" className="space-y-4 pt-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="text-muted-foreground text-sm">
                     {detailColeg.echipamente.length > 0
                       ? `${detailColeg.echipamente.length} echipamente alocate`
                       : 'Nu există echipamente alocate.'}
                   </p>
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      setSelectedAngajatId(detailColeg.id);
-                      setDetailColeg(null);
-                      setActiveTab('profile');
-                    }}
-                  >
-                    Asignează echipament
-                  </Button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {pendingForDetailColegCount > 0 && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => onGeneratePV(detailColeg.id)}
+                      >
+                        Generează PV ({pendingForDetailColegCount})
+                      </Button>
+                    )}
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setSelectedAngajatId(detailColeg.id);
+                        setDetailColeg(null);
+                        setActiveTab('profile');
+                      }}
+                    >
+                      Asignează echipament
+                    </Button>
+                  </div>
                 </div>
                 {selectedEquipmentIds.length > 0 && (
                   <div className="border-red-100/70 bg-red-50/70 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3">
