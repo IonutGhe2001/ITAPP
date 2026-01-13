@@ -126,10 +126,9 @@ export default function Echipamente() {
     enabled: queryEnabled,
   });
 
-  const {
-    data: fetchedTypes = [],
-    isLoading: isLoadingTypes,
-  } = useEquipmentTypes({ enabled: queryEnabled });
+  const { data: fetchedTypes = [], isLoading: isLoadingTypes } = useEquipmentTypes({
+    enabled: queryEnabled,
+  });
 
   const availableTypes = useMemo(() => {
     const values = new Map<string, string>();
@@ -492,9 +491,7 @@ export default function Echipamente() {
               onEdit={handleEdit}
               onDelete={handleDelete}
               onTransfer={handleTransfer}
-              onViewDetails={(eq) =>
-                navigate(ROUTES.EQUIPMENT_DETAIL.replace(':id', eq.id))
-              }
+              onViewDetails={(eq) => navigate(ROUTES.EQUIPMENT_DETAIL.replace(':id', eq.id))}
               setSize={setSize}
             />
           )}
@@ -621,7 +618,7 @@ export default function Echipamente() {
                     </span>
                   )}
                 </div>
-                </div>
+              </div>
 
               <div>
                 <Select
@@ -690,7 +687,6 @@ export default function Echipamente() {
         <div className={containerClasses} ref={!isError ? containerRef : undefined}>
           {!isError && hasData && width === 0 && height === 0 ? renderSkeleton() : content}
         </div>
-
       </Container>
 
       {selected && (

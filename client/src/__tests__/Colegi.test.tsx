@@ -79,8 +79,8 @@ describe('Colegi', () => {
         pendingPV={undefined}
         onGeneratePV={vi.fn()}
         onOpenDetails={vi.fn()}
-        />
+      />
     );
     expect(screen.queryByText('Marchează creat')).not.toBeInTheDocument();
   });
-  });
+});

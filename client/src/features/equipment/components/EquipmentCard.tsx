@@ -37,7 +37,7 @@ function EquipmentCard({
   const assignedLabel = getAssignedLabel(echipament);
 
   return (
-     <article className="group flex h-full flex-col gap-4 rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-800/70 dark:bg-slate-900/70">
+    <article className="group flex h-full flex-col gap-4 rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-800/70 dark:bg-slate-900/70">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-2xl">
@@ -114,7 +114,7 @@ function EquipmentCard({
           )}
         </div>
       </div>
-      </article>
+    </article>
   );
 }
 

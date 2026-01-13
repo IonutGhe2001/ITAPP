@@ -40,7 +40,7 @@ export default function ProfilePage() {
   const extractLocation = (locatie: string | null | undefined): string => {
     if (!locatie) return '-';
     // Assuming location format is "City, County" or similar
-    const parts = locatie.split(',').map(part => part.trim());
+    const parts = locatie.split(',').map((part) => part.trim());
     return parts.join(', ');
   };
 
@@ -52,14 +52,14 @@ export default function ProfilePage() {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
+
     const relativeTime = formatRelativeTime(diffMins);
     if (relativeTime) return relativeTime;
-    
-    return date.toLocaleDateString('ro-RO', { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
+
+    return date.toLocaleDateString('ro-RO', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
     });
   };
 
@@ -154,7 +154,7 @@ export default function ProfilePage() {
     },
   ];
 
-      return (
+  return (
     <div className="mx-auto max-w-6xl px-6 py-8">
       <div className="space-y-6">
         <div className="border-border/60 from-primary/20 via-primary/10 relative overflow-hidden rounded-3xl border bg-gradient-to-r to-transparent shadow-sm">
@@ -197,7 +197,7 @@ export default function ProfilePage() {
                   ) : null}
                 </div>
               </div>
-            <div className="space-y-4 text-center sm:text-left">
+              <div className="space-y-4 text-center sm:text-left">
                 <div>
                   <h1 className="text-foreground text-3xl font-semibold tracking-tight">
                     {fullName || t('profile.heading')}
@@ -221,7 +221,7 @@ export default function ProfilePage() {
                 </dl>
               </div>
             </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <Button
                 type="button"
                 variant="outline"
@@ -251,19 +251,13 @@ export default function ProfilePage() {
               </header>
               <dl className="grid gap-4 sm:grid-cols-2">
                 <DefinitionItem label={t('profile.labels.fullName')} value={fullName || '-'} />
-                <DefinitionItem
-                  label={t('profile.labels.position')}
-                  value={user?.functie || '-'}
-                />
+                <DefinitionItem label={t('profile.labels.position')} value={user?.functie || '-'} />
                 <DefinitionItem label={t('profile.labels.email')} value={user?.email || '-'} />
-                <DefinitionItem
-                  label={t('profile.labels.phone')}
-                  value={user?.telefon || '-'}
-                />
+                <DefinitionItem label={t('profile.labels.phone')} value={user?.telefon || '-'} />
               </dl>
             </section>
 
-              <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
+            <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
               <header className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h2 className="text-lg font-semibold">
@@ -277,7 +271,7 @@ export default function ProfilePage() {
                     })}
                   </p>
                 </div>
-            <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Button
                     type="button"
                     size="sm"
@@ -315,7 +309,7 @@ export default function ProfilePage() {
             </section>
           </div>
 
-               <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm lg:col-span-12 xl:col-span-8 2xl:col-span-7">
+          <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm lg:col-span-12 xl:col-span-8 2xl:col-span-7">
             <header className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="text-lg font-semibold">
                 {t('profile.sections.sessions', { defaultValue: 'Sesiuni active' })}
@@ -326,7 +320,9 @@ export default function ProfilePage() {
                 variant="outline"
                 className="focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2"
               >
-                {t('profile.buttons.signOutOthers', { defaultValue: 'Deconectează-te de pe celelalte' })}
+                {t('profile.buttons.signOutOthers', {
+                  defaultValue: 'Deconectează-te de pe celelalte',
+                })}
               </Button>
             </header>
             <div className="border-border/50 overflow-hidden rounded-xl border">
@@ -367,7 +363,10 @@ export default function ProfilePage() {
                                 <div className="flex items-center gap-2">
                                   <span className="font-medium">{deviceName}</span>
                                   {session.current ? (
-                                    <Badge variant="outline" className="border-primary/60 bg-primary/10 text-primary text-xs">
+                                    <Badge
+                                      variant="outline"
+                                      className="border-primary/60 bg-primary/10 text-primary text-xs"
+                                    >
                                       Curent
                                     </Badge>
                                   ) : null}
@@ -377,13 +376,21 @@ export default function ProfilePage() {
                             </td>
                             <td className="px-4 py-3">
                               <div className="space-y-1">
-                                <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{browser}</span>
-                                <span className="text-muted-foreground block text-xs">{osName}</span>
+                                <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                                  {browser}
+                                </span>
+                                <span className="text-muted-foreground block text-xs">
+                                  {osName}
+                                </span>
                               </div>
-                              </td>
-                            <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">{location}</td>
-                            <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">{ip}</td>
-                            <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">
+                            </td>
+                            <td className="text-muted-foreground whitespace-nowrap px-4 py-3">
+                              {location}
+                            </td>
+                            <td className="text-muted-foreground whitespace-nowrap px-4 py-3">
+                              {ip}
+                            </td>
+                            <td className="text-muted-foreground whitespace-nowrap px-4 py-3">
                               {formatSessionLastActive(session.lastActive)}
                             </td>
                           </tr>
@@ -394,7 +401,9 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <p className="text-muted-foreground px-4 py-6 text-sm">
-                  {t('profile.sessions.empty', { defaultValue: 'Nu există sesiuni active înregistrate.' })}
+                  {t('profile.sessions.empty', {
+                    defaultValue: 'Nu există sesiuni active înregistrate.',
+                  })}
                 </p>
               )}
             </div>

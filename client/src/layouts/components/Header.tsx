@@ -78,11 +78,11 @@ export default function Header() {
 
             <div className="bg-border/70 hidden h-8 w-px md:block" aria-hidden="true" />
 
-          <NotificationsMenu />
+            <NotificationsMenu />
 
             <div className="bg-border/70 hidden h-8 w-px md:block" aria-hidden="true" />
 
-          <ThemeToggle />
+            <ThemeToggle />
 
             {user && (
               <DropdownMenu>

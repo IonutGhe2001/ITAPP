@@ -178,28 +178,32 @@ export const getEquipmentStatusTimeline = async (): Promise<
   };
   const typeMap = new Map<string, StatusCounts>();
 
-  equipmentByType.forEach((item: { tip: string; stare: string; _count: { tip: number } }) => {
-    if (!typeMap.has(item.tip)) {
-      typeMap.set(item.tip, {
-        in_stock: 0,
-        allocated: 0,
-        repair: 0,
-        retired: 0,
-      });
-    }
+  equipmentByType.forEach(
+    (item: { tip: string; stare: string; _count: { tip: number } }) => {
+      if (!typeMap.has(item.tip)) {
+        typeMap.set(item.tip, {
+          in_stock: 0,
+          allocated: 0,
+          repair: 0,
+          retired: 0,
+        });
+      }
 
-    const counts = typeMap.get(item.tip)!;
-    const category = STATUS_CATEGORY_MAP[item.stare];
-    if (category) {
-      counts[category] = item._count.tip;
+      const counts = typeMap.get(item.tip)!;
+      const category = STATUS_CATEGORY_MAP[item.stare];
+      if (category) {
+        counts[category] = item._count.tip;
+      }
     }
-  });
+  );
 
   // Convert to array format
-  return Array.from(typeMap.entries()).map(([tip, counts]): EquipmentStatusRecord => ({
-    status: tip,
-    ...counts,
-  }));
+  return Array.from(typeMap.entries()).map(
+    ([tip, counts]): EquipmentStatusRecord => ({
+      status: tip,
+      ...counts,
+    })
+  );
 };
 
 export const getAlerts = async (limit: number): Promise<Alert[]> => {
@@ -298,26 +302,31 @@ export const getPvQueue = async (limit: number): Promise<PvQueueItem[]> => {
     orderBy: { createdAt: "asc" },
   });
 
-  return changes.map((change: EquipmentChange & {
-    angajat: EmployeeWithDepartment;
-    echipament: Echipament;
-  }) => {
-    const daysSinceAllocation = Math.floor(
-      (now.getTime() - new Date(change.createdAt).getTime()) /
-        (1000 * 60 * 60 * 24)
-    );
-    const isOverdue = daysSinceAllocation > 7;
+  return changes.map(
+    (
+      change: EquipmentChange & {
+        angajat: EmployeeWithDepartment;
+        echipament: Echipament;
+      }
+    ) => {
+      const daysSinceAllocation = Math.floor(
+        (now.getTime() - new Date(change.createdAt).getTime()) /
+          (1000 * 60 * 60 * 24)
+      );
+      const isOverdue = daysSinceAllocation > 7;
 
-    return {
-      id: change.id,
-      employeeId: change.angajatId,
-      employee: change.angajat.numeComplet,
-      equipment: `${change.echipament.nume} ${change.echipament.serie}`,
-      allocationDate: change.createdAt.toISOString(),
-      location: change.angajat.departmentConfig?.name ?? "București - Sediu Central",
-      status: isOverdue ? ("overdue" as const) : ("pending" as const),
-    };
-  });
+      return {
+        id: change.id,
+        employeeId: change.angajatId,
+        employee: change.angajat.numeComplet,
+        equipment: `${change.echipament.nume} ${change.echipament.serie}`,
+        allocationDate: change.createdAt.toISOString(),
+        location:
+          change.angajat.departmentConfig?.name ?? "București - Sediu Central",
+        status: isOverdue ? ("overdue" as const) : ("pending" as const),
+      };
+    }
+  );
 };
 
 export const getActivity = async (limit: number): Promise<ActivityItem[]> => {
@@ -331,31 +340,35 @@ export const getActivity = async (limit: number): Promise<ActivityItem[]> => {
     orderBy: { createdAt: "desc" },
   });
 
-  return changes.map((change: EquipmentChange & { angajat: Angajat; echipament: Echipament }) => {
-    let action = "";
-    let target = "";
+  return changes.map(
+    (
+      change: EquipmentChange & { angajat: Angajat; echipament: Echipament }
+    ) => {
+      let action = "";
+      let target = "";
 
-    switch (change.tip) {
-      case "ASSIGN":
-        action = "a alocat";
-        target = `${change.echipament.nume} către ${change.angajat.numeComplet}`;
-        break;
-      case "RETURN":
-        action = "a returnat";
-        target = `${change.echipament.nume} de la ${change.angajat.numeComplet}`;
-        break;
-      case "REPLACE":
-        action = "a înlocuit";
-        target = `${change.echipament.nume} pentru ${change.angajat.numeComplet}`;
-        break;
+      switch (change.tip) {
+        case "ASSIGN":
+          action = "a alocat";
+          target = `${change.echipament.nume} către ${change.angajat.numeComplet}`;
+          break;
+        case "RETURN":
+          action = "a returnat";
+          target = `${change.echipament.nume} de la ${change.angajat.numeComplet}`;
+          break;
+        case "REPLACE":
+          action = "a înlocuit";
+          target = `${change.echipament.nume} pentru ${change.angajat.numeComplet}`;
+          break;
+      }
+
+      return {
+        id: change.id,
+        actor: change.angajat.numeComplet,
+        action,
+        target,
+        timestamp: change.createdAt.toISOString(),
+      };
     }
-
-    return {
-      id: change.id,
-      actor: change.angajat.numeComplet,
-      action,
-      target,
-      timestamp: change.createdAt.toISOString(),
-    };
-  });
+  );
 };

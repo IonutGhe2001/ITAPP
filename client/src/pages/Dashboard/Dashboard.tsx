@@ -112,10 +112,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    window.localStorage.setItem(
-      READ_ALERTS_STORAGE_KEY,
-      JSON.stringify(Array.from(readAlertIds))
-    );
+    window.localStorage.setItem(READ_ALERTS_STORAGE_KEY, JSON.stringify(Array.from(readAlertIds)));
   }, [readAlertIds]);
 
   const monthRange = useMemo(() => {

@@ -46,7 +46,8 @@ export const parseUserAgentInfo = (userAgent?: string): ParsedUserAgent => {
 
   const typeKey = device.type?.toLowerCase();
   const deviceType = typeKey
-    ? DEVICE_TYPE_LABELS[typeKey] ?? typeKey.replace(/^./, (c: string) => c.toUpperCase())
+    ? (DEVICE_TYPE_LABELS[typeKey] ??
+      typeKey.replace(/^./, (c: string) => c.toUpperCase()))
     : "Web";
 
   return {

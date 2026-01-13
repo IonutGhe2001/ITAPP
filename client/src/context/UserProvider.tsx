@@ -16,7 +16,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const data = await getCurrentUser();
     setUser(data);
     setUserStorage(data);
-  return data;
+    return data;
   }, []);
 
   useEffect(() => {

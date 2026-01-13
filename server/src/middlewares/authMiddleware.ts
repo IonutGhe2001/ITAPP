@@ -49,7 +49,7 @@ export const authenticate = async (
         throw sessionErr;
       }
     }
-    
+
     next();
   } catch (err) {
     return res.status(401).json({ message: "Token invalid" });

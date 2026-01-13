@@ -32,7 +32,7 @@ const angajatSelect = {
       serie: true,
       stare: true,
     },
-    },
+  },
 } satisfies Prisma.AngajatSelect;
 
 export interface GetAngajatiParams {
@@ -170,7 +170,7 @@ export const deleteAngajat = (id: string) => {
       });
     }
 
-      if (tx.equipmentChange) {
+    if (tx.equipmentChange) {
       await tx.equipmentChange.deleteMany({
         where: { angajatId: id },
       });

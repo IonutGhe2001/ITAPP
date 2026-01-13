@@ -87,8 +87,8 @@ export async function getEchipamente(
   const { page, pageSize, search, status, type, sort, sortBy } = params;
   const normalizedType = type?.trim();
   const searchTerm = search?.trim();
-  
-    const where = {
+
+  const where = {
     ...(status ? { stare: status.toLowerCase() } : {}),
     ...(normalizedType
       ? { tip: { equals: normalizedType, mode: "insensitive" } }
@@ -325,7 +325,7 @@ export const updateEchipament = async (
       ) {
         updateData.defectAt = null;
       }
-      } else if (data.angajatId !== undefined) {
+    } else if (data.angajatId !== undefined) {
       updateData.stare = data.angajatId
         ? EQUIPMENT_STATUS.ALOCAT
         : EQUIPMENT_STATUS.IN_STOC;

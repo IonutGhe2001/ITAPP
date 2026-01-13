@@ -37,7 +37,7 @@ export default function SearchResults() {
   const q = params.get('q') || '';
   const { data, isLoading, isFetching } = useGlobalSearch(q);
   const trimmedQuery = q.trim();
-  
+
   const isPending = isLoading || isFetching;
   const noResults = !data?.echipamente?.length && !data?.angajati?.length;
   const showNoResults = !isPending && noResults;

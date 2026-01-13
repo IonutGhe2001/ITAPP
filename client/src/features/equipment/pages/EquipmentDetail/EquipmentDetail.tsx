@@ -110,7 +110,7 @@ export default function EquipmentDetail() {
       data.dataAchizitie ?? ((rawDataAchizitie as string) || (rawPurchaseDate as string)),
     garantie: data.garantie ?? ((rawGarantie as string) || (rawWarranty as string)),
   };
-  
+
   const dedicatedEntries = [
     { key: 'CPU', value: dedicated.cpu },
     { key: 'RAM', value: dedicated.ram },
@@ -179,17 +179,22 @@ export default function EquipmentDetail() {
                 </span>
                 <StatusBadge label={statusLabel} tone={statusTone} withDot />
               </div>
-              </div>
+            </div>
             <div className="px-6 py-6 sm:px-8 sm:py-8">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="space-y-2">
-                  <h1 className="text-3xl font-semibold leading-tight text-slate-900">{data.nume}</h1>
+                  <h1 className="text-3xl font-semibold leading-tight text-slate-900">
+                    {data.nume}
+                  </h1>
                   <p className="text-muted-foreground text-sm">Serie: {data.serie}</p>
                   {assignedEmployeeName ? (
                     <p className="text-muted-foreground text-sm">
                       Predat către{' '}
                       {assignedEmployeeLink ? (
-                        <Link to={assignedEmployeeLink} className="font-medium text-red-700 hover:text-red-600 hover:underline">
+                        <Link
+                          to={assignedEmployeeLink}
+                          className="font-medium text-red-700 hover:text-red-600 hover:underline"
+                        >
                           {assignedEmployeeName}
                         </Link>
                       ) : (
@@ -245,7 +250,9 @@ export default function EquipmentDetail() {
             <Card className="p-6">
               <Tabs defaultValue="detalii" className="space-y-4">
                 <TabsList className="flex flex-wrap gap-2">
-                  {dedicatedEntries.length > 0 && <TabsTrigger value="detalii">Detalii</TabsTrigger>}
+                  {dedicatedEntries.length > 0 && (
+                    <TabsTrigger value="detalii">Detalii</TabsTrigger>
+                  )}
                   {Object.keys(remainingMetadata).length > 0 && (
                     <TabsTrigger value="metadata">Metadata</TabsTrigger>
                   )}
@@ -259,7 +266,9 @@ export default function EquipmentDetail() {
                     <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2 md:grid-cols-3">
                       {dedicatedEntries.map(({ key, value }) => (
                         <div key={key} className="rounded-xl border border-slate-200/70 p-4">
-                          <p className="text-muted-foreground text-xs uppercase tracking-wide">{key}</p>
+                          <p className="text-muted-foreground text-xs uppercase tracking-wide">
+                            {key}
+                          </p>
                           <p className="text-slate-900 dark:text-slate-100">{String(value)}</p>
                         </div>
                       ))}
@@ -272,7 +281,9 @@ export default function EquipmentDetail() {
                     <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2 md:grid-cols-3">
                       {flattenMetadata(remainingMetadata).map(([key, value]) => (
                         <div key={key} className="rounded-xl border border-slate-200/70 p-4">
-                          <p className="text-muted-foreground text-xs uppercase tracking-wide">{key}</p>
+                          <p className="text-muted-foreground text-xs uppercase tracking-wide">
+                            {key}
+                          </p>
                           <p className="text-slate-900 dark:text-slate-100">{value}</p>
                         </div>
                       ))}
@@ -291,7 +302,7 @@ export default function EquipmentDetail() {
           </div>
 
           <aside className="space-y-6 lg:col-span-4">
-            <Card className="p-6 space-y-4">
+            <Card className="space-y-4 p-6">
               <h2 className="text-lg font-semibold">Stare și alocare</h2>
               <div className="space-y-3 text-sm">
                 <div>
@@ -299,14 +310,21 @@ export default function EquipmentDetail() {
                   <StatusBadge label={statusLabel} tone={statusTone} withDot />
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs uppercase tracking-wide">Asignat către</p>
+                  <p className="text-muted-foreground text-xs uppercase tracking-wide">
+                    Asignat către
+                  </p>
                   {assignedEmployeeName ? (
                     assignedEmployeeLink ? (
-                      <Link to={assignedEmployeeLink} className="text-primary font-medium hover:underline">
+                      <Link
+                        to={assignedEmployeeLink}
+                        className="text-primary font-medium hover:underline"
+                      >
                         {assignedEmployeeName}
                       </Link>
                     ) : (
-                      <span className="font-medium text-slate-900 dark:text-slate-100">{assignedEmployeeName}</span>
+                      <span className="font-medium text-slate-900 dark:text-slate-100">
+                        {assignedEmployeeName}
+                      </span>
                     )
                   ) : (
                     <span className="text-muted-foreground">Neasignat</span>
@@ -316,13 +334,13 @@ export default function EquipmentDetail() {
             </Card>
 
             {hardwareHighlights.length > 0 && (
-              <Card className="p-6 space-y-4">
+              <Card className="space-y-4 p-6">
                 <h2 className="text-lg font-semibold">Specificatii rapide</h2>
                 <div className="grid gap-3 text-sm">
                   {hardwareHighlights.map((item) => (
                     <div key={item.label} className="flex justify-between gap-4">
                       <span className="text-muted-foreground">{item.label}</span>
-                      <span className="font-medium text-right text-slate-900 dark:text-slate-100">
+                      <span className="text-right font-medium text-slate-900 dark:text-slate-100">
                         {item.value as string}
                       </span>
                     </div>
@@ -331,7 +349,7 @@ export default function EquipmentDetail() {
               </Card>
             )}
 
-            <Card className="p-6 space-y-3">
+            <Card className="space-y-3 p-6">
               <h2 className="text-lg font-semibold">Acțiuni rapide</h2>
               <div className="flex flex-col gap-2">
                 <Button className="w-full" onClick={() => setShowEdit(true)}>
@@ -340,7 +358,11 @@ export default function EquipmentDetail() {
                 <Button className="w-full" variant="outline" onClick={() => setShowReassign(true)}>
                   Reasignare echipament
                 </Button>
-                <Button className="w-full" variant="destructive" onClick={() => setConfirmDefect(true)}>
+                <Button
+                  className="w-full"
+                  variant="destructive"
+                  onClick={() => setConfirmDefect(true)}
+                >
                   Marchează ca defect
                 </Button>
                 <Button className="w-full" asChild variant="secondary">

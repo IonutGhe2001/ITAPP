@@ -44,7 +44,7 @@ describe('EquipmentList', () => {
         <EquipmentList echipamente={[]} onEdit={vi.fn()} onDelete={vi.fn()} />
       </BrowserRouter>
     );
-    
+
     expect(container.firstChild).toBeNull();
   });
 });

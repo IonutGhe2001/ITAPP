@@ -49,7 +49,8 @@ export const getUserMetrics = async (userId: number): Promise<UserMetric[]> => {
   });
 
   const activeAssets =
-    angajat?.echipamente.filter((eq: Echipament) => eq.stare === "alocat").length || 0;
+    angajat?.echipamente.filter((eq: Echipament) => eq.stare === "alocat")
+      .length || 0;
 
   // Count pending onboarding tasks if any
   const pendingOnboarding = angajat
@@ -109,43 +110,45 @@ export const getUserActivity = async (
     take: limit,
   });
 
-  const activities: UserActivity[] = changes.map((change: EquipmentChange & { echipament: Echipament }) => {
-    let title = "";
-    const now = new Date();
-    const timeDiff = now.getTime() - change.createdAt.getTime();
-    const daysAgo = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-    const hoursAgo = Math.floor(timeDiff / (1000 * 60 * 60));
+  const activities: UserActivity[] = changes.map(
+    (change: EquipmentChange & { echipament: Echipament }) => {
+      let title = "";
+      const now = new Date();
+      const timeDiff = now.getTime() - change.createdAt.getTime();
+      const daysAgo = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+      const hoursAgo = Math.floor(timeDiff / (1000 * 60 * 60));
 
-    let timeStr = "";
-    if (daysAgo === 0 && hoursAgo === 0) {
-      timeStr = "Just now";
-    } else if (daysAgo === 0) {
-      timeStr = `${hoursAgo} hour${hoursAgo > 1 ? "s" : ""} ago`;
-    } else if (daysAgo === 1) {
-      timeStr = "Yesterday";
-    } else if (daysAgo < 7) {
-      timeStr = `${daysAgo} days ago`;
-    } else {
-      timeStr = "Last week";
+      let timeStr = "";
+      if (daysAgo === 0 && hoursAgo === 0) {
+        timeStr = "Just now";
+      } else if (daysAgo === 0) {
+        timeStr = `${hoursAgo} hour${hoursAgo > 1 ? "s" : ""} ago`;
+      } else if (daysAgo === 1) {
+        timeStr = "Yesterday";
+      } else if (daysAgo < 7) {
+        timeStr = `${daysAgo} days ago`;
+      } else {
+        timeStr = "Last week";
+      }
+
+      switch (change.tip) {
+        case "ASSIGN":
+          title = `New device enrolled: ${change.echipament.nume}`;
+          break;
+        case "RETURN":
+          title = `Returned device: ${change.echipament.nume}`;
+          break;
+        case "REPLACE":
+          title = `Device replaced: ${change.echipament.nume}`;
+          break;
+      }
+
+      return {
+        title,
+        time: timeStr,
+      };
     }
-
-    switch (change.tip) {
-      case "ASSIGN":
-        title = `New device enrolled: ${change.echipament.nume}`;
-        break;
-      case "RETURN":
-        title = `Returned device: ${change.echipament.nume}`;
-        break;
-      case "REPLACE":
-        title = `Device replaced: ${change.echipament.nume}`;
-        break;
-    }
-
-    return {
-      title,
-      time: timeStr,
-    };
-  });
+  );
 
   // If no activities, add a default one
   if (activities.length === 0) {
@@ -197,7 +200,7 @@ export const getUserSessions = async (
       .filter((part) => Boolean(part?.trim()))
       .map((part) => part!.trim());
 
-  const locationName = locationParts.length
+    const locationName = locationParts.length
       ? locationParts.join(", ")
       : user?.locatie || "Necunoscut";
 

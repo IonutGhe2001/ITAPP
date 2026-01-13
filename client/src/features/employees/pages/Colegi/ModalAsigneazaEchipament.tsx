@@ -102,12 +102,8 @@ export default function ModalAsigneazaEchipament({
         onPendingPV?.(payload);
       }
 
-      queueProcesVerbal(
-        angajatId,
-        tip,
-        payload
-      );
-      
+      queueProcesVerbal(angajatId, tip, payload);
+
       const assignedEquipment = selectedSnapshot
         .map((id) => echipamente.find((e: Echipament) => e.id === id))
         .filter((item): item is Echipament => Boolean(item))
@@ -141,7 +137,7 @@ export default function ModalAsigneazaEchipament({
       ? `Asignează ${selectedIds.length} echipamente`
       : 'Asignează';
 
-      const canSubmit = isReplacing
+  const canSubmit = isReplacing
     ? replaceLimit === 0 || selectedIds.length === replaceLimit
     : selectedIds.length > 0;
 
@@ -181,7 +177,7 @@ export default function ModalAsigneazaEchipament({
               return (
                 <label
                   key={e.id}
-                  className="border-border flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2 text-sm shadow-sm transition hover:border-primary/60"
+                  className="border-border hover:border-primary/60 flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2 text-sm shadow-sm transition"
                 >
                   <input
                     type={selectionType}
@@ -193,7 +189,7 @@ export default function ModalAsigneazaEchipament({
                     disabled={isReplacing && reachedReplaceLimit && !isSelected}
                   />
                   <div className="flex flex-col">
-                    <span className="font-medium text-foreground">{e.nume}</span>
+                    <span className="text-foreground font-medium">{e.nume}</span>
                     <span className="text-muted-foreground text-xs">Serie: {e.serie}</span>
                   </div>
                 </label>

@@ -41,10 +41,7 @@ export const getUserSessions = async (
 ) => {
   try {
     const userId = Number(req.user!.id);
-    const sessions = await getUserSessionsService(
-      userId,
-      req.user?.sessionId
-    );
+    const sessions = await getUserSessionsService(userId, req.user?.sessionId);
     res.json(sessions);
   } catch (err) {
     next(err);

@@ -6,7 +6,7 @@ import http from './http';
 export type OverviewStats = {
   echipamente: number;
   angajati: number;
-  } & Record<EquipmentStatus, number>;
+} & Record<EquipmentStatus, number>;
 
 export const useOverviewStats = () =>
   useQuery<OverviewStats>({

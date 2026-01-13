@@ -437,7 +437,7 @@ export default function Colegi() {
       });
     }
   };
-  
+
   const handleScrollToPending = () => {
     const firstId = pendingPVEmployees[0];
     if (!firstId) return;
@@ -614,7 +614,7 @@ export default function Colegi() {
                     <Icon className="h-4 w-4" aria-hidden="true" />
                   </div>
                 </div>
-              <p className="mt-4 text-3xl font-semibold tracking-tight">
+                <p className="mt-4 text-3xl font-semibold tracking-tight">
                   {value.toLocaleString('ro-RO')}
                 </p>
                 <p className="text-xs text-slate-500">{description}</p>

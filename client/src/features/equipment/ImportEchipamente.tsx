@@ -126,9 +126,9 @@ function ImportEchipamente({ onImportSuccess }: { onImportSuccess?: () => void }
         </Button>
       </div>
 
-        {error && <p className="mt-4 text-sm text-red-500">{error}</p>}
+      {error && <p className="mt-4 text-sm text-red-500">{error}</p>}
 
-        {result && (
+      {result && (
         <div className="mt-4 space-y-2 rounded-2xl border border-slate-200/60 bg-white/80 p-4 text-sm shadow-sm dark:border-slate-800/60 dark:bg-slate-900/60">
           <p className="font-medium text-slate-700 dark:text-slate-200">
             ✅ {result.importate} echipamente importate cu succes

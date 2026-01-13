@@ -64,7 +64,7 @@ export default function EquipmentStatusChart({ data }: EquipmentStatusChartProps
 
   return (
     <div
-      className="h-[320px] min-w-0 w-full"
+      className="h-[320px] w-full min-w-0"
       role="img"
       aria-label="Stare echipamente pe categorii"
     >

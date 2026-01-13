@@ -106,7 +106,7 @@ export const EventList = forwardRef<EventListHandle, EventListProps>(function Ev
 
   const openCreateDialog = () => {
     setMode('create');
-     setForm({
+    setForm({
       date: format(date, 'yyyy-MM-dd'),
       title: '',
       time: '',

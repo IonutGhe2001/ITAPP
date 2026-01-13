@@ -53,7 +53,7 @@ export default function RecentUpdates() {
       const url = baseUrl.replace(/\/api$/, '');
       socket = io(url, { withCredentials: true });
 
-    socket.on('update', (update: Update) => {
+      socket.on('update', (update: Update) => {
         toastRef.current({ title: update.type, description: update.message });
         setUpdates((prev) => [update, ...prev]);
       });
@@ -64,7 +64,7 @@ export default function RecentUpdates() {
     return () => {
       socket?.disconnect();
     };
-  // toastRef keeps the latest toast function, so we only need to set up once
+    // toastRef keeps the latest toast function, so we only need to set up once
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

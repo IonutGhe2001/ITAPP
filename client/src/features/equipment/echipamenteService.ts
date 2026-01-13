@@ -107,7 +107,7 @@ export const useEchipamente = (options: UseEchipamenteOptions = {}) => {
     if (!defaultQuery || autoFetchAll === false || items.length === 0) {
       return;
     }
-  setEchipamenteCache(items);
+    setEchipamenteCache(items);
   }, [items, defaultQuery, autoFetchAll]);
 
   useEffect(() => {
@@ -156,8 +156,8 @@ export const useEchipament = (id: string) => {
 
 export const useEquipmentTypes = (options?: { enabled?: boolean }) =>
   useQuery<string[]>({
-    queryKey: [...QUERY_KEYS.EQUIPMENT, "types"],
-    queryFn: () => http.get<string[]>("/echipamente/types"),
+    queryKey: [...QUERY_KEYS.EQUIPMENT, 'types'],
+    queryFn: () => http.get<string[]>('/echipamente/types'),
     staleTime: 5 * 60_000,
     enabled: options?.enabled ?? true,
   });

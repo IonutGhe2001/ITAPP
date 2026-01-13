@@ -70,7 +70,7 @@ export const getOnboardingReport = async ({
     const tasksValue = onboarding.tasks as unknown;
     const tasksArray = Array.isArray(tasksValue) ? tasksValue : [];
 
-  const allTasksCompleted =
+    const allTasksCompleted =
       tasksArray.length > 0 &&
       tasksArray.every((task) => {
         if (typeof task !== "object" || task === null) {
@@ -91,5 +91,7 @@ export const getOnboardingReport = async ({
     count,
   }));
 
-  return status ? formatted.filter((entry) => entry.status === status) : formatted;
+  return status
+    ? formatted.filter((entry) => entry.status === status)
+    : formatted;
 };

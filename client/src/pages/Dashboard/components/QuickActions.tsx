@@ -54,7 +54,7 @@ export function QuickActions({ actions }: QuickActionsProps) {
         },
       },
     ];
-    
+
     return actions ?? defaultActions;
   }, [actions]);
 

@@ -32,7 +32,7 @@ export function errorHandler(
   if (err.name === "TokenExpiredError") {
     return res.status(401).json({ error: "Token expirat" });
   }
-  
+
   // Default
   return res.status(err.status || 500).json({
     success: false,

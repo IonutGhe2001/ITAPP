@@ -51,29 +51,23 @@ export function queueProcesVerbal(
   opts?: { predate?: string[]; primite?: string[] }
 ) {
   const existing = readQueue();
-  
+
   // Find if there's already a queued PV for this employee
   const existingIndex = existing.findIndex((item) => item.angajatId === angajatId);
-  
+
   if (existingIndex !== -1) {
     // Consolidate the changes into the existing queue item
     const existingItem = existing[existingIndex];
-    const consolidatedPredate = [
-      ...(existingItem.predate || []),
-      ...(opts?.predate || []),
-    ];
-    const consolidatedPrimite = [
-      ...(existingItem.primite || []),
-      ...(opts?.primite || []),
-    ];
-    
+    const consolidatedPredate = [...(existingItem.predate || []), ...(opts?.predate || [])];
+    const consolidatedPrimite = [...(existingItem.primite || []), ...(opts?.primite || [])];
+
     // Remove duplicates
     const uniquePredate = Array.from(new Set(consolidatedPredate));
     const uniquePrimite = Array.from(new Set(consolidatedPrimite));
-    
+
     // Determine the correct tip based on what we have
     const consolidatedTip = determinePvType(uniquePredate, uniquePrimite);
-    
+
     // Update the existing item
     existing[existingIndex] = {
       angajatId,
@@ -85,7 +79,7 @@ export function queueProcesVerbal(
     // Add new item to queue
     existing.push({ angajatId, tip, ...opts });
   }
-  
+
   writeQueue(existing);
 }
 

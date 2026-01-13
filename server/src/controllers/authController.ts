@@ -20,7 +20,7 @@ export const login = async (req: Request, res: Response) => {
         .status(401)
         .json({ message: "Date de autentificare invalide" });
     }
-    
+
     const { email, password } = req.body;
     const sessionContext: SessionContext = {
       userAgent: req.get("user-agent") ?? undefined,
@@ -72,7 +72,6 @@ export const getMe = async (req: Request, res: Response) => {
   }
 };
 
-
 export const updateMe = async (req: Request, res: Response) => {
   const userId = req.user!.id;
   const {
@@ -121,7 +120,7 @@ export const updateMe = async (req: Request, res: Response) => {
     }
   }
 
-    Object.entries(updateData).forEach(([key, value]) => {
+  Object.entries(updateData).forEach(([key, value]) => {
     if (value === undefined || value === "") {
       delete updateData[key as keyof UserUpdateData];
     }

@@ -77,10 +77,9 @@ export default function ColegModals({
   const { toast } = useToast();
   const pendingForDetailColeg = detailColeg ? pendingPV[detailColeg.id] : undefined;
   const pendingForDetailColegCount =
-    (pendingForDetailColeg?.predate.length ?? 0) +
-    (pendingForDetailColeg?.primite.length ?? 0);
+    (pendingForDetailColeg?.predate.length ?? 0) + (pendingForDetailColeg?.primite.length ?? 0);
 
-    const restoreDetailProfile = useCallback(
+  const restoreDetailProfile = useCallback(
     (transform?: (detail: AngajatWithRelations) => AngajatWithRelations) => {
       let restored = false;
       setDetailColeg((current) => {
@@ -102,7 +101,14 @@ export default function ColegModals({
         setDetailToRestore(null);
       }
     },
-    [detailToRestore, setDetailColeg, setActiveTab, setSelectedEquipmentIds, setBulkReplaceIds, setDetailToRestore]
+    [
+      detailToRestore,
+      setDetailColeg,
+      setActiveTab,
+      setSelectedEquipmentIds,
+      setBulkReplaceIds,
+      setDetailToRestore,
+    ]
   );
 
   const handleAssignModalClose = useCallback(() => {
@@ -116,7 +122,8 @@ export default function ColegModals({
         restoreDetailProfile((detail) => {
           const existing = Array.isArray(detail.echipamente) ? detail.echipamente : [];
           const existingIds = new Set(existing.map((item) => item.id));
-          const additions = result.assignedEquipment?.filter((item) => !existingIds.has(item.id)) ?? [];
+          const additions =
+            result.assignedEquipment?.filter((item) => !existingIds.has(item.id)) ?? [];
           return {
             ...detail,
             echipamente: [...existing, ...additions],
@@ -464,7 +471,7 @@ export default function ColegModals({
                   </div>
                 </div>
                 {selectedEquipmentIds.length > 0 && (
-                  <div className="border-red-100/70 bg-red-50/70 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-100/70 bg-red-50/70 px-4 py-3">
                     <p className="text-sm font-semibold text-red-700">
                       {selectedEquipmentIds.length === 1
                         ? '1 echipament selectat'
@@ -531,7 +538,7 @@ export default function ColegModals({
                             <div className="space-y-1 text-sm">
                               <Link
                                 to={ROUTES.EQUIPMENT_DETAIL.replace(':id', eq.id)}
-                                className="font-medium text-slate-900 hover:text-primary hover:underline dark:text-slate-100"
+                                className="hover:text-primary font-medium text-slate-900 hover:underline dark:text-slate-100"
                               >
                                 {eq.nume}
                               </Link>
@@ -559,7 +566,7 @@ export default function ColegModals({
                             </Button>
                           </div>
                         </div>
-                        );
+                      );
                     })}
                   </div>
                 )}

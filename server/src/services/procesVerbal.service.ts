@@ -123,7 +123,7 @@ export const creeazaProcesVerbalDinSchimbari = async (angajatId: string) => {
     tip = ProcesVerbalTip.SCHIMB;
   } else if (echipamentePredateIds.length) {
     tip = ProcesVerbalTip.RESTITUIRE;
-    } else if (hasReplace) {
+  } else if (hasReplace) {
     tip = ProcesVerbalTip.SCHIMB;
   }
 
