@@ -93,7 +93,8 @@ export const useCreateAngajat = () => {
   return useMutation({
     mutationFn: (data: AngajatInput) => http.post<Angajat>('/angajati', data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
+      // Reset infinite queries to avoid duplicates when loading more pages
+      queryClient.resetQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
     },
   });
 };
@@ -104,7 +105,8 @@ export const useUpdateAngajat = () => {
     mutationFn: ({ id, data }: { id: string; data: AngajatUpdateInput }) =>
       http.put<Angajat>(`/angajati/${id}`, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
+      // Reset infinite queries to avoid duplicates when loading more pages
+      queryClient.resetQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
     },
   });
 };
@@ -114,7 +116,8 @@ export const useDeleteAngajat = () => {
   return useMutation({
     mutationFn: (id: string) => http.delete<void>(`/angajati/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
+      // Reset infinite queries to avoid duplicates when loading more pages
+      queryClient.resetQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
     },
   });
 };
@@ -139,7 +142,8 @@ export const useCreateEmailAccount = () => {
         link,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
+      // Reset infinite queries to avoid duplicates when loading more pages
+      queryClient.resetQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
     },
   });
 };

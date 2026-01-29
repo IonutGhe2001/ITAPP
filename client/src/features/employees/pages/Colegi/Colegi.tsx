@@ -427,7 +427,7 @@ export default function Colegi() {
     try {
       await deleteMutation.mutateAsync(id);
       toast({ title: 'Coleg șters' });
-      await refetch();
+      // No need to refetch here as the mutation already resets the query
       setExpanded(new Set());
     } catch {
       toast({
