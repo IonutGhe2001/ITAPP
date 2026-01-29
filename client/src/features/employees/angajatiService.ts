@@ -15,7 +15,6 @@ export interface PaginatedAngajatiResponse {
 export interface GetAngajatiParams {
   pageSize?: number;
   department?: string;
-  status?: string;
 }
 
 const DEFAULT_QUERY_PARAMS: GetAngajatiParams = Object.freeze({});

@@ -359,21 +359,15 @@ export default function ColegModals({
                     label={(() => {
                       const status = getEmployeeLifecycleStatus(detailColeg);
                       if (status === 'active') return 'Activ';
-                      if (status === 'pending') return 'În așteptare';
                       return 'Inactiv';
                     })()}
                     tone={((status) =>
-                      status === 'active'
-                        ? 'success'
-                        : status === 'pending'
-                          ? 'warning'
-                          : 'neutral')(getEmployeeLifecycleStatus(detailColeg))}
+                      status === 'active' ? 'success' : 'neutral')(
+                      getEmployeeLifecycleStatus(detailColeg)
+                    )}
                     withDot
                   />
-                  {detailColeg.emailAccountStatus === 'PENDING' && (
-                    <StatusBadge label="Email pending" tone="warning" />
-                  )}
-                  {detailColeg.emailAccountStatus === 'CREATED' && (
+                  {detailColeg.emailAccountCreatedAt && (
                     <StatusBadge label="Email activ" tone="success" />
                   )}
                 </div>

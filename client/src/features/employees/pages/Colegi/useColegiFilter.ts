@@ -56,9 +56,8 @@ export const getEmployeeLifecycleStatus = (
     }
   }
 
-  if (coleg.emailAccountStatus === 'PENDING') return 'pending';
-  if (coleg.emailAccountStatus === 'CREATED') return 'active';
-  if (coleg.cDataCreated) return 'active';
+  // Active if they have email or cData created
+  if (coleg.email || coleg.cDataCreated) return 'active';
 
   return 'inactive';
 };

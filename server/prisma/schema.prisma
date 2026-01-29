@@ -34,34 +34,28 @@ model DepartmentConfig {
 }
 
 model Angajat {
-  id                      String             @id @default(uuid())
+  id                      String            @id @default(uuid())
   numeComplet             String
   functie                 String
   email                   String?
   telefon                 String?
-  dataAngajare            DateTime           @default(now())
+  dataAngajare            DateTime          @default(now())
   cDataUsername           String?
   cDataId                 String?
   cDataNotes              String?
-  cDataCreated            Boolean            @default(false)
-  emailAccountStatus      EmailAccountStatus @default(PENDING)
+  cDataCreated            Boolean           @default(false)
   emailAccountCreatedAt   DateTime?
   emailAccountResponsible String?
   emailAccountLink        String?
   echipamente             Echipament[]
-  createdAt               DateTime           @default(now())
+  createdAt               DateTime          @default(now())
   proceseVerbale          ProcesVerbal[]
   equipmentChanges        EquipmentChange[]
   departmentConfigId      String?
-  departmentConfig        DepartmentConfig?  @relation(fields: [departmentConfigId], references: [id])
-  checklist               String[]           @default([])
-  licenses                String[]           @default([])
+  departmentConfig        DepartmentConfig? @relation(fields: [departmentConfigId], references: [id])
+  checklist               String[]          @default([])
+  licenses                String[]          @default([])
   onboarding              Onboarding[]
-}
-
-enum EmailAccountStatus {
-  PENDING
-  CREATED
 }
 
 model Echipament {

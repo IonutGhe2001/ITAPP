@@ -45,7 +45,6 @@ import {
   AlertTriangle,
   Users,
   UserCheck,
-  Clock3,
   Laptop2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -99,21 +98,19 @@ export default function Colegi() {
 
   const employeeMetrics = useMemo(() => {
     if (colegi.length === 0) {
-      return { total: 0, active: 0, pending: 0, equipment: 0 };
+      return { total: 0, active: 0, equipment: 0 };
     }
 
     return colegi.reduce(
       (acc, coleg) => {
         const status = getEmployeeLifecycleStatus(coleg);
         if (status === 'active') acc.active += 1;
-        if (status === 'pending') acc.pending += 1;
         acc.equipment += Array.isArray(coleg.echipamente) ? coleg.echipamente.length : 0;
         return acc;
       },
       {
         total: colegi.length,
         active: 0,
-        pending: 0,
         equipment: 0,
       }
     );
@@ -133,12 +130,6 @@ export default function Colegi() {
           value: employeeMetrics.active,
           description: 'Cu acces confirmat',
           icon: UserCheck,
-        },
-        {
-          label: 'În așteptare',
-          value: employeeMetrics.pending,
-          description: 'Invitații ce necesită acțiune',
-          icon: Clock3,
         },
         {
           label: 'Echipamente alocate',

@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma";
-import type { Prisma, PrismaClient, EmailAccountStatus } from "@prisma/client";
+import type { Prisma, PrismaClient } from "@prisma/client";
 
 const angajatSelect = {
   id: true,
@@ -15,7 +15,6 @@ const angajatSelect = {
   cDataId: true,
   cDataNotes: true,
   cDataCreated: true,
-  emailAccountStatus: true,
   emailAccountCreatedAt: true,
   emailAccountResponsible: true,
   emailAccountLink: true,
@@ -39,18 +38,15 @@ export interface GetAngajatiParams {
   page: number;
   pageSize: number;
   department?: string;
-  status?: EmailAccountStatus;
 }
 
 export const getAngajati = async ({
   page,
   pageSize,
   department,
-  status,
 }: GetAngajatiParams) => {
   const where: Prisma.AngajatWhereInput = {
     ...(department ? { departmentConfigId: department } : {}),
-    ...(status ? { emailAccountStatus: status } : {}),
   };
 
   const [total, angajati] = await prisma.$transaction([
@@ -193,7 +189,6 @@ export const createEmailAccount = (
     where: { id },
     data: {
       email: data.email,
-      emailAccountStatus: "CREATED",
       emailAccountCreatedAt: new Date(),
       emailAccountResponsible: data.responsible,
       emailAccountLink: data.link,
