@@ -1,13 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import * as angajatService from "../services/angajat.service";
 import { emitUpdate } from "../lib/websocket";
-import { EmailAccountStatus } from "@prisma/client";
 
 type GetAngajatiQuery = {
   page: number;
   pageSize: number;
   department?: string;
-  status?: EmailAccountStatus;
 };
 
 const normalizeQueryValue = (value: unknown) => {
@@ -28,17 +26,6 @@ const parseNumberParam = (value: unknown, defaultValue: number) => {
   return Number.isNaN(parsed) ? defaultValue : parsed;
 };
 
-const parseStatusParam = (value: unknown): EmailAccountStatus | undefined => {
-  const normalized = normalizeQueryValue(value);
-  if (!normalized) {
-    return undefined;
-  }
-
-  return (Object.values(EmailAccountStatus) as string[]).includes(normalized)
-    ? (normalized as EmailAccountStatus)
-    : undefined;
-};
-
 export const getAngajati = async (
   req: Request,
   res: Response,
@@ -48,13 +35,11 @@ export const getAngajati = async (
     const page = parseNumberParam(req.query.page, 1);
     const pageSize = parseNumberParam(req.query.pageSize, 25);
     const department = normalizeQueryValue(req.query.department);
-    const status = parseStatusParam(req.query.status);
 
     const params: GetAngajatiQuery = {
       page,
       pageSize,
       department: department ?? undefined,
-      status,
     };
     const response = await angajatService.getAngajati(params);
     res.json(response);

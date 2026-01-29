@@ -1,7 +1,5 @@
 import React, { Suspense, useId, useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { updateCurrentUser } from '@/services/authService';
-import { getUserSessions } from '@/services/profileService';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '@/context/useUser';
 import type { User } from '@/types/user';
@@ -9,7 +7,6 @@ import { useToast } from '@/hooks/use-toast/use-toast-hook';
 import Avatar from '@/components/Avatar';
 import ProfileInput from '@/components/ProfileInput';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -62,28 +59,6 @@ export default function ProfilePage() {
       year: 'numeric' 
     });
   };
-
-  const formatSessionLastActive = (value: string | null | undefined): string => {
-    if (!value) return '-';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return value;
-    return date.toLocaleString('ro-RO', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
-  const sessionsQuery = useQuery({
-    queryKey: ['profile', 'sessions'],
-    queryFn: getUserSessions,
-    staleTime: 30_000,
-  });
-
-  const activeSessions = sessionsQuery.data ?? [];
-  const isLoadingSessions = sessionsQuery.isLoading;
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -241,160 +216,73 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-12">
-          <div className="space-y-6 lg:col-span-7 xl:col-span-8">
-            <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
-              <header className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold">
-                  {t('profile.sections.contact', { defaultValue: 'Contact & Organization' })}
-                </h2>
-              </header>
-              <dl className="grid gap-4 sm:grid-cols-2">
-                <DefinitionItem label={t('profile.labels.fullName')} value={fullName || '-'} />
-                <DefinitionItem
-                  label={t('profile.labels.position')}
-                  value={user?.functie || '-'}
-                />
-                <DefinitionItem label={t('profile.labels.email')} value={user?.email || '-'} />
-                <DefinitionItem
-                  label={t('profile.labels.phone')}
-                  value={user?.telefon || '-'}
-                />
-              </dl>
-            </section>
-
-              <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
-              <header className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold">
-                    {t('profile.labels.digitalSignature', {
-                      defaultValue: 'Digital signature',
-                    })}
-                  </h2>
-                  <p className="text-muted-foreground text-sm">
-                    {t('profile.signature.description', {
-                      defaultValue: 'Preview of your current digital signature.',
-                    })}
-                  </p>
-                </div>
-            <div className="flex flex-wrap gap-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setIsEditing(true)}
-                    className="focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2"
-                  >
-                    {t('profile.buttons.replace', { defaultValue: 'Replace' })}
-                  </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    className="focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2"
-                  >
-                    {t('profile.buttons.download', { defaultValue: 'Download' })}
-                  </Button>
-                </div>
-              </header>
-              <div className="border-border/60 bg-muted/20 flex h-48 items-center justify-center rounded-xl border border-dashed">
-                {user?.digitalSignature ? (
-                  <img
-                    src={user.digitalSignature}
-                    alt={t('profile.labels.digitalSignature', {
-                      defaultValue: 'Digital signature',
-                    })}
-                    className="max-h-32 object-contain"
-                  />
-                ) : (
-                  <p className="text-muted-foreground text-sm">
-                    {t('profile.signature.empty', { defaultValue: 'No signature on file.' })}
-                  </p>
-                )}
-              </div>
-            </section>
-          </div>
-
-               <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm lg:col-span-12 xl:col-span-8 2xl:col-span-7">
-            <header className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="grid gap-6">
+          <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
+            <header className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold">
-                {t('profile.sections.sessions', { defaultValue: 'Sesiuni active' })}
+                {t('profile.sections.contact', { defaultValue: 'Contact & Organization' })}
               </h2>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2"
-              >
-                {t('profile.buttons.signOutOthers', { defaultValue: 'Deconectează-te de pe celelalte' })}
-              </Button>
             </header>
-            <div className="border-border/50 overflow-hidden rounded-xl border">
-              {isLoadingSessions ? (
-                <div className="space-y-2 p-4" aria-hidden>
-                  {Array.from({ length: 3 }).map((_, index) => (
-                    <div key={index} className="bg-muted/30 h-10 animate-pulse rounded-md" />
-                  ))}
-                </div>
-              ) : activeSessions.length ? (
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[720px] text-left text-sm">
-                    <thead className="bg-muted/40 text-muted-foreground">
-                      <tr>
-                        <th className="px-4 py-3 font-medium">Dispozitiv</th>
-                        <th className="px-4 py-3 font-medium">Detalii</th>
-                        <th className="px-4 py-3 font-medium">Locație</th>
-                        <th className="px-4 py-3 font-medium">Adresă IP</th>
-                        <th className="px-4 py-3 font-medium">Ultima activitate</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {activeSessions.map((session) => {
-                        const deviceName = session.deviceName || 'Dispozitiv necunoscut';
-                        const deviceType = session.deviceType || 'Tip necunoscut';
-                        const browser = session.browserName || 'Browser necunoscut';
-                        const osName = session.osName || 'Sistem necunoscut';
-                        const location = session.locationName || 'Necunoscut';
-                        const ip = session.ipAddress || 'Nedisponibil';
+            <dl className="grid gap-4 sm:grid-cols-2">
+              <DefinitionItem label={t('profile.labels.fullName')} value={fullName || '-'} />
+              <DefinitionItem
+                label={t('profile.labels.position')}
+                value={user?.functie || '-'}
+              />
+              <DefinitionItem label={t('profile.labels.email')} value={user?.email || '-'} />
+              <DefinitionItem
+                label={t('profile.labels.phone')}
+                value={user?.telefon || '-'}
+              />
+            </dl>
+          </section>
 
-                        return (
-                          <tr
-                            key={session.id}
-                            className={`border-border/40 border-t ${session.current ? 'bg-red-50/60' : ''}`}
-                          >
-                            <td className="px-4 py-3">
-                              <div className="flex flex-col gap-1">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-medium">{deviceName}</span>
-                                  {session.current ? (
-                                    <Badge variant="outline" className="border-primary/60 bg-primary/10 text-primary text-xs">
-                                      Curent
-                                    </Badge>
-                                  ) : null}
-                                </div>
-                                <span className="text-muted-foreground text-xs">{deviceType}</span>
-                              </div>
-                            </td>
-                            <td className="px-4 py-3">
-                              <div className="space-y-1">
-                                <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{browser}</span>
-                                <span className="text-muted-foreground block text-xs">{osName}</span>
-                              </div>
-                              </td>
-                            <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">{location}</td>
-                            <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">{ip}</td>
-                            <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">
-                              {formatSessionLastActive(session.lastActive)}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+          <section className="border-border/60 bg-card/90 rounded-2xl border p-6 shadow-sm">
+            <header className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-lg font-semibold">
+                  {t('profile.labels.digitalSignature', {
+                    defaultValue: 'Digital signature',
+                  })}
+                </h2>
+                <p className="text-muted-foreground text-sm">
+                  {t('profile.signature.description', {
+                    defaultValue: 'Preview of your current digital signature.',
+                  })}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsEditing(true)}
+                  className="focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2"
+                >
+                  {t('profile.buttons.replace', { defaultValue: 'Replace' })}
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2"
+                >
+                  {t('profile.buttons.download', { defaultValue: 'Download' })}
+                </Button>
+              </div>
+            </header>
+            <div className="border-border/60 bg-muted/20 flex h-48 items-center justify-center rounded-xl border border-dashed">
+              {user?.digitalSignature ? (
+                <img
+                  src={user.digitalSignature}
+                  alt={t('profile.labels.digitalSignature', {
+                    defaultValue: 'Digital signature',
+                  })}
+                  className="max-h-32 object-contain"
+                />
               ) : (
-                <p className="text-muted-foreground px-4 py-6 text-sm">
-                  {t('profile.sessions.empty', { defaultValue: 'Nu există sesiuni active înregistrate.' })}
+                <p className="text-muted-foreground text-sm">
+                  {t('profile.signature.empty', { defaultValue: 'No signature on file.' })}
                 </p>
               )}
             </div>

@@ -44,7 +44,6 @@ model Angajat {
   cDataId                 String?
   cDataNotes              String?
   cDataCreated            Boolean            @default(false)
-  emailAccountStatus      EmailAccountStatus @default(PENDING)
   emailAccountCreatedAt   DateTime?
   emailAccountResponsible String?
   emailAccountLink        String?
@@ -57,11 +56,7 @@ model Angajat {
   checklist               String[]           @default([])
   licenses                String[]           @default([])
   onboarding              Onboarding[]
-}
-
-enum EmailAccountStatus {
-  PENDING
-  CREATED
+  documents               AngajatDocument[]
 }
 
 model Echipament {
@@ -142,6 +137,18 @@ model EquipmentDocument {
   name         String
   path         String
   createdAt    DateTime   @default(now())
+}
+
+model AngajatDocument {
+  id         String   @id @default(uuid())
+  angajatId  String
+  angajat    Angajat  @relation(fields: [angajatId], references: [id], onDelete: Cascade)
+  name       String
+  path       String
+  type       String?
+  size       Int?
+  createdAt  DateTime @default(now())
+  uploadedBy String?
 }
 
 model EquipmentImage {

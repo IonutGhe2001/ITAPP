@@ -1,9 +1,10 @@
-import React, { Suspense, useCallback, useMemo, useState } from 'react';
+import React, { Suspense, useCallback, useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import ModalAsigneazaEchipament from './ModalAsigneazaEchipament';
 import ModalEditColeg from './ModalEditColeg';
+import AngajatDocumentSection from './AngajatDocumentSection';
 import { useUpdateEchipament } from '@/features/equipment';
 import { queueProcesVerbal } from '@/features/proceseVerbale/pvQueue';
 import type { Angajat, Echipament } from '@/features/equipment/types';
@@ -16,6 +17,7 @@ import { Mail, Phone, UserRound, MapPin, Laptop2, BadgeCheck } from 'lucide-reac
 import { ROUTES } from '@/constants/routes';
 import { useToast } from '@/hooks/use-toast/use-toast-hook';
 import { handleApiError } from '@/utils/apiError';
+import http from '@/services/http';
 
 const ModalAddColeg = React.lazy(() => import('@/pages/Dashboard/modals/ModalAddColeg'));
 
@@ -69,16 +71,36 @@ export default function ColegModals({
   onGeneratePV,
 }: ColegModalsProps) {
   const updateMutation = useUpdateEchipament();
-  const [activeTab, setActiveTab] = useState<'profile' | 'equipment'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'equipment' | 'documents'>('profile');
   const [selectedEquipmentIds, setSelectedEquipmentIds] = useState<string[]>([]);
   const [bulkReplaceIds, setBulkReplaceIds] = useState<string[] | null>(null);
   const [isProcessingEquipment, setIsProcessingEquipment] = useState(false);
   const [detailToRestore, setDetailToRestore] = useState<AngajatWithRelations | null>(null);
+  const [documents, setDocuments] = useState<any[]>([]);
   const { toast } = useToast();
   const pendingForDetailColeg = detailColeg ? pendingPV[detailColeg.id] : undefined;
   const pendingForDetailColegCount =
     (pendingForDetailColeg?.predate.length ?? 0) +
     (pendingForDetailColeg?.primite.length ?? 0);
+
+  // Fetch documents when detailColeg opens
+  useEffect(() => {
+    if (detailColeg?.id) {
+      fetchDocuments();
+    } else {
+      setDocuments([]);
+    }
+  }, [detailColeg?.id]);
+
+  const fetchDocuments = async () => {
+    if (!detailColeg?.id) return;
+    try {
+      const docs = await http.get(`/angajati/${detailColeg.id}/documents`);
+      setDocuments(docs);
+    } catch (err: unknown) {
+      console.error('Error fetching documents:', err);
+    }
+  };
 
     const restoreDetailProfile = useCallback(
     (transform?: (detail: AngajatWithRelations) => AngajatWithRelations) => {
@@ -346,12 +368,13 @@ export default function ColegModals({
             </DialogHeader>
             <Tabs
               value={activeTab}
-              onValueChange={(value) => setActiveTab(value as 'profile' | 'equipment')}
+              onValueChange={(value) => setActiveTab(value as 'profile' | 'equipment' | 'documents')}
               className="mt-4"
             >
-              <TabsList className="grid w-full grid-cols-2 rounded-xl">
+              <TabsList className="grid w-full grid-cols-3 rounded-xl">
                 <TabsTrigger value="profile">Profil</TabsTrigger>
                 <TabsTrigger value="equipment">Echipamente</TabsTrigger>
+                <TabsTrigger value="documents">Documente</TabsTrigger>
               </TabsList>
               <TabsContent value="profile" className="space-y-4 pt-4">
                 <div className="flex flex-wrap items-center gap-2">
@@ -359,21 +382,15 @@ export default function ColegModals({
                     label={(() => {
                       const status = getEmployeeLifecycleStatus(detailColeg);
                       if (status === 'active') return 'Activ';
-                      if (status === 'pending') return 'În așteptare';
                       return 'Inactiv';
                     })()}
                     tone={((status) =>
-                      status === 'active'
-                        ? 'success'
-                        : status === 'pending'
-                          ? 'warning'
-                          : 'neutral')(getEmployeeLifecycleStatus(detailColeg))}
+                      status === 'active' ? 'success' : 'neutral')(
+                      getEmployeeLifecycleStatus(detailColeg)
+                    )}
                     withDot
                   />
-                  {detailColeg.emailAccountStatus === 'PENDING' && (
-                    <StatusBadge label="Email pending" tone="warning" />
-                  )}
-                  {detailColeg.emailAccountStatus === 'CREATED' && (
+                  {detailColeg.emailAccountCreatedAt && (
                     <StatusBadge label="Email activ" tone="success" />
                   )}
                 </div>
@@ -563,6 +580,13 @@ export default function ColegModals({
                     })}
                   </div>
                 )}
+              </TabsContent>
+              <TabsContent value="documents" className="space-y-4 pt-4">
+                <AngajatDocumentSection
+                  angajatId={detailColeg.id}
+                  documents={documents}
+                  refetch={fetchDocuments}
+                />
               </TabsContent>
             </Tabs>
           </DialogContent>
