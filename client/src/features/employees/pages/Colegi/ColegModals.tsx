@@ -304,11 +304,8 @@ export default function ColegModals({
           onSuccess={() => {
             setBulkReplaceIds(null);
             setSelectedEquipmentIds([]);
-            // Restore the detail dialog with updated equipment list
-            restoreDetailProfile((detail) => {
-              // We need to refetch to get the updated equipment list, so just restore as-is
-              return detail;
-            });
+            // Restore the detail dialog (refetch will provide updated equipment data)
+            restoreDetailProfile();
             void refetch();
           }}
         />
