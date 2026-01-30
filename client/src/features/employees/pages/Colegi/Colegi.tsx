@@ -87,8 +87,6 @@ export default function Colegi() {
     isLoading,
     isError,
     error,
-    fetchNextPage,
-    hasNextPage,
     isFetchingNextPage,
   } = useAngajati(undefined, { enabled: queryEnabled });
   const colegi: AngajatWithRelations[] = useMemo(
