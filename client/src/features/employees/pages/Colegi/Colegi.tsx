@@ -759,21 +759,9 @@ export default function Colegi() {
           {!isError && hasData && width === 0 && height === 0 ? renderSkeleton() : content}
         </div>
 
-        {!isError && (
+        {!isError && isFetchingNextPage && (
           <div className="flex flex-col items-center gap-3">
-            {isFetchingNextPage && (
-              <Loader2 className="text-primary h-5 w-5 animate-spin" aria-hidden="true" />
-            )}
-            {hasNextPage && (
-              <Button
-                onClick={() => fetchNextPage()}
-                disabled={isFetchingNextPage}
-                variant="outline"
-                className="rounded-full px-5"
-              >
-                {isFetchingNextPage ? 'Se încarcă...' : 'Încarcă mai mulți colegi'}
-              </Button>
-            )}
+            <Loader2 className="text-primary h-5 w-5 animate-spin" aria-hidden="true" />
           </div>
         )}
       </Container>
