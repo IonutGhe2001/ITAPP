@@ -149,7 +149,7 @@ export default function ModalAsigneazaEchipament({
   const reachedReplaceLimit = isReplacing && replaceLimit > 0 && selectedIds.length >= replaceLimit;
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="bg-card relative w-full max-w-md space-y-4 rounded-2xl p-6 shadow-xl">
         <h2 className="text-primary text-lg font-semibold">Asignează echipament</h2>
 
@@ -195,6 +195,7 @@ export default function ModalAsigneazaEchipament({
                   <div className="flex flex-col">
                     <span className="font-medium text-foreground">{e.nume}</span>
                     <span className="text-muted-foreground text-xs">Serie: {e.serie}</span>
+                    <span className="text-muted-foreground text-xs">Tip: {e.tip}</span>
                   </div>
                 </label>
               );

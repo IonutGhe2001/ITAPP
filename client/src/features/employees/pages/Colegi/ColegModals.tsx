@@ -203,7 +203,16 @@ export default function ColegModals({
     if (!detailColeg) return;
     const equipmentIds = ids ?? selectedEquipmentIds;
     if (!equipmentIds.length) return;
+    // Save detail state before closing dialog (same as assign equipment flow)
+    setDetailToRestore({
+      ...detailColeg,
+      echipamente: Array.isArray(detailColeg.echipamente)
+        ? [...detailColeg.echipamente]
+        : [],
+    });
     setBulkReplaceIds(equipmentIds);
+    setDetailColeg(null);
+    setActiveTab('profile');
   };
 
   const departmentName = useMemo(() => {
@@ -264,9 +273,9 @@ export default function ColegModals({
           }}
         />
       )}
-      {bulkReplaceIds && detailColeg && (
+      {bulkReplaceIds && detailToRestore && (
         <ModalAsigneazaEchipament
-          angajatId={detailColeg.id}
+          angajatId={detailToRestore.id}
           oldEchipamentIds={bulkReplaceIds}
           onReplace={async (oldIds, newIds) => {
             for (const oldId of oldIds) {
@@ -279,32 +288,25 @@ export default function ColegModals({
             for (const newId of newIds) {
               const updated = await updateMutation.mutateAsync({
                 id: newId,
-                data: { angajatId: detailColeg.id, stare: 'alocat' },
+                data: { angajatId: detailToRestore.id, stare: 'alocat' },
               });
               assignedEquipment.push(updated);
             }
             const payload = { predate: oldIds, primite: newIds };
-            onPVChange(detailColeg.id, payload);
-            setDetailColeg((prev) =>
-              prev
-                ? {
-                    ...prev,
-                    echipamente: [
-                      ...prev.echipamente.filter((item) => !oldIds.includes(item.id)),
-                      ...assignedEquipment,
-                    ],
-                  }
-                : prev
-            );
+            onPVChange(detailToRestore.id, payload);
             await refetch();
-            setActiveTab('profile');
           }}
-          onPendingPV={(change) => onPVChange(detailColeg.id, change)}
-          onClose={() => setBulkReplaceIds(null)}
+          onPendingPV={(change) => onPVChange(detailToRestore.id, change)}
+          onClose={() => {
+            setBulkReplaceIds(null);
+            restoreDetailProfile();
+          }}
           onSuccess={() => {
             setBulkReplaceIds(null);
             setSelectedEquipmentIds([]);
-            setActiveTab('profile');
+            // Restore the detail dialog (refetch will provide updated equipment data)
+            restoreDetailProfile();
+            void refetch();
           }}
         />
       )}
