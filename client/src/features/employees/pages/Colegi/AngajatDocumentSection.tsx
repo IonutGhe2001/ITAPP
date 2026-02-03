@@ -8,6 +8,8 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import http from '@/services/http';
 import { toast } from 'react-toastify';
 import { handleApiError } from '@/utils/apiError';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 
 const apiBase = (import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '');
 
@@ -19,6 +21,8 @@ interface DocumentItem {
   size?: number;
   createdAt: string;
   uploadedBy?: string;
+  documentType?: string;
+  uploadYear?: number;
 }
 
 interface Props {
@@ -26,6 +30,20 @@ interface Props {
   documents: DocumentItem[];
   refetch: () => void;
 }
+
+const DOCUMENT_TYPES = {
+  PROCES_VERBAL: 'Proces Verbal',
+  CONTRACT_ANGAJARE: 'Contract de Angajare',
+  CONTRACT_MUNCA: 'Contract de Muncă',
+  CERTIFICAT: 'Certificat',
+  DIPLOMA: 'Diplomă',
+  EVALUARE: 'Evaluare',
+  AVERTISMENT: 'Avertisment',
+  DECIZIE: 'Decizie',
+  CERERE: 'Cerere',
+  ALTA_CORESPONDENTA: 'Altă Corespondență',
+  OTHER: 'Altele',
+} as const;
 
 function formatFileSize(bytes?: number): string {
   if (!bytes) return '';
@@ -47,17 +65,32 @@ export default function AngajatDocumentSection({ angajatId, documents, refetch }
   const [docError, setDocError] = useState<string | null>(null);
   const [selectedDoc, setSelectedDoc] = useState<DocumentItem | null>(null);
   const [deleteDocId, setDeleteDocId] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [documentType, setDocumentType] = useState<string>('OTHER');
+  const [uploadYear, setUploadYear] = useState<number>(new Date().getFullYear());
 
-  const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (file) {
+      setSelectedFile(file);
+      setDocError(null);
+    }
+  };
+
+  const handleDocumentUpload = async () => {
+    if (!selectedFile) return;
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', selectedFile);
+    formData.append('documentType', documentType);
+    formData.append('uploadYear', uploadYear.toString());
     try {
       await http.post(`/angajati/${angajatId}/documents`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setDocError(null);
+      setSelectedFile(null);
+      setDocumentType('OTHER');
+      setUploadYear(new Date().getFullYear());
       refetch();
       toast.success('Document încărcat cu succes');
     } catch (err: unknown) {
@@ -117,6 +150,12 @@ export default function AngajatDocumentSection({ angajatId, documents, refetch }
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-slate-900 truncate">{doc.name}</p>
                     <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                      {doc.documentType && (
+                        <span className="font-medium text-blue-600">
+                          {DOCUMENT_TYPES[doc.documentType as keyof typeof DOCUMENT_TYPES] || doc.documentType}
+                        </span>
+                      )}
+                      {doc.uploadYear && <span>Anul {doc.uploadYear}</span>}
                       {doc.size && <span>{formatFileSize(doc.size)}</span>}
                       <span>{formatDate(doc.createdAt)}</span>
                       {doc.uploadedBy && <span>Încărcat de {doc.uploadedBy}</span>}
@@ -161,15 +200,53 @@ export default function AngajatDocumentSection({ angajatId, documents, refetch }
           <p className="mt-2 text-sm text-slate-500">Nu există documente încărcate</p>
         </Card>
       )}
-      <div className="space-y-2">
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="documentType">Tip document</Label>
+            <Select value={documentType} onValueChange={setDocumentType}>
+              <SelectTrigger id="documentType">
+                <SelectValue placeholder="Selectează tipul" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(DOCUMENT_TYPES).map(([key, label]) => (
+                  <SelectItem key={key} value={key}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="uploadYear">Anul documentului</Label>
+            <Select value={uploadYear.toString()} onValueChange={(val) => setUploadYear(parseInt(val, 10))}>
+              <SelectTrigger id="uploadYear">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                  <SelectItem key={year} value={year.toString()}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         <UploadButton
           accept="application/pdf,image/png,image/jpeg"
-          onChange={handleDocumentUpload}
+          onChange={handleFileSelect}
           variant="outline"
           className="w-full"
         >
-          <FileUp className="mr-2 h-4 w-4" /> Încarcă document
+          <FileUp className="mr-2 h-4 w-4" /> 
+          {selectedFile ? selectedFile.name : 'Selectează document'}
         </UploadButton>
+        {selectedFile && (
+          <Button onClick={handleDocumentUpload} className="w-full">
+            Încarcă document
+          </Button>
+        )}
         <p className="text-xs text-slate-500">
           Acceptă fișiere PDF și imagini (PNG, JPEG) până la 10MB
         </p>

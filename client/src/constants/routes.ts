@@ -7,6 +7,7 @@ export const ROUTES = {
   EMPLOYEE_FORM: '/employee-form',
   PROFILE: '/profil',
   SEARCH: '/search',
+  ARCHIVE: '/arhiva',
 } as const;
 
 export type RoutePath = (typeof ROUTES)[keyof typeof ROUTES];
