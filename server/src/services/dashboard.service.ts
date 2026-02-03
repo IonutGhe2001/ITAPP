@@ -58,6 +58,7 @@ type PvQueueItem = {
   id: string;
   employeeId: string;
   employee: string;
+  employeeEmail: string | null;
   equipment: string;
   allocationDate: string;
   location: string;
@@ -312,6 +313,7 @@ export const getPvQueue = async (limit: number): Promise<PvQueueItem[]> => {
       id: change.id,
       employeeId: change.angajatId,
       employee: change.angajat.numeComplet,
+      employeeEmail: change.angajat.email,
       equipment: `${change.echipament.nume} ${change.echipament.serie}`,
       allocationDate: change.createdAt.toISOString(),
       location: change.angajat.departmentConfig?.name ?? "București - Sediu Central",

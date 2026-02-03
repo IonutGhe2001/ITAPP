@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { ro } from 'date-fns/locale';
-import { AlertTriangle, FileText, Loader2 } from 'lucide-react';
+import { AlertTriangle, FileText, Loader2, Mail } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ interface PvQueueProps {
   items: PvQueueItem[];
   isLoading?: boolean;
   onGenerate: (item: PvQueueItem) => void;
+  onGenerateAndSend?: (item: PvQueueItem) => void;
   onGenerateAll?: (items: PvQueueItem[]) => void;
   generatingId?: string | null;
   isBulkGenerating?: boolean;
@@ -35,6 +36,7 @@ export function PvQueue({
   items,
   isLoading,
   onGenerate,
+  onGenerateAndSend,
   onGenerateAll,
   generatingId,
   isBulkGenerating,
@@ -125,20 +127,36 @@ export function PvQueue({
                       {item.location} • alocat acum {waitingLabel}
                     </p>
                   </div>
-                  <Button
-                    type="button"
-                    className="gap-2 self-start sm:self-auto"
-                    onClick={() => void onGenerate(item)}
-                    aria-label={`Generează PV pentru ${item.employee}`}
-                    disabled={isBulkGenerating || generatingId === item.id}
-                  >
-                    {generatingId === item.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                    ) : (
-                      <FileText className="h-4 w-4" aria-hidden />
+                  <div className="flex gap-2 self-start sm:self-auto">
+                    <Button
+                      type="button"
+                      className="gap-2"
+                      onClick={() => void onGenerate(item)}
+                      aria-label={`Generează PV pentru ${item.employee}`}
+                      disabled={isBulkGenerating || generatingId === item.id}
+                    >
+                      {generatingId === item.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                      ) : (
+                        <FileText className="h-4 w-4" aria-hidden />
+                      )}
+                      {generatingId === item.id ? 'Se generează…' : 'Generează PV'}
+                    </Button>
+                    {onGenerateAndSend && item.employeeEmail && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="gap-2"
+                        onClick={() => void onGenerateAndSend(item)}
+                        aria-label={`Generează și trimite pentru semnare către ${item.employee}`}
+                        disabled={isBulkGenerating || generatingId === item.id}
+                        title="Generează PV și deschide email pentru semnătură"
+                      >
+                        <Mail className="h-4 w-4" aria-hidden />
+                        <span className="hidden sm:inline">Trimite</span>
+                      </Button>
                     )}
-                    {generatingId === item.id ? 'Se generează…' : 'Generează PV'}
-                  </Button>
+                  </div>
                 </li>
               );
             })}
