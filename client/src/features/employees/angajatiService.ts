@@ -171,23 +171,22 @@ export const useUnarchiveAngajat = () => {
   });
 };
 
-export interface DocumentType {
-  PROCES_VERBAL: 'PROCES_VERBAL';
-  CONTRACT_ANGAJARE: 'CONTRACT_ANGAJARE';
-  CONTRACT_MUNCA: 'CONTRACT_MUNCA';
-  CERTIFICAT: 'CERTIFICAT';
-  DIPLOMA: 'DIPLOMA';
-  EVALUARE: 'EVALUARE';
-  AVERTISMENT: 'AVERTISMENT';
-  DECIZIE: 'DECIZIE';
-  CERERE: 'CERERE';
-  ALTA_CORESPONDENTA: 'ALTA_CORESPONDENTA';
-  OTHER: 'OTHER';
-}
+export type DocumentType =
+  | 'PROCES_VERBAL'
+  | 'CONTRACT_ANGAJARE'
+  | 'CONTRACT_MUNCA'
+  | 'CERTIFICAT'
+  | 'DIPLOMA'
+  | 'EVALUARE'
+  | 'AVERTISMENT'
+  | 'DECIZIE'
+  | 'CERERE'
+  | 'ALTA_CORESPONDENTA'
+  | 'OTHER';
 
 export interface SearchDocumentsParams {
   employeeName?: string;
-  documentType?: keyof DocumentType;
+  documentType?: DocumentType;
   uploadYear?: number;
   includeInactive?: boolean;
   page?: number;
@@ -200,7 +199,7 @@ export interface ArchiveDocument {
   path: string;
   type?: string;
   size?: number;
-  documentType: keyof DocumentType;
+  documentType: DocumentType;
   uploadYear: number;
   createdAt: string;
   uploadedBy?: string;

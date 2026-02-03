@@ -126,10 +126,10 @@ export default function Archive() {
               <Label htmlFor="uploadYear">Anul documentului</Label>
               <Select value={uploadYear} onValueChange={setUploadYear}>
                 <SelectTrigger id="uploadYear">
-                  <SelectValue placeholder="Toate anii" />
+                  <SelectValue placeholder="Toți anii" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Toate anii</SelectItem>
+                  <SelectItem value="">Toți anii</SelectItem>
                   {years.map((year) => (
                     <SelectItem key={year} value={year.toString()}>
                       {year}
