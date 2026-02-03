@@ -63,7 +63,9 @@ router.get(
   controller.getAngajati
 );
 router.get("/full", controller.getAllAngajati);
+router.get("/archive/search", authorizeRoles("admin"), docController.searchArchiveDocuments);
 router.get("/documents/:docId", docController.downloadDocument);
+router.get("/documents/:docId/access-logs", authorizeRoles("admin"), docController.getAccessLogs);
 router.get("/:id", controller.getAngajatById);
 router.get("/:id/documents", docController.listDocuments);
 router.post(
@@ -94,6 +96,16 @@ router.post(
   authorizeRoles("admin"),
   validateRequest(createEmailAccountSchema),
   controller.createEmailAccount
+);
+router.post(
+  "/:id/archive",
+  authorizeRoles("admin"),
+  controller.archiveAngajat
+);
+router.post(
+  "/:id/unarchive",
+  authorizeRoles("admin"),
+  controller.unarchiveAngajat
 );
 router.delete("/:id", authorizeRoles("admin"), controller.deleteAngajat);
 

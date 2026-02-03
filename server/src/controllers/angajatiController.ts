@@ -6,6 +6,7 @@ type GetAngajatiQuery = {
   page: number;
   pageSize: number;
   department?: string;
+  includeInactive?: boolean;
 };
 
 const normalizeQueryValue = (value: unknown) => {
@@ -35,11 +36,13 @@ export const getAngajati = async (
     const page = parseNumberParam(req.query.page, 1);
     const pageSize = parseNumberParam(req.query.pageSize, 25);
     const department = normalizeQueryValue(req.query.department);
+    const includeInactive = req.query.includeInactive === "true";
 
     const params: GetAngajatiQuery = {
       page,
       pageSize,
       department: department ?? undefined,
+      includeInactive,
     };
     const response = await angajatService.getAngajati(params);
     res.json(response);
@@ -148,6 +151,47 @@ export const createEmailAccount = async (
     emitUpdate({
       type: "Coleg",
       message: "Cont e-mail marcat ca creat",
+      importance: "normal",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const archiveAngajat = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const user = (req as any).user;
+    const archivedBy = user ? `${user.nume} ${user.prenume}` : "Unknown";
+    
+    const updated = await angajatService.archiveAngajat(id, archivedBy);
+    res.json(updated);
+    emitUpdate({
+      type: "Coleg",
+      message: `Angajat arhivat: ${updated.numeComplet}`,
+      importance: "normal",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const unarchiveAngajat = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const updated = await angajatService.unarchiveAngajat(id);
+    res.json(updated);
+    emitUpdate({
+      type: "Coleg",
+      message: `Angajat reactivat: ${updated.numeComplet}`,
       importance: "normal",
     });
   } catch (err) {

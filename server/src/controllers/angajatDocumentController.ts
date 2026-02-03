@@ -6,7 +6,11 @@ import {
   getAngajatDocuments,
   getAngajatDocument,
   deleteAngajatDocument,
+  logDocumentAccess,
+  searchDocuments,
+  getDocumentAccessLogs,
 } from "../services/angajatDocument.service";
+import type { DocumentType } from "@prisma/client";
 
 export const listDocuments = async (
   req: Request,
@@ -45,6 +49,11 @@ export const uploadDocument = async (
 
     const user = (req as any).user;
     const uploadedBy = user ? `${user.nume} ${user.prenume}` : undefined;
+    
+    const documentType = (req.body.documentType as DocumentType) || "OTHER";
+    const uploadYear = req.body.uploadYear 
+      ? parseInt(req.body.uploadYear, 10) 
+      : new Date().getFullYear();
 
     const doc = await addAngajatDocument(
       id,
@@ -52,7 +61,9 @@ export const uploadDocument = async (
       `/angajat-documents/${file.filename}`,
       file.mimetype,
       file.size,
-      uploadedBy
+      uploadedBy,
+      documentType,
+      uploadYear
     );
     res.status(201).json(doc);
   } catch (err) {
@@ -72,6 +83,20 @@ export const downloadDocument = async (
       res.status(404).json({ message: "Document negăsit" });
       return;
     }
+    
+    // Log document access
+    const user = (req as any).user;
+    if (user) {
+      await logDocumentAccess(
+        docId,
+        user.id,
+        user.email,
+        `${user.nume} ${user.prenume}`,
+        "DOWNLOAD",
+        req.ip
+      );
+    }
+    
     const filePath = path.join(__dirname, "../../public", doc.path);
     if (!fs.existsSync(filePath)) {
       res.status(404).json({ message: "Fișier negăsit" });
@@ -101,6 +126,50 @@ export const deleteDocument = async (
     }
     await deleteAngajatDocument(docId);
     res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const searchArchiveDocuments = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const {
+      employeeName,
+      documentType,
+      uploadYear,
+      includeInactive,
+      page,
+      pageSize,
+    } = req.query;
+
+    const result = await searchDocuments({
+      employeeName: employeeName as string | undefined,
+      documentType: documentType as DocumentType | undefined,
+      uploadYear: uploadYear ? parseInt(uploadYear as string, 10) : undefined,
+      includeInactive: includeInactive === "true",
+      page: page ? parseInt(page as string, 10) : undefined,
+      pageSize: pageSize ? parseInt(pageSize as string, 10) : undefined,
+    });
+
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getAccessLogs = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { docId } = req.params;
+    const logs = await getDocumentAccessLogs(docId);
+    res.json(logs);
   } catch (err) {
     next(err);
   }
