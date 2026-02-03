@@ -55,7 +55,7 @@ export default function AppRouter() {
             <Route index element={<Dashboard />} />
             <Route path={ROUTES.EQUIPMENT.slice(1)} element={<Echipamente />} />
             <Route path={ROUTES.EQUIPMENT_DETAIL.slice(1)} element={<EquipmentDetail />} />
-            <Route path={ROUTES.COLEGI} element={<Colegi />} />
+            <Route path={ROUTES.COLEGI.slice(1)} element={<Colegi />} />
             <Route path={ROUTES.EMPLOYEE_FORM.slice(1)} element={<EmployeeForm />} />
             <Route path={ROUTES.PROFILE.slice(1)} element={<ProfilePage />} />
             <Route path={ROUTES.SEARCH.slice(1)} element={<SearchPage />} />

@@ -11,7 +11,7 @@ import { toast } from 'react-toastify';
 import { handleApiError } from '@/utils/apiError';
 
 const DOCUMENT_TYPES = {
-  '': 'Toate tipurile',
+  ALL: 'Toate tipurile',
   PROCES_VERBAL: 'Proces Verbal',
   CONTRACT_ANGAJARE: 'Contract de Angajare',
   CONTRACT_MUNCA: 'Contract de Muncă',
@@ -45,15 +45,15 @@ function formatDate(dateStr: string): string {
 
 export default function Archive() {
   const [employeeName, setEmployeeName] = useState('');
-  const [documentType, setDocumentType] = useState('');
-  const [uploadYear, setUploadYear] = useState('');
+  const [documentType, setDocumentType] = useState('ALL');
+  const [uploadYear, setUploadYear] = useState('ALL');
   const [includeInactive, setIncludeInactive] = useState(true);
   const [page, setPage] = useState(1);
 
   const { data, isLoading, error } = useSearchArchiveDocuments({
     employeeName: employeeName || undefined,
-    documentType: documentType || undefined,
-    uploadYear: uploadYear ? parseInt(uploadYear, 10) : undefined,
+    documentType: documentType === 'ALL' ? undefined : documentType,
+    uploadYear: uploadYear === 'ALL' ? undefined : parseInt(uploadYear, 10),
     includeInactive,
     page,
     pageSize: 50,
@@ -129,7 +129,7 @@ export default function Archive() {
                   <SelectValue placeholder="Toți anii" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Toți anii</SelectItem>
+                  <SelectItem value="ALL">Toți anii</SelectItem>
                   {years.map((year) => (
                     <SelectItem key={year} value={year.toString()}>
                       {year}

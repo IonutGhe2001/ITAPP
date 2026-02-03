@@ -9,6 +9,7 @@ export interface EchipamentFormData {
   simOperator: string;
   simSerie: string;
   simExpirare: string;
+  skipSerialNumber: boolean;
 }
 
 export function useEchipamentForm(initial?: Partial<EchipamentFormData>) {
@@ -21,6 +22,7 @@ export function useEchipamentForm(initial?: Partial<EchipamentFormData>) {
     simOperator: '',
     simSerie: '',
     simExpirare: '',
+    skipSerialNumber: false,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [search, setSearch] = useState('');
