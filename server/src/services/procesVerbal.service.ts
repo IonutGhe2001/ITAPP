@@ -117,24 +117,18 @@ export const creeazaProcesVerbalDinSchimbari = async (
     )
     .map((schimbare) => schimbare.echipamentId);
 
-  const hasReplace = schimbari.some(
-    (schimbare) => schimbare.tip === EQUIPMENT_CHANGE_TYPE.REPLACE
-  );
-
   let tip: ProcesVerbalTip = ProcesVerbalTip.PREDARE_PRIMIRE;
   
-  // SCHIMB (Switch) only when there's an actual REPLACE operation
-  if (hasReplace) {
+  // Determine PV type based on what operations are pending together
+  if (echipamentePredateIds.length && echipamentePrimiteIds.length) {
+    // Both returns AND receives in the same PV generation = SCHIMB (Switch)
+    // This means employee returned equipment and received equipment at the same time
     tip = ProcesVerbalTip.SCHIMB;
   } else if (echipamentePredateIds.length && !echipamentePrimiteIds.length) {
     // Only returns, no assignments - RESTITUIRE (Return)
     tip = ProcesVerbalTip.RESTITUIRE;
   } else if (!echipamentePredateIds.length && echipamentePrimiteIds.length) {
     // Only assignments, no returns - PREDARE_PRIMIRE (Receive)
-    tip = ProcesVerbalTip.PREDARE_PRIMIRE;
-  } else if (echipamentePredateIds.length && echipamentePrimiteIds.length) {
-    // Both returns and assignments but no REPLACE
-    // This means separate operations (not a switch), treat as PREDARE_PRIMIRE with both sections
     tip = ProcesVerbalTip.PREDARE_PRIMIRE;
   }
 
