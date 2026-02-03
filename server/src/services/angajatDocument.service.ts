@@ -129,3 +129,15 @@ export const getDocumentAccessLogs = (documentId: string) =>
     where: { documentId },
     orderBy: { timestamp: "desc" },
   });
+
+export const getAvailableYears = async (): Promise<number[]> => {
+  const documents = await prisma.angajatDocument.findMany({
+    select: { uploadYear: true },
+    distinct: ['uploadYear'],
+    orderBy: { uploadYear: 'desc' },
+  });
+  
+  return documents
+    .map(doc => doc.uploadYear)
+    .filter((year): year is number => year !== null && year !== undefined);
+};

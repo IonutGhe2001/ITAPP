@@ -6,6 +6,7 @@ const pageTitles: Record<string, string> = {
   [ROUTES.COLEGI]: 'Colegi',
   [ROUTES.PROFILE]: 'Profil',
   [ROUTES.SEARCH]: 'Căutare',
+  [ROUTES.ARCHIVE]: 'Arhivă',
 };
 
 export default pageTitles;

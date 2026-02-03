@@ -64,6 +64,7 @@ router.get(
 );
 router.get("/full", controller.getAllAngajati);
 router.get("/archive/search", authorizeRoles("admin"), docController.searchArchiveDocuments);
+router.get("/archive/years", authorizeRoles("admin"), docController.getAvailableDocumentYears);
 router.get("/documents/:docId", docController.downloadDocument);
 router.get("/documents/:docId/access-logs", authorizeRoles("admin"), docController.getAccessLogs);
 router.get("/:id", controller.getAngajatById);

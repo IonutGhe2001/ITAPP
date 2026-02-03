@@ -9,6 +9,7 @@ import {
   logDocumentAccess,
   searchDocuments,
   getDocumentAccessLogs,
+  getAvailableYears,
 } from "../services/angajatDocument.service";
 import type { DocumentType } from "@prisma/client";
 
@@ -170,6 +171,19 @@ export const getAccessLogs = async (
     const { docId } = req.params;
     const logs = await getDocumentAccessLogs(docId);
     res.json(logs);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getAvailableDocumentYears = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const years = await getAvailableYears();
+    res.json(years);
   } catch (err) {
     next(err);
   }

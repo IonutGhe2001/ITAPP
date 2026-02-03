@@ -228,3 +228,12 @@ export const useSearchArchiveDocuments = (params: SearchDocumentsParams) =>
     queryKey: ['archive-documents', params],
     queryFn: () => searchArchiveDocuments(params),
   });
+
+export const useAvailableDocumentYears = () =>
+  useQuery<number[]>({
+    queryKey: ['available-document-years'],
+    queryFn: async () => {
+      const response = await http.get('/angajati/archive/years');
+      return response as number[];
+    },
+  });

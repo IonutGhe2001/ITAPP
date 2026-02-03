@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileText, Download, Search, Archive as ArchiveIcon } from 'lucide-react';
-import { useSearchArchiveDocuments } from '@/features/employees/angajatiService';
+import { useSearchArchiveDocuments, useAvailableDocumentYears } from '@/features/employees/angajatiService';
 import http from '@/services/http';
 import { toast } from 'react-toastify';
 import { handleApiError } from '@/utils/apiError';
@@ -45,14 +45,15 @@ function formatDate(dateStr: string): string {
 
 export default function Archive() {
   const [employeeName, setEmployeeName] = useState('');
-  const [documentType, setDocumentType] = useState('ALL');
   const [uploadYear, setUploadYear] = useState('ALL');
   const [includeInactive, setIncludeInactive] = useState(true);
   const [page, setPage] = useState(1);
 
+  // Fetch available years dynamically
+  const { data: availableYears, isLoading: yearsLoading } = useAvailableDocumentYears();
+
   const { data, isLoading, error } = useSearchArchiveDocuments({
     employeeName: employeeName || undefined,
-    documentType: documentType === 'ALL' ? undefined : documentType,
     uploadYear: uploadYear === 'ALL' ? undefined : parseInt(uploadYear, 10),
     includeInactive,
     page,
@@ -81,9 +82,6 @@ export default function Archive() {
     setPage(1);
   };
 
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 15 }, (_, i) => currentYear - i);
-
   return (
     <div className="container mx-auto py-6 space-y-6">
       <div className="flex items-center gap-3">
@@ -97,7 +95,7 @@ export default function Archive() {
       <Card className="p-6">
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Filtrare documente</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="employeeName">Nume angajat</Label>
               <Input
@@ -108,21 +106,6 @@ export default function Archive() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="documentType">Tip document</Label>
-              <Select value={documentType} onValueChange={setDocumentType}>
-                <SelectTrigger id="documentType">
-                  <SelectValue placeholder="Toate tipurile" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(DOCUMENT_TYPES).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
               <Label htmlFor="uploadYear">Anul documentului</Label>
               <Select value={uploadYear} onValueChange={setUploadYear}>
                 <SelectTrigger id="uploadYear">
@@ -130,11 +113,15 @@ export default function Archive() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ALL">Toți anii</SelectItem>
-                  {years.map((year) => (
-                    <SelectItem key={year} value={year.toString()}>
-                      {year}
-                    </SelectItem>
-                  ))}
+                  {yearsLoading ? (
+                    <SelectItem value="loading" disabled>Se încarcă...</SelectItem>
+                  ) : (
+                    availableYears?.map((year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
