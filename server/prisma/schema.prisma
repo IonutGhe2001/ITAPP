@@ -85,8 +85,6 @@ model Echipament {
   changes          EquipmentChange[]
   documents        EquipmentDocument[]
   images           EquipmentImage[]
-
-  @@unique([tip, serie])
 }
 
 model Eveniment {
