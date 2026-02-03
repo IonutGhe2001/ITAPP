@@ -122,12 +122,20 @@ export const creeazaProcesVerbalDinSchimbari = async (
   );
 
   let tip: ProcesVerbalTip = ProcesVerbalTip.PREDARE_PRIMIRE;
-  if (echipamentePredateIds.length && echipamentePrimiteIds.length) {
+  
+  // SCHIMB (Switch) only when there's an actual REPLACE operation
+  if (hasReplace) {
     tip = ProcesVerbalTip.SCHIMB;
-  } else if (echipamentePredateIds.length) {
+  } else if (echipamentePredateIds.length && !echipamentePrimiteIds.length) {
+    // Only returns, no assignments - RESTITUIRE (Return)
     tip = ProcesVerbalTip.RESTITUIRE;
-    } else if (hasReplace) {
-    tip = ProcesVerbalTip.SCHIMB;
+  } else if (!echipamentePredateIds.length && echipamentePrimiteIds.length) {
+    // Only assignments, no returns - PREDARE_PRIMIRE (Receive)
+    tip = ProcesVerbalTip.PREDARE_PRIMIRE;
+  } else if (echipamentePredateIds.length && echipamentePrimiteIds.length) {
+    // Both returns and assignments but no REPLACE
+    // This means separate operations (not a switch), treat as PREDARE_PRIMIRE with both sections
+    tip = ProcesVerbalTip.PREDARE_PRIMIRE;
   }
 
   const uniquePredateIds = Array.from(new Set(echipamentePredateIds));

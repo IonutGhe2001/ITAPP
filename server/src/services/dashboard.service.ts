@@ -285,11 +285,11 @@ export const getAlerts = async (limit: number): Promise<Alert[]> => {
 export const getPvQueue = async (limit: number): Promise<PvQueueItem[]> => {
   const now = new Date();
 
-  // Get equipment changes not included in PV yet
+  // Get equipment changes not included in PV yet (both ASSIGN and RETURN)
   const changes = await prisma.equipmentChange.findMany({
     where: {
       includedInPV: false,
-      tip: "ASSIGN",
+      tip: { in: ["ASSIGN", "RETURN"] },
     },
     include: {
       angajat: { include: { departmentConfig: true } },
