@@ -432,11 +432,6 @@ export default function ColegModals({
                       : 'Nu există echipamente alocate.'}
                   </p>
                   <div className="flex flex-wrap items-center gap-2">
-                    {pendingForDetailColegCount > 0 && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                    )}
                     <Button
                       size="sm"
                       onClick={() => {
