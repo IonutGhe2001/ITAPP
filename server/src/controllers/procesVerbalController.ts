@@ -94,7 +94,14 @@ export const creareProcesVerbalDinSchimbari = async (
 ) => {
   try {
     const { angajatId } = req.body;
-    const result = await creeazaProcesVerbalDinSchimbari(angajatId);
+    
+    // Get current user to include digital signature
+    const currentUser = await getUserById(Number(req.user!.id));
+    
+    const result = await creeazaProcesVerbalDinSchimbari(
+      angajatId,
+      currentUser?.digitalSignature
+    );
 
     if (!result) {
       return res

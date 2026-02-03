@@ -90,7 +90,10 @@ export const creeazaProcesVerbalCuEchipamente = async (
   return { procesVerbal, echipamentePredate, echipamentePrimite };
 };
 
-export const creeazaProcesVerbalDinSchimbari = async (angajatId: string) => {
+export const creeazaProcesVerbalDinSchimbari = async (
+  angajatId: string,
+  digitalSignature?: string | null
+) => {
   const schimbari: EquipmentChangeWithEchipament[] =
     await prisma.equipmentChange.findMany({
       where: {
@@ -152,6 +155,7 @@ export const creeazaProcesVerbalDinSchimbari = async (angajatId: string) => {
     tip: procesVerbal.tip,
     data: new Date().toLocaleDateString("ro-RO"),
     firma: "Creative & Innovative Management SRL",
+    digitalSignature,
   });
 
   return {

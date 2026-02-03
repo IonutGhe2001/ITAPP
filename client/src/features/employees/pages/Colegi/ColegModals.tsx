@@ -6,7 +6,6 @@ import ModalAsigneazaEchipament from './ModalAsigneazaEchipament';
 import ModalEditColeg from './ModalEditColeg';
 import AngajatDocumentSection from './AngajatDocumentSection';
 import { useUpdateEchipament } from '@/features/equipment';
-import { queueProcesVerbal } from '@/features/proceseVerbale/pvQueue';
 import type { Angajat, Echipament } from '@/features/equipment/types';
 import type { AngajatWithRelations } from '@/features/employees/angajatiService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -42,11 +41,8 @@ interface ColegModalsProps {
   refetch: () => Promise<unknown>;
   setExpanded: React.Dispatch<React.SetStateAction<Set<string>>>;
   handleDelete: (id: string) => void;
-  onPVChange: (colegId: string, change: { predate?: string[]; primite?: string[] }) => void;
   detailColeg: AngajatWithRelations | null;
   setDetailColeg: React.Dispatch<React.SetStateAction<AngajatWithRelations | null>>;
-  pendingPV: Record<string, { predate: string[]; primite: string[] }>;
-  onGeneratePV: (colegId: string) => Promise<void> | void;
 }
 
 export default function ColegModals({
@@ -64,11 +60,8 @@ export default function ColegModals({
   refetch,
   setExpanded,
   handleDelete,
-  onPVChange,
   detailColeg,
   setDetailColeg,
-  pendingPV,
-  onGeneratePV,
 }: ColegModalsProps) {
   const updateMutation = useUpdateEchipament();
   const [activeTab, setActiveTab] = useState<'profile' | 'equipment' | 'documents'>('profile');
@@ -78,10 +71,6 @@ export default function ColegModals({
   const [detailToRestore, setDetailToRestore] = useState<AngajatWithRelations | null>(null);
   const [documents, setDocuments] = useState<any[]>([]);
   const { toast } = useToast();
-  const pendingForDetailColeg = detailColeg ? pendingPV[detailColeg.id] : undefined;
-  const pendingForDetailColegCount =
-    (pendingForDetailColeg?.predate.length ?? 0) +
-    (pendingForDetailColeg?.primite.length ?? 0);
 
   // Fetch documents when detailColeg opens
   useEffect(() => {
@@ -170,13 +159,6 @@ export default function ColegModals({
         )
       );
 
-      const payload = { predate: equipmentIds };
-      onPVChange(detailColeg.id, payload);
-
-      queueProcesVerbal(detailColeg.id, 'RESTITUIRE', {
-        predate: equipmentIds,
-      });
-
       await refetch();
       setDetailColeg((prev) =>
         prev
@@ -240,7 +222,6 @@ export default function ColegModals({
         <ModalAsigneazaEchipament
           angajatId={selectedAngajatId}
           onClose={handleAssignModalClose}
-          onPendingPV={(change) => onPVChange(selectedAngajatId, change)}
           onSuccess={handleAssignModalSuccess}
         />
       )}
@@ -261,9 +242,7 @@ export default function ColegModals({
               data: { angajatId: replaceData.colegId, stare: 'alocat' },
             });
             const payload = { predate: oldIds, primite: newIds };
-            onPVChange(replaceData.colegId, payload);
           }}
-          onPendingPV={(change) => onPVChange(replaceData.colegId, change)}
           onClose={() => setReplaceData(null)}
           onSuccess={() => {
             void refetch();
@@ -293,10 +272,8 @@ export default function ColegModals({
               assignedEquipment.push(updated);
             }
             const payload = { predate: oldIds, primite: newIds };
-            onPVChange(detailToRestore.id, payload);
             await refetch();
           }}
-          onPendingPV={(change) => onPVChange(detailToRestore.id, change)}
           onClose={() => {
             setBulkReplaceIds(null);
             restoreDetailProfile();
@@ -459,10 +436,6 @@ export default function ColegModals({
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => onGeneratePV(detailColeg.id)}
-                      >
-                        Generează PV ({pendingForDetailColegCount})
-                      </Button>
                     )}
                     <Button
                       size="sm"
