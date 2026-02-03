@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import Toolbar from '@/components/Toolbar';
 import Container from '@/components/Container';
 import StatusBadge from '@/components/StatusBadge';
-import { useAngajati, useDeleteAngajat } from '@/features/employees';
+import { useAngajati, useDeleteAngajat, useArchiveAngajat, useUnarchiveAngajat } from '@/features/employees';
 import type { Angajat } from '@/features/equipment/types';
 import type { AngajatWithRelations } from '@/features/employees/angajatiService';
 import { genereazaProcesVerbal, type ProcesVerbalTip } from '@/features/proceseVerbale';
@@ -173,6 +173,8 @@ export default function Colegi() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [detailColeg, setDetailColeg] = useState<AngajatWithRelations | null>(null);
   const deleteMutation = useDeleteAngajat();
+  const archiveMutation = useArchiveAngajat();
+  const unarchiveMutation = useUnarchiveAngajat();
   const { toast } = useToast();
   const [pendingPV, setPendingPV] = useState<
     Record<string, { predate: string[]; primite: string[] }>
@@ -426,6 +428,32 @@ export default function Colegi() {
       });
     }
   };
+
+  const handleArchive = async (id: string) => {
+    try {
+      await archiveMutation.mutateAsync(id);
+      toast({ title: 'Angajat arhivat cu succes' });
+    } catch {
+      toast({
+        title: 'Eroare',
+        description: 'Nu s-a putut arhiva angajatul',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleUnarchive = async (id: string) => {
+    try {
+      await unarchiveMutation.mutateAsync(id);
+      toast({ title: 'Angajat reactivat cu succes' });
+    } catch {
+      toast({
+        title: 'Eroare',
+        description: 'Nu s-a putut reactiva angajatul',
+        variant: 'destructive',
+      });
+    }
+  };
   
   const handleScrollToPending = () => {
     const firstId = pendingPVEmployees[0];
@@ -522,6 +550,8 @@ export default function Colegi() {
               pendingPV={pendingPV[filtered[index].id]}
               onGeneratePV={handleGeneratePV}
               onOpenDetails={setDetailColeg}
+              onArchive={handleArchive}
+              onUnarchive={handleUnarchive}
             />
           )}
         </List>

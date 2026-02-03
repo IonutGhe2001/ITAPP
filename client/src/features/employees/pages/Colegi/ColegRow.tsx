@@ -21,6 +21,8 @@ interface ColegRowProps {
   pendingPV?: { predate: string[]; primite: string[] };
   onGeneratePV: (colegId: string) => void;
   onOpenDetails: (coleg: AngajatWithRelations) => void;
+  onArchive?: (colegId: string) => void;
+  onUnarchive?: (colegId: string) => void;
 }
 
 const lifecycleTone = {
@@ -60,6 +62,8 @@ export default function ColegRow({
   pendingPV,
   onGeneratePV,
   onOpenDetails,
+  onArchive,
+  onUnarchive,
 }: ColegRowProps) {
   const rowRef = useRef<HTMLDivElement>(null);
   const lifecycleStatus = getEmployeeLifecycleStatus(coleg as AngajatWithRelations);
@@ -184,6 +188,20 @@ export default function ColegRow({
               </DropdownMenuItem>
             )}
             <DropdownMenuItem onSelect={() => setEditColeg(coleg)}>Editează</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {(coleg as AngajatWithRelations).isActive !== false ? (
+              onArchive && (
+                <DropdownMenuItem onSelect={() => onArchive(coleg.id)}>
+                  Arhivează angajat
+                </DropdownMenuItem>
+              )
+            ) : (
+              onUnarchive && (
+                <DropdownMenuItem onSelect={() => onUnarchive(coleg.id)}>
+                  Reactivează angajat
+                </DropdownMenuItem>
+              )
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive" onSelect={handleDeleteAction}>
               Șterge
