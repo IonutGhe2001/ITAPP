@@ -4,11 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileText, Download, Search, Archive as ArchiveIcon } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { FileText, Download, Search, Archive as ArchiveIcon, Eye } from 'lucide-react';
 import { useSearchArchiveDocuments, useAvailableDocumentYears } from '@/features/employees/angajatiService';
 import http from '@/services/http';
 import { toast } from 'react-toastify';
 import { handleApiError } from '@/utils/apiError';
+
+const apiBase = (import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '');
 
 const DOCUMENT_TYPES = {
   ALL: 'Toate tipurile',
@@ -43,11 +46,29 @@ function formatDate(dateStr: string): string {
   });
 }
 
+interface ArchiveDocument {
+  id: string;
+  name: string;
+  path: string;
+  type?: string;
+  size?: number;
+  documentType: string;
+  uploadYear: number;
+  createdAt: string;
+  uploadedBy?: string;
+  angajat: {
+    numeComplet: string;
+    functie: string;
+    isActive: boolean;
+  };
+}
+
 export default function Archive() {
   const [employeeName, setEmployeeName] = useState('');
   const [uploadYear, setUploadYear] = useState('ALL');
   const [includeInactive, setIncludeInactive] = useState(true);
   const [page, setPage] = useState(1);
+  const [selectedDoc, setSelectedDoc] = useState<ArchiveDocument | null>(null);
 
   // Fetch available years dynamically
   const { data: availableYears, isLoading: yearsLoading } = useAvailableDocumentYears();
@@ -81,6 +102,8 @@ export default function Archive() {
   const handleSearch = () => {
     setPage(1);
   };
+
+  const isPdf = (doc: ArchiveDocument) => doc.type === 'application/pdf' || doc.name.endsWith('.pdf');
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -236,6 +259,16 @@ export default function Archive() {
                       </div>
                     </div>
                     <div className="flex gap-2 flex-shrink-0">
+                      {isPdf(doc) && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedDoc(doc)}
+                          className="h-8"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      )}
                       <Button
                         variant="outline"
                         size="sm"
@@ -251,6 +284,31 @@ export default function Archive() {
             </div>
           )}
         </>
+      )}
+
+      {/* Preview Dialog */}
+      {selectedDoc && isPdf(selectedDoc) && (
+        <Dialog open onOpenChange={(open) => !open && setSelectedDoc(null)}>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>{selectedDoc.name}</DialogTitle>
+              <p className="text-sm text-slate-600">
+                Angajat: {selectedDoc.angajat.numeComplet} - {selectedDoc.angajat.functie}
+              </p>
+            </DialogHeader>
+            <iframe src={`${apiBase}${selectedDoc.path}`} className="h-[80vh] w-full" />
+            <div className="mt-4 flex justify-end">
+              <a
+                href={`${apiBase}${selectedDoc.path}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary text-sm underline"
+              >
+                Descarcă / deschide în tab nou
+              </a>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
