@@ -58,6 +58,7 @@ type PvQueueItem = {
   id: string;
   employeeId: string;
   employee: string;
+  employeeEmail: string | null;
   equipment: string;
   allocationDate: string;
   location: string;
@@ -284,40 +285,79 @@ export const getAlerts = async (limit: number): Promise<Alert[]> => {
 export const getPvQueue = async (limit: number): Promise<PvQueueItem[]> => {
   const now = new Date();
 
-  // Get equipment changes not included in PV yet
+  // Get equipment changes not included in PV yet (both ASSIGN and RETURN)
   const changes = await prisma.equipmentChange.findMany({
     where: {
       includedInPV: false,
-      tip: "ASSIGN",
+      tip: { in: ["ASSIGN", "RETURN"] },
     },
     include: {
       angajat: { include: { departmentConfig: true } },
       echipament: true,
     },
-    take: limit,
     orderBy: { createdAt: "asc" },
   });
 
-  return changes.map((change: EquipmentChange & {
+  // Group changes by employee to show switches as single entries
+  const groupedByEmployee = new Map<string, Array<EquipmentChange & {
     angajat: EmployeeWithDepartment;
     echipament: Echipament;
-  }) => {
+  }>>();
+
+  for (const change of changes) {
+    const existing = groupedByEmployee.get(change.angajatId) || [];
+    existing.push(change);
+    groupedByEmployee.set(change.angajatId, existing);
+  }
+
+  // Create PV queue items from grouped changes
+  const queueItems: PvQueueItem[] = [];
+  
+  for (const [, employeeChanges] of groupedByEmployee) {
+    if (queueItems.length >= limit) break;
+    
+    // Get the earliest change date for this employee
+    const earliestChange = employeeChanges.reduce((earliest, change) => 
+      change.createdAt < earliest.createdAt ? change : earliest
+    );
+    
     const daysSinceAllocation = Math.floor(
-      (now.getTime() - new Date(change.createdAt).getTime()) /
+      (now.getTime() - new Date(earliestChange.createdAt).getTime()) /
         (1000 * 60 * 60 * 24)
     );
     const isOverdue = daysSinceAllocation > 7;
 
-    return {
-      id: change.id,
-      employeeId: change.angajatId,
-      employee: change.angajat.numeComplet,
-      equipment: `${change.echipament.nume} ${change.echipament.serie}`,
-      allocationDate: change.createdAt.toISOString(),
-      location: change.angajat.departmentConfig?.name ?? "București - Sediu Central",
+    // Determine equipment description based on change types
+    const hasReturns = employeeChanges.some(c => c.tip === "RETURN");
+    const hasAssigns = employeeChanges.some(c => c.tip === "ASSIGN");
+    
+    let equipmentDesc: string;
+    if (hasReturns && hasAssigns) {
+      // Switch operation - show both
+      const returned = employeeChanges.filter(c => c.tip === "RETURN");
+      const assigned = employeeChanges.filter(c => c.tip === "ASSIGN");
+      equipmentDesc = `Schimb: ${returned.length} predat(e), ${assigned.length} primit(e)`;
+    } else if (hasReturns) {
+      // Only returns
+      equipmentDesc = employeeChanges.map(c => `${c.echipament.nume} ${c.echipament.serie}`).join(", ");
+    } else {
+      // Only assigns
+      equipmentDesc = employeeChanges.map(c => `${c.echipament.nume} ${c.echipament.serie}`).join(", ");
+    }
+
+    queueItems.push({
+      id: earliestChange.id, // Use first change ID as the group ID
+      employeeId: earliestChange.angajatId,
+      employee: earliestChange.angajat.numeComplet,
+      employeeEmail: earliestChange.angajat.email,
+      equipment: equipmentDesc,
+      allocationDate: earliestChange.createdAt.toISOString(),
+      location: earliestChange.angajat.departmentConfig?.name ?? "București - Sediu Central",
       status: isOverdue ? ("overdue" as const) : ("pending" as const),
-    };
-  });
+    });
+  }
+
+  return queueItems;
 };
 
 export const getActivity = async (limit: number): Promise<ActivityItem[]> => {

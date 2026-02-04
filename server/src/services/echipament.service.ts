@@ -26,7 +26,10 @@ const validateEchipamentUpdate = async (
   const newTip = data.tip ?? current.tip;
   const newSerie = data.serie ?? current.serie;
 
-  if (newTip !== current.tip || newSerie !== current.serie) {
+  // Skip duplicate check if serial number is N/A (equipment without serial number)
+  const isSerialNA = !newSerie || newSerie.trim() === '' || newSerie.toUpperCase() === 'N/A';
+
+  if ((newTip !== current.tip || newSerie !== current.serie) && !isSerialNA) {
     const duplicate = await tx.echipament.findFirst({
       where: { tip: newTip, serie: newSerie, NOT: { id } },
     });
@@ -220,15 +223,20 @@ export const createEchipament = (data: {
       : "in_stoc";
 
   return prisma.$transaction(async (tx: TransactionClient) => {
-    const existing = await tx.echipament.findFirst({
-      where: { tip: data.tip, serie: data.serie },
-    });
-    if (existing) {
-      const error = new Error(
-        "Există deja un echipament cu această serie pentru acest tip."
-      ) as Error & { status?: number };
-      error.status = 409;
-      throw error;
+    // Skip duplicate check if serial number is N/A (equipment without serial number)
+    const isSerialNA = !data.serie || data.serie.trim() === '' || data.serie.toUpperCase() === 'N/A';
+    
+    if (!isSerialNA) {
+      const existing = await tx.echipament.findFirst({
+        where: { tip: data.tip, serie: data.serie },
+      });
+      if (existing) {
+        const error = new Error(
+          "Există deja un echipament cu această serie pentru acest tip."
+        ) as Error & { status?: number };
+        error.status = 409;
+        throw error;
+      }
     }
 
     if (data.angajatId && !allowsMultipleAssignments(data.tip)) {

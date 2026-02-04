@@ -21,11 +21,9 @@ import { Button } from '@/components/ui/button';
 import Toolbar from '@/components/Toolbar';
 import Container from '@/components/Container';
 import StatusBadge from '@/components/StatusBadge';
-import { useAngajati, useDeleteAngajat } from '@/features/employees';
+import { useAngajati, useDeleteAngajat, useArchiveAngajat, useUnarchiveAngajat } from '@/features/employees';
 import type { Angajat } from '@/features/equipment/types';
 import type { AngajatWithRelations } from '@/features/employees/angajatiService';
-import { genereazaProcesVerbal, type ProcesVerbalTip } from '@/features/proceseVerbale';
-import { getQueue, removeFromQueue } from '@/features/proceseVerbale/pvQueue';
 import ColegRow from './ColegRow';
 import ColegModals from './ColegModals';
 import useColegiFilter, {
@@ -173,19 +171,9 @@ export default function Colegi() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [detailColeg, setDetailColeg] = useState<AngajatWithRelations | null>(null);
   const deleteMutation = useDeleteAngajat();
+  const archiveMutation = useArchiveAngajat();
+  const unarchiveMutation = useUnarchiveAngajat();
   const { toast } = useToast();
-  const [pendingPV, setPendingPV] = useState<
-    Record<string, { predate: string[]; primite: string[] }>
-  >({});
-  const pendingPVEmployees = useMemo(() => Object.keys(pendingPV), [pendingPV]);
-  const pendingPVTotal = useMemo(
-    () =>
-      Object.values(pendingPV).reduce(
-        (total, entry) => total + (entry?.predate?.length ?? 0) + (entry?.primite?.length ?? 0),
-        0
-      ),
-    [pendingPV]
-  );
 
   const {
     search,
@@ -229,57 +217,6 @@ export default function Colegi() {
   const [width, setWidth] = useState<number>(getInitialWidth);
   const [height, setHeight] = useState<number>(getInitialHeight);
   const rowHeights = useRef<number[]>([]);
-
-  useEffect(() => {
-    const items = getQueue();
-    if (items.length === 0) return;
-    const grouped: Record<string, { predate: string[]; primite: string[] }> = {};
-    for (const item of items) {
-      const current = grouped[item.angajatId] || { predate: [], primite: [] };
-      grouped[item.angajatId] = {
-        predate: Array.from(new Set([...current.predate, ...(item.predate || [])])),
-        primite: Array.from(new Set([...current.primite, ...(item.primite || [])])),
-      };
-    }
-    setPendingPV(grouped);
-  }, []);
-
-  const addPendingPV = (colegId: string, change: { predate?: string[]; primite?: string[] }) => {
-    setPendingPV((prev) => {
-      const current = prev[colegId] || { predate: [], primite: [] };
-      return {
-        ...prev,
-        [colegId]: {
-          predate: Array.from(new Set([...current.predate, ...(change.predate || [])])),
-          primite: Array.from(new Set([...current.primite, ...(change.primite || [])])),
-        },
-      };
-    });
-  };
-
-  const handleGeneratePV = async (colegId: string) => {
-    const data = pendingPV[colegId];
-    if (!data) return;
-    const tip: ProcesVerbalTip =
-      data.predate.length > 0 && data.primite.length > 0
-        ? 'SCHIMB'
-        : data.primite.length > 0
-          ? 'PREDARE_PRIMIRE'
-          : 'RESTITUIRE';
-    try {
-      const url = await genereazaProcesVerbal(colegId, tip, data);
-      window.open(url, '_blank');
-      toast({ title: 'Proces verbal generat' });
-      setPendingPV((prev) => {
-        const updated = { ...prev };
-        delete updated[colegId];
-        return updated;
-      });
-      removeFromQueue(colegId);
-    } catch {
-      toast({ title: 'Eroare la generarea procesului verbal', variant: 'destructive' });
-    }
-  };
 
   const toggleFunction = useCallback(
     (functie: string, checked: boolean) => {
@@ -426,18 +363,34 @@ export default function Colegi() {
       });
     }
   };
-  
-  const handleScrollToPending = () => {
-    const firstId = pendingPVEmployees[0];
-    if (!firstId) return;
-    const index = filtered.findIndex((c) => c.id === firstId);
-    if (index >= 0) {
-      listRef.current?.scrollToItem(index, 'start');
+
+  const handleArchive = async (id: string) => {
+    try {
+      await archiveMutation.mutateAsync(id);
+      toast({ title: 'Angajat arhivat cu succes' });
+    } catch {
+      toast({
+        title: 'Eroare',
+        description: 'Nu s-a putut arhiva angajatul',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleUnarchive = async (id: string) => {
+    try {
+      await unarchiveMutation.mutateAsync(id);
+      toast({ title: 'Angajat reactivat cu succes' });
+    } catch {
+      toast({
+        title: 'Eroare',
+        description: 'Nu s-a putut reactiva angajatul',
+        variant: 'destructive',
+      });
     }
   };
 
   const hasData = filtered.length > 0;
-  const hasPendingPV = pendingPVEmployees.length > 0;
   const showSkeleton = isLoading && colegi.length === 0;
 
   const renderSkeleton = () => (
@@ -519,9 +472,9 @@ export default function Colegi() {
               handleDelete={handleDelete}
               setSelectedAngajatId={setSelectedAngajatId}
               setSize={setSize}
-              pendingPV={pendingPV[filtered[index].id]}
-              onGeneratePV={handleGeneratePV}
               onOpenDetails={setDetailColeg}
+              onArchive={handleArchive}
+              onUnarchive={handleUnarchive}
             />
           )}
         </List>
@@ -614,34 +567,6 @@ export default function Colegi() {
       </header>
 
       <Container className="mt-10 space-y-6">
-        {hasPendingPV && !isError && (
-          <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex flex-wrap items-center gap-3">
-                <StatusBadge label="Procese verbale în lucru" tone="warning" withDot />
-                <span className="text-muted-foreground text-sm">
-                  {pendingPVEmployees.length === 1
-                    ? '1 coleg are procese verbale nefinalizate.'
-                    : `${pendingPVEmployees.length} colegi au procese verbale nefinalizate.`}
-                </span>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleScrollToPending}
-                className="rounded-full border-slate-300 bg-white px-4 text-xs font-semibold text-slate-700 hover:bg-slate-100"
-              >
-                Vezi detalii
-              </Button>
-            </div>
-            <p className="text-muted-foreground text-xs">
-              {pendingPVTotal === 1
-                ? '1 echipament în așteptare pentru confirmare.'
-                : `${pendingPVTotal} echipamente în așteptare pentru confirmare.`}
-            </p>
-          </div>
-        )}
-
         {showToolbar && (
           <Toolbar className="gap-6">
             <div className="grid w-full gap-4 lg:grid-cols-[minmax(0,1.6fr)_repeat(3,minmax(0,1fr))] xl:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))]">
@@ -779,11 +704,8 @@ export default function Colegi() {
         refetch={refetch}
         setExpanded={setExpanded}
         handleDelete={handleDelete}
-        onPVChange={addPendingPV}
         detailColeg={detailColeg}
         setDetailColeg={setDetailColeg}
-        pendingPV={pendingPV}
-        onGeneratePV={handleGeneratePV}
       />
     </div>
   );

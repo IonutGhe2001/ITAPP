@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import UploadButton from '@/components/UploadButton';
-import { FileUp, Trash2, FileText, Download } from 'lucide-react';
+import { FileText, Trash2, Download } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import http from '@/services/http';
 import { toast } from 'react-toastify';
 import { handleApiError } from '@/utils/apiError';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 
 const apiBase = (import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '');
 
@@ -19,6 +20,8 @@ interface DocumentItem {
   size?: number;
   createdAt: string;
   uploadedBy?: string;
+  documentType?: string;
+  uploadYear?: number;
 }
 
 interface Props {
@@ -26,6 +29,20 @@ interface Props {
   documents: DocumentItem[];
   refetch: () => void;
 }
+
+const DOCUMENT_TYPES = {
+  PROCES_VERBAL: 'Proces Verbal',
+  CONTRACT_ANGAJARE: 'Contract de Angajare',
+  CONTRACT_MUNCA: 'Contract de Muncă',
+  CERTIFICAT: 'Certificat',
+  DIPLOMA: 'Diplomă',
+  EVALUARE: 'Evaluare',
+  AVERTISMENT: 'Avertisment',
+  DECIZIE: 'Decizie',
+  CERERE: 'Cerere',
+  ALTA_CORESPONDENTA: 'Altă Corespondență',
+  OTHER: 'Altele',
+} as const;
 
 function formatFileSize(bytes?: number): string {
   if (!bytes) return '';
@@ -47,23 +64,50 @@ export default function AngajatDocumentSection({ angajatId, documents, refetch }
   const [docError, setDocError] = useState<string | null>(null);
   const [selectedDoc, setSelectedDoc] = useState<DocumentItem | null>(null);
   const [deleteDocId, setDeleteDocId] = useState<string | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploadYear, setUploadYear] = useState<number>(new Date().getFullYear());
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const formData = new FormData();
-    formData.append('file', file);
-    try {
-      await http.post(`/angajati/${angajatId}/documents`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      setSelectedFiles(Array.from(files));
       setDocError(null);
+    }
+  };
+
+  const handleDocumentUpload = async () => {
+    if (selectedFiles.length === 0) return;
+    setIsUploading(true);
+    
+    try {
+      // Upload files one by one
+      for (const file of selectedFiles) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('documentType', 'PROCES_VERBAL'); // Default to PV as per requirements
+        formData.append('uploadYear', uploadYear.toString());
+        
+        await http.post(`/angajati/${angajatId}/documents`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      }
+      
+      setDocError(null);
+      setSelectedFiles([]);
+      setUploadYear(new Date().getFullYear());
       refetch();
-      toast.success('Document încărcat cu succes');
+      toast.success(
+        selectedFiles.length === 1 
+          ? 'Document încărcat cu succes' 
+          : `${selectedFiles.length} documente încărcate cu succes`
+      );
     } catch (err: unknown) {
       const message = handleApiError(err, 'Eroare la încărcare');
       setDocError(message);
       toast.error(message);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -102,10 +146,10 @@ export default function AngajatDocumentSection({ angajatId, documents, refetch }
   return (
     <div className="space-y-4">
       <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-        Documente atașate
+        Procese verbale atașate
       </h3>
       <p className="text-sm text-slate-600">
-        Încarcă procese verbale semnate și alte documente importante pentru acest angajat.
+        Încarcă procese verbale semnate pentru acest angajat.
       </p>
       {documents && documents.length > 0 ? (
         <div className="space-y-2">
@@ -117,6 +161,12 @@ export default function AngajatDocumentSection({ angajatId, documents, refetch }
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-slate-900 truncate">{doc.name}</p>
                     <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                      {doc.documentType && (
+                        <span className="font-medium text-blue-600">
+                          {DOCUMENT_TYPES[doc.documentType as keyof typeof DOCUMENT_TYPES] || doc.documentType}
+                        </span>
+                      )}
+                      {doc.uploadYear && <span>Anul {doc.uploadYear}</span>}
                       {doc.size && <span>{formatFileSize(doc.size)}</span>}
                       <span>{formatDate(doc.createdAt)}</span>
                       {doc.uploadedBy && <span>Încărcat de {doc.uploadedBy}</span>}
@@ -161,17 +211,50 @@ export default function AngajatDocumentSection({ angajatId, documents, refetch }
           <p className="mt-2 text-sm text-slate-500">Nu există documente încărcate</p>
         </Card>
       )}
-      <div className="space-y-2">
-        <UploadButton
-          accept="application/pdf,image/png,image/jpeg"
-          onChange={handleDocumentUpload}
-          variant="outline"
-          className="w-full"
-        >
-          <FileUp className="mr-2 h-4 w-4" /> Încarcă document
-        </UploadButton>
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="uploadYear">Anul documentului</Label>
+          <Select value={uploadYear.toString()} onValueChange={(val) => setUploadYear(parseInt(val, 10))}>
+            <SelectTrigger id="uploadYear">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                <SelectItem key={year} value={year.toString()}>
+                  {year}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="file-upload">Selectează documente (PV-uri)</Label>
+          <input
+            id="file-upload"
+            type="file"
+            multiple
+            accept="application/pdf,image/png,image/jpeg"
+            onChange={handleFileSelect}
+            className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          />
+          {selectedFiles.length > 0 && (
+            <div className="text-sm text-slate-600">
+              {selectedFiles.length} {selectedFiles.length === 1 ? 'fișier selectat' : 'fișiere selectate'}:
+              <ul className="mt-1 list-disc list-inside">
+                {selectedFiles.map((file, idx) => (
+                  <li key={idx} className="truncate">{file.name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+        {selectedFiles.length > 0 && (
+          <Button onClick={handleDocumentUpload} className="w-full" disabled={isUploading}>
+            {isUploading ? 'Se încarcă...' : `Încarcă ${selectedFiles.length} ${selectedFiles.length === 1 ? 'document' : 'documente'}`}
+          </Button>
+        )}
         <p className="text-xs text-slate-500">
-          Acceptă fișiere PDF și imagini (PNG, JPEG) până la 10MB
+          Acceptă fișiere PDF și imagini (PNG, JPEG) până la 10MB. Poți selecta mai multe fișiere deodată.
         </p>
         {docError && <p className="text-sm text-red-500">{docError}</p>}
       </div>

@@ -52,7 +52,25 @@ export default function EchipamentForm({
         <Input
           value={formData.serie}
           onChange={(e) => setFormData({ ...formData, serie: e.target.value })}
+          disabled={formData.skipSerialNumber}
+          placeholder={formData.skipSerialNumber ? "Echipamentul nu are SN" : ""}
         />
+        <div className="mt-2 flex items-center">
+          <input
+            type="checkbox"
+            id="skipSerialNumber"
+            checked={formData.skipSerialNumber}
+            onChange={(e) => setFormData({ 
+              ...formData, 
+              skipSerialNumber: e.target.checked,
+              serie: e.target.checked ? 'N/A' : formData.serie === 'N/A' ? '' : formData.serie
+            })}
+            className="mr-2 h-4 w-4 rounded border-gray-300"
+          />
+          <Label htmlFor="skipSerialNumber" className="text-sm font-normal cursor-pointer">
+            Echipamentul nu are număr de serie
+          </Label>
+        </div>
         {errors.serie && <p className="text-sm text-red-500">{errors.serie}</p>}
       </div>
       <div>

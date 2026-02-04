@@ -140,6 +140,13 @@ app.use(
     etag: false,
   })
 );
+app.use(
+  "/angajat-documents",
+  express.static(path.join(__dirname, "../public/angajat-documents"), {
+    maxAge: "1y",
+    etag: false,
+  })
+);
 app.use("/api/auth/login", loginLimiter);
 app.use(logRequest);
 

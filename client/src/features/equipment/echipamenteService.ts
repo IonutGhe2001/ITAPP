@@ -168,6 +168,8 @@ export const useCreateEchipament = () => {
     mutationFn: (data: EchipamentInput) => http.post<Echipament>('/echipamente', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EQUIPMENT });
+      // Invalidate PV queue in case equipment was assigned during creation
+      queryClient.invalidateQueries({ queryKey: ['pv', 'queue'] });
     },
   });
 };
@@ -179,6 +181,8 @@ export const useUpdateEchipament = () => {
       http.put<Echipament>(`/echipamente/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EQUIPMENT });
+      // Invalidate PV queue to show instant updates
+      queryClient.invalidateQueries({ queryKey: ['pv', 'queue'] });
     },
   });
 };

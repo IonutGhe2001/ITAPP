@@ -35,6 +35,7 @@ export type PvQueueItem = {
   id: string;
   employeeId: string;
   employee: string;
+  employeeEmail: string | null;
   equipment: string;
   allocationDate: string;
   location: string;

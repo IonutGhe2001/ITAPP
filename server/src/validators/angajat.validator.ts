@@ -36,4 +36,5 @@ export const getAngajatiQuerySchema = Joi.object({
   page: Joi.number().integer().min(1).default(1),
   pageSize: Joi.number().integer().min(1).max(100).default(25),
   department: Joi.string().uuid().optional(),
+  includeInactive: Joi.boolean().optional(),
 });

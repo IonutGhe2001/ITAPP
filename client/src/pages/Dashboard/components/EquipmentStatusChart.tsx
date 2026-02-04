@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import {
   Bar,
   BarChart,
@@ -61,67 +61,109 @@ const renderTooltip = ({
 
 export default function EquipmentStatusChart({ data }: EquipmentStatusChartProps) {
   const chartData = useMemo(() => data, [data]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Check initial dimensions
+    const checkDimensions = () => {
+      const rect = container.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        setDimensions({ width: rect.width, height: rect.height });
+      }
+    };
+
+    // Check dimensions after a brief delay to allow layout to complete
+    const timeoutId = setTimeout(checkDimensions, 100);
+
+    // Set up ResizeObserver to handle container size changes
+    let resizeObserver: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const { width, height } = entry.contentRect;
+          if (width > 0 && height > 0) {
+            setDimensions({ width, height });
+          }
+        }
+      });
+      resizeObserver.observe(container);
+    }
+
+    return () => {
+      clearTimeout(timeoutId);
+      resizeObserver?.disconnect();
+    };
+  }, []);
 
   return (
     <div
+      ref={containerRef}
       className="h-[320px] min-w-0 w-full"
       role="img"
       aria-label="Stare echipamente pe categorii"
     >
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={chartData} barGap={10} barSize={28}>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis
-            dataKey="status"
-            stroke="hsl(var(--muted-foreground))"
-            tickLine={false}
-            axisLine={false}
-          />
-          <YAxis
-            stroke="hsl(var(--muted-foreground))"
-            tickLine={false}
-            axisLine={false}
-            allowDecimals={false}
-          />
-          <Tooltip cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} content={renderTooltip} />
-          <Legend
-            verticalAlign="bottom"
-            align="center"
-            formatter={(value: string) =>
-              tooltipLabels[value as keyof typeof tooltipLabels] ?? value
-            }
-            wrapperStyle={{ paddingTop: 16 }}
-          />
-          <Bar
-            dataKey="allocated"
-            stackId="status"
-            name="Alocate"
-            fill={colors.allocated}
-            radius={[4, 4, 0, 0]}
-          />
-          <Bar
-            dataKey="in_stock"
-            stackId="status"
-            name="În stoc"
-            fill={colors.in_stock}
-            radius={[4, 4, 0, 0]}
-          />
-          <Bar
-            dataKey="repair"
-            stackId="status"
-            name="În mentenanță"
-            fill={colors.repair}
-            radius={[4, 4, 0, 0]}
-          />
-          <Bar
-            dataKey="retired"
-            stackId="status"
-            name="Retrase"
-            fill={colors.retired}
-            radius={[4, 4, 0, 0]}
-          />
-        </BarChart>
-      </ResponsiveContainer>
+      {dimensions && dimensions.width > 0 && dimensions.height > 0 ? (
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={chartData} barGap={10} barSize={28}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <XAxis
+              dataKey="status"
+              stroke="hsl(var(--muted-foreground))"
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              stroke="hsl(var(--muted-foreground))"
+              tickLine={false}
+              axisLine={false}
+              allowDecimals={false}
+            />
+            <Tooltip cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} content={renderTooltip} />
+            <Legend
+              verticalAlign="bottom"
+              align="center"
+              formatter={(value: string) =>
+                tooltipLabels[value as keyof typeof tooltipLabels] ?? value
+              }
+              wrapperStyle={{ paddingTop: 16 }}
+            />
+            <Bar
+              dataKey="allocated"
+              stackId="status"
+              name="Alocate"
+              fill={colors.allocated}
+              radius={[4, 4, 0, 0]}
+            />
+            <Bar
+              dataKey="in_stock"
+              stackId="status"
+              name="În stoc"
+              fill={colors.in_stock}
+              radius={[4, 4, 0, 0]}
+            />
+            <Bar
+              dataKey="repair"
+              stackId="status"
+              name="În mentenanță"
+              fill={colors.repair}
+              radius={[4, 4, 0, 0]}
+            />
+            <Bar
+              dataKey="retired"
+              stackId="status"
+              name="Retrase"
+              fill={colors.retired}
+              radius={[4, 4, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <div className="bg-muted/30 h-full w-full animate-pulse rounded-lg" aria-hidden />
+      )}
     </div>
   );
 }

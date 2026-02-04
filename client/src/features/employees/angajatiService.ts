@@ -15,6 +15,7 @@ export interface PaginatedAngajatiResponse {
 export interface GetAngajatiParams {
   pageSize?: number;
   department?: string;
+  includeInactive?: boolean;
 }
 
 const DEFAULT_QUERY_PARAMS: GetAngajatiParams = Object.freeze({});
@@ -29,6 +30,9 @@ export interface AngajatWithRelations extends Angajat {
   echipamente: Echipament[];
   checklist?: string[];
   licenses?: string[];
+  isActive?: boolean;
+  archivedAt?: string | null;
+  archivedBy?: string | null;
 }
 
 export interface AngajatInput {
@@ -146,3 +150,90 @@ export const useCreateEmailAccount = () => {
     },
   });
 };
+
+export const useArchiveAngajat = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => http.post<void>(`/angajati/${id}/archive`),
+    onSuccess: () => {
+      queryClient.resetQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
+    },
+  });
+};
+
+export const useUnarchiveAngajat = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => http.post<void>(`/angajati/${id}/unarchive`),
+    onSuccess: () => {
+      queryClient.resetQueries({ queryKey: QUERY_KEYS.EMPLOYEES });
+    },
+  });
+};
+
+export type DocumentType =
+  | 'PROCES_VERBAL'
+  | 'CONTRACT_ANGAJARE'
+  | 'CONTRACT_MUNCA'
+  | 'CERTIFICAT'
+  | 'DIPLOMA'
+  | 'EVALUARE'
+  | 'AVERTISMENT'
+  | 'DECIZIE'
+  | 'CERERE'
+  | 'ALTA_CORESPONDENTA'
+  | 'OTHER';
+
+export interface SearchDocumentsParams {
+  employeeName?: string;
+  documentType?: DocumentType;
+  uploadYear?: number;
+  includeInactive?: boolean;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface ArchiveDocument {
+  id: string;
+  name: string;
+  path: string;
+  type?: string;
+  size?: number;
+  documentType: DocumentType;
+  uploadYear: number;
+  createdAt: string;
+  uploadedBy?: string;
+  angajat: {
+    id: string;
+    numeComplet: string;
+    functie: string;
+    isActive: boolean;
+    archivedAt?: string | null;
+  };
+}
+
+export interface SearchDocumentsResponse {
+  data: ArchiveDocument[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export const searchArchiveDocuments = (params: SearchDocumentsParams) =>
+  http.get<SearchDocumentsResponse>('/angajati/archive/search', { params });
+
+export const useSearchArchiveDocuments = (params: SearchDocumentsParams) =>
+  useQuery<SearchDocumentsResponse>({
+    queryKey: ['archive-documents', params],
+    queryFn: () => searchArchiveDocuments(params),
+  });
+
+export const useAvailableDocumentYears = () =>
+  useQuery<number[]>({
+    queryKey: ['available-document-years'],
+    queryFn: async () => {
+      const response = await http.get('/angajati/archive/years');
+      return response as number[];
+    },
+  });

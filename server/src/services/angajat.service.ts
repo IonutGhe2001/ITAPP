@@ -18,6 +18,9 @@ const angajatSelect = {
   emailAccountCreatedAt: true,
   emailAccountResponsible: true,
   emailAccountLink: true,
+  isActive: true,
+  archivedAt: true,
+  archivedBy: true,
   echipamente: {
     where: {
       angajatId: {
@@ -38,15 +41,18 @@ export interface GetAngajatiParams {
   page: number;
   pageSize: number;
   department?: string;
+  includeInactive?: boolean;
 }
 
 export const getAngajati = async ({
   page,
   pageSize,
   department,
+  includeInactive = false,
 }: GetAngajatiParams) => {
   const where: Prisma.AngajatWhereInput = {
     ...(department ? { departmentConfigId: department } : {}),
+    ...(includeInactive ? {} : { isActive: true }),
   };
 
   const [total, angajati] = await prisma.$transaction([
@@ -148,6 +154,34 @@ export const getAngajatById = (id: string) => {
       departmentConfigId: true,
       checklist: true,
       licenses: true,
+      isActive: true,
+      archivedAt: true,
+      archivedBy: true,
+    },
+  });
+};
+
+export const archiveAngajat = async (
+  id: string,
+  archivedBy: string
+) => {
+  return prisma.angajat.update({
+    where: { id },
+    data: {
+      isActive: false,
+      archivedAt: new Date(),
+      archivedBy,
+    },
+  });
+};
+
+export const unarchiveAngajat = async (id: string) => {
+  return prisma.angajat.update({
+    where: { id },
+    data: {
+      isActive: true,
+      archivedAt: null,
+      archivedBy: null,
     },
   });
 };
@@ -173,9 +207,11 @@ export const deleteAngajat = (id: string) => {
     }
 
     // Delete ProcesVerbal records to avoid foreign key constraint violation
-    await tx.procesVerbal.deleteMany({
-      where: { angajatId: id },
-    });
+    if (tx.procesVerbal) {
+      await tx.procesVerbal.deleteMany({
+        where: { angajatId: id },
+      });
+    }
 
     await tx.angajat.delete({ where: { id } });
   });

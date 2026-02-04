@@ -15,6 +15,7 @@ const EmployeeForm = lazy(() => import('./features/employees/pages/EmployeeForm/
 const AppLayout = lazy(() => import('./layouts/AppLayout'));
 const ProfilePage = lazy(() => import('./pages/Profile/ProfilePage'));
 const SearchPage = lazy(() => import('./pages/Search/Search'));
+const ArchivePage = lazy(() => import('./pages/Archive/Archive'));
 const NotFound = lazy(() => import('./pages/NotFound/NotFound'));
 
 // Componentă pentru rute protejate
@@ -54,10 +55,11 @@ export default function AppRouter() {
             <Route index element={<Dashboard />} />
             <Route path={ROUTES.EQUIPMENT.slice(1)} element={<Echipamente />} />
             <Route path={ROUTES.EQUIPMENT_DETAIL.slice(1)} element={<EquipmentDetail />} />
-            <Route path={ROUTES.COLEGI} element={<Colegi />} />
+            <Route path={ROUTES.COLEGI.slice(1)} element={<Colegi />} />
             <Route path={ROUTES.EMPLOYEE_FORM.slice(1)} element={<EmployeeForm />} />
             <Route path={ROUTES.PROFILE.slice(1)} element={<ProfilePage />} />
             <Route path={ROUTES.SEARCH.slice(1)} element={<SearchPage />} />
+            <Route path={ROUTES.ARCHIVE.slice(1)} element={<ArchivePage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

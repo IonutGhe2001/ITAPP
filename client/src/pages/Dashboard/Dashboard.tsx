@@ -306,6 +306,51 @@ export default function Dashboard() {
     }
   };
 
+  const handleGenerateAndSendForSignature = async (item: PvQueueItem) => {
+    if (!item.employeeEmail) {
+      toast({
+        title: 'Email lipsă',
+        description: `Angajatul ${item.employee} nu are o adresă de email asociată.`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      setGeneratingPvId(item.id);
+      const objectUrl = await genereazaProcesVerbal(item.employeeId, 'PREDARE_PRIMIRE', {
+        fromChanges: true,
+      });
+      const fileName = `pv-${sanitizeFileName(item.employee)}.pdf`;
+      downloadPdf(objectUrl, fileName);
+      
+      // Create mailto link with subject and employee email
+      const subject = encodeURIComponent('De semnat PV');
+      const body = encodeURIComponent('');
+      const mailtoLink = `mailto:${item.employeeEmail}?subject=${subject}&body=${body}`;
+      
+      // Small delay to allow download to start before opening email client
+      setTimeout(() => {
+        window.location.href = mailtoLink;
+      }, 500);
+      
+      toast({
+        title: 'PV generat și email deschis',
+        description: `Atașați manual fișierul ${fileName} în emailul către ${item.employee}.`,
+      });
+    } catch (error) {
+      console.error('Eroare la generarea procesului verbal', error);
+      toast({
+        title: 'Eroare la generare',
+        description: 'Nu am putut genera procesul verbal. Încearcă din nou.',
+        variant: 'destructive',
+      });
+    } finally {
+      setGeneratingPvId(null);
+      void queryClient.invalidateQueries({ queryKey: ['pv', 'queue'] });
+    }
+  };
+
   const handleGenerateAllPv = async (queueItems: PvQueueItem[]) => {
     if (!queueItems.length) return;
     setIsGeneratingAll(true);
@@ -499,6 +544,7 @@ export default function Dashboard() {
               items={pvQueueItems}
               isLoading={pvQueueQuery.isLoading}
               onGenerate={handleGeneratePv}
+              onGenerateAndSend={handleGenerateAndSendForSignature}
               onGenerateAll={handleGenerateAllPv}
               generatingId={generatingPvId}
               isBulkGenerating={isGeneratingAll}

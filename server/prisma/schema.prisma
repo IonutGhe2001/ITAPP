@@ -47,6 +47,9 @@ model Angajat {
   emailAccountCreatedAt   DateTime?
   emailAccountResponsible String?
   emailAccountLink        String?
+  isActive                Boolean            @default(true)
+  archivedAt              DateTime?
+  archivedBy              String?
   echipamente             Echipament[]
   createdAt               DateTime           @default(now())
   proceseVerbale          ProcesVerbal[]
@@ -82,8 +85,6 @@ model Echipament {
   changes          EquipmentChange[]
   documents        EquipmentDocument[]
   images           EquipmentImage[]
-
-  @@unique([tip, serie])
 }
 
 model Eveniment {
@@ -140,15 +141,44 @@ model EquipmentDocument {
 }
 
 model AngajatDocument {
-  id         String   @id @default(uuid())
-  angajatId  String
-  angajat    Angajat  @relation(fields: [angajatId], references: [id], onDelete: Cascade)
-  name       String
-  path       String
-  type       String?
-  size       Int?
-  createdAt  DateTime @default(now())
-  uploadedBy String?
+  id           String                @id @default(uuid())
+  angajatId    String
+  angajat      Angajat               @relation(fields: [angajatId], references: [id], onDelete: Cascade)
+  name         String
+  path         String
+  type         String?
+  size         Int?
+  documentType DocumentType          @default(OTHER)
+  uploadYear   Int
+  createdAt    DateTime              @default(now())
+  uploadedBy   String?
+  accessLogs   DocumentAccessLog[]
+}
+
+enum DocumentType {
+  PROCES_VERBAL
+  CONTRACT_ANGAJARE
+  CONTRACT_MUNCA
+  CERTIFICAT
+  DIPLOMA
+  EVALUARE
+  AVERTISMENT
+  DECIZIE
+  CERERE
+  ALTA_CORESPONDENTA
+  OTHER
+}
+
+model DocumentAccessLog {
+  id               String          @id @default(uuid())
+  documentId       String
+  document         AngajatDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  userId           Int
+  userEmail        String
+  userName         String
+  action           String          @default("VIEW")
+  ipAddress        String?
+  timestamp        DateTime        @default(now())
 }
 
 model EquipmentImage {

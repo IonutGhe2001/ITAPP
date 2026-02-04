@@ -90,7 +90,10 @@ export const creeazaProcesVerbalCuEchipamente = async (
   return { procesVerbal, echipamentePredate, echipamentePrimite };
 };
 
-export const creeazaProcesVerbalDinSchimbari = async (angajatId: string) => {
+export const creeazaProcesVerbalDinSchimbari = async (
+  angajatId: string,
+  digitalSignature?: string | null
+) => {
   const schimbari: EquipmentChangeWithEchipament[] =
     await prisma.equipmentChange.findMany({
       where: {
@@ -114,17 +117,19 @@ export const creeazaProcesVerbalDinSchimbari = async (angajatId: string) => {
     )
     .map((schimbare) => schimbare.echipamentId);
 
-  const hasReplace = schimbari.some(
-    (schimbare) => schimbare.tip === EQUIPMENT_CHANGE_TYPE.REPLACE
-  );
-
   let tip: ProcesVerbalTip = ProcesVerbalTip.PREDARE_PRIMIRE;
+  
+  // Determine PV type based on what operations are pending together
   if (echipamentePredateIds.length && echipamentePrimiteIds.length) {
+    // Both returns AND receives in the same PV generation = SCHIMB (Switch)
+    // This means employee returned equipment and received equipment at the same time
     tip = ProcesVerbalTip.SCHIMB;
-  } else if (echipamentePredateIds.length) {
+  } else if (echipamentePredateIds.length && !echipamentePrimiteIds.length) {
+    // Only returns, no assignments - RESTITUIRE (Return)
     tip = ProcesVerbalTip.RESTITUIRE;
-    } else if (hasReplace) {
-    tip = ProcesVerbalTip.SCHIMB;
+  } else if (!echipamentePredateIds.length && echipamentePrimiteIds.length) {
+    // Only assignments, no returns - PREDARE_PRIMIRE (Receive)
+    tip = ProcesVerbalTip.PREDARE_PRIMIRE;
   }
 
   const uniquePredateIds = Array.from(new Set(echipamentePredateIds));
@@ -152,6 +157,7 @@ export const creeazaProcesVerbalDinSchimbari = async (angajatId: string) => {
     tip: procesVerbal.tip,
     data: new Date().toLocaleDateString("ro-RO"),
     firma: "Creative & Innovative Management SRL",
+    digitalSignature,
   });
 
   return {

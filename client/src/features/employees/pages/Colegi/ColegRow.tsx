@@ -18,9 +18,9 @@ interface ColegRowProps {
   handleDelete: (id: string) => void;
   setSelectedAngajatId: (id: string) => void;
   setSize: (index: number, size: number) => void;
-  pendingPV?: { predate: string[]; primite: string[] };
-  onGeneratePV: (colegId: string) => void;
   onOpenDetails: (coleg: AngajatWithRelations) => void;
+  onArchive?: (colegId: string) => void;
+  onUnarchive?: (colegId: string) => void;
 }
 
 const lifecycleTone = {
@@ -57,14 +57,13 @@ export default function ColegRow({
   handleDelete,
   setSelectedAngajatId,
   setSize,
-  pendingPV,
-  onGeneratePV,
   onOpenDetails,
+  onArchive,
+  onUnarchive,
 }: ColegRowProps) {
   const rowRef = useRef<HTMLDivElement>(null);
   const lifecycleStatus = getEmployeeLifecycleStatus(coleg as AngajatWithRelations);
   const department = useMemo(() => getDepartmentName(coleg as AngajatWithRelations), [coleg]);
-  const pendingPVCount = (pendingPV?.predate?.length ?? 0) + (pendingPV?.primite?.length ?? 0);
   const equipmentCount = Array.isArray(coleg.echipamente) ? coleg.echipamente.length : 0;
 
   useLayoutEffect(() => {
@@ -97,7 +96,6 @@ export default function ColegRow({
   const handleOpenDetails = () => onOpenDetails(coleg as AngajatWithRelations);
 
   const statusIndicatorClass = lifecycleTone[lifecycleStatus];
-  const showPendingPV = pendingPVCount > 0;
 
   return (
     <div style={style} className="px-2 sm:px-4">
@@ -159,15 +157,6 @@ export default function ColegRow({
               <span>{coleg.telefon}</span>
             </a>
           )}
-          {showPendingPV && (
-            <button
-              type="button"
-              onClick={() => onGeneratePV(coleg.id)}
-              className="text-left text-xs font-medium text-amber-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-            >
-              Procese verbale ({pendingPVCount})
-            </button>
-          )}
         </div>
         <div className="order-5 col-span-3 flex items-center gap-2 text-sm font-medium text-slate-700 sm:order-4 sm:col-span-1 sm:justify-center">
           {equipmentCount}
@@ -178,12 +167,21 @@ export default function ColegRow({
             <DropdownMenuItem onSelect={() => setSelectedAngajatId(coleg.id)}>
               Asignează echipament
             </DropdownMenuItem>
-            {showPendingPV && (
-              <DropdownMenuItem onSelect={() => onGeneratePV(coleg.id)}>
-                Generează PV
-              </DropdownMenuItem>
-            )}
             <DropdownMenuItem onSelect={() => setEditColeg(coleg)}>Editează</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {(coleg as AngajatWithRelations).isActive !== false ? (
+              onArchive && (
+                <DropdownMenuItem onSelect={() => onArchive(coleg.id)}>
+                  Arhivează angajat
+                </DropdownMenuItem>
+              )
+            ) : (
+              onUnarchive && (
+                <DropdownMenuItem onSelect={() => onUnarchive(coleg.id)}>
+                  Reactivează angajat
+                </DropdownMenuItem>
+              )
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive" onSelect={handleDeleteAction}>
               Șterge
