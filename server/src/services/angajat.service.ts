@@ -207,9 +207,11 @@ export const deleteAngajat = (id: string) => {
     }
 
     // Delete ProcesVerbal records to avoid foreign key constraint violation
-    await tx.procesVerbal.deleteMany({
-      where: { angajatId: id },
-    });
+    if (tx.procesVerbal) {
+      await tx.procesVerbal.deleteMany({
+        where: { angajatId: id },
+      });
+    }
 
     await tx.angajat.delete({ where: { id } });
   });
