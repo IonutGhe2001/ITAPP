@@ -187,3 +187,28 @@ describe('createEchipament', () => {
     expect(res).toMatchObject({ tip: 'Laptop', serie: 'N/A' });
   });
 });
+
+describe('updateEchipament with N/A serial', () => {
+  it('allows updating type when serie is N/A without duplicate check', async () => {
+    tx.echipament.findUnique.mockResolvedValue({
+      id: 'e1',
+      tip: 'Laptop',
+      serie: 'N/A',
+      angajatId: null,
+      stare: 'in_stoc',
+    });
+    tx.echipament.update.mockResolvedValue({ id: 'e1', tip: 'Desktop', serie: 'N/A', stare: 'in_stoc' });
+    (tx as any).equipmentChange = { create: jest.fn() };
+
+    const res = await updateEchipament('e1', { tip: 'Desktop' });
+
+    // findFirst should NOT be called for duplicate check since serial is N/A
+    expect(tx.echipament.findFirst).not.toHaveBeenCalled();
+    expect(tx.echipament.update).toHaveBeenCalledWith({
+      where: { id: 'e1' },
+      data: expect.objectContaining({ tip: 'Desktop' }),
+      include: { angajat: true },
+    });
+    expect(res).toMatchObject({ id: 'e1', tip: 'Desktop', serie: 'N/A' });
+  });
+});
