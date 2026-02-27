@@ -1,5 +1,5 @@
 import { jest, describe, it, expect, beforeEach } from '@jest/globals';
-import { updateEchipament } from '../src/services/echipament.service';
+import { updateEchipament, createEchipament } from '../src/services/echipament.service';
 import { creeazaProcesVerbalCuEchipamente } from '../src/services/procesVerbal.service';
 
 const tx = {
@@ -164,5 +164,26 @@ describe('updateEchipament', () => {
       include: { angajat: true },
     });
     expect(res).toEqual({ id: 'e1', stare: 'mentenanta', defectAt: now });
+  });
+});
+
+describe('createEchipament', () => {
+  it('allows creating multiple equipment of the same type when serie is N/A', async () => {
+    tx.echipament.findFirst.mockResolvedValue(null);
+    tx.echipament.create = jest.fn<(...args: any[]) => Promise<any>>().mockResolvedValue({
+      id: 'e2',
+      tip: 'Laptop',
+      serie: 'N/A',
+      angajatId: null,
+      stare: 'in_stoc',
+    });
+    (tx as any).equipmentChange = { create: jest.fn() };
+
+    const res = await createEchipament({ nume: 'Laptop 2', tip: 'Laptop', serie: 'N/A' });
+
+    // findFirst should NOT be called since serial is N/A
+    expect(tx.echipament.findFirst).not.toHaveBeenCalled();
+    expect(tx.echipament.create).toHaveBeenCalled();
+    expect(res).toMatchObject({ tip: 'Laptop', serie: 'N/A' });
   });
 });
