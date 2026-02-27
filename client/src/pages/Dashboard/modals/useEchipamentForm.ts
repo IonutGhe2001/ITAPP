@@ -55,15 +55,18 @@ export function useEchipamentForm(initial?: Partial<EchipamentFormData>) {
           metadataStr = JSON.stringify(metaObj);
         }
       }
+      const initialSerie = initial.serie ?? '';
+      const initialSkipSerialNumber = !initialSerie?.trim() || initialSerie.toUpperCase() === 'N/A';
       setFormData({
         nume: initial.nume ?? '',
-        serie: initial.serie ?? '',
+        serie: initialSerie,
         tip: initial.tip ?? '',
         angajatId: initial.angajatId ?? 'none',
         metadata: metadataStr,
         simOperator,
         simSerie,
         simExpirare,
+        skipSerialNumber: initialSkipSerialNumber,
       });
     }
   }, [initial]);

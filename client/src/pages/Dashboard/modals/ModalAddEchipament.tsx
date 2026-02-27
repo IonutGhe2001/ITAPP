@@ -50,7 +50,8 @@ export default function ModalAddEchipament({
 
     const payload = buildPayload();
 
-    const duplicate = echipamente.find((e) => e.tip === payload.tip && e.serie === payload.serie);
+    const isSerialNA = !payload.serie?.trim() || payload.serie.toUpperCase() === 'N/A';
+    const duplicate = !isSerialNA && echipamente.find((e) => e.tip === payload.tip && e.serie === payload.serie);
     if (duplicate) {
       setErrors((prev) => ({ ...prev, serie: 'Un echipament cu aceasta serie exista deja.' }));
       return;

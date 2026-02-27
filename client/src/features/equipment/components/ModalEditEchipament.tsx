@@ -52,7 +52,8 @@ function ModalEditEchipament({ echipament, onClose, onUpdated }: ModalEditEchipa
 
     const payload = buildPayload();
 
-    const duplicate = echipamente.find(
+    const isSerialNA = !payload.serie?.trim() || payload.serie.toUpperCase() === 'N/A';
+    const duplicate = !isSerialNA && echipamente.find(
       (e) => e.tip === payload.tip && e.serie === payload.serie && e.id !== echipament.id
     );
     if (duplicate) {
